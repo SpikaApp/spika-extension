@@ -15,7 +15,7 @@ const SentEventCard = ({
         <FileUploadIcon sx={{ fontSize: 24, marginRight: 2 }} color="primary" />
         To: {shortenAddress(to)}
         <br />
-        Amount sent: {amount}
+        Amount: {amount}
         <br />
         Txn No. {sequence_number}
       </ListItem>

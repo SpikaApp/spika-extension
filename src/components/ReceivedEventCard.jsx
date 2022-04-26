@@ -15,7 +15,7 @@ const ReceivedEventCard = ({
         <DownloadIcon sx={{ fontSize: 24, marginRight: 2 }} color="primary" />
         From: {shortenAddress(from)}
         <br />
-        Amount received: {amount}
+        Amount: {amount}
         <br />
         Txn No. {sequence_number}
       </ListItem>
