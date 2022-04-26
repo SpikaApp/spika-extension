@@ -1,14 +1,21 @@
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
   const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } = useContext(UIContext);
-  const { alertSignal, setAlertSignal, alertTitle, alertMessage } = useContext(AccountContext);
+  const { alertSignal, setAlertSignal, alertTitle, setAlertTitle, alertMessage, setAlertMessage, setMnemonic } =
+    useContext(AccountContext);
 
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigator.clipboard.writeText(alertMessage);
+  };
 
   const handleOpen = () => {
     alertSignal > 0 && setOpenAlertDialog(true);
@@ -30,7 +37,12 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setOpenSendDialog(false);
         break;
+      case 91:
         setOpenAlertDialog(false);
+        setAlertSignal(0);
+        setAlertTitle("");
+        setAlertMessage("");
+        setMnemonic("");
         break;
       case 2: // Failed create account
       case 12: // Failed import account
@@ -55,7 +67,18 @@ const AlertDialog = () => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
+      {alertSignal === 91 ? (
+        <DialogTitle id="alert-dialog-title">
+          {alertTitle}
+          <Tooltip title="Copy to clipboard">
+            <IconButton aria-label="copyToClipboard" onClick={handleClick}>
+              <ContentCopyIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </DialogTitle>
+      ) : (
+        <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
+      )}
       <DialogContent>
         <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
       </DialogContent>

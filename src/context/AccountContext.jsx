@@ -249,12 +249,14 @@ export const AccountProvider = ({ children }) => {
   return (
     <AccountContext.Provider
       value={{
-        alertSignal,
-        setAlertSignal,
         mnemonic,
         setMnemonic,
         alertTitle,
+        alertSignal,
+        setAlertSignal,
+        setAlertTitle,
         alertMessage,
+        setAlertMessage,
         isLoading,
         handleImport,
         currentAddress,

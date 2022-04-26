@@ -1,7 +1,30 @@
-import { Container, Typography, Link, Card, CardContent } from "@mui/material";
+import { useContext } from "react";
+import { Container, Typography, Link, Card, CardContent, CardActions, Button } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import KeyIcon from "@mui/icons-material/Key";
+import AlertDialog from "./components/AlertDialog";
+import { AccountContext } from "./context/AccountContext";
+import { UIContext } from "./context/UIContext";
 
 const About = () => {
+  const { setOpenAlertDialog } = useContext(UIContext);
+  const { setAlertSignal, setAlertTitle, setAlertMessage } = useContext(AccountContext);
+
+  const handleMnemonic = () => {
+    try {
+      var data = localStorage.getItem("mnemonic");
+      setAlertSignal(91);
+      setAlertTitle("Mnemonic Phrase");
+      setAlertMessage(data);
+      setOpenAlertDialog(true);
+    } catch (error) {
+      setAlertSignal(92);
+      setAlertTitle("Error");
+      setAlertMessage("No mnemonic found");
+      setOpenMnemonicDialog(true);
+    }
+  };
+
   return (
     <Container maxWidth="xs">
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
@@ -29,7 +52,13 @@ const About = () => {
             </Link>
           </Typography>
         </CardContent>
+        <CardActions>
+          <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonic}>
+            Reveal Mnemonic
+          </Button>
+        </CardActions>
       </Card>
+      <AlertDialog />
     </Container>
   );
 };
