@@ -7,3 +7,8 @@
   from = "/faucet/*"
   to = "https://faucet.devnet.aptoslabs.com/:splat"
   status = 200
+
+  [[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404
