@@ -18,9 +18,9 @@ const SendDialog = () => {
     <Dialog open={openSendDialog} onClose={handleCancel}>
       <DialogTitle>Send Transaction</DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText>
+        {/* <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText> */}
         <TextField
-          sx={{ marginBottom: 2 }}
+          sx={{ marginTop: 2, marginBottom: 2 }}
           id="recipientAddress"
           label="Recipient Address"
           fullWidth={true}

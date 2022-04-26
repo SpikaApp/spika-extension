@@ -18,9 +18,9 @@ const MintDialog = () => {
     <Dialog open={openMintDialog} onClose={handleCancel}>
       <DialogTitle>Mint Test Coins</DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ marginBottom: 2 }}>Enter amount to mint:</DialogContentText>
+        {/* <DialogContentText sx={{ marginBottom: 2 }}>Enter amount to mint:</DialogContentText> */}
         <TextField
-          sx={{ width: 200 }}
+          sx={{ marginTop: 2, width: 200 }}
           id="amount"
           label="Amount"
           type="number"
