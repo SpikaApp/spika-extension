@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as aptos from "aptos";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
@@ -30,6 +31,8 @@ export const AccountProvider = ({ children }) => {
   const [amount, setAmount] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
 
+  const navigate = useNavigate();
+
   const client = new aptos.AptosClient(NODE_URL);
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
@@ -60,6 +63,7 @@ export const AccountProvider = ({ children }) => {
 
   const handleLogout = () => {
     localStorage.clear();
+    navigate("/");
     window.location.reload();
   };
 
