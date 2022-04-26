@@ -16,7 +16,7 @@ const LogoutDialog = () => {
       <DialogTitle>Confirm Logout</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ marginBottom: 2 }}>
-          Confirm your mnemonic phrase is saved before logout
+          Make sure to save your mnemonic phrase before logout
           <br />
         </DialogContentText>
       </DialogContent>
