@@ -72,7 +72,7 @@ const AlertDialog = () => {
           {alertTitle}
           <Tooltip title="Copy to clipboard">
             <IconButton aria-label="copyToClipboard" onClick={handleClick}>
-              <ContentCopyIcon fontSize="inherit" />
+              <ContentCopyIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </DialogTitle>
