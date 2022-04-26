@@ -1,10 +1,10 @@
 import React from "react";
 import { ListItem, Divider } from "@mui/material";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
+import DownloadIcon from "@mui/icons-material/Download";
 import shortenAddress from "../utils/shortenAddress";
 
 const ReceivedEventCard = ({
-  ReceivedEvent: {
+  receivedEvent: {
     sequence_number,
     data: { amount, from },
   },
@@ -12,12 +12,12 @@ const ReceivedEventCard = ({
   return (
     <div className="sendEvent" key={sequence_number}>
       <ListItem button>
-        <FileUploadIcon sx={{ fontSize: 24, marginRight: 2 }} color="primary" />
+        <DownloadIcon sx={{ fontSize: 24, marginRight: 2 }} color="primary" />
+        From: {shortenAddress(from)}
+        <br />
+        Amount received: {amount}
+        <br />
         Txn No. {sequence_number}
-        <br />
-        Amount sent: {amount}
-        <br />
-        To: {shortenAddress(from)}
       </ListItem>
       <Divider />
     </div>
