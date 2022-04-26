@@ -1,0 +1,29 @@
+/* .MuiContainer-root {
+  margin-top: 2rem;
+} */
+
+.MuiCard-root {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.MuiCardMedia-media {
+  margin-top: 2rem;
+  max-width: 50px;
+  max-height: 50px;
+}
+
+.MuiCardActions-root {
+  margin-bottom: 2rem;
+}
+
+.MuiTextField-root {
+  width: 18rem;
+}
+
+.MuiAlert-root {
+  margin-top: 2rem;
+}
