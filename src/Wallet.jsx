@@ -48,7 +48,7 @@ const Wallet = () => {
             </Tooltip>
           ) : (
             <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
-              Welcome!
+              Welcome
             </Typography>
           )}
           {accountImported ? (
