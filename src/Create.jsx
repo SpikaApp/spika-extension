@@ -1,6 +1,4 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import BackspaceIcon from "@mui/icons-material/Backspace";
 
 import { Container, Typography, Card, CardActions, CardContent, Button, TextField } from "@mui/material";
 
@@ -12,13 +10,7 @@ import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Create = () => {
-  const { newMnemonic, setNewMnemonic, handleGenerate, handleCreate } = useContext(AccountContext);
-  const navigate = useNavigate("");
-
-  const handleClear = () => {
-    setNewMnemonic("");
-    navigate("/");
-  };
+  const { newMnemonic, handleGenerate, handleCreate } = useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
@@ -59,12 +51,9 @@ const Create = () => {
             </Button>
           </CardActions>
         ) : (
-          <CardActions sx={{ display: "flex", flexDirection: "column" }}>
-            <Button sx={{ marginBottom: 2 }} variant="contained" onClick={handleCreate}>
+          <CardActions>
+            <Button variant="contained" onClick={handleCreate}>
               Create Account
-            </Button>
-            <Button variant="outlined" onClick={handleClear}>
-              Clear
             </Button>
           </CardActions>
         )}
