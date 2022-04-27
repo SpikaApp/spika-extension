@@ -19,7 +19,7 @@ const Import = () => {
         <CardContent>
           <TextField
             id="standard-multiline-static"
-            label="Enter your mnemonic phrase"
+            label="Mnemonic phrase"
             margin="normal"
             autoFocus={true}
             multiline

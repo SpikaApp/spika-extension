@@ -1,4 +1,6 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import BackspaceIcon from "@mui/icons-material/Backspace";
 
 import { Container, Typography, Card, CardActions, CardContent, Button, TextField } from "@mui/material";
 
@@ -10,7 +12,13 @@ import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Create = () => {
-  const { mnemonic, setMnemonic, handleGenerate, handleCreate } = useContext(AccountContext);
+  const { newMnemonic, setNewMnemonic, handleGenerate, handleCreate } = useContext(AccountContext);
+  const navigate = useNavigate("");
+
+  const handleClear = () => {
+    setNewMnemonic("");
+    navigate("/");
+  };
 
   return (
     <Container maxWidth="xs">
@@ -20,7 +28,7 @@ const Create = () => {
         Create New Account
       </Typography>
       <Card>
-        {mnemonic === "" ? (
+        {newMnemonic === "" ? (
           <CardContent>
             <Typography variant="body1" align="center" color="textSecondary" gutterBottom>
               <InfoIcon color="primary" />
@@ -39,21 +47,24 @@ const Create = () => {
               multiline
               rows={6}
               variant="outlined"
-              value={mnemonic}
+              value={newMnemonic}
             />
           </CardContent>
         )}
 
-        {mnemonic === "" ? (
+        {newMnemonic === "" ? (
           <CardActions>
             <Button variant="outlined" onClick={handleGenerate}>
               Generate Mnemonic
             </Button>
           </CardActions>
         ) : (
-          <CardActions>
-            <Button variant="contained" onClick={handleCreate}>
+          <CardActions sx={{ display: "flex", flexDirection: "column" }}>
+            <Button sx={{ marginBottom: 2 }} variant="contained" onClick={handleCreate}>
               Create Account
+            </Button>
+            <Button variant="outlined" onClick={handleClear}>
+              Clear
             </Button>
           </CardActions>
         )}

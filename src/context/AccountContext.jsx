@@ -21,6 +21,7 @@ export const AccountProvider = ({ children }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mnemonic, setMnemonic] = useState("");
+  const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
   const [accountImported, setAccountImported] = useState(false);
   const [account, setAccount] = useState([]); // AptosAccount
@@ -46,7 +47,7 @@ export const AccountProvider = ({ children }) => {
 
   const generateMnemonic = () => {
     const mn = bip39.generateMnemonic(english.wordlist);
-    setMnemonic(mn);
+    setNewMnemonic(mn);
   };
 
   const handleCreate = async () => {
@@ -84,7 +85,7 @@ export const AccountProvider = ({ children }) => {
 
   const createAccount = async () => {
     try {
-      const accountSeed = bip39.mnemonicToSeedSync(mnemonic);
+      const accountSeed = bip39.mnemonicToSeedSync(newMnemonic);
       const seed = new Uint8Array(accountSeed).slice(0, 32);
       const keypair = sign.keyPair.fromSeed(seed);
       const secretKey = keypair.secretKey;
@@ -94,7 +95,7 @@ export const AccountProvider = ({ children }) => {
       let resources = await client.getAccountResources(account.address());
       let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
       localStorage.setItem("accountImported", JSON.stringify(true));
-      localStorage.setItem("mnemonic", mnemonic);
+      localStorage.setItem("mnemonic", newMnemonic);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -104,6 +105,7 @@ export const AccountProvider = ({ children }) => {
       setAlertSignal(1);
       setAlertTitle("Account Created");
       setAlertMessage(`Address:\n${shortenAddress(account.address().toString())}`);
+      setNewMnemonic("");
       setMnemonic("");
     } catch (error) {
       setError(true);
@@ -254,6 +256,8 @@ export const AccountProvider = ({ children }) => {
     <AccountContext.Provider
       value={{
         mnemonic,
+        newMnemonic,
+        setNewMnemonic,
         setMnemonic,
         alertTitle,
         alertSignal,
