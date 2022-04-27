@@ -45,7 +45,7 @@ const About = () => {
             Wallet version 0.0.1 <br />
             Aptos SDK version 0.0.15
             <br />
-            Copyrights 2022 by{" "}
+            Copyright 2022 by{" "}
             <Link href="https://github.com/xorgal" underline="none">
               {" "}
               xorgal
