@@ -56,7 +56,7 @@ const Transactions = () => {
               <TabPanel value="1">
                 {receivedEvents?.length > 0 ? (
                   <List
-                    sx={(style, { width: 350, display: "flex", flexDirection: "column", alignItems: "center" })}
+                    sx={(style, { display: "flex", flexDirection: "column", alignItems: "start" })}
                     component="nav"
                     aria-label="receivedTxns"
                   >
@@ -73,7 +73,7 @@ const Transactions = () => {
               <TabPanel value="2">
                 {sentEvents?.length > 0 ? (
                   <List
-                    sx={(style, { width: 350, display: "flex", flexDirection: "column", alignItems: "center" })}
+                    sx={(style, { display: "flex", flexDirection: "column", alignItems: "start" })}
                     component="nav"
                     aria-label="sentTxns"
                   >
