@@ -43,7 +43,7 @@ const Create = () => {
               id="standard-multiline-static"
               label="Mnemonic phrase"
               margin="normal"
-              autoFocus={true}
+              autoFocus={false}
               multiline
               rows={6}
               variant="outlined"
