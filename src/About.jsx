@@ -46,7 +46,7 @@ const About = () => {
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
             Wallet version 0.0.2 <br />
-            Aptos SDK version 0.0.15
+            Aptos SDK version 0.0.18
             <br />
             Copyright 2022 by{" "}
             <Link href="https://github.com/xorgal" underline="none">
