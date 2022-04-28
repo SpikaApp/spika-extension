@@ -45,7 +45,7 @@ const About = () => {
       <Card>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.0.1 <br />
+            Wallet version 0.0.2 <br />
             Aptos SDK version 0.0.15
             <br />
             Copyright 2022 by{" "}
