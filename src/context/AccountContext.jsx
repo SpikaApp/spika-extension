@@ -6,8 +6,8 @@ import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
 import shortenAddress from "../utils/shortenAddress";
 
-const NODE_URL = "/api";
-const FAUCET_URL = "/faucet";
+export const NODE_URL = "/api";
+export const FAUCET_URL = "/faucet";
 
 // const NODE_URL = process.env.APTOS_NODE_URL || "https://fullnode.devnet.aptoslabs.com";
 // const FAUCET_URL = process.env.APTOS_FAUCET_URL || "https://faucet.devnet.aptoslabs.com";

@@ -1,14 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Container, Typography, Link, Card, CardContent, CardActions, Button } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import KeyIcon from "@mui/icons-material/Key";
 import AlertDialog from "./components/AlertDialog";
 import { AccountContext } from "./context/AccountContext";
 import { UIContext } from "./context/UIContext";
+import useAxios from "./utils/useAxios";
+import { NODE_URL } from "./context/AccountContext";
 
 const About = () => {
   const { setOpenAlertDialog } = useContext(UIContext);
-  const { setAlertSignal, setAlertTitle, setAlertMessage } = useContext(AccountContext);
+  const { setAlertSignal, setAlertTitle, setAlertMessage, accountImported } = useContext(AccountContext);
+  const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   const handleMnemonic = () => {
     try {
@@ -37,7 +40,7 @@ const About = () => {
         <Link href="https://aptoslabs.com/" underline="none">
           APTOS
         </Link>{" "}
-        Blockchain
+        Blockchain (id: {chain_id})
       </Typography>
       <Card>
         <CardContent>
@@ -53,9 +56,11 @@ const About = () => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonic}>
-            Reveal Mnemonic
-          </Button>
+          {accountImported && (
+            <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonic}>
+              Reveal Mnemonic
+            </Button>
+          )}
         </CardActions>
       </Card>
       <AlertDialog />
