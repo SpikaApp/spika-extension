@@ -22,7 +22,7 @@ const SendDialog = () => {
         <TextField
           sx={{ marginTop: 2, marginBottom: 2 }}
           id="recipientAddress"
-          label="Recipient Address"
+          label="Recipient's Address"
           fullWidth={true}
           type="string"
           value={recipientAddress}
