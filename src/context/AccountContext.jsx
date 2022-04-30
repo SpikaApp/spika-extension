@@ -195,7 +195,7 @@ export const AccountProvider = ({ children }) => {
       await faucetClient.fundAccount(account.address(), amount);
       setAlertSignal(21);
       setAlertTitle("Woohoo! Airdrop :)");
-      setAlertMessage(`Received ${amount} Test Coins`);
+      setAlertMessage(`Received ${amount} TestCoin`);
     } catch (error) {
       setError(true);
       setAlertSignal(22);
@@ -222,7 +222,7 @@ export const AccountProvider = ({ children }) => {
 
       setAlertSignal(31);
       setAlertTitle("Transaction sent");
-      setAlertMessage(`${amount} Test Coins sent to ${shortenAddress(recipientAddress)}`);
+      setAlertMessage(`${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`);
     } catch (error) {
       setError(true);
       setAlertSignal(32);

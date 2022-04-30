@@ -53,7 +53,7 @@ const Wallet = () => {
           )}
           {accountImported ? (
             <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
-              {balance} Aptos
+              {balance} TestCoin
             </Typography>
           ) : (
             <Typography align="center" color="textSecondary" gutterBottom>
