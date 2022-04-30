@@ -41,7 +41,7 @@ const Wallet = () => {
       </Typography>
       <Card>
         {accountImported && <CardMedia component="img" image={aptos_logo} alt="aptos" />}
-        <CardContent>
+        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
             <Tooltip title="Copy address">
               <Chip sx={{ marginBottom: 1 }} label={shortenAddress(currentAddress)} onClick={handleClick} />
