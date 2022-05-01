@@ -8,8 +8,16 @@ import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
   const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } = useContext(UIContext);
-  const { alertSignal, setAlertSignal, alertTitle, setAlertTitle, alertMessage, setAlertMessage, setMnemonic } =
-    useContext(AccountContext);
+  const {
+    alertSignal,
+    setAlertSignal,
+    alertTitle,
+    setAlertTitle,
+    alertMessage,
+    setAlertMessage,
+    setMnemonic,
+    handleLogout,
+  } = useContext(AccountContext);
 
   const navigate = useNavigate();
 
@@ -57,6 +65,9 @@ const AlertDialog = () => {
       case 92: // No mnemonic phrase found
         setOpenAlertDialog(false);
         break;
+      case 93: // Unencrypted data is not supported in this version. Please login again to start using encryption
+        setOpenAlertDialog(false);
+        handleLogout();
     }
     setAlertSignal(0);
   };

@@ -6,6 +6,7 @@ import { AccountProvider } from "./context/AccountContext";
 import { CssBaseline } from "@mui/material";
 import { Box } from "@mui/material";
 import { theme } from "./theme";
+import AlertDialog from "./components/AlertDialog";
 import LoginDialog from "./components/LoginDialog";
 import "./index.css";
 
@@ -33,6 +34,7 @@ const App = () => {
               </Box>
             </div>
             <LoginDialog />
+            <AlertDialog />
           </AccountProvider>
         </UIProvider>
       </ThemeProvider>

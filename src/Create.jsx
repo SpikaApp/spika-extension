@@ -48,7 +48,7 @@ const Create = () => {
               label="Password"
               type="password"
               autoFocus={true}
-              autoComplete="current-password"
+              // autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -57,7 +57,7 @@ const Create = () => {
               id="confirmPassword"
               label="Confirm password"
               type="password"
-              autoComplete="current-password"
+              // autoComplete="current-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
@@ -79,7 +79,6 @@ const Create = () => {
         )}
       </Card>
       <Loading />
-      <AlertDialog />
     </Container>
   );
 };

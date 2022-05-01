@@ -37,7 +37,7 @@ export const AccountProvider = ({ children }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired } = useContext(UIContext);
+  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired, setOpenAlertDialog } = useContext(UIContext);
 
   const navigate = useNavigate();
 
@@ -59,8 +59,17 @@ export const AccountProvider = ({ children }) => {
 
   const checkIfLoginRequired = () => {
     try {
+      const oldMnemonic = localStorage.getItem("mnemonic"); // if unencrypted mnemonic found -> logout
       const data = JSON.parse(localStorage.getItem("accountImported"));
-      if (data === true) {
+
+      if (oldMnemonic !== null && oldMnemonic.length > 0) {
+        throwAlert(
+          93,
+          "Logout performed",
+          "Unencrypted data is not supported in this version. Please login again to start using encryption"
+        );
+        setOpenAlertDialog(true);
+      } else if (data === true) {
         handleLoginUI();
       } else {
         navigate("/");

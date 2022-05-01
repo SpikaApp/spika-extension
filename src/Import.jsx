@@ -36,7 +36,7 @@ const Import = () => {
             type="password"
             size="small"
             autoFocus={true}
-            autoComplete="current-password"
+            // autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -46,7 +46,7 @@ const Import = () => {
             label="Confirm password"
             type="password"
             size="small"
-            autoComplete="current-password"
+            // autoComplete="current-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -58,7 +58,6 @@ const Import = () => {
         </CardActions>
       </Card>
       <Loading />
-      <AlertDialog />
     </Container>
   );
 };

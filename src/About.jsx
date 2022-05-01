@@ -52,7 +52,6 @@ const About = () => {
           )}
         </CardActions>
       </Card>
-      <AlertDialog />
     </Container>
   );
 };
