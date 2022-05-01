@@ -37,6 +37,7 @@ const Create = () => {
               label="Mnemonic phrase"
               margin="normal"
               autoFocus={false}
+              autoComplete="off"
               multiline
               rows={6}
               variant="outlined"
@@ -48,7 +49,7 @@ const Create = () => {
               label="Password"
               type="password"
               autoFocus={true}
-              // autoComplete="current-password"
+              autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -57,7 +58,7 @@ const Create = () => {
               id="confirmPassword"
               label="Confirm password"
               type="password"
-              // autoComplete="current-password"
+              autoComplete="off"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />

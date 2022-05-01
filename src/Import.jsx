@@ -23,6 +23,7 @@ const Import = () => {
             label="Enter mnemonic phrase"
             margin="normal"
             autoFocus={true}
+            autoComplete="off"
             multiline
             rows={6}
             variant="outlined"
@@ -35,7 +36,7 @@ const Import = () => {
             label="Password"
             type="password"
             autoFocus={true}
-            // autoComplete="current-password"
+            autoComplete="off"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -44,7 +45,7 @@ const Import = () => {
             id="confirmPassword"
             label="Confirm password"
             type="password"
-            // autoComplete="current-password"
+            autoComplete="off"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
