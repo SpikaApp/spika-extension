@@ -10,7 +10,7 @@ const ReceivedEventCard = ({
   },
 }) => {
   return (
-    <div className="sendEvent" key={sequence_number}>
+    <div className="ReceivedEvent" key={sequence_number}>
       <ListItem>
         <DownloadIcon sx={{ fontSize: 24, marginRight: 2 }} color="primary" />
         From: {shortenAddress(from)}
