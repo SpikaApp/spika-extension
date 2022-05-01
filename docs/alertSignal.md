@@ -17,7 +17,7 @@
 ---
 
 - 21: Coins minted
-- 22: Failed mint coins
+- 22: Mint failed
 
 ---
 
@@ -28,3 +28,15 @@
 
 - 41: Account loaded
 - 42: Failed load account
+
+---
+
+- 52: Password field cannot be empty
+- 53: Passwords do not match
+- 54: Password must be at least 6 characters long
+- 55: Incorrect password
+
+---
+
+- 91: Mnemonic phrase
+- 92: No mnemonic phrase found
