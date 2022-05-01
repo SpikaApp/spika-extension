@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import * as aptos from "aptos";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
 import shortenAddress from "../utils/shortenAddress";
+import * as passworder from "@metamask/browser-passworder";
+import { UIContext } from "./UIContext";
 
 // export const NODE_URL = "/api";
 // export const FAUCET_URL = "/faucet";
@@ -18,22 +20,24 @@ export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
 export const AccountContext = React.createContext();
 
 export const AccountProvider = ({ children }) => {
-  const [error, setError] = useState(true);
   const [alertSignal, setAlertSignal] = useState(0);
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [accountImported, setAccountImported] = useState(false);
   const [mnemonic, setMnemonic] = useState("");
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
-  const [accountImported, setAccountImported] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
   const [account, setAccount] = useState([]); // AptosAccount
-  const [currentAddress, setCurrentAddress] = useState(""); // PublicKey in HexString
   const [balance, setBalance] = useState([]);
   const [sentEvents, setSentEvents] = useState([]);
   const [receivedEvents, setReceivedEvents] = useState([]);
   const [amount, setAmount] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired } = useContext(UIContext);
 
   const navigate = useNavigate();
 
@@ -41,7 +45,7 @@ export const AccountProvider = ({ children }) => {
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
   useEffect(() => {
-    loadAccount();
+    checkIfLoginRequired();
   }, []);
 
   const handleGenerate = () => {
@@ -53,16 +57,86 @@ export const AccountProvider = ({ children }) => {
     setNewMnemonic(mn);
   };
 
+  const checkIfLoginRequired = () => {
+    try {
+      const data = JSON.parse(localStorage.getItem("accountImported"));
+      if (data === true) {
+        handleLoginUI();
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      setAccountImported(false);
+      console.log(error);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      setOpenLoginDialog(false);
+      setIsLoading(true);
+      await loadAccount();
+      setIsLoading(false);
+      setPassword("");
+    } catch (error) {
+      setOpenLoginDialog(false);
+      throwAlert(62, "Error", "Failed load account");
+      setPassword("");
+      console.log("Error occured during loading account");
+    }
+  };
+
+  const handleRevealMnemonic = async () => {
+    try {
+      const encryptedMnemonic = localStorage.getItem("data");
+      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      throwAlert(91, "Mnemonic Phrase", decryptedMnemonic);
+      setPassword("");
+      setMnemonicRequired(false);
+      setOpenLoginDialog(false);
+    } catch (error) {
+      throwAlert(92, "Error", "Incorrect password");
+      setPassword("");
+      setMnemonicRequired(false);
+      setOpenLoginDialog(false);
+    }
+  };
+
   const handleCreate = async () => {
-    setIsLoading(true);
-    await createAccount();
-    setIsLoading(false);
+    if (password === confirmPassword && password.length > 5) {
+      setIsLoading(true);
+      await createAccount();
+      clearPasswords();
+      setIsLoading(false);
+    } else if (password === "") {
+      throwAlert(52, "Incorrect password", "Password field cannot be empty");
+      clearPasswords();
+    } else if (password !== confirmPassword) {
+      throwAlert(53, "Incorrect password", "Passwords do not match");
+      clearPasswords();
+    } else if ([password.length > 5]) {
+      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+      clearPasswords();
+    }
   };
 
   const handleImport = async () => {
-    setIsLoading(true);
-    await importAccount();
-    setIsLoading(false);
+    if (password === confirmPassword && password.length > 5) {
+      setIsLoading(true);
+      await importAccount();
+      clearPasswords();
+      setIsLoading(false);
+      setIsLoading(false);
+    } else if (password === "") {
+      throwAlert(52, "Incorrect password", "Password field cannot be empty");
+      clearPasswords();
+    } else if (password !== confirmPassword) {
+      throwAlert(53, "Incorrect password", "Passwords do not match");
+      clearPasswords();
+    } else if ([password.length > 5]) {
+      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+      clearPasswords();
+    }
   };
 
   const handleLogout = () => {
@@ -86,6 +160,17 @@ export const AccountProvider = ({ children }) => {
     setAmount("");
   };
 
+  const clearPasswords = () => {
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const throwAlert = (signal, title, message) => {
+    setAlertSignal(signal);
+    setAlertTitle(title);
+    setAlertMessage(message);
+  };
+
   const createAccount = async () => {
     try {
       const accountSeed = bip39.mnemonicToSeedSync(newMnemonic);
@@ -97,24 +182,19 @@ export const AccountProvider = ({ children }) => {
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
       let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+      let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       localStorage.setItem("accountImported", JSON.stringify(true));
-      localStorage.setItem("mnemonic", newMnemonic);
+      localStorage.setItem("data", encryptedMnemonic);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
       setCurrentAddress(account.address().toString());
       setBalance(accountBalance.data.coin.value);
-
-      setAlertSignal(1);
-      setAlertTitle("Account Created");
-      setAlertMessage(`Address:\n${shortenAddress(account.address().toString())}`);
       setNewMnemonic("");
       setMnemonic("");
+      throwAlert(1, "Account Created", `Address:\n${shortenAddress(account.address().toString())}`);
     } catch (error) {
-      setError(true);
-      setAlertSignal(2);
-      setAlertTitle("Error");
-      setAlertMessage("Failed create account");
+      throwAlert(2, "Error", "Failed create account");
       console.log(error);
     }
   };
@@ -129,63 +209,51 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
       let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+      let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       localStorage.setItem("accountImported", JSON.stringify(true));
-      localStorage.setItem("mnemonic", mnemonic);
+      localStorage.setItem("data", encryptedMnemonic);
+
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
       setCurrentAddress(account.address().toString());
       setBalance(accountBalance.data.coin.value);
-
-      setAlertSignal(11);
-      setAlertTitle("Account Imported");
-      setAlertMessage(`Address:\n${shortenAddress(account.address().toString())}`);
       setMnemonic("");
+      throwAlert(11, "Account Imported", `Address:\n${shortenAddress(account.address().toString())}`);
     } catch (error) {
-      setError(true);
-      setAlertSignal(12);
-      setAlertTitle("Error");
-      setAlertMessage("Failed import account");
+      throwAlert(12, "Error", "Failed import account");
       console.log(error);
     }
   };
 
   const loadAccount = async () => {
     try {
-      const data = JSON.parse(localStorage.getItem("accountImported"));
-      if (data === true) {
-        const storedMnemonic = localStorage.getItem("mnemonic");
-        try {
-          setIsLoading(true);
-          const accountSeed = bip39.mnemonicToSeedSync(storedMnemonic);
-          const seed = new Uint8Array(accountSeed).slice(0, 32);
-          const keypair = sign.keyPair.fromSeed(seed);
-          const secretKey = keypair.secretKey;
-          const address = keypair.publicKey.Hex;
-          const account = new aptos.AptosAccount(secretKey, address);
-          let resources = await client.getAccountResources(account.address());
-          let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
-
-          setAccountImported(true);
-          setPrivateKey(secretKey);
-          setAccount(account);
-          setCurrentAddress(account.address().toString());
-          setBalance(accountBalance.data.coin.value);
-          setIsLoading(false);
-        } catch (error) {
-          setError(true);
-          setAlertSignal(42);
-          setAlertTitle("Error");
-          setAlertMessage("Failed load account");
-          localStorage.clear();
-          console.log(error);
-          setIsLoading(false);
-        }
-      } else {
-        setAccountImported(false);
+      const encryptedMnemonic = localStorage.getItem("data");
+      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      try {
+        const accountSeed = bip39.mnemonicToSeedSync(decryptedMnemonic);
+        const seed = new Uint8Array(accountSeed).slice(0, 32);
+        const keypair = sign.keyPair.fromSeed(seed);
+        const secretKey = keypair.secretKey;
+        const address = keypair.publicKey.Hex;
+        const account = new aptos.AptosAccount(secretKey, address);
+        let resources = await client.getAccountResources(account.address());
+        let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+        setAccountImported(true);
+        setPrivateKey(secretKey);
+        setAccount(account);
+        setCurrentAddress(account.address().toString());
+        setBalance(accountBalance.data.coin.value);
+      } catch (error) {
+        localStorage.clear();
+        console.log(error);
+        throwAlert(42, "Error", "Failed load account");
       }
     } catch (error) {
       console.log(error);
+      throwAlert(55, "Error", "Incorrect password");
+      setPassword("");
+      setOpenLoginDialog(true);
     }
   };
 
@@ -193,14 +261,9 @@ export const AccountProvider = ({ children }) => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      setAlertSignal(21);
-      setAlertTitle("Woohoo! Airdrop :)");
-      setAlertMessage(`Received ${amount} TestCoin`);
+      throwAlert(21, "Woohoo! Airdrop :)", `Received ${amount} TestCoin`);
     } catch (error) {
-      setError(true);
-      setAlertSignal(22);
-      setAlertTitle("Error");
-      setAlertMessage("Failed mint coins");
+      throwAlert(22, "Error", "Mint failed");
       setIsLoading(false);
       console.log(error);
     }
@@ -219,15 +282,9 @@ export const AccountProvider = ({ children }) => {
       const signedTxn = await client.signTransaction(account, txnRequest);
       const transactionRes = await client.submitTransaction(account, signedTxn);
       await client.waitForTransaction(transactionRes.hash);
-
-      setAlertSignal(31);
-      setAlertTitle("Transaction sent");
-      setAlertMessage(`${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`);
+      throwAlert(31, "Transaction sent", `${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`);
     } catch (error) {
-      setError(true);
-      setAlertSignal(32);
-      setAlertTitle("Error");
-      setAlertMessage("Transaction failed");
+      throwAlert(32, "Error", "Transaction failed");
       setIsLoading(false);
       console.log(error);
     }
@@ -287,6 +344,12 @@ export const AccountProvider = ({ children }) => {
         getReceivedEvents,
         receivedEvents,
         handleLogout,
+        password,
+        setPassword,
+        confirmPassword,
+        setConfirmPassword,
+        handleLogin,
+        handleRevealMnemonic,
       }}
     >
       {children}

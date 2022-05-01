@@ -50,6 +50,11 @@ const AlertDialog = () => {
       case 32: // Transaction failed
       case 41: // Account loaded from localStorage
       case 42: // Failed load account
+      case 52: // Password field cannot be empty
+      case 53: // Passwords do not match
+      case 54: // Password must at least 6 characters long
+      case 55: // Failed load account
+      case 92: // No mnemonic phrase found
         setOpenAlertDialog(false);
         break;
     }

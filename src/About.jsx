@@ -9,24 +9,9 @@ import useAxios from "./utils/useAxios";
 import { NODE_URL } from "./context/AccountContext";
 
 const About = () => {
-  const { setOpenAlertDialog } = useContext(UIContext);
-  const { setAlertSignal, setAlertTitle, setAlertMessage, accountImported } = useContext(AccountContext);
+  const { accountImported } = useContext(AccountContext);
+  const { handleMnemonicUI } = useContext(UIContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
-
-  const handleMnemonic = () => {
-    try {
-      var data = localStorage.getItem("mnemonic");
-      setAlertSignal(91);
-      setAlertTitle("Mnemonic Phrase");
-      setAlertMessage(data);
-      setOpenAlertDialog(true);
-    } catch (error) {
-      setAlertSignal(92);
-      setAlertTitle("Error");
-      setAlertMessage("No mnemonic found");
-      setOpenMnemonicDialog(true);
-    }
-  };
 
   return (
     <Container maxWidth="xs">
@@ -45,7 +30,7 @@ const About = () => {
       <Card>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.0.2 <br />
+            Wallet version 0.0.3 <br />
             Aptos SDK version 0.0.18
             <br />
             Copyright 2022 by{" "}
@@ -53,11 +38,15 @@ const About = () => {
               {" "}
               xorgal
             </Link>
+            <br />
+            <Link href="mailto:spika@xorgal.xyz" underline="none">
+              spika@xorgal.xyz
+            </Link>
           </Typography>
         </CardContent>
         <CardActions>
           {accountImported && (
-            <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonic}>
+            <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonicUI}>
               Reveal Mnemonic
             </Button>
           )}

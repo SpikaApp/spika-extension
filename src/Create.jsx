@@ -10,7 +10,8 @@ import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Create = () => {
-  const { newMnemonic, handleGenerate, handleCreate } = useContext(AccountContext);
+  const { newMnemonic, handleGenerate, handleCreate, password, setPassword, confirmPassword, setConfirmPassword } =
+    useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
@@ -30,9 +31,9 @@ const Create = () => {
             </Typography>
           </CardContent>
         ) : (
-          <CardContent>
+          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <TextField
-              id="standard-multiline-static"
+              id="newMnemonic"
               label="Mnemonic phrase"
               margin="normal"
               autoFocus={false}
@@ -40,6 +41,25 @@ const Create = () => {
               rows={6}
               variant="outlined"
               value={newMnemonic}
+            />
+            <TextField
+              sx={{ marginTop: 4 }}
+              id="password"
+              label="Password"
+              type="password"
+              autoFocus={true}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextField
+              sx={{ marginTop: 2, marginBottom: 2 }}
+              id="confirmPassword"
+              label="Confirm password"
+              type="password"
+              autoComplete="current-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </CardContent>
         )}

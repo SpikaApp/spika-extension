@@ -6,7 +6,8 @@ import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Import = () => {
-  const { mnemonic, setMnemonic, handleImport } = useContext(AccountContext);
+  const { mnemonic, setMnemonic, handleImport, password, setPassword, confirmPassword, setConfirmPassword } =
+    useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
@@ -16,10 +17,10 @@ const Import = () => {
         Import Account
       </Typography>
       <Card>
-        <CardContent>
+        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <TextField
             id="standard-multiline-static"
-            label="Mnemonic phrase"
+            label="Enter mnemonic phrase"
             margin="normal"
             autoFocus={true}
             multiline
@@ -27,6 +28,27 @@ const Import = () => {
             variant="outlined"
             value={mnemonic}
             onChange={(e) => setMnemonic(e.target.value)}
+          />
+          <TextField
+            sx={{ marginTop: 4 }}
+            id="password"
+            label="Password"
+            type="password"
+            size="small"
+            autoFocus={true}
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <TextField
+            sx={{ marginTop: 2, marginBottom: 2 }}
+            id="confirmPassword"
+            label="Confirm password"
+            type="password"
+            size="small"
+            autoComplete="current-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </CardContent>
         <CardActions>
