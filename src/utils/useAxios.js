@@ -15,7 +15,6 @@ const useAxios = (url, searchId) => {
         console.error(error);
       });
   }, [searchId]);
-  console.log(result);
   return { result };
 };
 
