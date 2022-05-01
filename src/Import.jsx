@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { Container, Typography, Card, CardActions, CardContent, Button, TextField } from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
-import AlertDialog from "./components/AlertDialog";
 import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
