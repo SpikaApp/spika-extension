@@ -34,7 +34,6 @@ const Import = () => {
             id="password"
             label="Password"
             type="password"
-            size="small"
             autoFocus={true}
             // autoComplete="current-password"
             value={password}
@@ -45,7 +44,6 @@ const Import = () => {
             id="confirmPassword"
             label="Confirm password"
             type="password"
-            size="small"
             // autoComplete="current-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
