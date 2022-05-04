@@ -1,14 +1,5 @@
 import { useContext } from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  TextField,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
@@ -22,7 +13,7 @@ const LoginDialog = () => {
       <DialogContent>
         <DialogContentText>Enter password to continue</DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ display: "flex", flexDirection: "column" }}>
+      <DialogActions sx={{ display: "flex", flexDirection: "column", width: 340 }}>
         <form className="login-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <TextField
