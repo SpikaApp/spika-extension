@@ -69,7 +69,10 @@ const Navbar = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="relative">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <div className="menu-btn">
+          <div className="menu">
+            <IconButton aria-label="home" size="normal" onClick={handleHome}>
+              <HomeIcon sx={{ color: "white" }} />
+            </IconButton>
             <Button
               id="menu-button"
               aria-controls={open ? "menu" : undefined}
@@ -124,9 +127,6 @@ const Navbar = () => {
                 </Link>
               </MenuItem>
             </StyledMenu>
-            <IconButton aria-label="home" size="normal" onClick={handleHome}>
-              <HomeIcon sx={{ color: "white" }} />
-            </IconButton>
           </div>
           {accountImported && (
             <Button color="inherit" onClick={handleLogoutUI}>
