@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import { AppBar, Box, Toolbar, Button, Menu, MenuItem, Divider } from "@mui/material";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { AppBar, Box, Toolbar, Button, Menu, MenuItem, Divider, IconButton } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import HomeIcon from "@mui/icons-material/Home";
 import { styled, alpha } from "@mui/material/styles";
 import Link from "@mui/material/Link";
 import { AccountContext } from "./context/AccountContext";
@@ -50,11 +51,18 @@ const Navbar = () => {
   const { handleLogoutUI } = useContext(UIContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const navigate = useNavigate();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleHome = () => {
+    navigate("/");
   };
 
   return (
@@ -116,6 +124,9 @@ const Navbar = () => {
                 </Link>
               </MenuItem>
             </StyledMenu>
+            <IconButton aria-label="home" size="normal" onClick={handleHome}>
+              <HomeIcon sx={{ color: "white" }} />
+            </IconButton>
           </div>
           {accountImported && (
             <Button color="inherit" onClick={handleLogoutUI}>
