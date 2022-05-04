@@ -27,38 +27,41 @@ const Create = () => {
             </Typography>
           </CardContent>
         ) : (
-          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <TextField
-              id="newMnemonic"
-              label="Mnemonic phrase"
-              margin="normal"
-              autoFocus={false}
-              autoComplete="off"
-              multiline
-              rows={6}
-              variant="outlined"
-              value={newMnemonic}
-            />
-            <TextField
-              sx={{ marginTop: 4 }}
-              id="password"
-              label="Password"
-              type="password"
-              autoFocus={true}
-              autoComplete="off"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <TextField
-              sx={{ marginTop: 2, marginBottom: 2 }}
-              id="confirmPassword"
-              label="Confirm password"
-              type="password"
-              autoComplete="off"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </CardContent>
+          <form className="create-form">
+            <input hidden type="text" autoComplete="username" value={undefined}></input>
+            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <TextField
+                id="newMnemonic"
+                label="Mnemonic phrase"
+                margin="normal"
+                autoFocus={false}
+                autoComplete="off"
+                multiline
+                rows={6}
+                variant="outlined"
+                value={newMnemonic}
+              />
+              <TextField
+                sx={{ marginTop: 4 }}
+                id="password"
+                label="Password"
+                type="password"
+                autoFocus={true}
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                sx={{ marginTop: 2, marginBottom: 2 }}
+                id="confirmPassword"
+                label="Confirm password"
+                type="password"
+                autoComplete="off"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </CardContent>
+          </form>
         )}
 
         {newMnemonic === "" ? (

@@ -16,39 +16,42 @@ const Import = () => {
         Import Account
       </Typography>
       <Card>
-        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <TextField
-            id="standard-multiline-static"
-            label="Enter mnemonic phrase"
-            margin="normal"
-            autoFocus={true}
-            autoComplete="off"
-            multiline
-            rows={6}
-            variant="outlined"
-            value={mnemonic}
-            onChange={(e) => setMnemonic(e.target.value)}
-          />
-          <TextField
-            sx={{ marginTop: 4 }}
-            id="password"
-            label="Password"
-            type="password"
-            autoFocus={true}
-            autoComplete="off"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <TextField
-            sx={{ marginTop: 2, marginBottom: 2 }}
-            id="confirmPassword"
-            label="Confirm password"
-            type="password"
-            autoComplete="off"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </CardContent>
+        <form className="import-form">
+          <input hidden type="text" autoComplete="username" value={undefined}></input>
+          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <TextField
+              id="standard-multiline-static"
+              label="Enter mnemonic phrase"
+              margin="normal"
+              autoFocus={true}
+              autoComplete="off"
+              multiline
+              rows={6}
+              variant="outlined"
+              value={mnemonic}
+              onChange={(e) => setMnemonic(e.target.value)}
+            />
+            <TextField
+              sx={{ marginTop: 4 }}
+              id="password"
+              label="Password"
+              type="password"
+              autoFocus={true}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextField
+              sx={{ marginTop: 2, marginBottom: 2 }}
+              id="confirmPassword"
+              label="Confirm password"
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </CardContent>
+        </form>
         <CardActions>
           <Button variant="contained" onClick={handleImport}>
             IMPORT
