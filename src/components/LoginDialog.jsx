@@ -13,11 +13,11 @@ const LoginDialog = () => {
       <DialogContent>
         <DialogContentText>Enter password to continue</DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ display: "flex", flexDirection: "column", width: 340 }}>
+      <DialogActions sx={{ display: "flex", flexDirection: "column" }}>
         <form className="login-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <TextField
-            sx={{ marginBottom: 4, marginRight: 2, marginLeft: 2 }}
+            sx={{ marginBottom: 4, marginRight: 2, marginLeft: 2, width: 280 }}
             id="password"
             label="Password"
             type="password"
