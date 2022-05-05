@@ -28,7 +28,6 @@ export const AccountProvider = ({ children }) => {
   const [mnemonic, setMnemonic] = useState("");
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
-  const [privateKeyHex, setPrivateKeyHex] = useState(""); // Private Key in HexString
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
   const [account, setAccount] = useState([]); // AptosAccount
   const [balance, setBalance] = useState([]);
@@ -38,6 +37,7 @@ export const AccountProvider = ({ children }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [data0Exist, setData0Exist] = useState("false");
   const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired, setPrivateKeyRequired, setOpenAlertDialog } =
     useContext(UIContext);
 
@@ -48,6 +48,7 @@ export const AccountProvider = ({ children }) => {
 
   useEffect(() => {
     checkIfLoginRequired();
+    checkIfData0Exist();
   }, []);
 
   const handleGenerate = () => {
@@ -79,6 +80,15 @@ export const AccountProvider = ({ children }) => {
     } catch (error) {
       setAccountImported(false);
       console.log(error);
+    }
+  };
+
+  const checkIfData0Exist = () => {
+    const data0 = localStorage.getItem("data0");
+    if (data0 !== null) {
+      setData0Exist(true);
+    } else {
+      setData0Exist(false);
     }
   };
 
@@ -267,6 +277,7 @@ export const AccountProvider = ({ children }) => {
         const seed = new Uint8Array(accountSeed).slice(0, 32);
         const keypair = sign.keyPair.fromSeed(seed);
         const secretKey = keypair.secretKey;
+        const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
         const address = keypair.publicKey.Hex;
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
@@ -276,6 +287,12 @@ export const AccountProvider = ({ children }) => {
         setAccount(account);
         setCurrentAddress(account.address().toString());
         setBalance(accountBalance.data.coin.value);
+
+        // check if current account has data0 (compatability after update)
+        if (data0Exist === false) {
+          let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
+          localStorage.setItem("data0", encryptedPrivateKey);
+        }
       } catch (error) {
         localStorage.clear();
         console.log(error);
