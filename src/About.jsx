@@ -1,8 +1,6 @@
-import { useContext, useEffect } from "react";
-import { Container, Typography, Link, Card, CardContent, CardActions, Button } from "@mui/material";
+import { useContext } from "react";
+import { Container, Typography, Link, Card, CardContent, CardActions, Stack, Button } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import KeyIcon from "@mui/icons-material/Key";
-import AlertDialog from "./components/AlertDialog";
 import { AccountContext } from "./context/AccountContext";
 import { UIContext } from "./context/UIContext";
 import useAxios from "./utils/useAxios";
@@ -10,7 +8,7 @@ import { NODE_URL } from "./context/AccountContext";
 
 const About = () => {
   const { accountImported } = useContext(AccountContext);
-  const { handleMnemonicUI } = useContext(UIContext);
+  const { handleMnemonicUI, handlePrivateKeyUI } = useContext(UIContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   return (
@@ -46,9 +44,14 @@ const About = () => {
         </CardContent>
         <CardActions>
           {accountImported && (
-            <Button variant="outlined" endIcon={<KeyIcon />} onClick={handleMnemonicUI}>
-              Reveal Mnemonic
-            </Button>
+            <Stack>
+              <Button sx={{ marginBottom: 2 }} variant="outlined" onClick={handleMnemonicUI}>
+                Show Mnemonic
+              </Button>
+              <Button variant="outlined" onClick={handlePrivateKeyUI}>
+                Show Private Key
+              </Button>
+            </Stack>
           )}
         </CardActions>
       </Card>

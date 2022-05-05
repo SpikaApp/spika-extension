@@ -1,12 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
+  const [isDesktop, setIsDesktop] = useState(false);
   const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } = useContext(UIContext);
   const {
     alertSignal,
@@ -18,6 +17,24 @@ const AlertDialog = () => {
     setMnemonic,
     handleLogout,
   } = useContext(AccountContext);
+
+  useEffect(() => {
+    if (window.innerWidth > 700) {
+      setIsDesktop(true);
+    } else {
+      setIsDesktop(false);
+    }
+    window.addEventListener("resize", updateMedia);
+    return () => window.removeEventListener("resize", updateMedia);
+  }, []);
+
+  const updateMedia = () => {
+    if (window.innerWidth > 700) {
+      setIsDesktop(true);
+    } else {
+      setIsDesktop(false);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -45,6 +62,11 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setOpenSendDialog(false);
         break;
+      case 81:
+        setOpenAlertDialog(false);
+        setAlertSignal(0);
+        setAlertTitle("");
+        setAlertMessage("");
       case 91:
         setOpenAlertDialog(false);
         setAlertSignal(0);
@@ -83,20 +105,27 @@ const AlertDialog = () => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      {alertSignal === 91 ? (
-        <DialogTitle id="alert-dialog-title">
-          {alertTitle}
-          <Tooltip title="Copy to clipboard">
-            <IconButton aria-label="copyToClipboard" onClick={handleClick}>
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </DialogTitle>
-      ) : (
-        <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
-      )}
+      <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
+        {alertSignal === 81 || alertSignal === 91 ? (
+          <DialogContentText
+            sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+            id="alert-dialog-description"
+          >
+            <TextField
+              sx={{ width: 275, marginBottom: 2 }}
+              id="output-field"
+              multiline
+              maxRows={6}
+              value={alertMessage}
+            />
+            <Button variant="outlined" onClick={handleClick}>
+              Copy to clipboard
+            </Button>
+          </DialogContentText>
+        ) : (
+          <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Close</Button>

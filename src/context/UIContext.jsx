@@ -8,6 +8,7 @@ export const UIProvider = ({ children }) => {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
+  const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
 
   const handleMintUI = () => {
     setOpenMintDialog(true);
@@ -26,6 +27,11 @@ export const UIProvider = ({ children }) => {
 
   const handleMnemonicUI = () => {
     setMnemonicRequired(true);
+    setOpenLoginDialog(true);
+  };
+
+  const handlePrivateKeyUI = () => {
+    setPrivateKeyRequired(true);
     setOpenLoginDialog(true);
   };
 
@@ -49,6 +55,9 @@ export const UIProvider = ({ children }) => {
         handleMnemonicUI,
         mnemonicRequired,
         setMnemonicRequired,
+        handlePrivateKeyUI,
+        privateKeyRequired,
+        setPrivateKeyRequired,
       }}
     >
       {children}

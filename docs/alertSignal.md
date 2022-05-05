@@ -38,6 +38,9 @@
 
 ---
 
+- 81: Private key
+- 82: No private key found
+
 - 91: Mnemonic phrase
 - 92: No mnemonic phrase found
 - 93: Unencrypted mnemonic found and logout performed. Please re-login to start using encryption

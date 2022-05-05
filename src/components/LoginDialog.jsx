@@ -1,15 +1,42 @@
 import { useContext } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Stack,
+} from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const LoginDialog = () => {
-  const { password, setPassword, handleLogin, handleRevealMnemonic } = useContext(AccountContext);
-  const { openLoginDialog, mnemonicRequired } = useContext(UIContext);
+  const { password, setPassword, handleLogin, handleRevealMnemonic, handleRevealPrivateKey } =
+    useContext(AccountContext);
+  const {
+    openLoginDialog,
+    setOpenLoginDialog,
+    mnemonicRequired,
+    setMnemonicRequired,
+    privateKeyRequired,
+    setPrivateKeyRequired,
+  } = useContext(UIContext);
 
+  const handleCancel = () => {
+    setOpenLoginDialog(false);
+    setMnemonicRequired(false);
+    setPrivateKeyRequired(false);
+    setPassword("");
+  };
   return (
     <Dialog open={openLoginDialog}>
-      <DialogTitle>Unlock required</DialogTitle>
+      {mnemonicRequired || privateKeyRequired ? (
+        <DialogTitle>Unlock required</DialogTitle>
+      ) : (
+        <DialogTitle>Login</DialogTitle>
+      )}
       <DialogContent>
         <DialogContentText>Enter password to continue</DialogContentText>
       </DialogContent>
@@ -27,11 +54,19 @@ const LoginDialog = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </form>
-        {mnemonicRequired ? (
-          <Button onClick={handleRevealMnemonic}>Unlock</Button>
-        ) : (
-          <Button onClick={handleLogin}>Unlock</Button>
+        {mnemonicRequired && (
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button onClick={handleRevealMnemonic}>Unlock</Button>
+          </Stack>
         )}
+        {privateKeyRequired && (
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button onClick={handleRevealPrivateKey}>Unlock</Button>
+          </Stack>
+        )}
+        {!mnemonicRequired && !privateKeyRequired && <Button onClick={handleLogin}>Login</Button>}
       </DialogActions>
     </Dialog>
   );

@@ -68,10 +68,10 @@ const Navbar = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="relative">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
           <div className="menu">
             <IconButton aria-label="home" size="normal" onClick={handleHome}>
-              <HomeIcon sx={{ color: "white" }} />
+              <HomeIcon sx={{ color: "white", marginTop: -0.5 }} />
             </IconButton>
             <Button
               id="menu-button"
@@ -86,9 +86,9 @@ const Navbar = () => {
               Spika Project
             </Button>
             <StyledMenu
-              id="demo-customized-menu"
+              id="main-menu"
               MenuListProps={{
-                "aria-labelledby": "demo-customized-button",
+                "aria-labelledby": "main-menu-btn",
               }}
               anchorEl={anchorEl}
               open={open}

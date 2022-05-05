@@ -28,6 +28,7 @@ export const AccountProvider = ({ children }) => {
   const [mnemonic, setMnemonic] = useState("");
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
+  const [privateKeyHex, setPrivateKeyHex] = useState(""); // Private Key in HexString
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
   const [account, setAccount] = useState([]); // AptosAccount
   const [balance, setBalance] = useState([]);
@@ -37,7 +38,8 @@ export const AccountProvider = ({ children }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired, setOpenAlertDialog } = useContext(UIContext);
+  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired, setPrivateKeyRequired, setOpenAlertDialog } =
+    useContext(UIContext);
 
   const navigate = useNavigate();
 
@@ -107,6 +109,22 @@ export const AccountProvider = ({ children }) => {
       throwAlert(92, "Error", "Incorrect password");
       setPassword("");
       setMnemonicRequired(false);
+      setOpenLoginDialog(false);
+    }
+  };
+
+  const handleRevealPrivateKey = async () => {
+    try {
+      const encryptedPrivateKey = localStorage.getItem("data0");
+      let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
+      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
+      setPassword("");
+      setPrivateKeyRequired(false);
+      setOpenLoginDialog(false);
+    } catch (error) {
+      throwAlert(92, "Error", "Incorrect password");
+      setPassword("");
+      setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
     }
   };
@@ -186,14 +204,17 @@ export const AccountProvider = ({ children }) => {
       const seed = new Uint8Array(accountSeed).slice(0, 32);
       const keypair = sign.keyPair.fromSeed(seed);
       const secretKey = keypair.secretKey;
+      const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
       const address = keypair.publicKey.Hex;
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
       let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
+      let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
       localStorage.setItem("data", encryptedMnemonic);
+      localStorage.setItem("data0", encryptedPrivateKey);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -214,14 +235,16 @@ export const AccountProvider = ({ children }) => {
       const seed = new Uint8Array(accountSeed).slice(0, 32);
       const keypair = sign.keyPair.fromSeed(seed);
       const secretKey = keypair.secretKey;
+      const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
       const address = keypair.publicKey.Hex;
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
       let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
+      let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
       localStorage.setItem("data", encryptedMnemonic);
-
+      localStorage.setItem("data0", encryptedPrivateKey);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -359,6 +382,7 @@ export const AccountProvider = ({ children }) => {
         setConfirmPassword,
         handleLogin,
         handleRevealMnemonic,
+        handleRevealPrivateKey,
       }}
     >
       {children}
