@@ -36,7 +36,7 @@ const Import = () => {
               id="password"
               label="Password"
               type="password"
-              autoFocus={true}
+              autoFocus={false}
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
