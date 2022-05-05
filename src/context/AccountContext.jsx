@@ -310,7 +310,7 @@ export const AccountProvider = ({ children }) => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Woohoo! Airdrop :)", `Received ${amount} TestCoin`);
+      throwAlert(21, "Success", `Received ${amount} TestCoin`);
     } catch (error) {
       throwAlert(22, "Error", "Mint failed");
       setIsLoading(false);
