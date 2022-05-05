@@ -57,13 +57,17 @@ const LoginDialog = () => {
         {mnemonicRequired && (
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <Button onClick={handleCancel}>Cancel</Button>
-            <Button onClick={handleRevealMnemonic}>Unlock</Button>
+            <Button sx={{ marginLeft: 4 }} onClick={handleRevealMnemonic}>
+              Unlock
+            </Button>
           </Stack>
         )}
         {privateKeyRequired && (
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <Button onClick={handleCancel}>Cancel</Button>
-            <Button onClick={handleRevealPrivateKey}>Unlock</Button>
+            <Button sx={{ marginLeft: 4 }} onClick={handleRevealPrivateKey}>
+              Unlock
+            </Button>
           </Stack>
         )}
         {!mnemonicRequired && !privateKeyRequired && <Button onClick={handleLogin}>Login</Button>}
