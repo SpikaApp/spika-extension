@@ -56,7 +56,7 @@ const Create = () => {
                 id="confirmPassword"
                 label="Confirm password"
                 type="password"
-                autoComplete="off"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
