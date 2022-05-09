@@ -1,1 +1,1 @@
-global = globalThis;
+const global = globalThis;
