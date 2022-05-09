@@ -8,4 +8,4 @@ Wallet was created during early stages of Aptos blockchain development and serve
 Latest release available as Chrome extension. Unzip content and upload to chrome://extensions
 
 ### License
-- MIT
+MIT
