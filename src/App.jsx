@@ -23,7 +23,7 @@ const App = () => {
                 <div className="content">
                   <Routes>
                     <Route path="/" exact element={<Wallet />} />
-                    <Route path="*" element={<NotFound />} />
+                    <Route path="*" element={<Wallet />} />
                     <Route path="create" element={<Create />} />
                     <Route path="import" element={<Import />} />
                     <Route path="nfts" element={<NFTs />} />

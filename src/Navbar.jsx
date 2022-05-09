@@ -83,7 +83,7 @@ const Navbar = () => {
               onClick={handleClick}
               endIcon={<KeyboardArrowDownIcon />}
             >
-              Spika Project
+              Menu
             </Button>
             <StyledMenu
               id="main-menu"
