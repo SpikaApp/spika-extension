@@ -1,1 +1,0 @@
-const global = globalThis;
