@@ -327,9 +327,9 @@ export const AccountProvider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const txnRequest = await client.generateTransaction(account.address(), payload);
+      const txnRequest = await client.generateTransaction(currentAddress, payload);
       const signedTxn = await client.signTransaction(account, txnRequest);
-      const transactionRes = await client.submitTransaction(account, signedTxn);
+      const transactionRes = await client.submitTransaction(signedTxn);
       await client.waitForTransaction(transactionRes.hash);
       throwAlert(31, "Transaction sent", `${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`);
     } catch (error) {
