@@ -219,7 +219,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+      let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
@@ -229,7 +229,7 @@ export const AccountProvider = ({ children }) => {
       setPrivateKey(secretKey);
       setAccount(account);
       setCurrentAddress(account.address().toString());
-      setBalance(accountBalance.data.coin.value);
+      setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
       throwAlert(1, "Account Created", `Address:\n${shortenAddress(account.address().toString())}`);
@@ -249,7 +249,7 @@ export const AccountProvider = ({ children }) => {
       const address = keypair.publicKey.Hex;
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
-      let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+      let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
@@ -259,7 +259,7 @@ export const AccountProvider = ({ children }) => {
       setPrivateKey(secretKey);
       setAccount(account);
       setCurrentAddress(account.address().toString());
-      setBalance(accountBalance.data.coin.value);
+      setBalance(accountResource.data.coin.value);
       setMnemonic("");
       throwAlert(11, "Account Imported", `Address:\n${shortenAddress(account.address().toString())}`);
     } catch (error) {
@@ -281,12 +281,12 @@ export const AccountProvider = ({ children }) => {
         const address = keypair.publicKey.Hex;
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
-        let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
+        let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
         setAccountImported(true);
         setPrivateKey(secretKey);
         setAccount(account);
         setCurrentAddress(account.address().toString());
-        setBalance(accountBalance.data.coin.value);
+        setBalance(accountResource.data.coin.value);
 
         // check if current account has data0 (compatability after update)
         if (data0Exist === false) {
@@ -320,8 +320,8 @@ export const AccountProvider = ({ children }) => {
 
   const payload = {
     type: "script_function_payload",
-    function: "0x1::TestCoin::transfer",
-    type_arguments: [],
+    function: "0x1::Coin::transfer",
+    type_arguments: ["0x1::TestCoin::TestCoin"],
     arguments: [recipientAddress, amount],
   };
 
@@ -343,20 +343,28 @@ export const AccountProvider = ({ children }) => {
     // try-catch ?
     const account = new aptos.AptosAccount(privateKey, currentAddress);
     let resources = await client.getAccountResources(account.address());
-    let accountBalance = resources.find((r) => r.type === "0x1::TestCoin::Balance");
-    setBalance(accountBalance.data.coin.value);
+    let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
+    setBalance(accountResource.data.coin.value);
   };
 
   const getSentEvents = async () => {
     // try-catch ?
-    let data = await client.getEventsByEventHandle(currentAddress, "0x1::TestCoin::TransferEvents", "sent_events");
+    let data = await client.getEventsByEventHandle(
+      currentAddress,
+      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>::TransferEvents",
+      "sent_events"
+    );
     let res = data.reverse((r) => r.type === "sequence_number");
     setSentEvents(res);
   };
 
   const getReceivedEvents = async () => {
     // try-catch ?
-    let data = await client.getEventsByEventHandle(currentAddress, "0x1::TestCoin::TransferEvents", "received_events");
+    let data = await client.getEventsByEventHandle(
+      currentAddress,
+      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>::TransferEvents",
+      "received_events"
+    );
     let res = data.reverse((r) => r.type === "sequence_number");
     setReceivedEvents(res);
   };
