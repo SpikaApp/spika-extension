@@ -28,8 +28,8 @@ const About = () => {
       <Card>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.0.41 <br />
-            Aptos SDK version 0.0.20
+            Wallet version 0.0.5 <br />
+            Aptos SDK version 1.0.0
             <br />
             Copyright 2022 by{" "}
             <Link href="https://github.com/xorgal" underline="none">
