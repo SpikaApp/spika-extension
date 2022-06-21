@@ -163,7 +163,6 @@ export const AccountProvider = ({ children }) => {
       await importAccount();
       clearPasswords();
       setIsLoading(false);
-      setIsLoading(false);
     } else if (password === "") {
       throwAlert(52, "Incorrect password", "Password field cannot be empty");
       clearPasswords();
