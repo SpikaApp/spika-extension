@@ -31,6 +31,7 @@ export const AccountProvider = ({ children }) => {
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
   const [account, setAccount] = useState([]); // AptosAccount
   const [balance, setBalance] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [sentEvents, setSentEvents] = useState([]);
   const [receivedEvents, setReceivedEvents] = useState([]);
   const [amount, setAmount] = useState("");
@@ -38,8 +39,13 @@ export const AccountProvider = ({ children }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [data0Exist, setData0Exist] = useState("false");
-  const { handleLoginUI, setOpenLoginDialog, setMnemonicRequired, setPrivateKeyRequired, setOpenAlertDialog } =
-    useContext(UIContext);
+  const {
+    handleLoginUI,
+    setOpenLoginDialog,
+    setMnemonicRequired,
+    setPrivateKeyRequired,
+    setOpenAlertDialog,
+  } = useContext(UIContext);
 
   const navigate = useNavigate();
 
@@ -218,7 +224,9 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
+      let accountResource = resources.find(
+        (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+      );
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
@@ -248,7 +256,9 @@ export const AccountProvider = ({ children }) => {
       const address = keypair.publicKey.Hex;
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
+      let accountResource = resources.find(
+        (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+      );
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       localStorage.setItem("accountImported", JSON.stringify(true));
@@ -260,7 +270,11 @@ export const AccountProvider = ({ children }) => {
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
       setMnemonic("");
-      throwAlert(11, "Account Imported", `Address:\n${shortenAddress(account.address().toString())}`);
+      throwAlert(
+        11,
+        "Account Imported",
+        `Address:\n${shortenAddress(account.address().toString())}`
+      );
     } catch (error) {
       throwAlert(12, "Error", "Failed import account");
       console.log(error);
@@ -280,7 +294,9 @@ export const AccountProvider = ({ children }) => {
         const address = keypair.publicKey.Hex;
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
-        let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
+        let accountResource = resources.find(
+          (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+        );
         setAccountImported(true);
         setPrivateKey(secretKey);
         setAccount(account);
@@ -330,7 +346,11 @@ export const AccountProvider = ({ children }) => {
       const signedTxn = await client.signTransaction(account, txnRequest);
       const transactionRes = await client.submitTransaction(signedTxn);
       await client.waitForTransaction(transactionRes.hash);
-      throwAlert(31, "Transaction sent", `${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`);
+      throwAlert(
+        31,
+        "Transaction sent",
+        `${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`
+      );
     } catch (error) {
       throwAlert(32, "Error", "Transaction failed");
       setIsLoading(false);
@@ -342,19 +362,17 @@ export const AccountProvider = ({ children }) => {
     // try-catch ?
     const account = new aptos.AptosAccount(privateKey, currentAddress);
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>");
+    let accountResource = resources.find(
+      (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+    );
     setBalance(accountResource.data.coin.value);
   };
 
-  const getSentEvents = async () => {
+  const getSentTransactions = async () => {
     // try-catch ?
-    let data = await client.getEventsByEventHandle(
-      currentAddress,
-      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
-      "withdraw_events"
-    );
+    let data = await client.getAccountTransactions(currentAddress);
     let res = data.reverse((r) => r.type === "sequence_number");
-    setSentEvents(res);
+    setTransactions(res);
   };
 
   const getReceivedEvents = async () => {
@@ -395,8 +413,8 @@ export const AccountProvider = ({ children }) => {
         getBalance,
         recipientAddress,
         setRecipientAddress,
-        getSentEvents,
-        sentEvents,
+        getSentTransactions,
+        transactions,
         getReceivedEvents,
         receivedEvents,
         handleLogout,
