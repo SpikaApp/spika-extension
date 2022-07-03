@@ -45,7 +45,7 @@ const LoginDialog = () => {
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <TextField
             sx={{ marginBottom: 4, marginRight: 2, marginLeft: 2, width: 260 }}
-            id="password"
+            id="login-prompt"
             label="Password"
             type="password"
             autoFocus={true}
