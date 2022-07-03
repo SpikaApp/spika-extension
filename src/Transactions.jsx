@@ -60,8 +60,8 @@ const Transactions = () => {
                     component="nav"
                     aria-label="receivedTxns"
                   >
-                    {receivedEvents.map((receivedEvent) => (
-                      <ReceivedEventCard receivedEvent={receivedEvent} />
+                    {receivedEvents.map((receivedEvent, sequence_number) => (
+                      <ReceivedEventCard receivedEvent={receivedEvent} key={sequence_number} />
                     ))}
                   </List>
                 ) : (
@@ -77,8 +77,8 @@ const Transactions = () => {
                     component="nav"
                     aria-label="sentTxns"
                   >
-                    {sentEvents.map((sentEvent) => (
-                      <SentEventCard sentEvent={sentEvent} />
+                    {sentEvents.map((sentEvent, sequence_number) => (
+                      <SentEventCard sentEvent={sentEvent} key={sequence_number} />
                     ))}
                   </List>
                 ) : (
