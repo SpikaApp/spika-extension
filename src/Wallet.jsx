@@ -1,6 +1,16 @@
 import React, { useContext, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { Container, Typography, Card, CardActions, CardContent, CardMedia, Button, Chip, Tooltip } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Button,
+  Chip,
+  Tooltip,
+} from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SendIcon from "@mui/icons-material/Send";
 import CallReceivedIcon from "@mui/icons-material/CallReceived";
@@ -11,10 +21,11 @@ import SendDialog from "./components/SendDialog";
 import { UIContext } from "./context/UIContext";
 import { AccountContext } from "./context/AccountContext";
 import shortenAddress from "./utils/shortenAddress";
-import aptos_logo from "./assets/aptos_logo.png";
+import aptos from "./assets/aptos.png";
+import aptos2 from "./assets/aptos2.png";
 
 const Wallet = () => {
-  const { handleMintUI, handleSendUI } = useContext(UIContext);
+  const { darkMode, handleMintUI, handleSendUI } = useContext(UIContext);
   const { currentAddress, accountImported, balance, getBalance } = useContext(AccountContext);
 
   useEffect(() => {
@@ -39,11 +50,23 @@ const Wallet = () => {
         Your Wallet
       </Typography>
       <Card>
-        {accountImported && <CardMedia component="img" image={aptos_logo} alt="aptos" />}
+        {accountImported && (
+          <div>
+            {darkMode ? (
+              <CardMedia component="img" image={aptos} alt="aptos" />
+            ) : (
+              <CardMedia component="img" image={aptos2} alt="aptos" />
+            )}
+          </div>
+        )}
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
             <Tooltip title="Copy address">
-              <Chip sx={{ marginBottom: 1 }} label={shortenAddress(currentAddress)} onClick={handleClick} />
+              <Chip
+                sx={{ marginBottom: 1 }}
+                label={shortenAddress(currentAddress)}
+                onClick={handleClick}
+              />
             </Tooltip>
           ) : (
             <Typography variant="h6" align="center" color="textSecondary" gutterBottom>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 export const UIContext = React.createContext();
 
 export const UIProvider = ({ children }) => {
+  const [darkMode, setDarkMode] = useState(true);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
   const [openSendDialog, setOpenSendDialog] = useState(false);
@@ -38,6 +39,8 @@ export const UIProvider = ({ children }) => {
   return (
     <UIContext.Provider
       value={{
+        darkMode,
+        setDarkMode,
         openAlertDialog,
         setOpenAlertDialog,
         openMintDialog,
