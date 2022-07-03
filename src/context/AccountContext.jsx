@@ -350,8 +350,8 @@ export const AccountProvider = ({ children }) => {
     // try-catch ?
     let data = await client.getEventsByEventHandle(
       currentAddress,
-      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>::TransferEvents",
-      "sent_events"
+      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+      "withdraw_events"
     );
     let res = data.reverse((r) => r.type === "sequence_number");
     setSentEvents(res);
@@ -361,8 +361,8 @@ export const AccountProvider = ({ children }) => {
     // try-catch ?
     let data = await client.getEventsByEventHandle(
       currentAddress,
-      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>::TransferEvents",
-      "received_events"
+      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+      "deposit_events"
     );
     let res = data.reverse((r) => r.type === "sequence_number");
     setReceivedEvents(res);
