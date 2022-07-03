@@ -5,7 +5,7 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
-  const [isDesktop, setIsDesktop] = useState(false);
+  // const [isDesktop, setIsDesktop] = useState(false);
   const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } = useContext(UIContext);
   const {
     alertSignal,
@@ -18,23 +18,23 @@ const AlertDialog = () => {
     handleLogout,
   } = useContext(AccountContext);
 
-  useEffect(() => {
-    if (window.innerWidth > 700) {
-      setIsDesktop(true);
-    } else {
-      setIsDesktop(false);
-    }
-    window.addEventListener("resize", updateMedia);
-    return () => window.removeEventListener("resize", updateMedia);
-  }, []);
+  // useEffect(() => {
+  //   if (window.innerWidth > 700) {
+  //     setIsDesktop(true);
+  //   } else {
+  //     setIsDesktop(false);
+  //   }
+  //   window.addEventListener("resize", updateMedia);
+  //   return () => window.removeEventListener("resize", updateMedia);
+  // }, []);
 
-  const updateMedia = () => {
-    if (window.innerWidth > 700) {
-      setIsDesktop(true);
-    } else {
-      setIsDesktop(false);
-    }
-  };
+  // const updateMedia = () => {
+  //   if (window.innerWidth > 700) {
+  //     setIsDesktop(true);
+  //   } else {
+  //     setIsDesktop(false);
+  //   }
+  // };
 
   const navigate = useNavigate();
 
@@ -108,10 +108,7 @@ const AlertDialog = () => {
       <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
       <DialogContent>
         {alertSignal === 81 || alertSignal === 91 ? (
-          <DialogContentText
-            sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-            id="alert-dialog-description"
-          >
+          <div>
             <TextField
               sx={{ width: 275, marginBottom: 2 }}
               id="output-field"
@@ -119,10 +116,15 @@ const AlertDialog = () => {
               maxRows={6}
               value={alertMessage}
             />
-            <Button variant="outlined" onClick={handleClick}>
-              Copy to clipboard
-            </Button>
-          </DialogContentText>
+            <DialogContentText
+              sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+              id="alert-dialog-description"
+            >
+              <Button variant="outlined" onClick={handleClick}>
+                Copy to clipboard
+              </Button>
+            </DialogContentText>
+          </div>
         ) : (
           <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
         )}
