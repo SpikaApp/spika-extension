@@ -1,8 +1,20 @@
 import { useState, useContext } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { AppBar, Box, Toolbar, Button, Menu, MenuItem, Divider, IconButton } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Button,
+  Menu,
+  MenuItem,
+  Divider,
+  Stack,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import HomeIcon from "@mui/icons-material/Home";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { styled, alpha } from "@mui/material/styles";
 import Link from "@mui/material/Link";
 import { AccountContext } from "./context/AccountContext";
@@ -48,11 +60,9 @@ const StyledMenu = styled((props) => (
 
 const Navbar = () => {
   const { accountImported } = useContext(AccountContext);
-  const { handleLogoutUI } = useContext(UIContext);
+  const { darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  const navigate = useNavigate();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -61,18 +71,26 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
-  const handleHome = () => {
-    navigate("/");
+  const handleThemeSwitch = () => {
+    if (darkMode) {
+      setDarkMode(false);
+    } else {
+      setDarkMode(true);
+    }
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="relative">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <div className="menu">
-            <IconButton aria-label="home" size="normal" onClick={handleHome}>
-              <HomeIcon sx={{ color: "white", marginTop: -0.5 }} />
-            </IconButton>
             <Button
               id="menu-button"
               aria-controls={open ? "menu" : undefined}
@@ -128,11 +146,18 @@ const Navbar = () => {
               </MenuItem>
             </StyledMenu>
           </div>
-          {accountImported && (
-            <Button color="inherit" onClick={handleLogoutUI}>
-              Logout
-            </Button>
-          )}
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Toggle theme">
+              <IconButton aria-label="theme" size="normal" onClick={handleThemeSwitch}>
+                {darkMode ? <LightModeIcon /> : <DarkModeIcon sx={{ color: "white" }} />}
+              </IconButton>
+            </Tooltip>
+            {accountImported && (
+              <Button color="inherit" onClick={handleLogoutUI}>
+                Logout
+              </Button>
+            )}
+          </Stack>
         </Toolbar>
         <LogoutDialog />
       </AppBar>
