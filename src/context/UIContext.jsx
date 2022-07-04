@@ -9,6 +9,8 @@ export const UIProvider = ({ children }) => {
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
+  const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
+  const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
 
@@ -22,6 +24,14 @@ export const UIProvider = ({ children }) => {
 
   const handleReceiveUI = () => {
     setOpenReceiveDialog(true);
+  };
+
+  const handleCreateCollectionUI = () => {
+    setOpenCreateCollectionDialog(true);
+  };
+
+  const handleCreateNFTUI = () => {
+    setOpenCreateNftDialog(true);
   };
 
   const handleLoginUI = () => {
@@ -57,6 +67,12 @@ export const UIProvider = ({ children }) => {
         handleReceiveUI,
         openReceiveDialog,
         setOpenReceiveDialog,
+        openCreateCollectionDialog,
+        setOpenCreateCollectionDialog,
+        handleCreateCollectionUI,
+        openCreateNftDialog,
+        setOpenCreateNftDialog,
+        handleCreateNFTUI,
         openLoginDialog,
         setOpenLoginDialog,
         handleLoginUI,
