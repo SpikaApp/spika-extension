@@ -1,12 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Typography,
+  Stack,
+} from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
   // const [isDesktop, setIsDesktop] = useState(false);
-  const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } = useContext(UIContext);
+  const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } =
+    useContext(UIContext);
   const {
     alertSignal,
     setAlertSignal,
@@ -111,7 +122,8 @@ const AlertDialog = () => {
           <div>
             <TextField
               sx={{ width: 275, marginBottom: 2 }}
-              id="output-field"
+              error
+              id="output-error"
               multiline
               maxRows={6}
               value={alertMessage}
@@ -120,7 +132,12 @@ const AlertDialog = () => {
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               id="alert-dialog-description"
             >
-              <Button variant="outlined" onClick={handleClick}>
+              <Stack sx={{ maxWidth: 250 }}>
+                <Typography align="center" sx={{ mb: 2 }} color="error.main">
+                  Never share your secret phrase or private key with anyone. Use with caution.
+                </Typography>
+              </Stack>
+              <Button variant="outlined" color="error" onClick={handleClick}>
                 Copy to clipboard
               </Button>
             </DialogContentText>
