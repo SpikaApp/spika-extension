@@ -112,33 +112,41 @@ const Navbar = () => {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose} disableRipple>
-                <Link underline="none" component={RouterLink} to="create">
-                  Create Account
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleClose} disableRipple>
-                <Link underline="none" component={RouterLink} to="import">
-                  Import Account
-                </Link>
-              </MenuItem>
-              <Divider sx={{ my: 0.5 }} />
-              <MenuItem onClick={handleClose} disableRipple>
-                <Link underline="none" component={RouterLink} to="/">
-                  Wallet
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleClose} disableRipple>
-                <Link underline="none" component={RouterLink} to="nfts">
-                  NFTs
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleClose} disableRipple>
-                <Link underline="none" component={RouterLink} to="transactions">
-                  Transactions
-                </Link>
-              </MenuItem>
-              <Divider sx={{ my: 0.5 }} />
+              {!accountImported && (
+                <Stack>
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="create">
+                      Create Account
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="import">
+                      Import Account
+                    </Link>
+                  </MenuItem>
+                  <Divider sx={{ my: 0.5 }} />
+                </Stack>
+              )}
+              {accountImported && (
+                <Stack>
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="/">
+                      Wallet
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="nfts">
+                      NFTs
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="transactions">
+                      Transactions
+                    </Link>
+                  </MenuItem>
+                  <Divider sx={{ my: 0.5 }} />
+                </Stack>
+              )}
               <MenuItem onClick={handleClose} disableRipple>
                 <Link underline="none" component={RouterLink} to="about">
                   About
