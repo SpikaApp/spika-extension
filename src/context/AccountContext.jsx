@@ -7,6 +7,7 @@ import { sign } from "tweetnacl";
 import shortenAddress from "../utils/shortenAddress";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
+import { TokenClient } from "aptos";
 
 // export const NODE_URL = "/api";
 // export const FAUCET_URL = "/faucet";
@@ -29,6 +30,13 @@ export const AccountProvider = ({ children }) => {
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
+  const [collectionName, setCollectionName] = useState("");
+  const [collectionDescription, setCollectionDescription] = useState("");
+  const [collectionUri, setCollectionUri] = useState("");
+  const [nftName, setNftName] = useState("");
+  const [nftDescription, setNftDescription] = useState("");
+  const [nftUri, setNftUri] = useState("");
+  const [nftSupply, setNftSupply] = useState(""); // number ?
   const [account, setAccount] = useState([]); // AptosAccount
   const [balance, setBalance] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -50,6 +58,7 @@ export const AccountProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const client = new aptos.AptosClient(NODE_URL);
+  const tokenClient = new TokenClient(client);
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
   useEffect(() => {
@@ -202,6 +211,26 @@ export const AccountProvider = ({ children }) => {
     setAmount("");
   };
 
+  const handleCreateCollection = async () => {
+    setIsLoading(true);
+    await createCollection();
+    setIsLoading(false);
+    setCollectionName("");
+    setCollectionDescription("");
+    setCollectionUri("");
+  };
+
+  const handleCreateNft = async () => {
+    setIsLoading(true);
+    await createNft();
+    setIsLoading(false);
+    setCollectionName("");
+    setNftName("");
+    setNftDescription("");
+    setNftUri("");
+    setNftSupply("");
+  };
+
   const clearPasswords = () => {
     setPassword("");
     setConfirmPassword("");
@@ -346,13 +375,44 @@ export const AccountProvider = ({ children }) => {
       const signedTxn = await client.signTransaction(account, txnRequest);
       const transactionRes = await client.submitTransaction(signedTxn);
       await client.waitForTransaction(transactionRes.hash);
-      throwAlert(
-        31,
-        "Transaction sent",
-        `${amount} TestCoin sent to ${shortenAddress(recipientAddress)}`
-      );
+      throwAlert(31, "Transaction sent", `${transactionRes.hash}`);
     } catch (error) {
       throwAlert(32, "Error", "Transaction failed");
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const createCollection = async () => {
+    try {
+      const collection = await tokenClient.createCollection(
+        account,
+        collectionName,
+        collectionDescription,
+        collectionUri
+      );
+      throwAlert(61, "Transaction sent", `${collection}`);
+    } catch (error) {
+      throwAlert(62, "Error", `${error}`);
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const createNft = async () => {
+    try {
+      const nft = await tokenClient.createToken(
+        account,
+        collectionName,
+        nftName,
+        nftDescription,
+        nftSupply,
+        nftUri,
+        0 // royalty_points_per_million
+      );
+      throwAlert(71, "Transaction sent", `${nft}`);
+    } catch (error) {
+      throwAlert(72, "Error", `${error}`);
       setIsLoading(false);
       console.log(error);
     }
@@ -370,9 +430,20 @@ export const AccountProvider = ({ children }) => {
 
   const getSentTransactions = async () => {
     // try-catch ?
-    let data = await client.getAccountTransactions(currentAddress);
-    let res = data.reverse((r) => r.type === "sequence_number");
-    setTransactions(res);
+    let currentAccount = await client.getAccount(currentAddress);
+    let sn = parseInt(currentAccount.sequence_number);
+    if (sn <= 25) {
+      let data = await client.getAccountTransactions(currentAddress);
+      let res = data.reverse((r) => r.type === "version");
+      setTransactions(res);
+    } else {
+      let data = await client.getAccountTransactions(currentAddress, {
+        start: sn - 25,
+        limit: 25,
+      });
+      let res = data.reverse((r) => r.type === "version");
+      setTransactions(res);
+    }
   };
 
   const getReceivedEvents = async () => {
@@ -403,6 +474,22 @@ export const AccountProvider = ({ children }) => {
         handleImport,
         currentAddress,
         accountImported,
+        collectionName,
+        setCollectionName,
+        collectionDescription,
+        setCollectionDescription,
+        collectionUri,
+        setCollectionUri,
+        handleCreateCollection,
+        nftName,
+        setNftName,
+        nftDescription,
+        setNftDescription,
+        nftUri,
+        setNftUri,
+        nftSupply,
+        setNftSupply,
+        handleCreateNft,
         balance,
         handleGenerate,
         handleCreate,

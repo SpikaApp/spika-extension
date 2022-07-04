@@ -1,8 +1,21 @@
-import { Container, Typography, Link, Card, CardContent, CardActions } from "@mui/material";
+import React, { useContext } from "react";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Stack,
+  Button,
+} from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
 import ConstructionIcon from "@mui/icons-material/Construction";
+import { UIContext } from "./context/UIContext";
+import CreateCollectionDialog from "./components/CreateCollectionDialog";
+import CreateNftDialog from "./components/CreateNftDialog";
 
-const About = () => {
+const NFTs = () => {
+  const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
   return (
     <Container maxWidth="xs">
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
@@ -12,16 +25,19 @@ const About = () => {
       </Typography>
       <Card>
         <CardContent>
-          <Typography sx={{ marginTop: 2 }} variant="h5" align="center" color="textPrimary" gutterBottom>
-            Under heavy development...
-          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button onClick={handleCreateCollectionUI}>Create collection</Button>
+            <Button onClick={handleCreateNFTUI}>Create NFT</Button>
+          </Stack>
         </CardContent>
         <CardActions>
           <ConstructionIcon sx={{ fontSize: 72, margingTop: 4 }} color="alt" />
         </CardActions>
       </Card>
+      <CreateCollectionDialog />
+      <CreateNftDialog />
     </Container>
   );
 };
 
-export default About;
+export default NFTs;
