@@ -6,6 +6,7 @@ export const UIProvider = ({ children }) => {
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
   const [openSendDialog, setOpenSendDialog] = useState(false);
+  const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
@@ -17,6 +18,10 @@ export const UIProvider = ({ children }) => {
 
   const handleSendUI = () => {
     setOpenSendDialog(true);
+  };
+
+  const handleReceiveUI = () => {
+    setOpenReceiveDialog(true);
   };
 
   const handleLoginUI = () => {
@@ -49,6 +54,9 @@ export const UIProvider = ({ children }) => {
         setOpenSendDialog,
         handleMintUI,
         handleSendUI,
+        handleReceiveUI,
+        openReceiveDialog,
+        setOpenReceiveDialog,
         openLoginDialog,
         setOpenLoginDialog,
         handleLoginUI,

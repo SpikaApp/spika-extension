@@ -10,14 +10,17 @@ import {
   Button,
   Chip,
   Tooltip,
+  Stack,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SendIcon from "@mui/icons-material/Send";
-import CallReceivedIcon from "@mui/icons-material/CallReceived";
+import CloudQueueIcon from "@mui/icons-material/CloudQueue";
+import DownloadIcon from "@mui/icons-material/Download";
 import Loading from "./components/Loading";
 import AlertDialog from "./components/AlertDialog";
 import MintDialog from "./components/MintDialog";
 import SendDialog from "./components/SendDialog";
+import ReceiveDialog from "./components/ReceiveDialog";
 import { UIContext } from "./context/UIContext";
 import { AccountContext } from "./context/AccountContext";
 import shortenAddress from "./utils/shortenAddress";
@@ -25,7 +28,7 @@ import aptos from "./assets/aptos.png";
 import aptos2 from "./assets/aptos2.png";
 
 const Wallet = () => {
-  const { darkMode, handleMintUI, handleSendUI } = useContext(UIContext);
+  const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
   const { currentAddress, accountImported, balance, getBalance } = useContext(AccountContext);
 
   useEffect(() => {
@@ -50,33 +53,44 @@ const Wallet = () => {
         Your Wallet
       </Typography>
       <Card>
-        {accountImported && (
-          <div>
-            {darkMode ? (
-              <CardMedia component="img" image={aptos} alt="aptos" />
-            ) : (
-              <CardMedia component="img" image={aptos2} alt="aptos" />
-            )}
-          </div>
-        )}
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
-            <Tooltip title="Copy address">
-              <Chip
-                sx={{ marginBottom: 1 }}
-                label={shortenAddress(currentAddress)}
-                onClick={handleClick}
-              />
-            </Tooltip>
+            <Stack>
+              <Typography sx={{ mb: 1.5 }} color="info.main">
+                Network: Aptos Devnet
+              </Typography>
+
+              <Tooltip title="Copy address">
+                <Chip
+                  sx={{ marginBottom: 1 }}
+                  label={shortenAddress(currentAddress)}
+                  onClick={handleClick}
+                />
+              </Tooltip>
+            </Stack>
           ) : (
             <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
               Welcome
             </Typography>
           )}
           {accountImported ? (
-            <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
-              {balance} TestCoin
-            </Typography>
+            <Stack sx={{ display: "flex", alignItems: "center", my: -2 }}>
+              {darkMode ? (
+                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos} alt="aptos" />
+              ) : (
+                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos2} alt="aptos" />
+              )}
+
+              <Typography
+                sx={{ mb: 2 }}
+                variant="h6"
+                align="center"
+                color="textSecondary"
+                gutterBottom
+              >
+                {balance} TestCoin
+              </Typography>
+            </Stack>
           ) : (
             <Typography align="center" color="textSecondary" gutterBottom>
               Create or import existing account to start working with wallet
@@ -85,12 +99,30 @@ const Wallet = () => {
         </CardContent>
         {accountImported ? (
           <CardActions>
-            <Button variant="outlined" startIcon={<CallReceivedIcon />} onClick={handleMintUI}>
-              Mint
-            </Button>
-            <Button variant="contained" endIcon={<SendIcon />} onClick={handleSendUI}>
-              Send
-            </Button>
+            <Stack sx={{ display: "flex", alignItems: "center" }}>
+              <Button
+                sx={{ mb: 4, width: 100 }}
+                variant="outlined"
+                startIcon={<CloudQueueIcon />}
+                onClick={handleMintUI}
+              >
+                Mint
+              </Button>
+
+              <Stack direction="row">
+                <Button
+                  sx={{ mr: 4 }}
+                  variant="contained"
+                  endIcon={<SendIcon />}
+                  onClick={handleSendUI}
+                >
+                  Send
+                </Button>
+                <Button variant="contained" endIcon={<DownloadIcon />} onClick={handleReceiveUI}>
+                  Receive
+                </Button>
+              </Stack>
+            </Stack>
           </CardActions>
         ) : (
           <CardActions>
@@ -106,6 +138,7 @@ const Wallet = () => {
       <Loading />
       <MintDialog />
       <SendDialog />
+      <ReceiveDialog />
       <AlertDialog />
     </Container>
   );
