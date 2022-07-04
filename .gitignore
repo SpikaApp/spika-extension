@@ -27,3 +27,4 @@ dist-ssr
 tmp
 
 .aptos
+src/components/_DraftDialog.jsx
