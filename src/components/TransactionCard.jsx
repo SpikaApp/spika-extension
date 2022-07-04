@@ -45,7 +45,7 @@ const TransactionCard = ({
             Gas used: {gas_used}
             <br />
             <Stack direction="row">
-              <Typography sx={{ my: 0.5, ml: 0.1, mr: 1 }}>To: </Typography>
+              <Typography sx={{ my: 0.5, ml: 0.1, mr: 1 }}>Recipient: </Typography>
               <Tooltip title="Copy address">
                 <Chip
                   sx={{ marginBottom: 1 }}
