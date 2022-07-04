@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -10,14 +11,22 @@ import {
   TextField,
   Typography,
   Stack,
+  Link,
 } from "@mui/material";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
 const AlertDialog = () => {
-  // const [isDesktop, setIsDesktop] = useState(false);
-  const { openAlertDialog, setOpenAlertDialog, setOpenMintDialog, setOpenSendDialog } =
-    useContext(UIContext);
+  const [isTransaction, setIsTransaction] = useState(false);
+  const {
+    openAlertDialog,
+    setOpenAlertDialog,
+    setOpenMintDialog,
+    setOpenSendDialog,
+    setOpenCreateCollectionDialog,
+    setOpenCreateNftDialog,
+  } = useContext(UIContext);
   const {
     alertSignal,
     setAlertSignal,
@@ -29,23 +38,11 @@ const AlertDialog = () => {
     handleLogout,
   } = useContext(AccountContext);
 
-  // useEffect(() => {
-  //   if (window.innerWidth > 700) {
-  //     setIsDesktop(true);
-  //   } else {
-  //     setIsDesktop(false);
-  //   }
-  //   window.addEventListener("resize", updateMedia);
-  //   return () => window.removeEventListener("resize", updateMedia);
-  // }, []);
-
-  // const updateMedia = () => {
-  //   if (window.innerWidth > 700) {
-  //     setIsDesktop(true);
-  //   } else {
-  //     setIsDesktop(false);
-  //   }
-  // };
+  const checkDialogType = async () => {
+    if (alertSignal === 31 || alertSignal === 61 || alertSignal === 71) {
+      setIsTransaction(true);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -72,7 +69,17 @@ const AlertDialog = () => {
       case 31: // Transaction sent
         setOpenAlertDialog(false);
         setOpenSendDialog(false);
+        setIsTransaction(false);
         break;
+      case 61: // Collection Created
+        setOpenAlertDialog(false);
+        setOpenCreateCollectionDialog(false);
+        setIsTransaction(false);
+        break;
+      case 71: // NFT Created
+        setOpenAlertDialog(false);
+        setOpenCreateNftDialog(false);
+        setIsTransaction(false);
       case 81:
         setOpenAlertDialog(false);
         setAlertSignal(0);
@@ -95,6 +102,8 @@ const AlertDialog = () => {
       case 53: // Passwords do not match
       case 54: // Password must at least 6 characters long
       case 55: // Failed load account
+      case 62: // Failed create collection
+      case 72: // Failed create nft
       case 92: // No mnemonic phrase found
         setOpenAlertDialog(false);
         break;
@@ -106,6 +115,7 @@ const AlertDialog = () => {
   };
 
   useEffect(() => {
+    checkDialogType();
     handleOpen();
   }, [alertSignal]);
 
@@ -118,6 +128,32 @@ const AlertDialog = () => {
     >
       <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
       <DialogContent>
+        {isTransaction && (
+          <Stack component="span" sx={{ maxWidth: 250 }}>
+            <Typography component="span">
+              Open transactions
+              <Link
+                sx={{ ml: 0.5 }}
+                component={RouterLink}
+                to="/transactions"
+                underline="none"
+                onClick={handleClose}
+              >
+                log
+              </Link>{" "}
+              or view full details in{" "}
+              <Link
+                href={`https://explorer.devnet.aptos.dev/txn/${alertMessage}`}
+                target="_blank"
+                underline="none"
+                onClick={handleClose}
+              >
+                Aptos Explorer {""}
+                <OpenInNewIcon sx={{ fontSize: 16 }} />
+              </Link>
+            </Typography>
+          </Stack>
+        )}
         {alertSignal === 81 || alertSignal === 91 ? (
           <Stack>
             <TextField
@@ -143,7 +179,9 @@ const AlertDialog = () => {
             </DialogContentText>
           </Stack>
         ) : (
-          <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
+          !isTransaction && (
+            <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
+          )
         )}
       </DialogContent>
       <DialogActions>
