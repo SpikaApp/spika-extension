@@ -38,8 +38,20 @@
 
 ---
 
+- 61: Collection created
+- 62: Failed create collection
+
+---
+
+- 71: NFT created
+- 72: Failed create nft
+
+---
+
 - 81: Private key
 - 82: No private key found
+
+---
 
 - 91: Mnemonic phrase
 - 92: No mnemonic phrase found
