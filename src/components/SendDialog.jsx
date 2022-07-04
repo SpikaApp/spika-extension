@@ -1,13 +1,26 @@
 import { useContext } from "react";
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import useAxios from "../utils/useAxios";
+import { NODE_URL } from "../context/AccountContext";
 
 const SendDialog = () => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
-  const { recipientAddress, setRecipientAddress, amount, setAmount, handleSend } = useContext(AccountContext);
+  const { recipientAddress, setRecipientAddress, amount, setAmount, handleSend } =
+    useContext(AccountContext);
+  const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   const handleCancel = () => {
     setAmount("");
@@ -18,9 +31,13 @@ const SendDialog = () => {
     <Dialog open={openSendDialog} onClose={handleCancel}>
       <DialogTitle>Send Transaction</DialogTitle>
       <DialogContent>
+        <Typography align="left" color="warning.main">
+          Confirm destination network Aptos and recipient's address exist and registered on chain id{" "}
+          {chain_id}. Resources sent to wrong or non-existing address will be lost.
+        </Typography>
         {/* <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText> */}
         <TextField
-          sx={{ marginTop: 2, marginBottom: 2 }}
+          sx={{ marginTop: 4, marginBottom: 2 }}
           id="recipientAddress"
           label="Recipient's Address"
           fullWidth={true}
