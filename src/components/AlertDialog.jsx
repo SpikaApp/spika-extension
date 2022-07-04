@@ -119,7 +119,7 @@ const AlertDialog = () => {
       <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
       <DialogContent>
         {alertSignal === 81 || alertSignal === 91 ? (
-          <div>
+          <Stack>
             <TextField
               sx={{ width: 275, marginBottom: 2 }}
               error
@@ -132,8 +132,8 @@ const AlertDialog = () => {
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               id="alert-dialog-description"
             >
-              <Stack sx={{ maxWidth: 250 }}>
-                <Typography align="center" sx={{ mb: 2 }} color="error.main">
+              <Stack component="span" sx={{ maxWidth: 250 }}>
+                <Typography component="span" align="center" sx={{ mb: 2 }} color="error.main">
                   Never share your secret phrase or private key with anyone. Use with caution.
                 </Typography>
               </Stack>
@@ -141,7 +141,7 @@ const AlertDialog = () => {
                 Copy to clipboard
               </Button>
             </DialogContentText>
-          </div>
+          </Stack>
         ) : (
           <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
         )}
