@@ -38,7 +38,7 @@ const Transactions = () => {
       const updateAccountResources = window.setInterval(() => {
         getReceivedEvents();
         getSentTransactions();
-      }, 10000);
+      }, 30000);
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
