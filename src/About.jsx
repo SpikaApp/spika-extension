@@ -1,5 +1,14 @@
 import { useContext } from "react";
-import { Container, Typography, Link, Card, CardContent, CardActions, Stack, Button } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Link,
+  Card,
+  CardContent,
+  CardActions,
+  Stack,
+  Button,
+} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { AccountContext } from "./context/AccountContext";
 import { UIContext } from "./context/UIContext";
@@ -20,7 +29,7 @@ const About = () => {
       </Typography>
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
         for{" "}
-        <Link href="https://aptoslabs.com/" underline="none">
+        <Link href="https://aptoslabs.com/" underline="none" target="_blank">
           APTOS
         </Link>{" "}
         Blockchain (id: {chain_id})
@@ -28,16 +37,25 @@ const About = () => {
       <Card>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.0.7 <br />
+            Wallet version 0.1.0 <br />
             Aptos SDK version 1.2.0
             <br />
-            Copyright 2022 by{" "}
-            <Link href="https://github.com/xorgal" underline="none">
+            Project on
+            <Link href="https://github.com/xorgal/spika" underline="none" target="_blank">
               {" "}
-              xorgal
+              GitHub
             </Link>
             <br />
-            <Link href="mailto:spika@xorgal.xyz" underline="none">
+            <Link
+              href="https://github.com/xorgal/spika/blob/main/LICENSE"
+              underline="none"
+              target="_blank"
+            >
+              {" "}
+              License
+            </Link>
+            <br />
+            <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank">
               spika@xorgal.xyz
             </Link>
           </Typography>
