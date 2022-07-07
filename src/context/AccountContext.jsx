@@ -9,11 +9,11 @@ import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
 
-// export const NODE_URL = "/api";
-// export const FAUCET_URL = "/faucet";
+export const NODE_URL = "/api";
+export const FAUCET_URL = "/faucet";
 
-export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
-export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
+// export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
+// export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
 
 // export const NODE_URL = process.env.APTOS_NODE_URL || "https://fullnode.devnet.aptoslabs.com";
 // export const FAUCET_URL = process.env.APTOS_FAUCET_URL || "https://faucet.devnet.aptoslabs.com";
@@ -42,9 +42,11 @@ export const AccountProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
   const [sentEvents, setSentEvents] = useState([]);
   const [receivedEvents, setReceivedEvents] = useState([]);
+  const [accountTokens, setAccountTokens] = useState([]);
+  const [nftDetails, setNftDetails] = useState([]);
   const [amount, setAmount] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("112221");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [data0Exist, setData0Exist] = useState("false");
   const {
@@ -338,7 +340,6 @@ export const AccountProvider = ({ children }) => {
           localStorage.setItem("data0", encryptedPrivateKey);
         }
       } catch (error) {
-        localStorage.clear();
         console.log(error);
         throwAlert(42, "Error", "Failed load account");
       }
@@ -419,8 +420,6 @@ export const AccountProvider = ({ children }) => {
   };
 
   const getBalance = async () => {
-    // try-catch ?
-    const account = new aptos.AptosAccount(privateKey, currentAddress);
     let resources = await client.getAccountResources(account.address());
     let accountResource = resources.find(
       (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
@@ -429,7 +428,6 @@ export const AccountProvider = ({ children }) => {
   };
 
   const getSentTransactions = async () => {
-    // try-catch ?
     let currentAccount = await client.getAccount(currentAddress);
     let sn = parseInt(currentAccount.sequence_number);
     if (sn <= 25) {
@@ -447,14 +445,105 @@ export const AccountProvider = ({ children }) => {
   };
 
   const getReceivedEvents = async () => {
-    // try-catch ?
-    let data = await client.getEventsByEventHandle(
-      currentAddress,
-      "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
-      "deposit_events"
+    let accountResources = await client.getAccountResources(currentAddress);
+    let accountTestCoins = accountResources.find(
+      (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
     );
-    let res = data.reverse((r) => r.type === "sequence_number");
-    setReceivedEvents(res);
+
+    let counter = parseInt(accountTestCoins.data.deposit_events.counter);
+
+    if (counter <= 25) {
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+        "deposit_events"
+      );
+      let res = data.reverse((r) => r.type === "sequence_number");
+      setReceivedEvents(res);
+    } else {
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+        "deposit_events",
+        {
+          start: counter - 25,
+        }
+      );
+      let res = data.reverse((r) => r.type === "sequence_number");
+      setReceivedEvents(res);
+    }
+  };
+
+  const getAccountTokens = async () => {
+    try {
+      // Get total number of Token deposit_events received by an account
+      let accountResources = await client.getAccountResources(currentAddress);
+      let accountDepositedTokens = accountResources.find(
+        (r) => r.type === "0x1::Token::TokenStore"
+      );
+
+      const getTokens = async () => {
+        if (accountDepositedTokens === undefined) {
+          console.log("Account doesn't hold any NFT yet");
+          return setAccountTokens(0);
+        } else {
+          let tokenDepositCounter = parseInt(accountDepositedTokens.data.deposit_events.counter);
+          // Get Token deposit_events
+          let data = await client.getEventsByEventHandle(
+            currentAddress,
+            "0x1::Token::TokenStore",
+            "deposit_events",
+            {
+              limit: tokenDepositCounter,
+            }
+          );
+
+          // Get TokenId for accountDepositedTokens and remove dublicates
+          let tokenIds = [...new Set(data.map((value) => value.data.id))];
+
+          // Returns an array of tokenId and value
+          const accountTokensBalances = await Promise.all(
+            tokenIds.map(async (i) => {
+              let data = await tokenClient.getTokenBalanceForAccount(currentAddress, i);
+              return data;
+            })
+          );
+
+          // Returns an array of tokenId and value for all tokens with > 0 balance
+          let result = accountTokensBalances.filter((r) => {
+            return r.value !== "0";
+          });
+
+          if (result == undefined) {
+            console.log("Account holds 0 tokens with positive balance");
+            setAccountTokens(0);
+          } else {
+            setAccountTokens(result);
+          }
+        }
+      };
+      getTokens();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getNftDetails = async () => {
+    try {
+      if (accountTokens === 0) {
+        console.log("Account doesn't hold any NFT yet");
+        return setNftDetails(0);
+      } else {
+        let data = await Promise.all(
+          accountTokens.map(
+            async (i) => await tokenClient.getTokenData(i.id.creator, i.id.collection, i.id.name)
+          )
+        );
+        return setNftDetails(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -504,6 +593,10 @@ export const AccountProvider = ({ children }) => {
         transactions,
         getReceivedEvents,
         receivedEvents,
+        getAccountTokens,
+        getNftDetails,
+        accountTokens,
+        nftDetails,
         handleLogout,
         password,
         setPassword,
