@@ -55,19 +55,21 @@ const Wallet = () => {
       <Card>
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
-            <Stack>
-              <Typography sx={{ mb: 1.5 }} color="info.main">
-                Network: Aptos Devnet
-              </Typography>
+            <div>
+              <Stack sx={{ alignItems: "center" }}>
+                <Typography sx={{ mb: 1.5 }} color="info.main">
+                  Network: Aptos Devnet
+                </Typography>
 
-              <Tooltip title="Copy address">
-                <Chip
-                  sx={{ marginBottom: 1 }}
-                  label={shortenAddress(currentAddress)}
-                  onClick={handleClick}
-                />
-              </Tooltip>
-            </Stack>
+                <Tooltip title="Copy address">
+                  <Chip
+                    sx={{ marginBottom: 1 }}
+                    label={shortenAddress(currentAddress)}
+                    onClick={handleClick}
+                  />
+                </Tooltip>
+              </Stack>
+            </div>
           ) : (
             <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
               Welcome
