@@ -9,11 +9,11 @@ import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
 
-export const NODE_URL = "/api";
-export const FAUCET_URL = "/faucet";
+// export const NODE_URL = "/api";
+// export const FAUCET_URL = "/faucet";
 
-// export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
-// export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
+export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
+export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
 
 // export const NODE_URL = process.env.APTOS_NODE_URL || "https://fullnode.devnet.aptoslabs.com";
 // export const FAUCET_URL = process.env.APTOS_FAUCET_URL || "https://faucet.devnet.aptoslabs.com";
@@ -46,7 +46,7 @@ export const AccountProvider = ({ children }) => {
   const [nftDetails, setNftDetails] = useState([]);
   const [amount, setAmount] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [password, setPassword] = useState("112221");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [data0Exist, setData0Exist] = useState("false");
   const {
