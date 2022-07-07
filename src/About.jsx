@@ -47,7 +47,7 @@ const About = () => {
             </Link>
             <br />
             <Link
-              href="https://github.com/xorgal/spika/blob/main/LICENSE"
+              href="https://github.com/xorgal/spika/blob/master/LICENSE"
               underline="none"
               target="_blank"
             >
