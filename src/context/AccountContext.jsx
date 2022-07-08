@@ -484,7 +484,7 @@ export const AccountProvider = ({ children }) => {
 
       const getTokens = async () => {
         if (accountDepositedTokens === undefined) {
-          console.log("Account doesn't hold any NFT yet");
+          // console.log("Account doesn't hold any NFT yet");
           return setAccountTokens(0);
         } else {
           let tokenDepositCounter = parseInt(accountDepositedTokens.data.deposit_events.counter);
@@ -515,7 +515,6 @@ export const AccountProvider = ({ children }) => {
           });
 
           if (result == undefined) {
-            console.log("Account holds 0 tokens with positive balance");
             setAccountTokens(0);
           } else {
             setAccountTokens(result);
@@ -531,7 +530,7 @@ export const AccountProvider = ({ children }) => {
   const getNftDetails = async () => {
     try {
       if (accountTokens === 0) {
-        console.log("Account doesn't hold any NFT yet");
+        // console.log("Account doesn't hold any NFT yet");
         return setNftDetails(0);
       } else {
         let data = await Promise.all(
