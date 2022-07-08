@@ -50,8 +50,9 @@ const ReceiveDialog = () => {
             Copy to clipboard
           </Button>
           <Typography align="center" sx={{ my: 2 }} color="warning.main">
-            Confirm Aptos network selected and chain id set to {chain_id} before sending any
-            resources to this address.
+            Network: Aptos Devnet
+            <br />
+            Chain id: {chain_id}
           </Typography>
         </Stack>
       </DialogContent>
