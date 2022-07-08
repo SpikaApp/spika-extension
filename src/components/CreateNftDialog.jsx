@@ -46,7 +46,7 @@ const CreateNftDialog = () => {
       <DialogContent>
         <Stack component="span" sx={{ maxWidth: 300 }}>
           <TextField
-            sx={{ mt: 1, mb: 2, width: 275 }}
+            sx={{ mt: 1, mb: 1.5, width: 250 }}
             id="collectionName"
             label="Collection Name"
             type="string"
@@ -57,7 +57,7 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 1, mb: 1, width: 250 }}
+            sx={{ mt: 1.5, mb: 1.5, width: 250 }}
             id="nftName"
             label="NFT Name"
             type="string"
