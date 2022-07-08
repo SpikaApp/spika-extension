@@ -57,7 +57,7 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2, width: 275 }}
+            sx={{ mt: 2, mb: 2, width: 250 }}
             id="nftName"
             label="NFT Name"
             type="string"
@@ -68,7 +68,7 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2, width: 275 }}
+            sx={{ mt: 2, mb: 2, width: 250 }}
             id="nftDescription"
             label="Description"
             type="string"
@@ -92,7 +92,7 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2, width: 275 }}
+            sx={{ mt: 2, mb: 2, width: 250 }}
             id="nftUri"
             label="URL"
             type="string"
