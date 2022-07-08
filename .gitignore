@@ -28,3 +28,5 @@ tmp
 
 .aptos
 src/components/_DraftDialog.jsx
+extension
+build-ext.sh
