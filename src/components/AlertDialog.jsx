@@ -157,7 +157,7 @@ const AlertDialog = () => {
         {alertSignal === 81 || alertSignal === 91 ? (
           <Stack>
             <TextField
-              sx={{ width: 275, marginBottom: 2 }}
+              sx={{ width: 250, marginBottom: 2 }}
               error
               id="output-error"
               multiline
