@@ -44,6 +44,7 @@ const CreateCollectionDialog = () => {
             sx={{ mt: 2, mb: 2 }}
             id="collectionName"
             label="Collection Name"
+            fullWidth={true}
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
@@ -55,6 +56,7 @@ const CreateCollectionDialog = () => {
             sx={{ mt: 2, mb: 2 }}
             id="collectionDescription"
             label="Collection Description"
+            fullWidth={true}
             type="string"
             multiline
             rows={3}
@@ -68,6 +70,7 @@ const CreateCollectionDialog = () => {
             sx={{ mt: 2, mb: 2 }}
             id="collectionUri"
             label="URL"
+            fullWidth={true}
             type="string"
             value={collectionUri}
             onChange={(e) => setCollectionUri(e.target.value)}
