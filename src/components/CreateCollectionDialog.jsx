@@ -39,12 +39,11 @@ const CreateCollectionDialog = () => {
         <Stack sx={{ display: "flex", alignItems: "center" }}>Create New Collection</Stack>
       </DialogTitle>
       <DialogContent>
-        <Stack component="span">
+        <Stack component="span" sx={{ maxWidth: 300 }}>
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="collectionName"
             label="Collection Name"
-            fullWidth={true}
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
@@ -53,10 +52,9 @@ const CreateCollectionDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="collectionDescription"
             label="Collection Description"
-            fullWidth={true}
             type="string"
             multiline
             rows={3}
@@ -67,10 +65,9 @@ const CreateCollectionDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="collectionUri"
             label="URL"
-            fullWidth={true}
             type="string"
             value={collectionUri}
             onChange={(e) => setCollectionUri(e.target.value)}

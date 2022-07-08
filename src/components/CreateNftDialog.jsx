@@ -44,12 +44,11 @@ const CreateNftDialog = () => {
         <Stack sx={{ display: "flex", alignItems: "center" }}>Create NFT</Stack>
       </DialogTitle>
       <DialogContent>
-        <Stack component="span">
+        <Stack component="span" sx={{ maxWidth: 300 }}>
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="collectionName"
             label="Collection Name"
-            fullWidth={true}
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
@@ -58,10 +57,9 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="nftName"
             label="NFT Name"
-            fullWidth={true}
             type="string"
             value={nftName}
             onChange={(e) => setNftName(e.target.value)}
@@ -70,10 +68,9 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="nftDescription"
             label="Description"
-            fullWidth={true}
             type="string"
             multiline
             rows={3}
@@ -95,10 +92,9 @@ const CreateNftDialog = () => {
             }}
           />
           <TextField
-            sx={{ mt: 2, mb: 2 }}
+            sx={{ mt: 2, mb: 2, width: 275 }}
             id="nftUri"
             label="URL"
-            fullWidth={true}
             type="string"
             value={nftUri}
             onChange={(e) => setNftUri(e.target.value)}
