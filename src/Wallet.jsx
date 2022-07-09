@@ -24,8 +24,8 @@ import ReceiveDialog from "./components/ReceiveDialog";
 import { UIContext } from "./context/UIContext";
 import { AccountContext } from "./context/AccountContext";
 import shortenAddress from "./utils/shortenAddress";
-import aptos from "./assets/aptos.png";
-import aptos2 from "./assets/aptos2.png";
+import aptos_light from "./assets/aptos_light.png";
+import aptos_dark from "./assets/aptos_dark.png";
 
 const Wallet = () => {
   const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
@@ -78,13 +78,13 @@ const Wallet = () => {
           {accountImported ? (
             <Stack sx={{ display: "flex", alignItems: "center", my: -2 }}>
               {darkMode ? (
-                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos} alt="aptos" />
+                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos_dark} alt="aptos" />
               ) : (
-                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos2} alt="aptos" />
+                <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos_light} alt="aptos" />
               )}
 
               <Typography
-                sx={{ mb: 2 }}
+                sx={{ mb: 1 }}
                 variant="h6"
                 align="center"
                 color="textSecondary"
