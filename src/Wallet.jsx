@@ -52,7 +52,7 @@ const Wallet = () => {
         <br />
         Your Wallet
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
             <div>

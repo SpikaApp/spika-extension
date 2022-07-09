@@ -1,13 +1,28 @@
 import React, { useContext } from "react";
-import { Container, Typography, Card, CardActions, CardContent, Button, TextField } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardActions,
+  CardContent,
+  Button,
+  TextField,
+} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Create = () => {
-  const { newMnemonic, handleGenerate, handleCreate, password, setPassword, confirmPassword, setConfirmPassword } =
-    useContext(AccountContext);
+  const {
+    newMnemonic,
+    handleGenerate,
+    handleCreate,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+  } = useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
@@ -16,14 +31,15 @@ const Create = () => {
         <br />
         Create New Account
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         {newMnemonic === "" ? (
           <CardContent>
             <Typography variant="body1" align="center" color="textSecondary" gutterBottom>
               <InfoIcon color="primary" />
               <br />
-              First, let's generate new mnemonic phrase. Make sure to write down all words in correct order and store it
-              in a safe place. Remember, mnemonic phrase is a key to your account!
+              First, let's generate new mnemonic phrase. Make sure to write down all words in
+              correct order and store it in a safe place. Remember, mnemonic phrase is a key to your
+              account!
             </Typography>
           </CardContent>
         ) : (
@@ -37,12 +53,12 @@ const Create = () => {
                 autoFocus={false}
                 autoComplete="off"
                 multiline
-                rows={6}
+                rows={3}
                 variant="outlined"
                 value={newMnemonic}
               />
               <TextField
-                sx={{ marginTop: 4 }}
+                sx={{ mt: 4 }}
                 id="password"
                 label="Password"
                 type="password"
@@ -52,7 +68,7 @@ const Create = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <TextField
-                sx={{ marginTop: 2, marginBottom: 2 }}
+                sx={{ mt: 2 }}
                 id="confirmPassword"
                 label="Confirm password"
                 type="password"

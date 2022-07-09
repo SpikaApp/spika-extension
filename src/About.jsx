@@ -34,7 +34,7 @@ const About = () => {
         </Link>{" "}
         Blockchain (id: {chain_id})
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
             Wallet version 0.1.0 <br />

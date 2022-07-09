@@ -47,7 +47,6 @@ const CreateNftDialog = () => {
         <Stack component="span" sx={{ maxWidth: 300 }}>
           <TextField
             sx={{ mt: 1, mb: 1.5, width: 250 }}
-            size="small"
             id="collectionName"
             label="Collection Name"
             type="string"
@@ -59,7 +58,6 @@ const CreateNftDialog = () => {
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
-            size="small"
             id="nftName"
             label="NFT Name"
             type="string"
@@ -71,12 +69,11 @@ const CreateNftDialog = () => {
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
-            size="small"
             id="nftDescription"
             label="Description"
             type="string"
             multiline
-            rows={3}
+            rows={2}
             value={nftDescription}
             onChange={(e) => setNftDescription(e.target.value)}
             InputLabelProps={{
@@ -85,7 +82,6 @@ const CreateNftDialog = () => {
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 150 }}
-            size="small"
             id="nftSupply"
             label="Editions"
             type="number"
@@ -97,7 +93,6 @@ const CreateNftDialog = () => {
           />
           <TextField
             sx={{ mt: 1.5, width: 250 }}
-            size="small"
             id="nftUri"
             label="URL"
             type="string"

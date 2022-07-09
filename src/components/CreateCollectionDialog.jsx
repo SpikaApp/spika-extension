@@ -42,7 +42,6 @@ const CreateCollectionDialog = () => {
         <Stack component="span" sx={{ maxWidth: 300 }}>
           <TextField
             sx={{ mt: 1, mb: 1.5, width: 250 }}
-            size="small"
             id="collectionName"
             label="Collection Name"
             type="string"
@@ -54,7 +53,6 @@ const CreateCollectionDialog = () => {
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
-            size="small"
             id="collectionDescription"
             label="Collection Description"
             type="string"
@@ -67,7 +65,6 @@ const CreateCollectionDialog = () => {
             }}
           />
           <TextField
-            size="small"
             sx={{ mt: 1.5, width: 250 }}
             id="collectionUri"
             label="URL"
