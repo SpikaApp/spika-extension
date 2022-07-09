@@ -54,7 +54,7 @@ const NFTs = () => {
         <br />
         NFTs
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         <CardContent sx={{ minHeight: 300 }}>
           <Stack
             direction="row"

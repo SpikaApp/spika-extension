@@ -51,7 +51,7 @@ const Transactions = () => {
         <br />
         Latest Transactions
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         <CardContent>
           <Box
             sx={{

@@ -1,21 +1,36 @@
 import { useContext } from "react";
-import { Container, Typography, Card, CardActions, CardContent, Button, TextField } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardActions,
+  CardContent,
+  Button,
+  TextField,
+} from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
 import Loading from "./components/Loading";
 import { AccountContext } from "./context/AccountContext";
 
 const Import = () => {
-  const { mnemonic, setMnemonic, handleImport, password, setPassword, confirmPassword, setConfirmPassword } =
-    useContext(AccountContext);
+  const {
+    mnemonic,
+    setMnemonic,
+    handleImport,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+  } = useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        <ArticleIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
+        <ArticleIcon sx={{ mt: 2, fontSize: 48 }} color="primary" />
         <br />
         Import Account
       </Typography>
-      <Card>
+      <Card sx={{ mb: 2 }}>
         <form className="import-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -26,13 +41,13 @@ const Import = () => {
               autoFocus={true}
               autoComplete="off"
               multiline
-              rows={6}
+              rows={3}
               variant="outlined"
               value={mnemonic}
               onChange={(e) => setMnemonic(e.target.value)}
             />
             <TextField
-              sx={{ marginTop: 4 }}
+              sx={{ mt: 4 }}
               id="password"
               label="Password"
               type="password"
@@ -42,7 +57,7 @@ const Import = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <TextField
-              sx={{ marginTop: 2, marginBottom: 2 }}
+              sx={{ mt: 2 }}
               id="confirmPassword"
               label="Confirm password"
               type="password"
