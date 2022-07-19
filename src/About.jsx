@@ -55,8 +55,17 @@ const About = () => {
               License
             </Link>
             <br />
+            <Link
+              href="https://github.com/xorgal/spika/blob/master/docs/PRIVACY.md"
+              underline="none"
+              target="_blank"
+            >
+              {" "}
+              Privacy Policy
+            </Link>
+            <br />
             <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank">
-              spika@xorgal.xyz
+              Contacts
             </Link>
           </Typography>
         </CardContent>
