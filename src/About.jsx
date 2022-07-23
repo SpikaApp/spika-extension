@@ -37,8 +37,8 @@ const About = () => {
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.1.1 <br />
-            Aptos SDK version 1.2.0
+            Wallet version 0.1.2 <br />
+            Aptos SDK version 1.2.1
             <br />
             Project on
             <Link href="https://github.com/xorgal/spika" underline="none" target="_blank">
