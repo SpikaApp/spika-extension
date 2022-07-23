@@ -256,7 +256,7 @@ export const AccountProvider = ({ children }) => {
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
       let accountResource = resources.find(
-        (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+        (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
       );
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
@@ -288,7 +288,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
       let accountResource = resources.find(
-        (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+        (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
       );
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
@@ -326,7 +326,7 @@ export const AccountProvider = ({ children }) => {
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
         let accountResource = resources.find(
-          (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+          (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
         );
         setAccountImported(true);
         setPrivateKey(secretKey);
@@ -365,8 +365,8 @@ export const AccountProvider = ({ children }) => {
 
   const payload = {
     type: "script_function_payload",
-    function: "0x1::Coin::transfer",
-    type_arguments: ["0x1::TestCoin::TestCoin"],
+    function: "0x1::coin::transfer",
+    type_arguments: ["0x1::test_coin::TestCoin"],
     arguments: [recipientAddress, amount],
   };
 
@@ -422,7 +422,7 @@ export const AccountProvider = ({ children }) => {
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
     let accountResource = resources.find(
-      (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+      (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
     );
     setBalance(accountResource.data.coin.value);
   };
@@ -447,7 +447,7 @@ export const AccountProvider = ({ children }) => {
   const getReceivedEvents = async () => {
     let accountResources = await client.getAccountResources(currentAddress);
     let accountTestCoins = accountResources.find(
-      (r) => r.type === "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>"
+      (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
     );
 
     let counter = parseInt(accountTestCoins.data.deposit_events.counter);
@@ -455,7 +455,7 @@ export const AccountProvider = ({ children }) => {
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+        "0x1::coin::CoinStore<0x1::test_coin::TestCoin>",
         "deposit_events"
       );
       let res = data.reverse((r) => r.type === "sequence_number");
@@ -463,7 +463,7 @@ export const AccountProvider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::Coin::CoinStore<0x1::TestCoin::TestCoin>",
+        "0x1::coin::CoinStore<0x1::test_coin::TestCoin>",
         "deposit_events",
         {
           start: counter - 25,
@@ -479,7 +479,7 @@ export const AccountProvider = ({ children }) => {
       // Get total number of Token deposit_events received by an account
       let accountResources = await client.getAccountResources(currentAddress);
       let accountDepositedTokens = accountResources.find(
-        (r) => r.type === "0x1::Token::TokenStore"
+        (r) => r.type === "0x1::token::TokenStore"
       );
 
       const getTokens = async () => {
@@ -491,7 +491,7 @@ export const AccountProvider = ({ children }) => {
           // Get Token deposit_events
           let data = await client.getEventsByEventHandle(
             currentAddress,
-            "0x1::Token::TokenStore",
+            "0x1::token::TokenStore",
             "deposit_events",
             {
               limit: tokenDepositCounter,
