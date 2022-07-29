@@ -256,7 +256,7 @@ export const AccountProvider = ({ children }) => {
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
       let accountResource = resources.find(
-        (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
+        (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
       );
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
@@ -288,7 +288,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       let resources = await client.getAccountResources(account.address());
       let accountResource = resources.find(
-        (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
+        (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
       );
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
@@ -326,7 +326,7 @@ export const AccountProvider = ({ children }) => {
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
         let accountResource = resources.find(
-          (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
+          (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
         );
         setAccountImported(true);
         setPrivateKey(secretKey);
@@ -355,7 +355,7 @@ export const AccountProvider = ({ children }) => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} TestCoin`);
+      throwAlert(21, "Success", `Received ${amount} AptosCoin`);
     } catch (error) {
       throwAlert(22, "Error", "Mint failed");
       setIsLoading(false);
@@ -366,7 +366,7 @@ export const AccountProvider = ({ children }) => {
   const payload = {
     type: "script_function_payload",
     function: "0x1::coin::transfer",
-    type_arguments: ["0x1::test_coin::TestCoin"],
+    type_arguments: ["0x1::aptos_coin::AptosCoin"],
     arguments: [recipientAddress, amount],
   };
 
@@ -422,7 +422,7 @@ export const AccountProvider = ({ children }) => {
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
     let accountResource = resources.find(
-      (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
+      (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
     );
     setBalance(accountResource.data.coin.value);
   };
@@ -446,16 +446,16 @@ export const AccountProvider = ({ children }) => {
 
   const getReceivedEvents = async () => {
     let accountResources = await client.getAccountResources(currentAddress);
-    let accountTestCoins = accountResources.find(
-      (r) => r.type === "0x1::coin::CoinStore<0x1::test_coin::TestCoin>"
+    let accountAptosCoins = accountResources.find(
+      (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
     );
 
-    let counter = parseInt(accountTestCoins.data.deposit_events.counter);
+    let counter = parseInt(accountAptosCoins.data.deposit_events.counter);
 
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::coin::CoinStore<0x1::test_coin::TestCoin>",
+        "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
         "deposit_events"
       );
       let res = data.reverse((r) => r.type === "sequence_number");
@@ -463,7 +463,7 @@ export const AccountProvider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::coin::CoinStore<0x1::test_coin::TestCoin>",
+        "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
         "deposit_events",
         {
           start: counter - 25,

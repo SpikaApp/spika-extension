@@ -90,7 +90,7 @@ const Wallet = () => {
                 color="textSecondary"
                 gutterBottom
               >
-                {balance} TestCoin
+                {balance} APTOS
               </Typography>
             </Stack>
           ) : (
