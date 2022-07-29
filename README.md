@@ -28,7 +28,7 @@ Web wallet will be installed and appear in the list of active extensions:
 3. Select **Load Unpacked** and upload package. Web wallet will be install and appear in **Active Extensions** ready for use
 
 ### **Build from source**
-To build extension from source using shell script and upload it to Chrome browser using steps described in [previous section](#download-zipped-package-from-github).
+Use this method to build extension from source and upload it to Chrome browser using steps described in [previous section](#download-zipped-package-from-github).
 
 **Requirements:**
 - Nodejs
