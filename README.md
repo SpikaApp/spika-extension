@@ -27,7 +27,7 @@ Web wallet will be installed and appear in the list of active extensions:
 ### **Download zipped package from GitHub**
 1. Navigate to **Releases** section and download latest zipped package
 2. Unzip package's content
-2. In Chrome browser open **Manage Extensions** tab and enable **Developer mode**
+2. In Chrome browser open **Manage Extensions** tab (`chrome://extensions/`)and enable **Developer mode**
 3. Select **Load Unpacked** and upload package. Web wallet will be installed and appear in **Active Extensions**
 
 ### **Build from source**
