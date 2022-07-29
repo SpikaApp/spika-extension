@@ -14,7 +14,7 @@ const ReceivedEventCard = ({
         <DownloadIcon sx={{ fontSize: 24, marginRight: 2, marginTop: 1 }} color="primary" />
         <Stack>
           <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
-            Amount: {amount} TestCoin
+            Amount: {amount} APTOS
             <br />
             Transaction No. {sequence_number}
           </Stack>

@@ -1,5 +1,13 @@
 import { useContext } from "react";
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
@@ -16,7 +24,7 @@ const MintDialog = () => {
 
   return (
     <Dialog open={openMintDialog} onClose={handleCancel}>
-      <DialogTitle>Mint TestCoin</DialogTitle>
+      <DialogTitle>Mint Test Aptos Coin</DialogTitle>
       <DialogContent>
         {/* <DialogContentText sx={{ marginBottom: 2 }}>Enter amount to mint:</DialogContentText> */}
         <TextField
