@@ -48,6 +48,6 @@ Build extension:
 ```
 npm run build
 ```
-Copy all files from `extension` directory to `build`
+Copy all files from `extension` directory to `build` directory and upload content of `build` directory to Chrome browser using steps described in [previous section](#download-zipped-package-from-github). 
 
 *NOTE: As an option `build-ext.sh` script can be used to automate above steps*
