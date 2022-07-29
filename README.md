@@ -50,4 +50,4 @@ npm run build
 ```
 Copy all files from `extension` directory to `build`
 
-*NOTE: As an option `build-ext.sh` script can be used to automate above steps (*nix/macos)*
+*NOTE: As an option `build-ext.sh` script can be used to automate above steps*
