@@ -3,10 +3,10 @@
   "name": "Spika",
   "description": "Web wallet for Aptos Blockchain",
   "version": "0.1.5",
-  "icons": { "128": "logo_128.png" },
+  "icons": { "128": "logo.png" },
   "action": {
     "default_title": "Spika",
-    "default_icon": "logo_128.png",
+    "default_icon": "logo.png",
     "default_popup": "index.html"
   }
 }
