@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
-import ReceivedEventCard from "./components/ReceivedEventCard";
-import TransactionCard from "./components/TransactionCard";
-import Loading from "./components/Loading";
-import { AccountContext } from "./context/AccountContext";
+import ReceivedEventCard from "../components/ReceivedEventCard";
+import TransactionCard from "../components/TransactionCard";
+import Loading from "../components/Loading";
+import { AccountContext } from "../context/AccountContext";
 
 const style = {
   width: "100%",

@@ -17,9 +17,9 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { styled, alpha } from "@mui/material/styles";
 import Link from "@mui/material/Link";
-import { AccountContext } from "./context/AccountContext";
-import { UIContext } from "./context/UIContext";
-import LogoutDialog from "./components/LogoutDialog";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import LogoutDialog from "../components/LogoutDialog";
 
 const StyledMenu = styled((props) => (
   <Menu

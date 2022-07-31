@@ -10,10 +10,10 @@ import {
   Button,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { AccountContext } from "./context/AccountContext";
-import { UIContext } from "./context/UIContext";
-import useAxios from "./utils/useAxios";
-import { NODE_URL } from "./context/AccountContext";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import useAxios from "../utils/useAxios";
+import { NODE_URL } from "../context/AccountContext";
 
 const About = () => {
   const { accountImported } = useContext(AccountContext);

@@ -9,8 +9,8 @@ import {
   TextField,
 } from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
-import Loading from "./components/Loading";
-import { AccountContext } from "./context/AccountContext";
+import Loading from "../components/Loading";
+import { AccountContext } from "../context/AccountContext";
 
 const Import = () => {
   const {

@@ -13,11 +13,11 @@ import {
   CircularProgress,
 } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
-import { UIContext } from "./context/UIContext";
-import { AccountContext } from "./context/AccountContext";
-import CreateCollectionDialog from "./components/CreateCollectionDialog";
-import CreateNftDialog from "./components/CreateNftDialog";
-import default_nft from "./assets/default_nft.jpg";
+import { UIContext } from "../context/UIContext";
+import { AccountContext } from "../context/AccountContext";
+import CreateCollectionDialog from "../components/CreateCollectionDialog";
+import CreateNftDialog from "../components/CreateNftDialog";
+import default_nft from "../assets/default_nft.jpg";
 
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
