@@ -54,6 +54,7 @@ export const AccountProvider = ({ children }) => {
     setMnemonicRequired,
     setPrivateKeyRequired,
     setOpenAlertDialog,
+    setOpenLogoutDialog,
   } = useContext(UIContext);
 
   const navigate = useNavigate();
@@ -192,9 +193,14 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
     navigate("/");
-    window.location.reload();
+    setPrivateKey("");
+    setCurrentAddress("");
+    setAccount([]);
+    clearPasswords();
+    setAccountImported(false);
+    localStorage.clear();
+    setOpenLogoutDialog(false);
   };
 
   const handleMint = async () => {
