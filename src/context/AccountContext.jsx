@@ -40,7 +40,6 @@ export const AccountProvider = ({ children }) => {
   const [account, setAccount] = useState([]); // AptosAccount
   const [balance, setBalance] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [sentEvents, setSentEvents] = useState([]);
   const [receivedEvents, setReceivedEvents] = useState([]);
   const [accountTokens, setAccountTokens] = useState([]);
   const [nftDetails, setNftDetails] = useState([]);
