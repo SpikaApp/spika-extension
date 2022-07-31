@@ -13,12 +13,11 @@ import {
   CircularProgress,
 } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
-import ConstructionIcon from "@mui/icons-material/Construction";
 import { UIContext } from "./context/UIContext";
 import { AccountContext } from "./context/AccountContext";
 import CreateCollectionDialog from "./components/CreateCollectionDialog";
 import CreateNftDialog from "./components/CreateNftDialog";
-import emptyNft from "./assets/emptyNft.jpg";
+import default_nft from "./assets/default_nft.jpg";
 
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
@@ -98,7 +97,7 @@ const NFTs = () => {
                       src={`${nft.uri}`}
                       onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
-                        currentTarget.src = emptyNft;
+                        currentTarget.src = default_nft;
                       }}
                     />
                     <ImageListItemBar
