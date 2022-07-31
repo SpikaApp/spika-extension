@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import Loading from "./components/Loading";
-import { AccountContext } from "./context/AccountContext";
+import Loading from "../components/Loading";
+import { AccountContext } from "../context/AccountContext";
 
 const Create = () => {
   const {

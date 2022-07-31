@@ -16,16 +16,16 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SendIcon from "@mui/icons-material/Send";
 import CloudQueueIcon from "@mui/icons-material/CloudQueue";
 import DownloadIcon from "@mui/icons-material/Download";
-import Loading from "./components/Loading";
-import AlertDialog from "./components/AlertDialog";
-import MintDialog from "./components/MintDialog";
-import SendDialog from "./components/SendDialog";
-import ReceiveDialog from "./components/ReceiveDialog";
-import { UIContext } from "./context/UIContext";
-import { AccountContext } from "./context/AccountContext";
-import shortenAddress from "./utils/shortenAddress";
-import aptos_light from "./assets/aptos_light.png";
-import aptos_dark from "./assets/aptos_dark.png";
+import Loading from "../components/Loading";
+import AlertDialog from "../components/AlertDialog";
+import MintDialog from "../components/MintDialog";
+import SendDialog from "../components/SendDialog";
+import ReceiveDialog from "../components/ReceiveDialog";
+import { UIContext } from "../context/UIContext";
+import { AccountContext } from "../context/AccountContext";
+import shortenAddress from "../utils/shortenAddress";
+import aptos_light from "../assets/aptos_light.png";
+import aptos_dark from "../assets/aptos_dark.png";
 
 const Wallet = () => {
   const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
