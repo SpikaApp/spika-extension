@@ -159,7 +159,7 @@ const Navbar = () => {
           <Stack direction="row" spacing={1}>
             <Tooltip title="Toggle theme">
               <IconButton aria-label="theme" size="normal" onClick={handleThemeSwitch}>
-                {darkMode ? <LightModeIcon /> : <DarkModeIcon sx={{ color: "white" }} />}
+                {darkMode ? <DarkModeIcon /> : <LightModeIcon sx={{ color: "white" }} />}
               </IconButton>
             </Tooltip>
             <Tooltip title="Lock wallet">
