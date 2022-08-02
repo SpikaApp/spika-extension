@@ -72,8 +72,8 @@ export const AccountProvider = ({ children }) => {
           id: "service_worker",
           task: "listen",
         });
-        handleLogin();
       }
+      handleLogin();
     }
   }, [isUnlocked === true]);
 

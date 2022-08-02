@@ -8,7 +8,7 @@ export const saveSession = (protocol, key, value) => {
 };
 
 export const loadSession = (protocol, key) => {
-  if (protocol === "http:" || protocol === "https:") {
+  if ((protocol === "http:") | (protocol === "https:")) {
     return sessionStorage.getItem(key);
   }
   if (protocol === "chrome-extension:") {
