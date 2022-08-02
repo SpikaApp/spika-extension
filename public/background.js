@@ -1,5 +1,5 @@
 // delay in minutes before locking wallet;
-const interval = 1;
+const interval = 15;
 let job = null;
 
 const walletLocker = () => {
