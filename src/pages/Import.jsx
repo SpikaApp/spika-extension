@@ -69,7 +69,7 @@ const Import = () => {
         </form>
         <CardActions>
           <Button variant="contained" onClick={handleImport}>
-            IMPORT
+            Import Account
           </Button>
         </CardActions>
       </Card>

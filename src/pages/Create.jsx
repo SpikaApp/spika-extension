@@ -82,7 +82,7 @@ const Create = () => {
 
         {newMnemonic === "" ? (
           <CardActions>
-            <Button variant="outlined" onClick={handleGenerate}>
+            <Button variant="contained" onClick={handleGenerate}>
               Generate Mnemonic
             </Button>
           </CardActions>

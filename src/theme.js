@@ -1,6 +1,18 @@
 import { createTheme } from "@mui/material";
 
 export const lightTheme = createTheme({
+  shape: {
+    borderRadius: 8,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 24,
+        },
+      },
+    },
+  },
   palette: {
     primary: {
       main: "#1760a5",
@@ -16,6 +28,18 @@ export const lightTheme = createTheme({
 });
 
 export const darkTheme = createTheme({
+  shape: {
+    borderRadius: 8,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 24,
+        },
+      },
+    },
+  },
   palette: {
     mode: "dark",
     alt: {

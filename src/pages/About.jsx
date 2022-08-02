@@ -13,7 +13,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import useAxios from "../utils/useAxios";
-import { NODE_URL } from "../context/AccountContext";
+import { NODE_URL } from "../utils/constants";
 
 const About = () => {
   const { accountImported } = useContext(AccountContext);
@@ -37,7 +37,7 @@ const About = () => {
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.1.5 <br />
+            Wallet version 0.1.6 <br />
             Aptos SDK version 1.2.2
             <br />
             Project on
