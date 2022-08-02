@@ -58,7 +58,6 @@ export const AccountProvider = ({ children }) => {
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
   useEffect(() => {
-    console.log(PROTOCOL_TYPE);
     if (PROTOCOL_TYPE === "chrome-extension:") {
       chrome.runtime.connect({ name: "spika" });
     }
