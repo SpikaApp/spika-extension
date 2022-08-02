@@ -1,5 +1,5 @@
 export const saveSession = (protocol, key, value) => {
-  if (protocol === "http:") {
+  if (protocol === "http:" || protocol === "https:") {
     sessionStorage.setItem(key, value);
   }
   if (protocol === "chrome-extension:") {
@@ -8,7 +8,7 @@ export const saveSession = (protocol, key, value) => {
 };
 
 export const loadSession = (protocol, key) => {
-  if (protocol === "http:") {
+  if (protocol === "http:" || protocol === "https:") {
     return sessionStorage.getItem(key);
   }
   if (protocol === "chrome-extension:") {
@@ -21,7 +21,7 @@ export const loadSession = (protocol, key) => {
 };
 
 export const clearSession = (protocol, key) => {
-  if (protocol === "http:") {
+  if (protocol === "http:" || protocol === "https:") {
     sessionStorage.removeItem(key);
   }
   if (protocol === "chrome-extension:") {
