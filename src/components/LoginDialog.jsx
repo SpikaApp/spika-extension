@@ -44,7 +44,7 @@ const LoginDialog = () => {
         <form className="login-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <TextField
-            sx={{ marginBottom: 4, marginRight: 2, marginLeft: 2, width: 260 }}
+            sx={{ marginBottom: 2, marginRight: 2, marginLeft: 2, width: 260 }}
             id="login-prompt"
             label="Password"
             type="password"
@@ -55,22 +55,30 @@ const LoginDialog = () => {
           />
         </form>
         {mnemonicRequired && (
-          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <Button onClick={handleCancel}>Cancel</Button>
-            <Button sx={{ marginLeft: 4 }} onClick={handleRevealMnemonic}>
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
+            <Button variant="contained" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealMnemonic}>
               Unlock
             </Button>
           </Stack>
         )}
         {privateKeyRequired && (
-          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <Button onClick={handleCancel}>Cancel</Button>
-            <Button sx={{ marginLeft: 4 }} onClick={handleRevealPrivateKey}>
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
+            <Button variant="contained" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealPrivateKey}>
               Unlock
             </Button>
           </Stack>
         )}
-        {!mnemonicRequired && !privateKeyRequired && <Button onClick={handleLogin}>Login</Button>}
+        {!mnemonicRequired && !privateKeyRequired && (
+          <Button variant="contained" onClick={handleLogin} sx={{ mb: 2 }}>
+            Login
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

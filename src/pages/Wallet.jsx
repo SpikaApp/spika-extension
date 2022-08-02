@@ -103,7 +103,7 @@ const Wallet = () => {
           <CardActions>
             <Stack sx={{ display: "flex", alignItems: "center" }}>
               <Button
-                sx={{ mb: 4, width: 100 }}
+                sx={{ mb: 2.5, width: 100 }}
                 variant="outlined"
                 startIcon={<CloudQueueIcon />}
                 onClick={handleMintUI}
@@ -128,12 +128,14 @@ const Wallet = () => {
           </CardActions>
         ) : (
           <CardActions>
-            <Button variant="outlined" component={RouterLink} to="create">
-              Create Account
-            </Button>
-            <Button variant="contained" component={RouterLink} to="import">
-              Import Account
-            </Button>
+            <Stack direction="column">
+              <Button variant="contained" component={RouterLink} to="create" sx={{ mb: 2.5 }}>
+                Create Account
+              </Button>
+              <Button variant="contained" component={RouterLink} to="import">
+                Import Account
+              </Button>
+            </Stack>
           </CardActions>
         )}
       </Card>

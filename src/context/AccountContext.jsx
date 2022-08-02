@@ -8,15 +8,8 @@ import shortenAddress from "../utils/shortenAddress";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
-
-// export const NODE_URL = "/api";
-// export const FAUCET_URL = "/faucet";
-
-export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
-export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
-
-// export const NODE_URL = process.env.APTOS_NODE_URL || "https://fullnode.devnet.aptoslabs.com";
-// export const FAUCET_URL = process.env.APTOS_FAUCET_URL || "https://faucet.devnet.aptoslabs.com";
+import { saveSession, loadSession, clearSession } from "../utils/sessionStore";
+import { PROTOCOL_TYPE, NODE_URL, FAUCET_URL } from "../utils/constants";
 
 export const AccountContext = React.createContext();
 
@@ -47,7 +40,8 @@ export const AccountProvider = ({ children }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [data0Exist, setData0Exist] = useState("false");
+  const [data0Exist, setData0Exist] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const {
     handleLoginUI,
     setOpenLoginDialog,
@@ -64,9 +58,34 @@ export const AccountProvider = ({ children }) => {
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
   useEffect(() => {
-    checkIfLoginRequired();
-    checkIfData0Exist();
+    if (PROTOCOL_TYPE === "chrome-extension:") {
+      chrome.runtime.connect({ name: "spika" });
+    }
+    walletState();
   }, []);
+
+  useEffect(() => {
+    if (isUnlocked) {
+      if (PROTOCOL_TYPE === "chrome-extension:") {
+        chrome.runtime.sendMessage({
+          id: "service_worker",
+          task: "listen",
+        });
+        handleLogin();
+      }
+    }
+  }, [isUnlocked === true]);
+
+  const walletState = async () => {
+    const data = await loadSession(PROTOCOL_TYPE, "PWD");
+    if (data === undefined || data === null) {
+      checkIfLoginRequired();
+      checkIfData0Exist();
+    } else {
+      setPassword(data);
+      setIsUnlocked(true);
+    }
+  };
 
   const handleGenerate = () => {
     generateMnemonic();
@@ -116,6 +135,12 @@ export const AccountProvider = ({ children }) => {
       await loadAccount();
       setIsLoading(false);
       setPassword("");
+      if (PROTOCOL_TYPE === "chrome-extension:") {
+        chrome.runtime.sendMessage({
+          id: "service_worker",
+          task: "listen",
+        });
+      }
     } catch (error) {
       setOpenLoginDialog(false);
       throwAlert(62, "Error", "Failed load account");
@@ -193,14 +218,37 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLogout = () => {
+    if (PROTOCOL_TYPE === "chrome-extension:") {
+      chrome.runtime.sendMessage({
+        id: "service_worker",
+        task: "idle",
+      });
+    }
     navigate("/");
     setPrivateKey("");
     setCurrentAddress("");
     setAccount([]);
     clearPasswords();
+    clearSession(PROTOCOL_TYPE, "PWD");
     setAccountImported(false);
     localStorage.clear();
     setOpenLogoutDialog(false);
+  };
+
+  const handleLock = () => {
+    if (PROTOCOL_TYPE === "chrome-extension:") {
+      chrome.runtime.sendMessage({
+        id: "service_worker",
+        task: "idle",
+      });
+    }
+    setPrivateKey("");
+    setCurrentAddress("");
+    setAccount([]);
+    clearPasswords();
+    clearSession(PROTOCOL_TYPE, "PWD");
+    setAccountImported(false);
+    handleLoginUI();
   };
 
   const handleMint = async () => {
@@ -268,6 +316,13 @@ export const AccountProvider = ({ children }) => {
       localStorage.setItem("accountImported", JSON.stringify(true));
       localStorage.setItem("data", encryptedMnemonic);
       localStorage.setItem("data0", encryptedPrivateKey);
+      saveSession(PROTOCOL_TYPE, "PWD", password);
+      if (PROTOCOL_TYPE === "chrome-extension:") {
+        chrome.runtime.sendMessage({
+          id: "service_worker",
+          task: "listen",
+        });
+      }
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -300,6 +355,13 @@ export const AccountProvider = ({ children }) => {
       localStorage.setItem("accountImported", JSON.stringify(true));
       localStorage.setItem("data", encryptedMnemonic);
       localStorage.setItem("data0", encryptedPrivateKey);
+      saveSession(PROTOCOL_TYPE, "PWD", password);
+      if (PROTOCOL_TYPE === "chrome-extension:") {
+        chrome.runtime.sendMessage({
+          id: "service_worker",
+          task: "listen",
+        });
+      }
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -333,6 +395,7 @@ export const AccountProvider = ({ children }) => {
         let accountResource = resources.find(
           (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
         );
+        saveSession(PROTOCOL_TYPE, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
         setAccount(account);
@@ -360,7 +423,7 @@ export const AccountProvider = ({ children }) => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} AptosCoin`);
+      throwAlert(21, "Success", `Received ${amount} Aptos Coin`);
     } catch (error) {
       throwAlert(22, "Error", "Mint failed");
       setIsLoading(false);
@@ -602,6 +665,7 @@ export const AccountProvider = ({ children }) => {
         accountTokens,
         nftDetails,
         handleLogout,
+        handleLock,
         password,
         setPassword,
         confirmPassword,

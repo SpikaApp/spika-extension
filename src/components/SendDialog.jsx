@@ -14,7 +14,7 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import useAxios from "../utils/useAxios";
-import { NODE_URL } from "../context/AccountContext";
+import { NODE_URL } from "../utils/constants";
 
 const SendDialog = () => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);

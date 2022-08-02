@@ -13,6 +13,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockIcon from "@mui/icons-material/Lock";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { styled, alpha } from "@mui/material/styles";
@@ -59,7 +61,7 @@ const StyledMenu = styled((props) => (
 }));
 
 const Navbar = () => {
-  const { accountImported } = useContext(AccountContext);
+  const { accountImported, handleLock } = useContext(AccountContext);
   const { darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -158,6 +160,16 @@ const Navbar = () => {
             <Tooltip title="Toggle theme">
               <IconButton aria-label="theme" size="normal" onClick={handleThemeSwitch}>
                 {darkMode ? <LightModeIcon /> : <DarkModeIcon sx={{ color: "white" }} />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Lock wallet">
+              <IconButton
+                aria-label="theme"
+                size="normal"
+                sx={{ color: "white" }}
+                onClick={handleLock}
+              >
+                {accountImported ? <LockOpenIcon /> : <LockIcon />}
               </IconButton>
             </Tooltip>
             {accountImported && (
