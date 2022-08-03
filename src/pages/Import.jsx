@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   Container,
   Typography,
@@ -7,6 +7,10 @@ import {
   CardContent,
   Button,
   TextField,
+  Stack,
+  FormControlLabel,
+  Checkbox,
+  Link,
 } from "@mui/material";
 import ArticleIcon from "@mui/icons-material/Article";
 import Loading from "../components/Loading";
@@ -22,6 +26,16 @@ const Import = () => {
     confirmPassword,
     setConfirmPassword,
   } = useContext(AccountContext);
+  const [checkedLicenseRules, setCheckedLicenseRules] = useState(false);
+  const [checkedPasswordRules, setCheckedPasswordRules] = useState(false);
+
+  const handleChangeLicenseRules = (event) => {
+    setCheckedLicenseRules(event.target.checked);
+  };
+
+  const handleChangePasswordRules = (event) => {
+    setCheckedPasswordRules(event.target.checked);
+  };
 
   return (
     <Container maxWidth="xs">
@@ -46,10 +60,11 @@ const Import = () => {
               value={mnemonic}
               onChange={(e) => setMnemonic(e.target.value)}
             />
+
             <TextField
               sx={{ mt: 4 }}
               id="password"
-              label="Password"
+              label="New Password"
               type="password"
               autoFocus={false}
               autoComplete="new-password"
@@ -67,10 +82,63 @@ const Import = () => {
             />
           </CardContent>
         </form>
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+            ml: 6,
+            mr: 6,
+            mr: 2,
+            mb: 2,
+          }}
+        >
+          <FormControlLabel
+            label={
+              <Typography>
+                I agree and accept license{" "}
+                <Link
+                  href="https://github.com/xorgal/spika/blob/master/LICENSE"
+                  underline="none"
+                  target="_blank"
+                >
+                  {" "}
+                  disclaimer
+                </Link>
+              </Typography>
+            }
+            control={<Checkbox checked={checkedLicenseRules} onChange={handleChangeLicenseRules} />}
+          />
+          <FormControlLabel
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+            label={
+              <Typography>
+                I understand that forgotten password cannot be recovered by wallet App{" "}
+              </Typography>
+            }
+            control={
+              <Checkbox
+                sx={{ my: -1 }}
+                checked={checkedPasswordRules}
+                onChange={handleChangePasswordRules}
+              />
+            }
+          />
+        </Stack>
         <CardActions>
-          <Button variant="contained" onClick={handleImport}>
-            Import Account
-          </Button>
+          {checkedLicenseRules && checkedPasswordRules ? (
+            <Button variant="contained" onClick={handleImport}>
+              Import Account
+            </Button>
+          ) : (
+            <Button variant="contained" disabled>
+              Import Account
+            </Button>
+          )}
         </CardActions>
       </Card>
       <Loading />

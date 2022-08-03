@@ -474,7 +474,6 @@ export const AccountProvider = ({ children }) => {
       let data = await client.getAccountTransactions(currentAddress);
       let res = data.reverse((r) => r.type === "version");
       setTransactions(res);
-      console.log(res);
     } else {
       let data = await client.getAccountTransactions(currentAddress, {
         start: sn - 25,
@@ -482,7 +481,6 @@ export const AccountProvider = ({ children }) => {
       });
       let res = data.reverse((r) => r.type === "version");
       setTransactions(res);
-      console.log(res);
     }
   };
 
