@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+
 export const UIContext = React.createContext();
 
 export const UIProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState();
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
   const [openSendDialog, setOpenSendDialog] = useState(false);

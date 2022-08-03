@@ -8,8 +8,8 @@ import shortenAddress from "../utils/shortenAddress";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
-import { saveSession, loadSession, clearSession } from "../utils/sessionStore";
-import { PROTOCOL_TYPE, NODE_URL, FAUCET_URL } from "../utils/constants";
+import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
+import { PLATFORM, NODE_URL, FAUCET_URL } from "../utils/constants";
 
 export const AccountContext = React.createContext();
 
@@ -40,14 +40,12 @@ export const AccountProvider = ({ children }) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [data0Exist, setData0Exist] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const {
     handleLoginUI,
     setOpenLoginDialog,
     setMnemonicRequired,
     setPrivateKeyRequired,
-    setOpenAlertDialog,
     setOpenLogoutDialog,
   } = useContext(UIContext);
 
@@ -58,7 +56,7 @@ export const AccountProvider = ({ children }) => {
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
 
   useEffect(() => {
-    if (PROTOCOL_TYPE === "chrome-extension:") {
+    if (PLATFORM === "chrome-extension:") {
       chrome.runtime.connect({ name: "spika" });
     }
     walletState();
@@ -66,7 +64,7 @@ export const AccountProvider = ({ children }) => {
 
   useEffect(() => {
     if (isUnlocked) {
-      if (PROTOCOL_TYPE === "chrome-extension:") {
+      if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
           id: "service_worker",
           task: "listen",
@@ -77,10 +75,9 @@ export const AccountProvider = ({ children }) => {
   }, [isUnlocked === true]);
 
   const walletState = async () => {
-    const data = await loadSession(PROTOCOL_TYPE, "PWD");
+    const data = await getMem(PLATFORM, "PWD");
     if (data === undefined || data === null) {
       checkIfLoginRequired();
-      checkIfData0Exist();
     } else {
       setPassword(data);
       setIsUnlocked(true);
@@ -96,19 +93,10 @@ export const AccountProvider = ({ children }) => {
     setNewMnemonic(mn);
   };
 
-  const checkIfLoginRequired = () => {
+  const checkIfLoginRequired = async () => {
     try {
-      const oldMnemonic = localStorage.getItem("mnemonic"); // if unencrypted mnemonic found -> logout
-      const data = JSON.parse(localStorage.getItem("accountImported"));
-
-      if (oldMnemonic !== null && oldMnemonic.length > 0) {
-        throwAlert(
-          93,
-          "Logout performed",
-          "Unencrypted data is not supported in this version. Please login again to start using encryption"
-        );
-        setOpenAlertDialog(true);
-      } else if (data === true) {
+      const data = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+      if (data) {
         handleLoginUI();
       } else {
         navigate("/");
@@ -119,15 +107,6 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const checkIfData0Exist = () => {
-    const data0 = localStorage.getItem("data0");
-    if (data0 !== null) {
-      setData0Exist(true);
-    } else {
-      setData0Exist(false);
-    }
-  };
-
   const handleLogin = async () => {
     try {
       setOpenLoginDialog(false);
@@ -135,7 +114,7 @@ export const AccountProvider = ({ children }) => {
       await loadAccount();
       setIsLoading(false);
       setPassword("");
-      if (PROTOCOL_TYPE === "chrome-extension:") {
+      if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
           id: "service_worker",
           task: "listen",
@@ -151,7 +130,7 @@ export const AccountProvider = ({ children }) => {
 
   const handleRevealMnemonic = async () => {
     try {
-      const encryptedMnemonic = localStorage.getItem("data");
+      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
       throwAlert(91, "Mnemonic Phrase", decryptedMnemonic);
       setPassword("");
@@ -167,7 +146,7 @@ export const AccountProvider = ({ children }) => {
 
   const handleRevealPrivateKey = async () => {
     try {
-      const encryptedPrivateKey = localStorage.getItem("data0");
+      const encryptedPrivateKey = await getStore(PLATFORM, "DATA0");
       let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
       throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
       setPassword("");
@@ -218,7 +197,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLogout = () => {
-    if (PROTOCOL_TYPE === "chrome-extension:") {
+    if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
         id: "service_worker",
         task: "idle",
@@ -229,14 +208,14 @@ export const AccountProvider = ({ children }) => {
     setCurrentAddress("");
     setAccount([]);
     clearPasswords();
-    clearSession(PROTOCOL_TYPE, "PWD");
+    removeMem(PLATFORM, "PWD");
     setAccountImported(false);
-    localStorage.clear();
+    clearStore(PLATFORM);
     setOpenLogoutDialog(false);
   };
 
   const handleLock = () => {
-    if (PROTOCOL_TYPE === "chrome-extension:") {
+    if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
         id: "service_worker",
         task: "idle",
@@ -246,7 +225,7 @@ export const AccountProvider = ({ children }) => {
     setCurrentAddress("");
     setAccount([]);
     clearPasswords();
-    clearSession(PROTOCOL_TYPE, "PWD");
+    removeMem(PLATFORM, "PWD");
     setAccountImported(false);
     handleLoginUI();
   };
@@ -313,16 +292,16 @@ export const AccountProvider = ({ children }) => {
       );
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      localStorage.setItem("accountImported", JSON.stringify(true));
-      localStorage.setItem("data", encryptedMnemonic);
-      localStorage.setItem("data0", encryptedPrivateKey);
-      saveSession(PROTOCOL_TYPE, "PWD", password);
-      if (PROTOCOL_TYPE === "chrome-extension:") {
+      if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
           id: "service_worker",
           task: "listen",
         });
       }
+      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
+      setStore(PLATFORM, "DATA0", encryptedMnemonic);
+      setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -352,16 +331,16 @@ export const AccountProvider = ({ children }) => {
       );
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      localStorage.setItem("accountImported", JSON.stringify(true));
-      localStorage.setItem("data", encryptedMnemonic);
-      localStorage.setItem("data0", encryptedPrivateKey);
-      saveSession(PROTOCOL_TYPE, "PWD", password);
-      if (PROTOCOL_TYPE === "chrome-extension:") {
+      if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
           id: "service_worker",
           task: "listen",
         });
       }
+      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
+      setStore(PLATFORM, "DATA0", encryptedMnemonic);
+      setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setPrivateKey(secretKey);
       setAccount(account);
@@ -381,32 +360,25 @@ export const AccountProvider = ({ children }) => {
 
   const loadAccount = async () => {
     try {
-      const encryptedMnemonic = localStorage.getItem("data");
-      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
+      const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
       try {
         const accountSeed = bip39.mnemonicToSeedSync(decryptedMnemonic);
         const seed = new Uint8Array(accountSeed).slice(0, 32);
         const keypair = sign.keyPair.fromSeed(seed);
         const secretKey = keypair.secretKey;
-        const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
         const address = keypair.publicKey.Hex;
         const account = new aptos.AptosAccount(secretKey, address);
         let resources = await client.getAccountResources(account.address());
         let accountResource = resources.find(
           (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
         );
-        saveSession(PROTOCOL_TYPE, "PWD", password);
+        setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
         setAccount(account);
         setCurrentAddress(account.address().toString());
         setBalance(accountResource.data.coin.value);
-
-        // check if current account has data0 (compatability after update)
-        if (data0Exist === false) {
-          let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-          localStorage.setItem("data0", encryptedPrivateKey);
-        }
       } catch (error) {
         console.log(error);
         throwAlert(42, "Error", "Failed load account");
