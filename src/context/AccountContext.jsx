@@ -8,8 +8,8 @@ import shortenAddress from "../utils/shortenAddress";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
-import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
 import { PLATFORM, NODE_URL, FAUCET_URL } from "../utils/constants";
+import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
 
 export const AccountContext = React.createContext();
 
