@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -27,14 +27,14 @@ const Import = () => {
     setConfirmPassword,
   } = useContext(AccountContext);
   const [checkedLicenseRules, setCheckedLicenseRules] = useState(false);
-  const [checkedPasswordRules, setCheckedPasswordRules] = useState(false);
+
+  useEffect(() => {
+    setPassword("");
+    setConfirmPassword("");
+  }, []);
 
   const handleChangeLicenseRules = (event) => {
     setCheckedLicenseRules(event.target.checked);
-  };
-
-  const handleChangePasswordRules = (event) => {
-    setCheckedPasswordRules(event.target.checked);
   };
 
   return (
@@ -47,7 +47,9 @@ const Import = () => {
       <Card sx={{ mb: 2 }}>
         <form className="import-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
-          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <CardContent
+            sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}
+          >
             <TextField
               id="standard-multiline-static"
               label="Enter mnemonic phrase"
@@ -82,55 +84,26 @@ const Import = () => {
             />
           </CardContent>
         </form>
-        <Stack
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-            ml: 6,
-            mr: 6,
-            mr: 2,
-            mb: 2,
-          }}
-        >
-          <FormControlLabel
-            label={
-              <Typography>
-                I agree and accept license{" "}
-                <Link
-                  href="https://github.com/xorgal/spika/blob/master/LICENSE"
-                  underline="none"
-                  target="_blank"
-                >
-                  {" "}
-                  disclaimer
-                </Link>
-              </Typography>
-            }
-            control={<Checkbox checked={checkedLicenseRules} onChange={handleChangeLicenseRules} />}
-          />
-          <FormControlLabel
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "start",
-            }}
-            label={
-              <Typography>
-                I understand that forgotten password cannot be recovered by wallet App{" "}
-              </Typography>
-            }
-            control={
-              <Checkbox
-                sx={{ my: -1 }}
-                checked={checkedPasswordRules}
-                onChange={handleChangePasswordRules}
-              />
-            }
-          />
-        </Stack>
+
+        <FormControlLabel
+          sx={{ mb: 2 }}
+          label={
+            <Typography>
+              I agree and accept license{" "}
+              <Link
+                href="https://github.com/xorgal/spika/blob/master/LICENSE"
+                underline="none"
+                target="_blank"
+              >
+                {" "}
+                disclaimer
+              </Link>
+            </Typography>
+          }
+          control={<Checkbox checked={checkedLicenseRules} onChange={handleChangeLicenseRules} />}
+        />
         <CardActions>
-          {checkedLicenseRules && checkedPasswordRules ? (
+          {checkedLicenseRules ? (
             <Button variant="contained" onClick={handleImport}>
               Import Account
             </Button>
