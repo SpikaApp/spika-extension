@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AccountContext } from "./AccountContext";
 
 export const UIContext = React.createContext();
 
@@ -14,6 +15,7 @@ export const UIProvider = ({ children }) => {
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
+  const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
 
   const handleMintUI = () => {
     setOpenMintDialog(true);
@@ -86,6 +88,8 @@ export const UIProvider = ({ children }) => {
         handlePrivateKeyUI,
         privateKeyRequired,
         setPrivateKeyRequired,
+        accountRoutesEnabled,
+        setAccountRoutesEnabled,
       }}
     >
       {children}

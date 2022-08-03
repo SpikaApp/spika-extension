@@ -47,6 +47,7 @@ export const AccountProvider = ({ children }) => {
     setMnemonicRequired,
     setPrivateKeyRequired,
     setOpenLogoutDialog,
+    setAccountRoutesEnabled,
   } = useContext(UIContext);
 
   const navigate = useNavigate();
@@ -103,6 +104,7 @@ export const AccountProvider = ({ children }) => {
       }
     } catch (error) {
       setAccountImported(false);
+      setAccountRoutesEnabled(true);
       console.log(error);
     }
   };
@@ -111,6 +113,7 @@ export const AccountProvider = ({ children }) => {
     try {
       setOpenLoginDialog(false);
       setIsLoading(true);
+      setAccountRoutesEnabled(false);
       await loadAccount();
       setIsLoading(false);
       setPassword("");
@@ -125,6 +128,7 @@ export const AccountProvider = ({ children }) => {
       throwAlert(62, "Error", "Failed load account");
       setPassword("");
       console.log("Error occured during loading account");
+      setAccountRoutesEnabled(true);
     }
   };
 
@@ -212,6 +216,7 @@ export const AccountProvider = ({ children }) => {
     setAccountImported(false);
     clearStore(PLATFORM);
     setOpenLogoutDialog(false);
+    setAccountRoutesEnabled(true);
   };
 
   const handleLock = () => {
