@@ -37,7 +37,7 @@ const About = () => {
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography align="center" color="textPrimary" gutterBottom>
-            Wallet version 0.1.6 <br />
+            Wallet version 0.1.7 <br />
             Aptos SDK version 1.2.2
             <br />
             Project on
