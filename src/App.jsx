@@ -13,7 +13,7 @@ import LoginDialog from "./components/LoginDialog";
 import "./index.css";
 
 const App = () => {
-  const { darkMode } = useContext(UIContext);
+  const { darkMode, accountRoutesEnabled } = useContext(UIContext);
   return (
     <Router>
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -27,8 +27,8 @@ const App = () => {
                   <Routes>
                     <Route path="/" exact element={<Wallet />} />
                     <Route path="*" element={<Wallet />} />
-                    <Route path="create" element={<Create />} />
-                    <Route path="import" element={<Import />} />
+                    {accountRoutesEnabled === true && <Route path="create" element={<Create />} />}
+                    {accountRoutesEnabled === true && <Route path="import" element={<Import />} />}
                     <Route path="nfts" element={<NFTs />} />
                     <Route path="transactions" element={<Transactions />} />
                     <Route path="about" element={<About />} />
