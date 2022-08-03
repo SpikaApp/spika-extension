@@ -2,8 +2,10 @@ import React from "react";
 import { ListItem, Divider, Stack, Tooltip, Typography, Link } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
-const TransactionCard = ({ transaction: { gas_used, version, status, vm_status } }) => {
+const TransactionCard = ({ transaction: { gas_used, version, success } }) => {
   return (
     <div className="transaction">
       <ListItem>
@@ -24,7 +26,15 @@ const TransactionCard = ({ transaction: { gas_used, version, status, vm_status }
             </Stack>
             Gas used: {gas_used}
             <br />
-            Status: {vm_status}
+            {success ? (
+              <Stack direction="row">
+                Status: <CheckCircleOutlinedIcon color="success" sx={{ ml: 0.5 }} />
+              </Stack>
+            ) : (
+              <Stack direction="row">
+                Status: <CancelOutlinedIcon color="error" sx={{ ml: 0.5 }} />
+              </Stack>
+            )}
           </Stack>
         </Stack>
       </ListItem>
