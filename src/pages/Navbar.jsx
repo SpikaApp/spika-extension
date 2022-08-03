@@ -22,6 +22,8 @@ import Link from "@mui/material/Link";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import LogoutDialog from "../components/LogoutDialog";
+import { PLATFORM } from "../utils/constants";
+import { setStore } from "../utils/store";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -76,8 +78,10 @@ const Navbar = () => {
   const handleThemeSwitch = () => {
     if (darkMode) {
       setDarkMode(false);
+      setStore(PLATFORM, "DARK_MODE", false);
     } else {
       setDarkMode(true);
+      setStore(PLATFORM, "DARK_MODE", true);
     }
   };
 
