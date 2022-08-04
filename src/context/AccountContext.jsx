@@ -125,7 +125,7 @@ export const AccountProvider = ({ children }) => {
       }
     } catch (error) {
       setOpenLoginDialog(false);
-      throwAlert(62, "Error", "Failed load account");
+      throwAlert(62, "Failed load account", `${error}`);
       setPassword("");
       console.log("Error occured during loading account");
       setAccountRoutesEnabled(true);
@@ -314,9 +314,9 @@ export const AccountProvider = ({ children }) => {
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
-      throwAlert(1, "Account Created", `Address:\n${shortenAddress(account.address().toString())}`);
+      throwAlert(1, "New Account Created", `Address:\n${account.address().toString()}`);
     } catch (error) {
-      throwAlert(2, "Error", "Failed create account");
+      throwAlert(2, "Failed create account", `${error}`);
       console.log(error);
     }
   };
@@ -352,13 +352,9 @@ export const AccountProvider = ({ children }) => {
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
       setMnemonic("");
-      throwAlert(
-        11,
-        "Account Imported",
-        `Address:\n${shortenAddress(account.address().toString())}`
-      );
+      throwAlert(11, "Account Imported", `Address:\n${account.address().toString()}`);
     } catch (error) {
-      throwAlert(12, "Error", "Failed import account");
+      throwAlert(12, "Failed import account", `${error}`);
       console.log(error);
     }
   };
@@ -386,7 +382,7 @@ export const AccountProvider = ({ children }) => {
         setBalance(accountResource.data.coin.value);
       } catch (error) {
         console.log(error);
-        throwAlert(42, "Error", "Failed load account");
+        throwAlert(42, "Failed load account", `${error}`);
       }
     } catch (error) {
       console.log(error);
@@ -402,7 +398,7 @@ export const AccountProvider = ({ children }) => {
       await faucetClient.fundAccount(account.address(), amount);
       throwAlert(21, "Success", `Received ${amount} Aptos Coin`);
     } catch (error) {
-      throwAlert(22, "Error", "Mint failed");
+      throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
       console.log(error);
     }
@@ -423,7 +419,8 @@ export const AccountProvider = ({ children }) => {
       await client.waitForTransaction(transactionRes.hash);
       throwAlert(31, "Transaction sent", `${transactionRes.hash}`);
     } catch (error) {
-      throwAlert(32, "Error", "Transaction failed");
+      throwAlert(32, "Transaction failed", `${error}`);
+      console.log(error);
       setIsLoading(false);
       console.log(error);
     }
@@ -439,7 +436,7 @@ export const AccountProvider = ({ children }) => {
       );
       throwAlert(61, "Transaction sent", `${collection}`);
     } catch (error) {
-      throwAlert(62, "Error", `${error}`);
+      throwAlert(62, "Transaction failed", `${error}`);
       setIsLoading(false);
       console.log(error);
     }
@@ -458,7 +455,7 @@ export const AccountProvider = ({ children }) => {
       );
       throwAlert(71, "Transaction sent", `${nft}`);
     } catch (error) {
-      throwAlert(72, "Error", `${error}`);
+      throwAlert(72, "Transaction failed", `${error}`);
       setIsLoading(false);
       console.log(error);
     }

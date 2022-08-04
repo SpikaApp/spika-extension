@@ -12,7 +12,6 @@ import {
   Typography,
   Stack,
   Link,
-  Slide,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { UIContext } from "../context/UIContext";
@@ -181,7 +180,12 @@ const AlertDialog = () => {
           </Stack>
         ) : (
           !isTransaction && (
-            <DialogContentText id="alert-dialog-description">{alertMessage}</DialogContentText>
+            <DialogContentText
+              sx={{ overflow: "hidden", textOverflow: "ellipsis", wordWrap: "break-word" }}
+              id="alert-dialog-description"
+            >
+              <Typography>{alertMessage}</Typography>
+            </DialogContentText>
           )
         )}
       </DialogContent>
