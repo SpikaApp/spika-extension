@@ -11,6 +11,7 @@ import {
   Chip,
   Tooltip,
   Stack,
+  Link,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SendIcon from "@mui/icons-material/Send";
@@ -26,7 +27,7 @@ import { AccountContext } from "../context/AccountContext";
 import shortenAddress from "../utils/shortenAddress";
 import aptos_light from "../assets/aptos_light.png";
 import aptos_dark from "../assets/aptos_dark.png";
-
+import { PLATFORM } from "../utils/constants";
 const Wallet = () => {
   const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
   const { currentAddress, accountImported, balance, getBalance } = useContext(AccountContext);
@@ -52,18 +53,15 @@ const Wallet = () => {
         <br />
         Your Wallet
       </Typography>
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, minHeight: 350 }}>
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {accountImported ? (
             <div>
-              <Stack sx={{ alignItems: "center" }}>
-                <Typography sx={{ mb: 1.5 }} color="info.main">
-                  Network: Aptos Devnet
-                </Typography>
-
+              <Stack sx={{ alignItems: "center", mt: 1 }}>
+                <Typography sx={{ mb: 1.5 }}>Network: Aptos Devnet</Typography>
                 <Tooltip title="Copy address">
                   <Chip
-                    sx={{ marginBottom: 1 }}
+                    sx={{ mb: 1 }}
                     label={shortenAddress(currentAddress)}
                     onClick={handleClick}
                   />
@@ -71,7 +69,7 @@ const Wallet = () => {
               </Stack>
             </div>
           ) : (
-            <Typography variant="h6" align="center" color="textSecondary" gutterBottom>
+            <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
               Welcome
             </Typography>
           )}
@@ -94,21 +92,36 @@ const Wallet = () => {
               </Typography>
             </Stack>
           ) : (
-            <Typography align="center" color="textSecondary" gutterBottom>
+            <Typography variant="h6" align="center" color="textPrimary">
               Create or import existing account to start working with wallet
+            </Typography>
+          )}
+          {accountImported === false && (PLATFORM === "http:" || PLATFORM === "https:") && (
+            <Typography variant="subtitle1" align="center" color="textPrimary" sx={{ mt: 2 }}>
+              For optimal experience it is advisable to install Spika as browser{" "}
+              <Link
+                href="https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb"
+                underline="none"
+                target="_blank"
+              >
+                {" "}
+                extension
+              </Link>
+              . Some features are not available in this version
+            </Typography>
+          )}
+          {accountImported === false && PLATFORM === "chrome-extension:" && (
+            <Typography variant="subtitle1" align="center" color="textPrimary" sx={{ mt: 2 }}>
+              Spika is connected to Aptos Devnet and all account addresses and resources will be
+              deleted with scheduled weekly Devnet update
             </Typography>
           )}
         </CardContent>
         {accountImported ? (
           <CardActions>
             <Stack sx={{ display: "flex", alignItems: "center" }}>
-              <Button
-                sx={{ mb: 2.5, width: 100 }}
-                variant="outlined"
-                startIcon={<CloudQueueIcon />}
-                onClick={handleMintUI}
-              >
-                Mint
+              <Button sx={{ mb: 2.5 }} variant="outlined" onClick={handleMintUI}>
+                Mint Test Coins
               </Button>
 
               <Stack direction="row">

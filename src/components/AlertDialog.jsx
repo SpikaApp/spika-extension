@@ -12,6 +12,7 @@ import {
   Typography,
   Stack,
   Link,
+  Slide,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { UIContext } from "../context/UIContext";
@@ -185,7 +186,9 @@ const AlertDialog = () => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
+        <Button variant="outlined" onClick={handleClose}>
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

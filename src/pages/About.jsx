@@ -10,6 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import useAxios from "../utils/useAxios";
@@ -25,26 +26,19 @@ const About = () => {
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
         <InfoIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
         <br />
-        Crypto Wallet in Development
+        Spika Web Wallet
       </Typography>
-      <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        for{" "}
-        <Link href="https://aptoslabs.com/" underline="none" target="_blank">
-          APTOS
-        </Link>{" "}
-        Blockchain (id: {chain_id})
-      </Typography>
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, minHeight: 350 }}>
         <CardContent>
-          <Typography align="center" color="textPrimary" gutterBottom>
+          <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
+            <Link href="https://aptoslabs.com/" underline="none" target="_blank">
+              Aptos
+            </Link>{" "}
+            blockchain chain_id: {chain_id}
+          </Typography>
+          <Typography variant="subtitle1" align="center" color="textPrimary">
             Wallet version 0.1.7 <br />
             Aptos SDK version 1.2.2
-            <br />
-            Project on
-            <Link href="https://github.com/xorgal/spika" underline="none" target="_blank">
-              {" "}
-              GitHub
-            </Link>
             <br />
             <Link
               href="https://github.com/xorgal/spika/blob/master/LICENSE"
@@ -67,6 +61,24 @@ const About = () => {
             <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank">
               Contacts
             </Link>
+            <Stack
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 2,
+              }}
+            >
+              <Link
+                href="https://github.com/xorgal/spika"
+                color="white"
+                underline="none"
+                target="_blank"
+              >
+                <GitHubIcon sx={{ fontSize: 42 }} />
+              </Link>
+            </Stack>
           </Typography>
         </CardContent>
         <CardActions>
