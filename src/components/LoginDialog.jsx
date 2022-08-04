@@ -8,6 +8,7 @@ import {
   DialogTitle,
   TextField,
   Stack,
+  Typography,
 } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
@@ -56,7 +57,7 @@ const LoginDialog = () => {
         </form>
         {mnemonicRequired && (
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
-            <Button variant="contained" onClick={handleCancel}>
+            <Button variant="outlined" onClick={handleCancel}>
               Cancel
             </Button>
             <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealMnemonic}>

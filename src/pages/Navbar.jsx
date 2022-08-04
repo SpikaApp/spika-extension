@@ -11,6 +11,7 @@ import {
   Stack,
   IconButton,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
@@ -131,12 +132,16 @@ const Navbar = () => {
                 <Stack>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="create">
-                      Create Account
+                      <Typography variant="h6" color="textPrimary">
+                        Create Account
+                      </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="import">
-                      Import Account
+                      <Typography variant="h6" color="textPrimary">
+                        Import Account
+                      </Typography>
                     </Link>
                   </MenuItem>
                   <Divider sx={{ my: 0.5 }} />
@@ -146,17 +151,23 @@ const Navbar = () => {
                 <Stack>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="/">
-                      Wallet
+                      <Typography variant="h6" color="textPrimary">
+                        Wallet
+                      </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="nfts">
-                      NFTs
+                      <Typography variant="h6" color="textPrimary">
+                        NFTs
+                      </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="transactions">
-                      Transactions
+                      <Typography variant="h6" color="textPrimary">
+                        Transactions
+                      </Typography>
                     </Link>
                   </MenuItem>
                   <Divider sx={{ my: 0.5 }} />
@@ -164,7 +175,9 @@ const Navbar = () => {
               )}
               <MenuItem onClick={handleClose} disableRipple>
                 <Link underline="none" component={RouterLink} to="about">
-                  About
+                  <Typography variant="h6" color="textPrimary">
+                    About
+                  </Typography>
                 </Link>
               </MenuItem>
             </StyledMenu>

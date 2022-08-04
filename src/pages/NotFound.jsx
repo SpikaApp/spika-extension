@@ -20,7 +20,13 @@ const About = () => {
       </Typography>
       <Card>
         <CardContent>
-          <Typography sx={{ marginTop: 2 }} variant="h5" align="center" color="textPrimary" gutterBottom>
+          <Typography
+            sx={{ marginTop: 2, minHeight: 350 }}
+            variant="h5"
+            align="center"
+            color="textPrimary"
+            gutterBottom
+          >
             Page not found
           </Typography>
         </CardContent>

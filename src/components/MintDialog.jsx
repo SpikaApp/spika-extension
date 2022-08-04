@@ -5,8 +5,9 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
+  Typography,
   DialogTitle,
+  Stack,
 } from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
@@ -23,12 +24,16 @@ const MintDialog = () => {
   };
 
   return (
-    <Dialog open={openMintDialog} onClose={handleCancel}>
-      <DialogTitle>Mint Test Aptos Coin</DialogTitle>
-      <DialogContent>
+    <Dialog align="center" open={openMintDialog} onClose={handleCancel}>
+      <DialogTitle align="center">Mint Test Coins</DialogTitle>
+      <DialogContent align="center">
+        <Typography variant="overline" sx={{ width: 250 }} color="textSecondary" gutterBottom>
+          Max amount 20000
+          <br />
+        </Typography>
         {/* <DialogContentText sx={{ marginBottom: 2 }}>Enter amount to mint:</DialogContentText> */}
         <TextField
-          sx={{ marginTop: 2, width: 200 }}
+          sx={{ marginTop: 3, width: 200 }}
           id="amount"
           label="Amount"
           type="number"
@@ -38,11 +43,23 @@ const MintDialog = () => {
             shrink: true,
           }}
         />
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            mt: 4,
+          }}
+        >
+          <Button variant="outlined" sx={{ mr: 2 }} onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleMint}>
+            Mint
+          </Button>
+        </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleMint}>Mint</Button>
-      </DialogActions>
       <Loading />
       <AlertDialog />
     </Dialog>
