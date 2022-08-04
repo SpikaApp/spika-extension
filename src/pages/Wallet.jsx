@@ -107,7 +107,7 @@ const Wallet = () => {
                 {" "}
                 extension
               </Link>
-              . Some features are not available in this version
+              . Some features may not be supported when running in browser's tab.
             </Typography>
           )}
           {accountImported === false && PLATFORM === "chrome-extension:" && (
