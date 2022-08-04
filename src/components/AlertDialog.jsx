@@ -128,7 +128,7 @@ const AlertDialog = () => {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ minWidth: 250 }}>
         {isTransaction && (
           <Stack component="span" sx={{ maxWidth: 250 }}>
             <Typography component="span">
@@ -186,9 +186,7 @@ const AlertDialog = () => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" onClick={handleClose}>
-          Close
-        </Button>
+        <Button onClick={handleClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );

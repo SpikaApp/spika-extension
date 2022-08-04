@@ -120,7 +120,6 @@ const CreateNftDialog = () => {
           </Button>
         </Stack>
       </DialogContent>
-
       <Loading />
       <AlertDialog />
     </Dialog>

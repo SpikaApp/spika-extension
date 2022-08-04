@@ -1,5 +1,12 @@
 import { useContext } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
@@ -20,9 +27,13 @@ const LogoutDialog = () => {
           <br />
         </DialogContentText>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleLogout}>Confirm</Button>
+      <DialogActions sx={{ mb: 1.5, mr: 1 }}>
+        <Button variant="outlined" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleLogout}>
+          Confirm
+        </Button>
       </DialogActions>
     </Dialog>
   );

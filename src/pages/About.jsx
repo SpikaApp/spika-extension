@@ -18,7 +18,7 @@ import { NODE_URL } from "../utils/constants";
 
 const About = () => {
   const { accountImported } = useContext(AccountContext);
-  const { handleMnemonicUI, handlePrivateKeyUI } = useContext(UIContext);
+  const { handleMnemonicUI, handlePrivateKeyUI, darkMode } = useContext(UIContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   return (
@@ -72,7 +72,7 @@ const About = () => {
             >
               <Link
                 href="https://github.com/xorgal/spika"
-                color="white"
+                color={darkMode ? "white" : "black"}
                 underline="none"
                 target="_blank"
               >
