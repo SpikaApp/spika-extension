@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Typography,
 } from "@mui/material";
@@ -60,7 +59,7 @@ const SendDialog = () => {
           }}
         />
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ mb: 1.5, mr: 2 }}>
         <Button variant="outlined" onClick={handleCancel}>
           Cancel
         </Button>

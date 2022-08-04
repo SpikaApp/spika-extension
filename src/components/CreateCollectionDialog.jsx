@@ -83,10 +83,9 @@ const CreateCollectionDialog = () => {
             alignItems: "center",
             justifyContent: "center",
             mt: 2,
-            mb: 2,
           }}
         >
-          <Button sx={{ mr: 2 }} variant="outlined" onClick={handleCancel}>
+          <Button variant="outlined" sx={{ mr: 2 }} onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="contained" onClick={handleCreateCollection}>

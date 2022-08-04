@@ -69,18 +69,14 @@ const NFTs = () => {
           >
             <Stack direction="row" sx={{ mt: 1 }}>
               <Button
-                sx={{ width: 150, mr: 1 }}
+                sx={{ width: 180, mr: 2 }}
                 variant="outlined"
                 onClick={handleCreateCollectionUI}
               >
-                <Typography align="center">Create New Collection</Typography>
+                <Typography align="center">NEW COLLECTION</Typography>
               </Button>
-              <Button sx={{ width: 150 }} variant="outlined" onClick={handleCreateNFTUI}>
-                <Typography align="center">
-                  Create
-                  <br />
-                  NFT
-                </Typography>
+              <Button sx={{ width: 120 }} variant="outlined" onClick={handleCreateNFTUI}>
+                <Typography align="center">New NFT</Typography>
               </Button>
             </Stack>
           </Stack>
