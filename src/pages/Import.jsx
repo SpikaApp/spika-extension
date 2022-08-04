@@ -38,7 +38,7 @@ const Import = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography sx={{ mt: 1 }} variant="h6" align="center" color="textPrimary" gutterBottom>
+      <Typography sx={{ mt: 3 }} variant="h6" align="center" color="textPrimary" gutterBottom>
         Import Account
       </Typography>
       <Card sx={{ mb: 2 }}>
@@ -59,7 +59,7 @@ const Import = () => {
             />
 
             <TextField
-              sx={{ mt: 4 }}
+              sx={{ mt: 2 }}
               id="password"
               label="New Password"
               type="password"

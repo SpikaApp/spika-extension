@@ -51,7 +51,7 @@ const Wallet = () => {
       <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
         <AccountBalanceWalletIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
         <br />
-        Your Wallet
+        Spika Web Wallet
       </Typography>
       <Card sx={{ mb: 2, minHeight: 350 }}>
         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
