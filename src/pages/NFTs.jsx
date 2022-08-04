@@ -11,6 +11,8 @@ import {
   ImageListItem,
   ImageListItemBar,
   CircularProgress,
+  Divider,
+  Box,
 } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
 import { UIContext } from "../context/UIContext";
@@ -53,8 +55,8 @@ const NFTs = () => {
         <br />
         NFTs
       </Typography>
-      <Card sx={{ mb: 2 }}>
-        <CardContent sx={{ minHeight: 300 }}>
+      <Card sx={{ mb: 2, minHeight: 350 }}>
+        <CardContent>
           <Stack
             direction="row"
             spacing={2}
@@ -65,19 +67,36 @@ const NFTs = () => {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={handleCreateCollectionUI}>Create collection</Button>
-            <Button onClick={handleCreateNFTUI}>Create NFT</Button>
+            <Stack direction="row" sx={{ mt: 1 }}>
+              <Button
+                sx={{ width: 150, mr: 1 }}
+                variant="outlined"
+                onClick={handleCreateCollectionUI}
+              >
+                <Typography align="center">Create New Collection</Typography>
+              </Button>
+              <Button sx={{ width: 150 }} variant="outlined" onClick={handleCreateNFTUI}>
+                <Typography align="center">
+                  Create
+                  <br />
+                  NFT
+                </Typography>
+              </Button>
+            </Stack>
           </Stack>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+            <Divider sx={{ mt: 2, width: 320 }} />
+          </Box>
           {isWaiting && (
-            <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 4 }}>
-              <Typography align="center" color="textSecondary" gutterBottom>
+            <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8 }}>
+              <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
                 Pulling metadata...
               </Typography>
               <CircularProgress sx={{ mt: 4 }} color="info" />
             </Stack>
           )}
           {accountTokens === 0 ? (
-            <Typography sx={{ mt: 4 }} align="center" color="textPrimary" gutterBottom>
+            <Typography sx={{ mt: 8 }} variant="h6" align="center" color="textPrimary" gutterBottom>
               No NFTs found
             </Typography>
           ) : (

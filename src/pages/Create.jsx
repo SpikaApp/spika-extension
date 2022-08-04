@@ -13,7 +13,6 @@ import {
   Link,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import PostAddIcon from "@mui/icons-material/PostAdd";
 import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 
@@ -40,9 +39,7 @@ const Create = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        <PostAddIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
-        <br />
+      <Typography variant="h6" sx={{ mt: 1 }} align="center" color="textPrimary" gutterBottom>
         Create New Account
       </Typography>
       <Card sx={{ mb: 2 }}>
@@ -60,7 +57,7 @@ const Create = () => {
                 sx={{ mt: 4 }}
                 label={
                   <Typography>
-                    I read above and accept license{" "}
+                    I accept the license{" "}
                     <Link
                       href="https://github.com/xorgal/spika/blob/master/LICENSE"
                       underline="none"

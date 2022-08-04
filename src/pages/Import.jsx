@@ -12,7 +12,6 @@ import {
   Checkbox,
   Link,
 } from "@mui/material";
-import ArticleIcon from "@mui/icons-material/Article";
 import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 
@@ -39,17 +38,13 @@ const Import = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        <ArticleIcon sx={{ mt: 2, fontSize: 48 }} color="primary" />
-        <br />
+      <Typography sx={{ mt: 1 }} variant="h6" align="center" color="textPrimary" gutterBottom>
         Import Account
       </Typography>
       <Card sx={{ mb: 2 }}>
         <form className="import-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
-          <CardContent
-            sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}
-          >
+          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <TextField
               id="standard-multiline-static"
               label="Enter mnemonic phrase"
@@ -89,7 +84,7 @@ const Import = () => {
           sx={{ mb: 2 }}
           label={
             <Typography>
-              I agree and accept license{" "}
+              I accept the license{" "}
               <Link
                 href="https://github.com/xorgal/spika/blob/master/LICENSE"
                 underline="none"

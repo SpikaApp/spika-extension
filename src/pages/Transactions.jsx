@@ -8,11 +8,13 @@ import {
   List,
   Box,
   Tab,
+  Link,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ReceivedEventCard from "../components/ReceivedEventCard";
 import TransactionCard from "../components/TransactionCard";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 
@@ -23,8 +25,14 @@ const style = {
 };
 
 const Transactions = () => {
-  const { accountImported, getReceivedEvents, getSentTransactions, receivedEvents, transactions } =
-    useContext(AccountContext);
+  const {
+    accountImported,
+    getReceivedEvents,
+    getSentTransactions,
+    receivedEvents,
+    transactions,
+    currentAddress,
+  } = useContext(AccountContext);
   const [value, setValue] = useState("1");
 
   const handleChange = (event, newValue) => {
@@ -51,7 +59,7 @@ const Transactions = () => {
         <br />
         Latest Transactions
       </Typography>
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, minHeight: 350 }}>
         <CardContent>
           <Box
             sx={{
@@ -65,8 +73,22 @@ const Transactions = () => {
             <TabContext value={value}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <TabList onChange={handleChange} aria-label="lab API tabs example">
-                  <Tab label="Sent" value="1" />
-                  <Tab label="Received" value="2" />
+                  <Tab
+                    label={
+                      <Typography variant="subtitle1" color="textPrimary">
+                        Sent
+                      </Typography>
+                    }
+                    value="1"
+                  />
+                  <Tab
+                    label={
+                      <Typography variant="subtitle1" color="textPrimary">
+                        Received
+                      </Typography>
+                    }
+                    value="2"
+                  />
                 </TabList>
               </Box>
 
@@ -82,7 +104,13 @@ const Transactions = () => {
                     ))}
                   </List>
                 ) : (
-                  <Typography align="center" color="textPrimary" gutterBottom>
+                  <Typography
+                    sx={{ mt: 4 }}
+                    align="center"
+                    variant="h6"
+                    color="textPrimary"
+                    gutterBottom
+                  >
                     No transactions found
                   </Typography>
                 )}
@@ -99,7 +127,13 @@ const Transactions = () => {
                     ))}
                   </List>
                 ) : (
-                  <Typography align="center" color="textPrimary" gutterBottom>
+                  <Typography
+                    sx={{ mt: 4 }}
+                    align="center"
+                    variant="h6"
+                    color="textPrimary"
+                    gutterBottom
+                  >
                     No transactions found
                   </Typography>
                 )}
@@ -107,7 +141,18 @@ const Transactions = () => {
             </TabContext>
           </Box>
         </CardContent>
-        <CardActions></CardActions>
+        <CardActions>
+          <Typography variant="subtitle1" align="center" color="textPrimary" gutterBottom>
+            View account in{" "}
+            <Link
+              href={`https://explorer.devnet.aptos.dev/account/${currentAddress}`}
+              underline="none"
+              target="_blank"
+            >
+              Aptos Explorer <OpenInNewIcon sx={{ fontSize: 16 }} />
+            </Link>
+          </Typography>
+        </CardActions>
       </Card>
 
       <Loading />

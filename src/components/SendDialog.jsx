@@ -61,8 +61,12 @@ const SendDialog = () => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleSend}>Send</Button>
+        <Button variant="outlined" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleSend}>
+          Send
+        </Button>
       </DialogActions>
       <Loading />
       <AlertDialog />

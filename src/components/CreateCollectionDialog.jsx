@@ -76,11 +76,24 @@ const CreateCollectionDialog = () => {
             }}
           />
         </Stack>
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            mt: 2,
+            mb: 2,
+          }}
+        >
+          <Button sx={{ mr: 2 }} variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleCreateCollection}>
+            Create
+          </Button>
+        </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleCreateCollection}>Create</Button>
-      </DialogActions>
       <Loading />
       <AlertDialog />
     </Dialog>

@@ -57,7 +57,9 @@ const ReceiveDialog = () => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
+        <Button variant="outlined" onClick={handleClose}>
+          Close
+        </Button>
       </DialogActions>
       <Loading />
       <AlertDialog />

@@ -73,7 +73,7 @@ const CreateNftDialog = () => {
             label="Description"
             type="string"
             multiline
-            rows={2}
+            rows={1}
             value={nftDescription}
             onChange={(e) => setNftDescription(e.target.value)}
             InputLabelProps={{
@@ -103,11 +103,24 @@ const CreateNftDialog = () => {
             }}
           />
         </Stack>
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            mt: 2,
+          }}
+        >
+          <Button variant="outlined" sx={{ mr: 2 }} onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleCreateNft}>
+            Create
+          </Button>
+        </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleCreateNft}>Create</Button>
-      </DialogActions>
+
       <Loading />
       <AlertDialog />
     </Dialog>
