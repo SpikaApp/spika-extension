@@ -39,7 +39,7 @@ const Create = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" sx={{ mt: 1 }} align="center" color="textPrimary" gutterBottom>
+      <Typography variant="h6" sx={{ mt: 3 }} align="center" color="textPrimary" gutterBottom>
         Create New Account
       </Typography>
       <Card sx={{ mb: 2 }}>
