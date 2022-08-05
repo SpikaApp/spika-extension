@@ -17,7 +17,7 @@ import { NODE_URL } from "../utils/constants";
 
 const SendDialog = () => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
-  const { recipientAddress, setRecipientAddress, amount, setAmount, handleSend } =
+  const { recipientAddress, setRecipientAddress, amount, setAmount, handleEstimate } =
     useContext(AccountContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
@@ -63,7 +63,7 @@ const SendDialog = () => {
         <Button variant="outlined" onClick={handleCancel}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleSend}>
+        <Button variant="contained" onClick={handleEstimate}>
           Send
         </Button>
       </DialogActions>

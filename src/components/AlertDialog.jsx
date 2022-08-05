@@ -24,6 +24,7 @@ const AlertDialog = () => {
     setOpenAlertDialog,
     setOpenMintDialog,
     setOpenSendDialog,
+    setOpenConfirmSendDialog,
     setOpenCreateCollectionDialog,
     setOpenCreateNftDialog,
   } = useContext(UIContext);
@@ -51,7 +52,11 @@ const AlertDialog = () => {
   };
 
   const handleOpen = () => {
-    alertSignal > 0 && setOpenAlertDialog(true);
+    // if transaction estimated as valid => handle TransactionDialog
+    // instead of sending alert, else => proceed with alert
+    if (alertSignal !== 30) {
+      alertSignal > 0 && setOpenAlertDialog(true);
+    }
   };
 
   const handleClose = () => {
@@ -67,8 +72,11 @@ const AlertDialog = () => {
         navigate("/");
         break;
       case 31: // Transaction sent
+      case 33: // Transaction estimated as invalid
+      case 34: // Failed estimate transaction
         setOpenAlertDialog(false);
         setOpenSendDialog(false);
+        setOpenConfirmSendDialog(false);
         setIsTransaction(false);
         break;
       case 61: // Collection Created
@@ -127,7 +135,7 @@ const AlertDialog = () => {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
-      <DialogContent sx={{ minWidth: 250 }}>
+      <DialogContent sx={{ minWidth: 250, maxWidth: 375 }}>
         {isTransaction && (
           <Stack component="span" sx={{ maxWidth: 250 }}>
             <Typography component="span">
