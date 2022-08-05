@@ -124,7 +124,7 @@ const Wallet = () => {
                 Mint Test Coins
               </Button>
 
-              <Stack direction="row">
+              <Stack direction="row" sx={{ mt: 2 }}>
                 <Button
                   sx={{ mr: 4 }}
                   variant="contained"

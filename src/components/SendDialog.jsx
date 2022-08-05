@@ -3,10 +3,10 @@ import {
   Button,
   TextField,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   Typography,
+  Stack,
 } from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
@@ -27,16 +27,14 @@ const SendDialog = () => {
   };
 
   return (
-    <Dialog open={openSendDialog} onClose={handleCancel}>
+    <Dialog align="center" open={openSendDialog} onClose={handleCancel}>
       <DialogTitle>Send Transaction</DialogTitle>
-      <DialogContent>
-        <Typography align="left" color="warning.main">
-          Confirm destination network Aptos and recipient's address exist and registered on chain id{" "}
-          {chain_id}. Resources sent to wrong or non-existing address will be lost.
+      <DialogContent sx={{ maxWidth: 375 }}>
+        <Typography color="warning.main">
+          Transaction will be submitted on chain id {chain_id}
         </Typography>
-        {/* <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText> */}
         <TextField
-          sx={{ marginTop: 4, marginBottom: 2 }}
+          sx={{ mt: 4, mb: 4 }}
           id="recipientAddress"
           label="Recipient's Address"
           fullWidth={true}
@@ -59,14 +57,23 @@ const SendDialog = () => {
           }}
         />
       </DialogContent>
-      <DialogActions sx={{ mb: 1.5, mr: 2 }}>
-        <Button variant="outlined" onClick={handleCancel}>
+      <Stack
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 2,
+          mb: 2,
+        }}
+      >
+        <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
           Cancel
         </Button>
         <Button variant="contained" onClick={handleEstimate}>
           Send
         </Button>
-      </DialogActions>
+      </Stack>
       <Loading />
       <AlertDialog />
     </Dialog>
