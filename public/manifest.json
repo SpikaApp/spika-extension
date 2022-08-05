@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Spika",
   "description": "Web wallet for Aptos Blockchain",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "icons": { "128": "logo.png" },
   "action": {
     "default_title": "Spika",
