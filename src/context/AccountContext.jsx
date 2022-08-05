@@ -234,7 +234,7 @@ export const AccountProvider = ({ children }) => {
 
   const handleRevealPrivateKey = async () => {
     try {
-      const encryptedPrivateKey = await getStore(PLATFORM, "DATA0");
+      const encryptedPrivateKey = await getStore(PLATFORM, "DATA1");
       let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
       throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
       setPassword("");
