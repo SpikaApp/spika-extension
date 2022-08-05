@@ -19,7 +19,6 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import shortenAddress from "../utils/shortenAddress";
-import convertTimestamp from "../utils/convertTimestamp";
 import copyToClipboard from "../utils/copyToClipboard";
 
 const ConfirmSendDialog = () => {
@@ -39,7 +38,6 @@ const ConfirmSendDialog = () => {
     if (isValidTransaction) {
       setOpenConfirmSendDialog(true);
       setRows([
-        createData("Time", convertTimestamp(estimatedTxnResult.timestamp)),
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
         createData("Amount", estimatedTxnResult.payload.arguments[1]),
