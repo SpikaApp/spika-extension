@@ -38,9 +38,6 @@ const CreateCollectionDialog = () => {
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
@@ -51,9 +48,6 @@ const CreateCollectionDialog = () => {
             rows={3}
             value={collectionDescription}
             onChange={(e) => setCollectionDescription(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, width: 250 }}
@@ -62,9 +56,6 @@ const CreateCollectionDialog = () => {
             type="string"
             value={collectionUri}
             onChange={(e) => setCollectionUri(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
         </Stack>
         <Stack

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   Typography,
@@ -11,13 +10,17 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  Paper,
+  Tooltip,
+  Chip,
   Stack,
 } from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import shortenAddress from "../utils/shortenAddress";
+import convertTimestamp from "../utils/convertTimestamp";
+import copyToClipboard from "../utils/copyToClipboard";
 
 const ConfirmSendDialog = () => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog } = useContext(UIContext);
@@ -36,12 +39,12 @@ const ConfirmSendDialog = () => {
     if (isValidTransaction) {
       setOpenConfirmSendDialog(true);
       setRows([
-        createData("Time", estimatedTxnResult.timestamp),
+        createData("Time", convertTimestamp(estimatedTxnResult.timestamp)),
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData("Amount", estimatedTxnResult.payload.arguments[1]),
-        createData("Gas amount", estimatedTxnResult.gas_used),
-        createData("Max gas amount", estimatedTxnResult.max_gas_amount),
+        createData("Send amount", estimatedTxnResult.payload.arguments[1]),
+        createData("Est. gas fee", estimatedTxnResult.gas_used),
+        createData("Max gas fee", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
       ]);
     }
@@ -61,14 +64,9 @@ const ConfirmSendDialog = () => {
 
   return (
     <Dialog open={openConfirmSendDialog} onClose={handleCancel}>
-      <DialogTitle>
-        <Typography align="center" variant="h6">
-          Review Transaction
-        </Typography>
-      </DialogTitle>
+      <DialogTitle align="center">Preview Transaction</DialogTitle>
       <DialogContent>
         <TableContainer
-          component={Paper}
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -83,14 +81,23 @@ const ConfirmSendDialog = () => {
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: 100 }}>
-                    <Typography variant="inherit">{row.value}</Typography>
+                    {row.name === "Sender" || row.name === "Recipient" ? (
+                      <Tooltip title="Copy address" sx={{ ml: -1.5 }}>
+                        <Chip
+                          label={shortenAddress(row.value)}
+                          onClick={copyToClipboard(row.value)}
+                        />
+                      </Tooltip>
+                    ) : (
+                      <Typography variant="inherit">{row.value}</Typography>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-        <Typography sx={{ mt: 1 }} align="center">
+        <Typography sx={{ mt: 1 }} align="center" variant="body2" color="warning.dark">
           Gas values are valid at time when transaction was calculated
         </Typography>
       </DialogContent>

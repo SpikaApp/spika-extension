@@ -52,9 +52,6 @@ const CreateNftDialog = () => {
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
@@ -63,9 +60,6 @@ const CreateNftDialog = () => {
             type="string"
             value={nftName}
             onChange={(e) => setNftName(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 250 }}
@@ -76,9 +70,6 @@ const CreateNftDialog = () => {
             rows={1}
             value={nftDescription}
             onChange={(e) => setNftDescription(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: 150 }}
@@ -87,9 +78,6 @@ const CreateNftDialog = () => {
             type="number"
             value={nftSupply}
             onChange={(e) => setNftSupply(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
           <TextField
             sx={{ mt: 1.5, width: 250 }}
@@ -98,9 +86,6 @@ const CreateNftDialog = () => {
             type="string"
             value={nftUri}
             onChange={(e) => setNftUri(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
           />
         </Stack>
         <Stack
