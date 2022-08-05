@@ -27,7 +27,7 @@ const MintDialog = () => {
     <Dialog align="center" open={openMintDialog} onClose={handleCancel}>
       <DialogTitle align="center">Mint Test Coins</DialogTitle>
       <DialogContent align="center">
-        <Typography variant="body2" sx={{ width: 250 }} color="warning.dark" gutterBottom>
+        <Typography variant="body1" sx={{ width: 250 }} color="warning.dark" gutterBottom>
           Max amount per request 20000
           <br />
         </Typography>
