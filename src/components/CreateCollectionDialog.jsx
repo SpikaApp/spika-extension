@@ -64,10 +64,11 @@ const CreateCollectionDialog = () => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            mt: 2,
+            mt: 3,
+            mb: 2,
           }}
         >
-          <Button variant="outlined" sx={{ mr: 2 }} onClick={handleCancel}>
+          <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="contained" onClick={handleCreateCollection}>
