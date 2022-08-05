@@ -60,7 +60,7 @@ const SendDialog = () => {
           alignItems: "center",
           justifyContent: "center",
           mt: 2,
-          mb: 2,
+          mb: 4,
         }}
       >
         <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>

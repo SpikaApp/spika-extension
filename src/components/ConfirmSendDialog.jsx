@@ -108,7 +108,7 @@ const ConfirmSendDialog = () => {
           alignItems: "center",
           justifyContent: "center",
           mt: 2,
-          mb: 2,
+          mb: 4,
         }}
       >
         <Button sx={{ mr: 4 }} variant="outlined" onClick={handleCancel}>
