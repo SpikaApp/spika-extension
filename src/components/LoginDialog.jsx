@@ -67,7 +67,7 @@ const LoginDialog = () => {
         )}
         {privateKeyRequired && (
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
-            <Button variant="contained" onClick={handleCancel}>
+            <Button variant="outlined" onClick={handleCancel}>
               Cancel
             </Button>
             <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealPrivateKey}>
