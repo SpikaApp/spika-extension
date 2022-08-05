@@ -21,8 +21,11 @@
 
 ---
 
+- 30: Transaction estimated as valid
 - 31: Transaction sent
-- 32: Failed send transaction
+- 32: Failed to send transaction
+- 33: Transaction estimated as invalid
+- 34: Failed estimate transaction
 
 ---
 
@@ -56,3 +59,5 @@
 - 91: Mnemonic phrase
 - 92: No mnemonic phrase found
 - 93: Unencrypted mnemonic found and logout performed. Please re-login to start using encryption
+
+---

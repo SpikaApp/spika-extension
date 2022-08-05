@@ -4,7 +4,6 @@ import * as aptos from "aptos";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
-import shortenAddress from "../utils/shortenAddress";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
@@ -41,12 +40,15 @@ export const AccountProvider = ({ children }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isValidTransaction, setIsValidTransaction] = useState(false);
+  const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
   const {
     handleLoginUI,
     setOpenLoginDialog,
     setMnemonicRequired,
     setPrivateKeyRequired,
     setOpenLogoutDialog,
+    setOpenSendDialog,
     setAccountRoutesEnabled,
   } = useContext(UIContext);
 
@@ -83,15 +85,6 @@ export const AccountProvider = ({ children }) => {
       setPassword(data);
       setIsUnlocked(true);
     }
-  };
-
-  const handleGenerate = () => {
-    generateMnemonic();
-  };
-
-  const generateMnemonic = () => {
-    const mn = bip39.generateMnemonic(english.wordlist);
-    setNewMnemonic(mn);
   };
 
   const checkIfLoginRequired = async () => {
@@ -132,36 +125,50 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const handleRevealMnemonic = async () => {
-    try {
-      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
-      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
-      throwAlert(91, "Mnemonic Phrase", decryptedMnemonic);
-      setPassword("");
-      setMnemonicRequired(false);
-      setOpenLoginDialog(false);
-    } catch (error) {
-      throwAlert(92, "Error", "Incorrect password");
-      setPassword("");
-      setMnemonicRequired(false);
-      setOpenLoginDialog(false);
+  const handleLogout = () => {
+    if (PLATFORM === "chrome-extension:") {
+      chrome.runtime.sendMessage({
+        id: "service_worker",
+        task: "idle",
+      });
     }
+    navigate("/");
+    setPrivateKey("");
+    setCurrentAddress("");
+    setAccount([]);
+    clearPasswords();
+    removeMem(PLATFORM, "PWD");
+    setAccountImported(false);
+    clearStore(PLATFORM);
+    setOpenLogoutDialog(false);
+    setAccountRoutesEnabled(true);
   };
 
-  const handleRevealPrivateKey = async () => {
-    try {
-      const encryptedPrivateKey = await getStore(PLATFORM, "DATA0");
-      let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
-      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
-      setPassword("");
-      setPrivateKeyRequired(false);
-      setOpenLoginDialog(false);
-    } catch (error) {
-      throwAlert(92, "Error", "Incorrect password");
-      setPassword("");
-      setPrivateKeyRequired(false);
-      setOpenLoginDialog(false);
+  const handleLock = () => {
+    if (PLATFORM === "chrome-extension:") {
+      chrome.runtime.sendMessage({
+        id: "service_worker",
+        task: "idle",
+      });
     }
+    setPrivateKey("");
+    setCurrentAddress("");
+    setAccount([]);
+    clearPasswords();
+    removeMem(PLATFORM, "PWD");
+    setAccountImported(false);
+    handleLoginUI();
+  };
+
+  const clearPasswords = () => {
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const throwAlert = (signal, title, message) => {
+    setAlertSignal(signal);
+    setAlertTitle(title);
+    setAlertMessage(message);
   };
 
   const handleCreate = async () => {
@@ -200,85 +207,45 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const handleLogout = () => {
-    if (PLATFORM === "chrome-extension:") {
-      chrome.runtime.sendMessage({
-        id: "service_worker",
-        task: "idle",
-      });
+  const handleGenerate = () => {
+    generateMnemonic();
+  };
+
+  const generateMnemonic = () => {
+    const mn = bip39.generateMnemonic(english.wordlist);
+    setNewMnemonic(mn);
+  };
+
+  const handleRevealMnemonic = async () => {
+    try {
+      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
+      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      throwAlert(91, "Mnemonic Phrase", decryptedMnemonic);
+      setPassword("");
+      setMnemonicRequired(false);
+      setOpenLoginDialog(false);
+    } catch (error) {
+      throwAlert(92, "Error", "Incorrect password");
+      setPassword("");
+      setMnemonicRequired(false);
+      setOpenLoginDialog(false);
     }
-    navigate("/");
-    setPrivateKey("");
-    setCurrentAddress("");
-    setAccount([]);
-    clearPasswords();
-    removeMem(PLATFORM, "PWD");
-    setAccountImported(false);
-    clearStore(PLATFORM);
-    setOpenLogoutDialog(false);
-    setAccountRoutesEnabled(true);
   };
 
-  const handleLock = () => {
-    if (PLATFORM === "chrome-extension:") {
-      chrome.runtime.sendMessage({
-        id: "service_worker",
-        task: "idle",
-      });
+  const handleRevealPrivateKey = async () => {
+    try {
+      const encryptedPrivateKey = await getStore(PLATFORM, "DATA0");
+      let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
+      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
+      setPassword("");
+      setPrivateKeyRequired(false);
+      setOpenLoginDialog(false);
+    } catch (error) {
+      throwAlert(92, "Error", "Incorrect password");
+      setPassword("");
+      setPrivateKeyRequired(false);
+      setOpenLoginDialog(false);
     }
-    setPrivateKey("");
-    setCurrentAddress("");
-    setAccount([]);
-    clearPasswords();
-    removeMem(PLATFORM, "PWD");
-    setAccountImported(false);
-    handleLoginUI();
-  };
-
-  const handleMint = async () => {
-    setIsLoading(true);
-    await mintCoins();
-    setIsLoading(false);
-    setAmount("");
-  };
-
-  const handleSend = async () => {
-    setIsLoading(true);
-    await sendTransaction();
-    setIsLoading(false);
-    setRecipientAddress("");
-    setAmount("");
-  };
-
-  const handleCreateCollection = async () => {
-    setIsLoading(true);
-    await createCollection();
-    setIsLoading(false);
-    setCollectionName("");
-    setCollectionDescription("");
-    setCollectionUri("");
-  };
-
-  const handleCreateNft = async () => {
-    setIsLoading(true);
-    await createNft();
-    setIsLoading(false);
-    setCollectionName("");
-    setNftName("");
-    setNftDescription("");
-    setNftUri("");
-    setNftSupply("");
-  };
-
-  const clearPasswords = () => {
-    setPassword("");
-    setConfirmPassword("");
-  };
-
-  const throwAlert = (signal, title, message) => {
-    setAlertSignal(signal);
-    setAlertTitle(title);
-    setAlertMessage(message);
   };
 
   const createAccount = async () => {
@@ -330,6 +297,7 @@ export const AccountProvider = ({ children }) => {
       const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
       const address = keypair.publicKey.Hex;
       const account = new aptos.AptosAccount(secretKey, address);
+      await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
       let accountResource = resources.find(
         (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
@@ -370,6 +338,9 @@ export const AccountProvider = ({ children }) => {
         const secretKey = keypair.secretKey;
         const address = keypair.publicKey.Hex;
         const account = new aptos.AptosAccount(secretKey, address);
+        if (!isUnlocked) {
+          await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
+        }
         let resources = await client.getAccountResources(account.address());
         let accountResource = resources.find(
           (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
@@ -392,6 +363,50 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
+  const handleMint = async () => {
+    setIsLoading(true);
+    await mintCoins();
+    setIsLoading(false);
+    setAmount("");
+  };
+
+  const handleEstimate = async () => {
+    setIsLoading(true);
+    setOpenSendDialog(false);
+    await estimateTransaction();
+    setIsLoading(false);
+  };
+
+  const handleSend = async () => {
+    setIsLoading(true);
+    await sendTransaction();
+    setIsLoading(false);
+    setIsValidTransaction(false);
+    setEstimatedTxnResult([]);
+    setRecipientAddress("");
+    setAmount("");
+  };
+
+  const handleCreateCollection = async () => {
+    setIsLoading(true);
+    await createCollection();
+    setIsLoading(false);
+    setCollectionName("");
+    setCollectionDescription("");
+    setCollectionUri("");
+  };
+
+  const handleCreateNft = async () => {
+    setIsLoading(true);
+    await createNft();
+    setIsLoading(false);
+    setCollectionName("");
+    setNftName("");
+    setNftDescription("");
+    setNftUri("");
+    setNftSupply("");
+  };
+
   const mintCoins = async () => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
@@ -409,6 +424,32 @@ export const AccountProvider = ({ children }) => {
     function: "0x1::coin::transfer",
     type_arguments: ["0x1::aptos_coin::AptosCoin"],
     arguments: [recipientAddress, amount],
+  };
+
+  const estimateTransaction = async () => {
+    try {
+      const txnRequest = await client.generateTransaction(currentAddress, payload);
+      const estimatedTxn = await client.simulateTransaction(account, txnRequest);
+      if (estimatedTxn.success === true) {
+        // logic if Move says wagmi
+        setIsValidTransaction(true);
+        setEstimatedTxnResult(estimatedTxn);
+        throwAlert(30, "Transaction estimated as valid", `vm_status: ${estimatedTxn.vm_status}`);
+      }
+      if (estimatedTxn.success === false) {
+        // logic if txn aborted by Move
+        setEstimatedTxnResult(estimatedTxn);
+        throwAlert(33, "Transaction estimated as invalid", `vm_status: ${estimatedTxn.vm_status}`);
+        setRecipientAddress("");
+        setAmount("");
+      }
+    } catch (error) {
+      // logic if txn body doesn't looks good to be submitted to VM
+      throwAlert(34, "Failed to estimate transaction", `${error}`);
+      setRecipientAddress("");
+      setAmount("");
+      console.log(error);
+    }
   };
 
   const sendTransaction = async () => {
@@ -626,12 +667,17 @@ export const AccountProvider = ({ children }) => {
         amount,
         setAmount,
         handleMint,
+        handleEstimate,
         handleSend,
         getBalance,
         recipientAddress,
         setRecipientAddress,
         getSentTransactions,
         transactions,
+        isValidTransaction,
+        setIsValidTransaction,
+        estimatedTxnResult,
+        setEstimatedTxnResult,
         getReceivedEvents,
         receivedEvents,
         getAccountTokens,
