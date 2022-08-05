@@ -14,6 +14,7 @@ import "./index.css";
 
 const App = () => {
   const { darkMode, accountRoutesEnabled } = useContext(UIContext);
+
   return (
     <Router>
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>

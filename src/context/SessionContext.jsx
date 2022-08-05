@@ -6,7 +6,7 @@ import { getStore } from "../utils/store";
 export const SessionContext = React.createContext();
 
 export const SessionProvider = ({ children }) => {
-  const { darkMode, setDarkMode } = useContext(UIContext);
+  const { setDarkMode } = useContext(UIContext);
 
   useEffect(() => {
     sessionTheme();
