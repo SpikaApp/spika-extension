@@ -27,6 +27,8 @@ const ConfirmSendDialog = () => {
     estimatedTxnResult,
     setEstimatedTxnResult,
     handleSend,
+    setRecipientAddress,
+    setAmount,
   } = useContext(AccountContext);
   const [rows, setRows] = useState([]);
 
@@ -53,6 +55,8 @@ const ConfirmSendDialog = () => {
     setOpenConfirmSendDialog(false);
     setIsValidTransaction(false);
     setEstimatedTxnResult(false);
+    setRecipientAddress("");
+    setAmount("");
   };
 
   return (
