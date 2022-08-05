@@ -42,9 +42,9 @@ const ConfirmSendDialog = () => {
         createData("Time", convertTimestamp(estimatedTxnResult.timestamp)),
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData("Send amount", estimatedTxnResult.payload.arguments[1]),
-        createData("Est. gas fee", estimatedTxnResult.gas_used),
-        createData("Max gas fee", estimatedTxnResult.max_gas_amount),
+        createData("Amount", estimatedTxnResult.payload.arguments[1]),
+        createData("Gas fee", estimatedTxnResult.gas_used),
+        createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
       ]);
     }
@@ -77,7 +77,7 @@ const ConfirmSendDialog = () => {
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ maxWidth: 75 }} component="th" scope="row">
+                  <TableCell sx={{ maxWidth: 60 }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: 100 }}>
