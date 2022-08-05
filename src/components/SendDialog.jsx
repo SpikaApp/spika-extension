@@ -30,32 +30,28 @@ const SendDialog = () => {
     <Dialog align="center" open={openSendDialog} onClose={handleCancel}>
       <DialogTitle>Send Transaction</DialogTitle>
       <DialogContent sx={{ maxWidth: 375 }}>
-        <Typography color="warning.main">
+        <Typography variant="body1" color="warning.dark">
           Transaction will be submitted on chain id {chain_id}
         </Typography>
-        <TextField
-          sx={{ mt: 4, mb: 4 }}
-          id="recipientAddress"
-          label="Recipient's Address"
-          fullWidth={true}
-          type="string"
-          value={recipientAddress}
-          onChange={(e) => setRecipientAddress(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-        <TextField
-          sx={{ width: 200 }}
-          id="amount"
-          label="Amount"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+        <Stack>
+          <TextField
+            sx={{ mt: 4, mb: 4 }}
+            id="recipientAddress"
+            label="Address"
+            fullWidth={true}
+            type="string"
+            value={recipientAddress}
+            onChange={(e) => setRecipientAddress(e.target.value)}
+          />
+          <TextField
+            id="amount"
+            label="Amount"
+            fullWidth={true}
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </Stack>
       </DialogContent>
       <Stack
         sx={{
@@ -71,7 +67,7 @@ const SendDialog = () => {
           Cancel
         </Button>
         <Button variant="contained" onClick={handleEstimate}>
-          Send
+          Estimate
         </Button>
       </Stack>
       <Loading />

@@ -49,10 +49,8 @@ const ReceiveDialog = () => {
           <Button variant="outlined" onClick={handleClick}>
             Copy to clipboard
           </Button>
-          <Typography align="center" sx={{ my: 2 }} color="warning.main">
-            Network: Aptos Devnet
-            <br />
-            Chain id: {chain_id}
+          <Typography align="center" variant="body1" sx={{ my: 3 }} color="warning.dark">
+            Aptos Devnet chain id {chain_id}
           </Typography>
         </Stack>
       </DialogContent>

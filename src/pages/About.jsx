@@ -32,12 +32,12 @@ const About = () => {
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
             <Link href="https://aptoslabs.com/" underline="none" target="_blank">
-              Aptos
+              Aptos Devnet
             </Link>{" "}
-            blockchain chain_id: {chain_id}
+            chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.1.8 <br />
+            Wallet version 0.2.0 <br />
             Aptos SDK version 1.2.2
             <br />
             <Link
