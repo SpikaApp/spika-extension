@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import { AccountContext } from "./AccountContext";
+import React, { useState } from "react";
 
 export const UIContext = React.createContext();
 
@@ -7,6 +6,7 @@ export const UIProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState();
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
+  const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState(false); // testing true, default shall be false
   const [openSendDialog, setOpenSendDialog] = useState(false);
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -65,6 +65,8 @@ export const UIProvider = ({ children }) => {
         setOpenMintDialog,
         openSendDialog,
         setOpenSendDialog,
+        openConfirmSendDialog,
+        setOpenConfirmSendDialog,
         handleMintUI,
         handleSendUI,
         handleReceiveUI,
