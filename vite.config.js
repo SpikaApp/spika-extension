@@ -32,5 +32,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [react({ fastRefresh: true })],
+  plugins: [react({ fastRefresh: false })],
 });

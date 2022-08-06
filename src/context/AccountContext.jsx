@@ -6,11 +6,10 @@ import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
-import { TokenClient } from "aptos";
 import { PLATFORM, NODE_URL, FAUCET_URL } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
-import isEqual from "lodash/isEqual";
 import * as token from "../utils/token";
+import isEqual from "lodash/isEqual";
 
 export const AccountContext = React.createContext();
 
@@ -44,6 +43,7 @@ export const AccountProvider = ({ children }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
+  const [currentAsset] = useState(token.AptosCoin);
   const [maxGasAmount] = useState("1000");
   const {
     handleLoginUI,
@@ -58,9 +58,8 @@ export const AccountProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const client = new aptos.AptosClient(NODE_URL);
-  const tokenClient = new TokenClient(client);
+  const tokenClient = new aptos.TokenClient(client);
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
-  const currentAsset = token.AptosCoin; // todo: set to store, get from store when account is loaded
 
   useEffect(() => {
     if (PLATFORM === "chrome-extension:") {
@@ -224,7 +223,7 @@ export const AccountProvider = ({ children }) => {
     try {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
-      throwAlert(91, "Mnemonic Phrase", decryptedMnemonic);
+      throwAlert(91, "Secret Recovery Phrase", decryptedMnemonic);
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
@@ -263,7 +262,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
+      let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
@@ -301,7 +300,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
+      let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
@@ -342,7 +341,7 @@ export const AccountProvider = ({ children }) => {
           await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
         }
         let resources = await client.getAccountResources(account.address());
-        let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
+        let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
         setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
@@ -421,12 +420,12 @@ export const AccountProvider = ({ children }) => {
     type: "script_function_payload",
     function: {
       module: {
-        address: currentAsset.address,
-        name: currentAsset.module,
+        address: currentAsset[1].address,
+        name: currentAsset[1].module,
       },
       name: "transfer",
     },
-    type_arguments: currentAsset.generic_type_params,
+    type_arguments: currentAsset[1].generic_type_params,
     arguments: [currentAddress, amount],
   };
 
@@ -435,23 +434,17 @@ export const AccountProvider = ({ children }) => {
       const txnRequest = await client.generateTransaction(currentAddress, payload, {
         max_gas_amount: maxGasAmount,
       });
-      console.log(txnRequest);
       const estimatedTxn = await client.simulateTransaction(account, txnRequest);
-      console.log(estimatedTxn);
       if (estimatedTxn[0].success === true) {
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(30, "Transaction estimated as valid", `vm_status: ${estimatedTxn[0].vm_status}`);
+        throwAlert(30, "Transaction estimated as valid", `${estimatedTxn[0].vm_status}`);
       }
       if (estimatedTxn[0].success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(
-          33,
-          "Transaction estimated as invalid",
-          `vm_status: ${estimatedTxn[0].vm_status}`
-        );
+        throwAlert(33, "Transaction estimated as invalid", `${estimatedTxn[0].vm_status}`);
         setRecipientAddress("");
         setAmount("");
       }
@@ -483,7 +476,7 @@ export const AccountProvider = ({ children }) => {
 
   const createCollection = async () => {
     try {
-      const collection = await tokenClient.createCollection(
+      await tokenClient.createCollection(
         account,
         collectionName,
         collectionDescription,
@@ -499,7 +492,7 @@ export const AccountProvider = ({ children }) => {
 
   const createNft = async () => {
     try {
-      const nft = await tokenClient.createToken(
+      await tokenClient.createToken(
         account,
         collectionName,
         nftName,
@@ -518,7 +511,7 @@ export const AccountProvider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
+    let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
     setBalance(accountResource.data.coin.value);
   };
 
@@ -541,14 +534,14 @@ export const AccountProvider = ({ children }) => {
 
   const getReceivedEvents = async () => {
     let resources = await client.getAccountResources(currentAddress);
-    let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
+    let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
 
     let counter = parseInt(accountResource.data.deposit_events.counter);
 
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset,
+        currentAsset[1],
         "deposit_events"
       );
       let res = data.reverse((r) => r.type === "sequence_number");
@@ -556,7 +549,7 @@ export const AccountProvider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset,
+        currentAsset[1],
         "deposit_events",
         {
           start: counter - 25,
@@ -703,6 +696,7 @@ export const AccountProvider = ({ children }) => {
         handleLogin,
         handleRevealMnemonic,
         handleRevealPrivateKey,
+        currentAsset,
       }}
     >
       {children}
