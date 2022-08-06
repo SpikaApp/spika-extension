@@ -22,6 +22,7 @@ const SendDialog = () => {
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   const handleCancel = () => {
+    setRecipientAddress("");
     setAmount("");
     setOpenSendDialog(false);
   };
