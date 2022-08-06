@@ -83,7 +83,9 @@ const ConfirmSendDialog = () => {
                       <Tooltip title="Copy address" sx={{ ml: -1.5 }}>
                         <Chip
                           label={shortenAddress(row.value)}
-                          onClick={copyToClipboard(row.value)}
+                          onClick={() => {
+                            copyToClipboard(row.value);
+                          }}
                         />
                       </Tooltip>
                     ) : (
