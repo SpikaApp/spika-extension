@@ -1,4 +1,11 @@
-const AptosCoin = [
+export const tokenStore = {
+  address: "0x3",
+  module: "token",
+  name: "TokenStore",
+  generic_type_params: [],
+};
+
+export const AptosCoin = [
   {
     name: "AptosCoin",
     ticker: "APTOS",
@@ -10,5 +17,3 @@ const AptosCoin = [
     generic_type_params: ["0x1::aptos_coin::AptosCoin"],
   },
 ];
-
-export { AptosCoin };
