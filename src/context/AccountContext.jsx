@@ -371,7 +371,7 @@ export const AccountProvider = ({ children }) => {
       aptos.TxnBuilderTypes.AccountAddress.fromHex(account.address()),
       BigInt(sequenceNumber),
       payload,
-      parseInt(maxGasAmount),
+      BigInt(parseInt(maxGasAmount)),
       1n,
       BigInt(Math.floor(Date.now() / 1000) + 20),
       new aptos.TxnBuilderTypes.ChainId(chainId)
@@ -380,7 +380,6 @@ export const AccountProvider = ({ children }) => {
     const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
     const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
 
-    console.log(transactionRes);
     return transactionRes.hash;
   };
 
@@ -591,29 +590,27 @@ export const AccountProvider = ({ children }) => {
   const getAccountTokens = async () => {
     try {
       // Get total number of Token deposit_events received by an account
-      let accountResources = await client.getAccountResources(currentAddress);
-      let accountDepositedTokens = accountResources.find(
-        (r) => r.type === "0x3::token::TokenStore"
-      );
+      let resources = await client.getAccountResources(currentAddress);
+      let tokenStore = resources.find((r) => isEqual(r.type, token.tokenStore));
 
       const getTokens = async () => {
-        if (accountDepositedTokens === undefined) {
+        if (tokenStore === undefined) {
           // console.log("Account doesn't hold any NFT yet");
           return setAccountTokens(0);
         } else {
-          let tokenDepositCounter = parseInt(accountDepositedTokens.data.deposit_events.counter);
+          let counter = parseInt(tokenStore.data.deposit_events.counter);
           // Get Token deposit_events
           let data = await client.getEventsByEventHandle(
             currentAddress,
-            "0x3::token::TokenStore",
+            tokenStore.type,
             "deposit_events",
             {
-              limit: tokenDepositCounter,
+              limit: counter,
             }
           );
 
           // Get TokenId for accountDepositedTokens and remove dublicates
-          let tokenIds = [...new Set(data.map((value) => value.data.id))];
+          let tokenIds = [...new Set(data.map((i) => i.data.id))];
 
           // Returns an array of tokenId and value
           const accountTokensBalances = await Promise.all(
@@ -625,7 +622,7 @@ export const AccountProvider = ({ children }) => {
 
           // Returns an array of tokenId and value for all tokens with > 0 balance
           let result = accountTokensBalances.filter((r) => {
-            return r.value !== "0";
+            return r.amount !== "0";
           });
 
           if (result == undefined) {
@@ -649,10 +646,16 @@ export const AccountProvider = ({ children }) => {
       } else {
         let data = await Promise.all(
           accountTokens.map(
-            async (i) => await tokenClient.getTokenData(i.id.creator, i.id.collection, i.id.name)
+            async (i) =>
+              await tokenClient.getTokenData(
+                i.id.token_data_id.creator,
+                i.id.token_data_id.collection,
+                i.id.token_data_id.name
+              )
           )
         );
-        return setNftDetails(data);
+        let res = data.reverse();
+        return setNftDetails(res);
       }
     } catch (error) {
       console.log(error);
