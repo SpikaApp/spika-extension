@@ -6,10 +6,11 @@ import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
+import isEqual from "lodash/isEqual";
 import { PLATFORM, NODE_URL, FAUCET_URL } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
 import * as token from "../utils/token";
-import isEqual from "lodash/isEqual";
+import * as bcsPayload from "../utils/payload";
 
 export const AccountContext = React.createContext();
 
@@ -360,6 +361,29 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
+  const submitTransactionHelper = async (account, payload) => {
+    const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
+      client.getAccount(account.address()),
+      client.getChainId(),
+    ]);
+
+    const rawTxn = new aptos.TxnBuilderTypes.RawTransaction(
+      aptos.TxnBuilderTypes.AccountAddress.fromHex(account.address()),
+      BigInt(sequenceNumber),
+      payload,
+      parseInt(maxGasAmount),
+      1n,
+      BigInt(Math.floor(Date.now() / 1000) + 20),
+      new aptos.TxnBuilderTypes.ChainId(chainId)
+    );
+
+    const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
+    const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
+
+    console.log(transactionRes);
+    return transactionRes.hash;
+  };
+
   const handleMint = async () => {
     setIsLoading(true);
     await mintCoins();
@@ -476,12 +500,14 @@ export const AccountProvider = ({ children }) => {
 
   const createCollection = async () => {
     try {
-      await tokenClient.createCollection(
-        account,
+      const collection = await bcsPayload.collection(
         collectionName,
         collectionDescription,
-        collectionUri
+        collectionUri,
+        1
       );
+      await submitTransactionHelper(account, collection);
+
       throwAlert(61, "Transaction sent", `${collection}`);
     } catch (error) {
       throwAlert(62, "Transaction failed", `${error}`);
@@ -492,15 +518,17 @@ export const AccountProvider = ({ children }) => {
 
   const createNft = async () => {
     try {
-      await tokenClient.createToken(
-        account,
+      const nft = await bcsPayload.nft(
+        currentAddress,
         collectionName,
         nftName,
         nftDescription,
         nftSupply,
         nftUri,
-        0 // royalty_points_per_million
+        1
       );
+
+      await submitTransactionHelper(account, nft);
       throwAlert(71, "Transaction sent", `${nft}`);
     } catch (error) {
       throwAlert(72, "Transaction failed", `${error}`);
