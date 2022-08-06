@@ -107,7 +107,7 @@ const NFTs = () => {
                 }}
               >
                 {nftDetails.map((nft) => (
-                  <ImageListItem key={nft.name}>
+                  <ImageListItem key={nft.collection + nft.name + nft.description}>
                     <img
                       src={`${nft.uri}`}
                       onError={({ currentTarget }) => {
