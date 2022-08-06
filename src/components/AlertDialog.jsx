@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
   Typography,
@@ -128,13 +127,8 @@ const AlertDialog = () => {
   }, [alertSignal]);
 
   return (
-    <Dialog
-      open={openAlertDialog}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">{alertTitle}</DialogTitle>
+    <Dialog open={openAlertDialog} onClose={handleClose}>
+      <DialogTitle>{alertTitle}</DialogTitle>
       <DialogContent sx={{ minWidth: 250, maxWidth: 375 }}>
         {isTransaction && (
           <Stack component="span" sx={{ maxWidth: 250 }}>
@@ -163,37 +157,28 @@ const AlertDialog = () => {
           </Stack>
         )}
         {alertSignal === 81 || alertSignal === 91 ? (
-          <Stack>
+          <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <TextField
               sx={{ width: 250, marginBottom: 2 }}
               error
-              id="output-error"
               multiline
               maxRows={6}
               value={alertMessage}
             />
-            <DialogContentText
-              sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-              id="alert-dialog-description"
-            >
-              <Stack component="span" sx={{ maxWidth: 250 }}>
-                <Typography component="span" align="center" sx={{ mb: 2 }} color="error.main">
-                  Never share your secret phrase or private key with anyone. Use with caution.
-                </Typography>
-              </Stack>
-              <Button variant="outlined" color="error" onClick={handleClick}>
-                Copy to clipboard
-              </Button>
-            </DialogContentText>
+            <Stack component="span" sx={{ maxWidth: 250 }}>
+              <Typography component="span" align="center" sx={{ mb: 2 }} color="error.main">
+                Never share your secret phrase or private key with anyone. Use with caution.
+              </Typography>
+            </Stack>
+            <Button variant="outlined" color="error" onClick={handleClick}>
+              Copy to clipboard
+            </Button>
           </Stack>
         ) : (
           !isTransaction && (
-            <DialogContentText
-              sx={{ overflow: "hidden", textOverflow: "ellipsis", wordWrap: "break-word" }}
-              id="alert-dialog-description"
-            >
+            <Stack sx={{ overflow: "hidden", textOverflow: "ellipsis", wordWrap: "break-word" }}>
               <Typography>{alertMessage}</Typography>
-            </DialogContentText>
+            </Stack>
           )
         )}
       </DialogContent>
