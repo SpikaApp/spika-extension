@@ -128,7 +128,11 @@ const AlertDialog = () => {
 
   return (
     <Dialog open={openAlertDialog} onClose={handleClose}>
-      <DialogTitle>{alertTitle}</DialogTitle>
+      {alertSignal === 81 || alertSignal === 91 ? (
+        <DialogTitle align="center">{alertTitle}</DialogTitle>
+      ) : (
+        <DialogTitle>{alertTitle}</DialogTitle>
+      )}
       <DialogContent sx={{ minWidth: 250, maxWidth: 375 }}>
         {isTransaction && (
           <Stack component="span" sx={{ maxWidth: 250 }}>
@@ -167,7 +171,9 @@ const AlertDialog = () => {
             />
             <Stack component="span" sx={{ maxWidth: 250 }}>
               <Typography component="span" align="center" sx={{ mb: 2 }} color="error.main">
-                Never share your secret phrase or private key with anyone. Use with caution.
+                Never share your secret phrase or private key with anyone.
+                <br />
+                Use with caution.
               </Typography>
             </Stack>
             <Button variant="outlined" color="error" onClick={handleClick}>
