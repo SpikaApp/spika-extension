@@ -33,7 +33,7 @@ const ReceiveDialog = () => {
   return (
     <Dialog open={openReceiveDialog} onClose={handleClose}>
       <DialogTitle>
-        <Stack sx={{ display: "flex", alignItems: "center" }}>Your Account Address</Stack>
+        <Stack sx={{ display: "flex", alignItems: "center" }}>Account Address</Stack>
       </DialogTitle>
       <DialogContent>
         {/* <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText> */}

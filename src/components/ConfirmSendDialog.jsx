@@ -31,6 +31,7 @@ const ConfirmSendDialog = () => {
     handleSend,
     setRecipientAddress,
     setAmount,
+    currentAsset,
   } = useContext(AccountContext);
   const [rows, setRows] = useState([]);
 
@@ -40,7 +41,10 @@ const ConfirmSendDialog = () => {
       setRows([
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData("Amount", estimatedTxnResult.payload.arguments[1]),
+        createData(
+          "Amount",
+          `${estimatedTxnResult.payload.arguments[1]} ${currentAsset[0].ticker}`
+        ),
         createData("Gas fee", estimatedTxnResult.gas_used),
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
