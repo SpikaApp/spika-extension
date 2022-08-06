@@ -9,6 +9,8 @@ import { UIContext } from "./UIContext";
 import { TokenClient } from "aptos";
 import { PLATFORM, NODE_URL, FAUCET_URL } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
+import isEqual from "lodash/isEqual";
+import * as token from "../utils/token";
 
 export const AccountContext = React.createContext();
 
@@ -42,6 +44,7 @@ export const AccountProvider = ({ children }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
+  const [maxGasAmount] = useState("1000");
   const {
     handleLoginUI,
     setOpenLoginDialog,
@@ -57,6 +60,7 @@ export const AccountProvider = ({ children }) => {
   const client = new aptos.AptosClient(NODE_URL);
   const tokenClient = new TokenClient(client);
   const faucetClient = new aptos.FaucetClient(NODE_URL, FAUCET_URL, null);
+  const currentAsset = token.AptosCoin; // todo: set to store, get from store when account is loaded
 
   useEffect(() => {
     if (PLATFORM === "chrome-extension:") {
@@ -259,9 +263,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find(
-        (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-      );
+      let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
@@ -299,9 +301,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find(
-        (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-      );
+      let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
@@ -342,9 +342,7 @@ export const AccountProvider = ({ children }) => {
           await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
         }
         let resources = await client.getAccountResources(account.address());
-        let accountResource = resources.find(
-          (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-        );
+        let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
         setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
@@ -421,25 +419,39 @@ export const AccountProvider = ({ children }) => {
 
   const payload = {
     type: "script_function_payload",
-    function: "0x1::coin::transfer",
-    type_arguments: ["0x1::aptos_coin::AptosCoin"],
-    arguments: [recipientAddress, amount],
+    function: {
+      module: {
+        address: currentAsset.address,
+        name: currentAsset.module,
+      },
+      name: "transfer",
+    },
+    type_arguments: currentAsset.generic_type_params,
+    arguments: [currentAddress, amount],
   };
 
   const estimateTransaction = async () => {
     try {
-      const txnRequest = await client.generateTransaction(currentAddress, payload);
+      const txnRequest = await client.generateTransaction(currentAddress, payload, {
+        max_gas_amount: maxGasAmount,
+      });
+      console.log(txnRequest);
       const estimatedTxn = await client.simulateTransaction(account, txnRequest);
-      if (estimatedTxn.success === true) {
+      console.log(estimatedTxn);
+      if (estimatedTxn[0].success === true) {
         // logic if Move says wagmi
         setIsValidTransaction(true);
-        setEstimatedTxnResult(estimatedTxn);
-        throwAlert(30, "Transaction estimated as valid", `vm_status: ${estimatedTxn.vm_status}`);
+        setEstimatedTxnResult(estimatedTxn[0]);
+        throwAlert(30, "Transaction estimated as valid", `vm_status: ${estimatedTxn[0].vm_status}`);
       }
-      if (estimatedTxn.success === false) {
+      if (estimatedTxn[0].success === false) {
         // logic if txn aborted by Move
-        setEstimatedTxnResult(estimatedTxn);
-        throwAlert(33, "Transaction estimated as invalid", `vm_status: ${estimatedTxn.vm_status}`);
+        setEstimatedTxnResult(estimatedTxn[0]);
+        throwAlert(
+          33,
+          "Transaction estimated as invalid",
+          `vm_status: ${estimatedTxn[0].vm_status}`
+        );
         setRecipientAddress("");
         setAmount("");
       }
@@ -454,7 +466,9 @@ export const AccountProvider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const txnRequest = await client.generateTransaction(currentAddress, payload);
+      const txnRequest = await client.generateTransaction(currentAddress, payload, {
+        max_gas_amount: maxGasAmount,
+      });
       const signedTxn = await client.signTransaction(account, txnRequest);
       const transactionRes = await client.submitTransaction(signedTxn);
       await client.waitForTransaction(transactionRes.hash);
@@ -504,9 +518,7 @@ export const AccountProvider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find(
-      (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-    );
+    let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
     setBalance(accountResource.data.coin.value);
   };
 
@@ -528,17 +540,15 @@ export const AccountProvider = ({ children }) => {
   };
 
   const getReceivedEvents = async () => {
-    let accountResources = await client.getAccountResources(currentAddress);
-    let accountAptosCoins = accountResources.find(
-      (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-    );
+    let resources = await client.getAccountResources(currentAddress);
+    let accountResource = resources.find((r) => isEqual(r.type, currentAsset));
 
-    let counter = parseInt(accountAptosCoins.data.deposit_events.counter);
+    let counter = parseInt(accountResource.data.deposit_events.counter);
 
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
+        currentAsset,
         "deposit_events"
       );
       let res = data.reverse((r) => r.type === "sequence_number");
@@ -546,7 +556,7 @@ export const AccountProvider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
+        currentAsset,
         "deposit_events",
         {
           start: counter - 25,
@@ -562,7 +572,7 @@ export const AccountProvider = ({ children }) => {
       // Get total number of Token deposit_events received by an account
       let accountResources = await client.getAccountResources(currentAddress);
       let accountDepositedTokens = accountResources.find(
-        (r) => r.type === "0x1::token::TokenStore"
+        (r) => r.type === "0x3::token::TokenStore"
       );
 
       const getTokens = async () => {
@@ -574,7 +584,7 @@ export const AccountProvider = ({ children }) => {
           // Get Token deposit_events
           let data = await client.getEventsByEventHandle(
             currentAddress,
-            "0x1::token::TokenStore",
+            "0x3::token::TokenStore",
             "deposit_events",
             {
               limit: tokenDepositCounter,
