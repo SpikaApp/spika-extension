@@ -18,8 +18,8 @@ import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
-import shortenAddress from "../utils/shortenAddress";
-import copyToClipboard from "../utils/copyToClipboard";
+import shortenAddress from "../utils/shorten_address";
+import copyToClipboard from "../utils/copy_clipboard";
 
 const ConfirmSendDialog = () => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog } = useContext(UIContext);

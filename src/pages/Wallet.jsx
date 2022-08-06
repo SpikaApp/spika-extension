@@ -24,7 +24,7 @@ import ConfirmSendDialog from "../components/ConfirmSendDialog";
 import ReceiveDialog from "../components/ReceiveDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
-import shortenAddress from "../utils/shortenAddress";
+import shortenAddress from "../utils/shorten_address";
 import aptos_light from "../assets/aptos_light.png";
 import aptos_dark from "../assets/aptos_dark.png";
 import { PLATFORM } from "../utils/constants";
