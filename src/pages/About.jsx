@@ -13,7 +13,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import useAxios from "../utils/useAxios";
+import useAxios from "../utils/use_axios";
 import { NODE_URL } from "../utils/constants";
 
 const About = () => {
