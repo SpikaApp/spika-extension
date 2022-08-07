@@ -1,4 +1,6 @@
 import { BCS, TxnBuilderTypes } from "aptos/dist/transaction_builder";
+
+// create collection payload
 export const collection = async (name, description, uri, maxAmount) => {
   const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
     TxnBuilderTypes.ScriptFunction.natural(
@@ -17,6 +19,7 @@ export const collection = async (name, description, uri, maxAmount) => {
   return payload;
 };
 
+// create nft payload
 export const nft = async (
   address,
   collectionName,
