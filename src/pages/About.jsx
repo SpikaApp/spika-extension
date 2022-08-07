@@ -37,8 +37,8 @@ const About = () => {
             chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.2.0 <br />
-            Aptos SDK version 1.2.2
+            Wallet version 0.2.1 <br />
+            Aptos SDK version 1.3.3
             <br />
             <Link
               href="https://github.com/xorgal/spika/blob/master/LICENSE"
