@@ -51,4 +51,4 @@ Build extension:
 ```
 npm run build
 ```
-Copy all files from `extension` directory to `build` directory and upload content of `build` directory to Chrome browser using steps described in [previous section](#download-zipped-package-from-github). 
+Copy all files from `public` directory to `build` directory and upload content of `build` directory to Chrome browser using steps described in [previous section](#download-zipped-package-from-github). 
