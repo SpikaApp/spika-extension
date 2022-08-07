@@ -449,7 +449,7 @@ export const AccountProvider = ({ children }) => {
       name: "transfer",
     },
     type_arguments: currentAsset[1].generic_type_params,
-    arguments: [currentAddress, amount],
+    arguments: [recipientAddress, amount],
   };
 
   const estimateTransaction = async () => {
