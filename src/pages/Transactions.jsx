@@ -17,6 +17,7 @@ import TransactionCard from "../components/TransactionCard";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 
 const style = {
   width: "100%",
@@ -25,14 +26,9 @@ const style = {
 };
 
 const Transactions = () => {
-  const {
-    accountImported,
-    getReceivedEvents,
-    getSentTransactions,
-    receivedEvents,
-    transactions,
-    currentAddress,
-  } = useContext(AccountContext);
+  const { accountImported, currentAddress } = useContext(AccountContext);
+  const { getReceivedEvents, getSentTransactions, receivedEvents, transactions } =
+    useContext(Web3Context);
   const [value, setValue] = useState("1");
 
   const handleChange = (event, newValue) => {

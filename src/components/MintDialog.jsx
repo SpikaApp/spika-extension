@@ -12,11 +12,11 @@ import {
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 
 const MintDialog = () => {
   const { openMintDialog, setOpenMintDialog } = useContext(UIContext);
-  const { amount, setAmount, handleMint } = useContext(AccountContext);
+  const { amount, setAmount, handleMint } = useContext(Web3Context);
 
   const handleCancel = () => {
     setAmount("");

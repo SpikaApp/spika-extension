@@ -3,9 +3,10 @@ import { Button, Dialog, DialogContent, DialogTitle, Stack, TextField } from "@m
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 
 const CreateCollectionDialog = () => {
+  const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
   const {
     collectionName,
     setCollectionName,
@@ -14,8 +15,7 @@ const CreateCollectionDialog = () => {
     collectionUri,
     setCollectionUri,
     handleCreateCollection,
-  } = useContext(AccountContext);
-  const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
+  } = useContext(Web3Context);
 
   const handleCancel = () => {
     setCollectionName("");

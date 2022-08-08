@@ -12,13 +12,15 @@ import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 import useAxios from "../utils/use_axios";
 import { NODE_URL } from "../utils/constants";
 
 const SendDialog = () => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
-  const { recipientAddress, setRecipientAddress, amount, setAmount, handleEstimate, currentAsset } =
-    useContext(AccountContext);
+  const { currentAsset } = useContext(AccountContext);
+  const { recipientAddress, setRecipientAddress, amount, setAmount, handleEstimate } =
+    useContext(Web3Context);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   const handleCancel = () => {
