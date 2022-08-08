@@ -355,6 +355,7 @@ export const Web3Provider = ({ children }) => {
         getReceivedEvents,
         getSentTransactions,
         handleEstimate,
+        accountTokens,
         getAccountTokens,
         getBalance,
         handleCreateCollection,
