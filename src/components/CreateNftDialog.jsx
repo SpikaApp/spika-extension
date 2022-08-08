@@ -11,9 +11,10 @@ import {
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 
 const CreateNftDialog = () => {
+  const { openCreateNftDialog, setOpenCreateNftDialog } = useContext(UIContext);
   const {
     collectionName,
     setCollectionName,
@@ -26,8 +27,7 @@ const CreateNftDialog = () => {
     nftSupply,
     setNftSupply,
     handleCreateNft,
-  } = useContext(AccountContext);
-  const { openCreateNftDialog, setOpenCreateNftDialog } = useContext(UIContext);
+  } = useContext(Web3Context);
 
   const handleCancel = () => {
     setCollectionName("");

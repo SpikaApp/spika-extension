@@ -17,14 +17,15 @@ import {
 import PaletteIcon from "@mui/icons-material/Palette";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 import CreateCollectionDialog from "../components/CreateCollectionDialog";
 import CreateNftDialog from "../components/CreateNftDialog";
 import default_nft from "../assets/default_nft.jpg";
 
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
-  const { accountImported, getAccountTokens, getNftDetails, accountTokens, nftDetails } =
-    useContext(AccountContext);
+  const { accountImported } = useContext(AccountContext);
+  const { getAccountTokens, getNftDetails, accountTokens, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState(false);
 
   useEffect(() => {

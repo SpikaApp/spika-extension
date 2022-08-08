@@ -18,11 +18,13 @@ import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
 const ConfirmSendDialog = () => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog } = useContext(UIContext);
+  const { currentAsset } = useContext(AccountContext);
   const {
     isValidTransaction,
     setIsValidTransaction,
@@ -31,8 +33,7 @@ const ConfirmSendDialog = () => {
     handleSend,
     setRecipientAddress,
     setAmount,
-    currentAsset,
-  } = useContext(AccountContext);
+  } = useContext(Web3Context);
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
