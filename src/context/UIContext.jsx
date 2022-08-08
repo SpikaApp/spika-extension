@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getStore } from "../utils/store";
+import { PLATFORM } from "../utils/constants";
 
 export const UIContext = React.createContext();
 
@@ -6,7 +8,7 @@ export const UIProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState();
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
-  const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState(false); // testing true, default shall be false
+  const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState(false);
   const [openSendDialog, setOpenSendDialog] = useState(false);
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -16,6 +18,19 @@ export const UIProvider = ({ children }) => {
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
+
+  useEffect(() => {
+    sessionTheme();
+  }, []);
+
+  const sessionTheme = async () => {
+    const data = await getStore(PLATFORM, "DARK_MODE");
+    if (data === undefined || data === null) {
+      setDarkMode(true);
+    } else {
+      setDarkMode(data);
+    }
+  };
 
   const handleMintUI = () => {
     setOpenMintDialog(true);
