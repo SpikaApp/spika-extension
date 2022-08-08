@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
-import { UIContext } from "./UIContext";
 import * as aptos from "aptos";
-import { AccountContext } from "./AccountContext";
 import { client, faucetClient, tokenClient } from "../utils/client";
+import { UIContext } from "./UIContext";
+import { AccountContext } from "./AccountContext";
 import * as token from "../utils/token";
 import * as bcsPayload from "../utils/payload";
 import isEqual from "lodash/isEqual";
@@ -22,9 +22,9 @@ export const Web3Provider = ({ children }) => {
   const { setOpenSendDialog } = useContext(UIContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [isValidTransaction, setIsValidTransaction] = useState(false);
+  const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
-  const [maxGasAmount] = useState("1000");
+  const [isValidTransaction, setIsValidTransaction] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [receivedEvents, setReceivedEvents] = useState([]);
   const [accountTokens, setAccountTokens] = useState([]);
@@ -103,11 +103,12 @@ export const Web3Provider = ({ children }) => {
     setNftSupply("");
   };
 
+  // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} Aptos Coin`);
+      throwAlert(21, "Success", `Received ${amount} ${token.AptosCoin[0].name}`);
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
@@ -138,18 +139,18 @@ export const Web3Provider = ({ children }) => {
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(30, "Transaction estimated as valid", `${estimatedTxn[0].vm_status}`);
+        throwAlert(30, "Transaction is valid", `${estimatedTxn[0].vm_status}`);
       }
       if (estimatedTxn[0].success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(33, "Transaction estimated as invalid", `${estimatedTxn[0].vm_status}`);
+        throwAlert(33, "Transaction is invalid", `${estimatedTxn[0].vm_status}`);
         setRecipientAddress("");
         setAmount("");
       }
     } catch (error) {
       // logic if txn body doesn't looks good to be submitted to VM
-      throwAlert(34, "Failed to estimate transaction", `${error}`);
+      throwAlert(34, "Failed to estimate", `${error}`);
       setRecipientAddress("");
       setAmount("");
       console.log(error);
