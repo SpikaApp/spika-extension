@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 
-const About = () => {
+const NotFound = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -40,4 +40,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default NotFound;
