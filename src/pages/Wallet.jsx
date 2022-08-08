@@ -25,10 +25,12 @@ import ReceiveDialog from "../components/ReceiveDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import shortenAddress from "../utils/shorten_address";
 import aptos_light from "../assets/aptos_light.png";
 import aptos_dark from "../assets/aptos_dark.png";
 import { PLATFORM } from "../utils/constants";
+import shortenAddress from "../utils/shorten_address";
+import copyToClipboard from "../utils/copy_clipboard";
+
 const Wallet = () => {
   const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
   const { currentAddress, accountImported, balance } = useContext(AccountContext);
@@ -45,7 +47,7 @@ const Wallet = () => {
   }, [accountImported]);
 
   const handleClick = () => {
-    navigator.clipboard.writeText(currentAddress);
+    copyToClipboard(currentAddress);
   };
 
   return (

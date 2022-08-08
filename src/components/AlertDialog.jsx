@@ -15,6 +15,7 @@ import {
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import copyToClipboard from "../utils/copy_clipboard";
 
 const AlertDialog = () => {
   const [isTransaction, setIsTransaction] = useState(false);
@@ -47,7 +48,7 @@ const AlertDialog = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigator.clipboard.writeText(alertMessage);
+    copyToClipboard(alertMessage);
   };
 
   const handleOpen = () => {
