@@ -19,7 +19,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://fullnode.devnet.aptoslabs.com",
+        target: "https://fullnode.devnet.aptoslabs.com/v1",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
