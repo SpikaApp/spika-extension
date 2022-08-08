@@ -16,6 +16,7 @@ import { AccountContext } from "../context/AccountContext";
 import { QRCodeCanvas } from "qrcode.react";
 import useAxios from "../utils/use_axios";
 import { NODE_URL } from "../utils/constants";
+import copyToClipboard from "../utils/copy_clipboard";
 
 const ReceiveDialog = () => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
@@ -23,7 +24,7 @@ const ReceiveDialog = () => {
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   const handleClick = () => {
-    navigator.clipboard.writeText(currentAddress);
+    copyToClipboard(currentAddress);
   };
 
   const handleClose = () => {
