@@ -1,46 +1,53 @@
-// delay in minutes before locking wallet;
-const interval = 15;
-let job = null;
+const task = "SERVICE_WORKER_TASK";
+const lockTimer = 15;
+
+const removeMem = (key) => {
+  chrome.storage.session.remove([key]);
+};
+
+const setStore = (key, value) => {
+  chrome.storage.local.set({ [key]: value });
+};
+
+const getStore = (key) => {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(key, (item) => {
+      resolve(item[key]);
+    });
+  });
+};
+
+const removeStore = (key) => {
+  chrome.storage.local.remove([key]);
+};
+
+const spikaMessanger = (msg) => {
+  if (msg.id === "service_worker") {
+    setStore(task, msg.task);
+  }
+};
 
 const walletLocker = () => {
-  chrome.storage.session.remove(["PWD"]);
+  removeMem("PWD");
   console.log("[worker]: wallet locked");
 };
 
-const onConnectListener = (msg) => {
-  console.log("[worker]: new message ", msg);
-  if (msg.id === "service_worker" && msg.task === "listen") {
-    job = msg.task;
-    if (chrome.alarms.onAlarm.hasListeners()) {
-      console.log("[worker]: walletLocker active, will clear");
-      chrome.alarms.onAlarm.removeListener(walletLocker);
-      console.log("[worker]: extension opened in unlocked state, walletLocker listener removed");
-    }
-    if (msg.id === "service_worker" && msg.task === "idle") {
-      job = msg.task;
-    }
-  } else {
-    console.log("[worker]: connection with extension established, but no tasks received");
-    job = "idle";
-  }
-};
-
-chrome.runtime.onConnect.addListener((port) => {
+chrome.runtime.onConnect.addListener(async (port) => {
   if (port.name === "spika") {
     console.log("[worker]: wallet connected");
-    chrome.runtime.onMessage.addListener(onConnectListener);
-    port.onDisconnect.addListener(() => {
-      console.log("[worker]: wallet disconnected");
-      if (job === "listen") {
-        chrome.alarms.create("lock_timer", { delayInMinutes: interval });
-        chrome.alarms.onAlarm.addListener(walletLocker);
-        console.log("[worker]: lock_timer created and walletLocker listener added");
-      }
-      if (chrome.runtime.onMessage.hasListeners()) {
-        console.log("[worker]: onConnectListener removed");
-        chrome.runtime.onMessage.removeListener(onConnectListener);
-      }
-      job = null;
-    });
+    await chrome.alarms.clear("lock_timer");
   }
+  port.onDisconnect.addListener(async () => {
+    const status = await getStore(task);
+    if (status === "listen") {
+      chrome.alarms.create("lock_timer", { delayInMinutes: lockTimer });
+    }
+    console.log("[worker]: wallet disconnected");
+    // if (status === "idle") {
+    //   console.log("[worker]: wallet disconnected");
+    // }
+  });
 });
+
+chrome.runtime.onMessage.addListener(spikaMessanger);
+chrome.alarms.onAlarm.addListener(walletLocker);
