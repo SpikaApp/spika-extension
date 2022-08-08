@@ -25,7 +25,7 @@ import default_nft from "../assets/default_nft.jpg";
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
-  const { getAccountTokens, getNftDetails, accountTokens, nftDetails } = useContext(Web3Context);
+  const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState(false);
 
   useEffect(() => {
