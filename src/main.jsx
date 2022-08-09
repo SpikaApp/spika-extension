@@ -4,7 +4,9 @@ import { UIProvider } from "./context/UIContext";
 import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <UIProvider>
-    <App />
-  </UIProvider>
+  <React.StrictMode>
+    <UIProvider>
+      <App />
+    </UIProvider>
+  </React.StrictMode>
 );
