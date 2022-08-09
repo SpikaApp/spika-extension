@@ -19,8 +19,7 @@ const removeMem = (key) => {
 };
 
 const spikaMessanger = (msg) => {
-  // wallet lock related messages
-  console.log("[worker]: new message: ", msg);
+  // console.log("[worker]: new message: ", msg);
   if (msg.ch === "spika_internal" && msg.id === "wallet_locker") {
     setMem(locker, msg.task);
   }
@@ -30,7 +29,7 @@ const walletLocker = async () => {
   const alarm = await getMem(walletLockRequired);
   if (alarm) {
     const task = await getMem(locker);
-    if (task === true) {
+    if (task) {
       removeMem("PWD");
       console.log("[worker]: wallet locked");
       setMem(locker, false);
@@ -46,22 +45,22 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onConnect.addListener(async (port) => {
   if (port.name === "spika") {
-    console.log("[worker]: wallet connected");
+    // console.log("[worker]: wallet connected");
     await chrome.alarms.clear(walletLockRequired);
     setMem(walletLockRequired, false);
   }
+
   port.onDisconnect.addListener(async () => {
     const task = await getMem(locker);
-    if (task === true) {
+    if (task) {
       const delay = await getMem(delayBeforeLock);
       chrome.alarms.create(walletLockRequired, { delayInMinutes: delay });
       setMem(walletLockRequired, true);
-    }
-    if (task === false) {
+    } else {
       await chrome.alarms.clear(walletLockRequired);
       setMem(walletLockRequired, false);
     }
-    console.log("[worker]: wallet disconnected");
+    // console.log("[worker]: wallet disconnected");
   });
 });
 
