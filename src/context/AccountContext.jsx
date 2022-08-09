@@ -52,8 +52,9 @@ export const AccountProvider = ({ children }) => {
     if (isUnlocked) {
       if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
-          id: "service_worker",
-          task: "listen",
+          ch: "spika_internal",
+          id: "wallet_locker",
+          task: true,
         });
       }
       handleLogin();
@@ -95,8 +96,9 @@ export const AccountProvider = ({ children }) => {
       setPassword("");
       if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
-          id: "service_worker",
-          task: "listen",
+          ch: "spika_internal",
+          id: "wallet_locker",
+          task: true,
         });
       }
     } catch (error) {
@@ -111,8 +113,9 @@ export const AccountProvider = ({ children }) => {
   const handleLogout = () => {
     if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
-        id: "service_worker",
-        task: "idle",
+        ch: "spika_internal",
+        id: "wallet_locker",
+        task: false,
       });
     }
     navigate("/");
@@ -130,8 +133,9 @@ export const AccountProvider = ({ children }) => {
   const handleLock = () => {
     if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
-        id: "service_worker",
-        task: "idle",
+        ch: "spika_internal",
+        id: "wallet_locker",
+        task: false,
       });
     }
     setPrivateKey("");
@@ -241,8 +245,9 @@ export const AccountProvider = ({ children }) => {
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
-          id: "service_worker",
-          task: "listen",
+          ch: "spika_internal",
+          id: "wallet_locker",
+          task: true,
         });
       }
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
@@ -279,8 +284,9 @@ export const AccountProvider = ({ children }) => {
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       if (PLATFORM === "chrome-extension:") {
         chrome.runtime.sendMessage({
-          id: "service_worker",
-          task: "listen",
+          ch: "spika_internal",
+          id: "wallet_locker",
+          task: true,
         });
       }
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
