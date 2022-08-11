@@ -1,4 +1,5 @@
 export { default as Navbar } from "./Navbar";
+export { default as Onboarding } from "./Onboarding";
 export { default as Create } from "./Create";
 export { default as Import } from "./Import";
 export { default as Wallet } from "./Wallet";
