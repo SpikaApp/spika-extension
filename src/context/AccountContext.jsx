@@ -11,10 +11,22 @@ import { client, faucetClient } from "../utils/client";
 import * as token from "../utils/token";
 import { PLATFORM } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
+import sendMessage from "../utils/send_message";
 
 export const AccountContext = React.createContext();
 
 export const AccountProvider = ({ children }) => {
+  const {
+    spikaWallet,
+    setSpikaWallet,
+    handleLoginUI,
+    setOpenLoginDialog,
+    setMnemonicRequired,
+    setPrivateKeyRequired,
+    setOpenLogoutDialog,
+    setAccountRoutesEnabled,
+  } = useContext(UIContext);
+
   const [alertSignal, setAlertSignal] = useState(0);
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -24,22 +36,25 @@ export const AccountProvider = ({ children }) => {
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
+  const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState([]); // AptosAccount
   const [currentAsset] = useState(token.AptosCoin);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const {
-    handleLoginUI,
-    setOpenLoginDialog,
-    setMnemonicRequired,
-    setPrivateKeyRequired,
-    setOpenLogoutDialog,
-    setAccountRoutesEnabled,
-  } = useContext(UIContext);
+  // msg.channel, msg.id, msg.method, msg.data
+  const msg = { channel: "spika_internal", id: "wallet_locker" };
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (spikaWallet === undefined) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [spikaWallet]);
 
   useEffect(() => {
     if (PLATFORM === "chrome-extension:") {
@@ -50,13 +65,7 @@ export const AccountProvider = ({ children }) => {
 
   useEffect(() => {
     if (isUnlocked) {
-      if (PLATFORM === "chrome-extension:") {
-        chrome.runtime.sendMessage({
-          ch: "spika_internal",
-          id: "wallet_locker",
-          task: true,
-        });
-      }
+      sendMessage(msg.channel, msg.id, "lock");
       handleLogin();
     }
   }, [isUnlocked === true]);
@@ -94,13 +103,7 @@ export const AccountProvider = ({ children }) => {
       await loadAccount();
       setIsLoading(false);
       setPassword("");
-      if (PLATFORM === "chrome-extension:") {
-        chrome.runtime.sendMessage({
-          ch: "spika_internal",
-          id: "wallet_locker",
-          task: true,
-        });
-      }
+      sendMessage(msg.channel, msg.id, "lock");
     } catch (error) {
       setOpenLoginDialog(false);
       throwAlert(62, "Failed load account", `${error}`);
@@ -111,13 +114,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLogout = () => {
-    if (PLATFORM === "chrome-extension:") {
-      chrome.runtime.sendMessage({
-        ch: "spika_internal",
-        id: "wallet_locker",
-        task: false,
-      });
-    }
+    sendMessage(msg.channelannel, msg.id, "idle");
     navigate("/");
     setPrivateKey("");
     setCurrentAddress("");
@@ -125,19 +122,14 @@ export const AccountProvider = ({ children }) => {
     clearPasswords();
     removeMem(PLATFORM, "PWD");
     setAccountImported(false);
+    setSpikaWallet(false);
     clearStore(PLATFORM);
     setOpenLogoutDialog(false);
     setAccountRoutesEnabled(true);
   };
 
   const handleLock = () => {
-    if (PLATFORM === "chrome-extension:") {
-      chrome.runtime.sendMessage({
-        ch: "spika_internal",
-        id: "wallet_locker",
-        task: false,
-      });
-    }
+    sendMessage(msg.channel, msg.id, "idle");
     setPrivateKey("");
     setCurrentAddress("");
     setAccount([]);
@@ -158,6 +150,7 @@ export const AccountProvider = ({ children }) => {
       await createAccount();
       clearPasswords();
       setIsLoading(false);
+      navigate("/");
     } else if (password === "") {
       throwAlert(52, "Incorrect password", "Password field cannot be empty");
       clearPasswords();
@@ -176,6 +169,7 @@ export const AccountProvider = ({ children }) => {
       await importAccount();
       clearPasswords();
       setIsLoading(false);
+      navigate("/");
     } else if (password === "") {
       throwAlert(52, "Incorrect password", "Password field cannot be empty");
       clearPasswords();
@@ -243,25 +237,24 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      if (PLATFORM === "chrome-extension:") {
-        chrome.runtime.sendMessage({
-          ch: "spika_internal",
-          id: "wallet_locker",
-          task: true,
-        });
-      }
+      sendMessage(msg.channel, msg.id, "lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
+      setSpikaWallet(true);
       setPrivateKey(secretKey);
       setAccount(account);
+      setPublicAccount({
+        account: account.address().toString(),
+        publicKey: account.pubKey().toString(),
+      });
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
-      throwAlert(1, "New Account Created", `Address:\n${account.address().toString()}`);
+      throwAlert(1, "Account created", `${account.address().toString()}`);
     } catch (error) {
       throwAlert(2, "Failed create account", `${error}`);
       console.log(error);
@@ -282,24 +275,23 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      if (PLATFORM === "chrome-extension:") {
-        chrome.runtime.sendMessage({
-          ch: "spika_internal",
-          id: "wallet_locker",
-          task: true,
-        });
-      }
+      sendMessage(msg.channel, msg.id, "lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
+      setSpikaWallet(true);
       setPrivateKey(secretKey);
       setAccount(account);
+      setPublicAccount({
+        account: account.address().toString(),
+        publicKey: account.pubKey().toString(),
+      });
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
       setMnemonic("");
-      throwAlert(11, "Account Imported", `Address:\n${account.address().toString()}`);
+      throwAlert(11, "Account imported", `${account.address().toString()}`);
     } catch (error) {
       throwAlert(12, "Failed import account", `${error}`);
       console.log(error);
@@ -326,11 +318,15 @@ export const AccountProvider = ({ children }) => {
         setAccountImported(true);
         setPrivateKey(secretKey);
         setAccount(account);
+        setPublicAccount({
+          account: account.address().toString(),
+          publicKey: account.pubKey().toString(),
+        });
         setCurrentAddress(account.address().toString());
         setBalance(accountResource.data.coin.value);
       } catch (error) {
         console.log(error);
-        throwAlert(42, "Failed load account", `${error}`);
+        throwAlert(42, "Failed to load account", `${error}`);
       }
     } catch (error) {
       console.log(error);
@@ -365,8 +361,10 @@ export const AccountProvider = ({ children }) => {
         setPassword,
         confirmPassword,
         setConfirmPassword,
+        spikaWallet,
         accountImported,
         account,
+        publicAccount,
         privateKey,
         currentAddress,
         currentAsset,

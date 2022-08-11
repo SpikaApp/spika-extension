@@ -64,19 +64,10 @@ const StyledMenu = styled((props) => (
 }));
 
 const Navbar = () => {
+  const { spikaWallet, darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
   const { accountImported, handleLock } = useContext(AccountContext);
-  const { darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [accountInStore, setAccountInStore] = useState(false);
   const open = Boolean(anchorEl);
-
-  useEffect(() => {
-    checkAccountInStore();
-  }, [accountImported]);
-
-  const checkAccountInStore = async () => {
-    setAccountInStore(await getStore(PLATFORM, "ACCOUNT_IMPORTED"));
-  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -188,7 +179,7 @@ const Navbar = () => {
                 {darkMode ? <DarkModeIcon /> : <LightModeIcon sx={{ color: "white" }} />}
               </IconButton>
             </Tooltip>
-            {accountInStore && (
+            {spikaWallet && (
               <Tooltip title="Lock wallet">
                 <IconButton
                   aria-label="theme"
