@@ -13,7 +13,6 @@ import {
   Link,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 
 const Create = () => {
@@ -136,7 +135,6 @@ const Create = () => {
           </CardActions>
         )}
       </Card>
-      <Loading />
     </Container>
   );
 };

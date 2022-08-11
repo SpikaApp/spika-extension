@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { getStore } from "../utils/store";
+import { getMem, getStore } from "../utils/store";
 import { PLATFORM } from "../utils/constants";
 
 export const UIContext = React.createContext();
 
 export const UIProvider = ({ children }) => {
+  const [spikaWallet, setSpikaWallet] = useState();
   const [darkMode, setDarkMode] = useState();
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openMintDialog, setOpenMintDialog] = useState(false);
@@ -18,10 +19,46 @@ export const UIProvider = ({ children }) => {
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
+  const [openPermissionDialog, setOpenPermissionDialog] = useState(false);
+  const [disableAllRoutes, setDisableAllRoutes] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState();
 
   useEffect(() => {
+    getWallet();
     sessionTheme();
+    getCurrentRoute();
   }, []);
+
+  useEffect(() => {
+    pageProvider();
+  }, [currentRoute]);
+
+  const getWallet = async () => {
+    const wallet = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+    if (wallet === undefined || wallet === null || wallet === false) {
+      setSpikaWallet(false);
+    } else if (wallet) {
+      setSpikaWallet(wallet);
+    }
+  };
+
+  const getCurrentRoute = async () => {
+    const route = await getMem(PLATFORM, "CURRENT_ROUTE");
+    if (route === undefined || route === null) {
+      setCurrentRoute("/");
+    } else {
+      setCurrentRoute(route);
+    }
+  };
+
+  const pageProvider = async () => {
+    if (currentRoute === "PermissionDialog") {
+      setDisableAllRoutes(true);
+      setOpenPermissionDialog(true);
+    } else {
+      setDisableAllRoutes(false);
+    }
+  };
 
   const sessionTheme = async () => {
     const data = await getStore(PLATFORM, "DARK_MODE");
@@ -72,6 +109,8 @@ export const UIProvider = ({ children }) => {
   return (
     <UIContext.Provider
       value={{
+        spikaWallet,
+        setSpikaWallet,
         darkMode,
         setDarkMode,
         openAlertDialog,
@@ -107,6 +146,10 @@ export const UIProvider = ({ children }) => {
         setPrivateKeyRequired,
         accountRoutesEnabled,
         setAccountRoutesEnabled,
+        openPermissionDialog,
+        setOpenPermissionDialog,
+        disableAllRoutes,
+        setDisableAllRoutes,
       }}
     >
       {children}

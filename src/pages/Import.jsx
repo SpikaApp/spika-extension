@@ -12,7 +12,6 @@ import {
   Checkbox,
   Link,
 } from "@mui/material";
-import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 
 const Import = () => {
@@ -109,7 +108,6 @@ const Import = () => {
           )}
         </CardActions>
       </Card>
-      <Loading />
     </Container>
   );
 };

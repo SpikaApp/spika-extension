@@ -15,7 +15,6 @@ import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ReceivedEventCard from "../components/ReceivedEventCard";
 import TransactionCard from "../components/TransactionCard";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import Loading from "../components/Loading";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 
@@ -150,8 +149,6 @@ const Transactions = () => {
           </Typography>
         </CardActions>
       </Card>
-
-      <Loading />
     </Container>
   );
 };
