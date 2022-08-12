@@ -5,7 +5,6 @@ import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import * as token from "../utils/token";
 import * as bcsPayload from "../utils/payload";
-import isEqual from "lodash/isEqual";
 
 export const Web3Context = React.createContext();
 
@@ -108,7 +107,7 @@ export const Web3Provider = ({ children }) => {
     try {
       const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} ${token.AptosCoin[0].name}`);
+      throwAlert(21, "Success", `Received ${amount} ${token.aptosCoin[0].ticker}`);
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
@@ -116,35 +115,22 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const payload = {
-    type: "script_function_payload",
-    function: {
-      module: {
-        address: currentAsset[1].address,
-        name: currentAsset[1].module,
-      },
-      name: "transfer",
-    },
-    type_arguments: currentAsset[1].generic_type_params,
-    arguments: [recipientAddress, amount],
-  };
-
   const estimateTransaction = async () => {
     try {
-      const txnRequest = await client.generateTransaction(currentAddress, payload, {
-        max_gas_amount: maxGasAmount,
-      });
-      const estimatedTxn = await client.simulateTransaction(account, txnRequest);
-      if (estimatedTxn[0].success === true) {
+      const payload = await bcsPayload.transfer(recipientAddress, amount);
+      const rawTxn = await client.generateRawTransaction(currentAddress, payload);
+      const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, rawTxn);
+      const estimatedTxn = (await client.submitBCSSimulation(bcsTxn))[0];
+      if (estimatedTxn.success === true) {
         // logic if Move says wagmi
         setIsValidTransaction(true);
-        setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(30, "Transaction is valid", `${estimatedTxn[0].vm_status}`);
+        setEstimatedTxnResult(estimatedTxn);
+        throwAlert(30, "Transaction is valid", `${estimatedTxn.vm_status}`);
       }
-      if (estimatedTxn[0].success === false) {
+      if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
-        setEstimatedTxnResult(estimatedTxn[0]);
-        throwAlert(33, "Transaction is invalid", `${estimatedTxn[0].vm_status}`);
+        setEstimatedTxnResult(estimatedTxn);
+        throwAlert(33, "Transaction is invalid", `${estimatedTxn.vm_status}`);
         setRecipientAddress("");
         setAmount("");
       }
@@ -159,11 +145,10 @@ export const Web3Provider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const txnRequest = await client.generateTransaction(currentAddress, payload, {
-        max_gas_amount: maxGasAmount,
-      });
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const transactionRes = await client.submitTransaction(signedTxn);
+      const payload = await bcsPayload.transfer(recipientAddress, amount);
+      const rawTxn = await client.generateRawTransaction(currentAddress, payload);
+      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
+      const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
       await client.waitForTransaction(transactionRes.hash);
       throwAlert(31, "Transaction sent", `${transactionRes.hash}`);
     } catch (error) {
@@ -215,7 +200,7 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
+    let accountResource = resources.find((r) => r.type === currentAsset[1].module);
     setBalance(accountResource.data.coin.value);
   };
 
@@ -238,14 +223,12 @@ export const Web3Provider = ({ children }) => {
 
   const getReceivedEvents = async () => {
     let resources = await client.getAccountResources(currentAddress);
-    let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
-
+    let accountResource = resources.find((r) => r.type === currentAsset[1].module);
     let counter = parseInt(accountResource.data.deposit_events.counter);
-
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset[1],
+        currentAsset[1].module,
         "deposit_events"
       );
       let res = data.reverse((r) => r.type === "sequence_number");
@@ -253,7 +236,7 @@ export const Web3Provider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset[1],
+        currentAsset[1].module,
         "deposit_events",
         {
           start: counter - 25,
@@ -268,7 +251,7 @@ export const Web3Provider = ({ children }) => {
     try {
       // Get total number of Token deposit_events received by an account
       let resources = await client.getAccountResources(currentAddress);
-      let tokenStore = resources.find((r) => isEqual(r.type, token.tokenStore));
+      let tokenStore = resources.find((r) => r.type === token.tokenStore.module);
 
       const getTokens = async () => {
         if (tokenStore === undefined) {
