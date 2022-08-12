@@ -25,12 +25,12 @@ export const UIProvider = ({ children }) => {
 
   useEffect(() => {
     getWallet();
-    sessionTheme();
     getCurrentRoute();
+    getSessionTheme();
   }, []);
 
   useEffect(() => {
-    pageProvider();
+    dialogProvider();
   }, [currentRoute]);
 
   const getWallet = async () => {
@@ -51,16 +51,18 @@ export const UIProvider = ({ children }) => {
     }
   };
 
-  const pageProvider = async () => {
-    if (currentRoute === "PermissionDialog") {
-      setDisableAllRoutes(true);
-      setOpenPermissionDialog(true);
-    } else {
-      setDisableAllRoutes(false);
+  const dialogProvider = async () => {
+    switch (currentRoute) {
+      case "/":
+        setDisableAllRoutes(false);
+        break;
+      case "PermissionDialog":
+        setDisableAllRoutes(true);
+        setOpenPermissionDialog(true);
     }
   };
 
-  const sessionTheme = async () => {
+  const getSessionTheme = async () => {
     const data = await getStore(PLATFORM, "DARK_MODE");
     if (data === undefined || data === null) {
       setDarkMode(true);

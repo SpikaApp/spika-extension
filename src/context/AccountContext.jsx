@@ -6,7 +6,6 @@ import * as english from "@scure/bip39/wordlists/english";
 import { sign } from "tweetnacl";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
-import isEqual from "lodash/isEqual";
 import { client, faucetClient } from "../utils/client";
 import * as token from "../utils/token";
 import { PLATFORM } from "../utils/constants";
@@ -38,7 +37,7 @@ export const AccountProvider = ({ children }) => {
   const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState([]); // AptosAccount
-  const [currentAsset] = useState(token.AptosCoin);
+  const [currentAsset] = useState(token.aptosCoin);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -234,7 +233,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
+      let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       sendMessage(msg.channel, msg.id, "lock");
@@ -272,7 +271,7 @@ export const AccountProvider = ({ children }) => {
       const account = new aptos.AptosAccount(secretKey, address);
       await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
+      let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
       sendMessage(msg.channel, msg.id, "lock");
@@ -313,7 +312,7 @@ export const AccountProvider = ({ children }) => {
           await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
         }
         let resources = await client.getAccountResources(account.address());
-        let accountResource = resources.find((r) => isEqual(r.type, currentAsset[1]));
+        let accountResource = resources.find((r) => r.type === currentAsset[1].module);
         setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
