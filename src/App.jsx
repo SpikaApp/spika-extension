@@ -11,7 +11,7 @@ import { lightTheme, darkTheme } from "./theme";
 import AlertDialog from "./components/AlertDialog";
 import LoginDialog from "./components/LoginDialog";
 import Loading from "./components/Loading";
-// import PermissionDialog from "./components/PermissionDialog";
+import PermissionDialog from "./components/PermissionDialog";
 import "./index.css";
 
 const App = () => {
@@ -62,7 +62,7 @@ const App = () => {
             <LoginDialog />
             <AlertDialog />
             <Loading />
-            {/* <PermissionDialog /> */}
+            <PermissionDialog />
           </Web3Provider>
         </AccountProvider>
       </ThemeProvider>
