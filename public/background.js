@@ -1,10 +1,13 @@
+const responseHandlers = new Map();
+
 // keys
-const locker = "WALLET_LOCKER";
-const walletLockStatus = "WALLET_LOCK_STATUS";
-const delayBeforeLock = "DELAY_BEFORE_LOCK";
-const currentRoute = "CURRENT_ROUTE";
-const messageMethod = "MESSAGE_METHOD";
-const transactionForApproval = "TRANSACTION_FOR_APPROVAL";
+const _locker = "WALLET_LOCKER";
+const _walletLockStatus = "WALLET_LOCK_STATUS";
+const _delayBeforeLock = "DELAY_BEFORE_LOCK";
+const _currentRoute = "CURRENT_ROUTE";
+const _method = "METHOD";
+
+let result;
 
 // values
 const permissionDialog = "PermissionDialog";
@@ -25,14 +28,35 @@ const removeMem = (key) => {
   chrome.storage.session.remove([key]);
 };
 
-const launchPopup = () => {
-  // set route to PermissionDialog
-  setMem(currentRoute, permissionDialog);
+const setStore = (key, value) => {
+  chrome.storage.local.set({ [key]: value });
+};
 
-  // creates new Popup window
+const getStore = (key) => {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(key, (item) => {
+      resolve(item[key]);
+    });
+  });
+};
+
+const launchPopup = (message, sender, sendResponse) => {
+  setMem(_currentRoute, permissionDialog);
+
+  const request = JSON.stringify({
+    method: message.method,
+    args: message.args,
+    id: message.id,
+  });
+
+  const searchParams = new URLSearchParams();
+  searchParams.set("request", request);
+  searchParams.set("origin", sender.origin);
+  searchParams.set("isPopUp", true);
+
   chrome.windows.getLastFocused(async (focusedWindow) => {
     await chrome.windows.create({
-      url: "index.html",
+      url: "index.html?" + searchParams.toString(),
       type: "popup",
       width: 375,
       height: 600,
@@ -41,53 +65,58 @@ const launchPopup = () => {
       focused: true,
     });
   });
+  responseHandlers.set(message.id, sendResponse);
 };
 
-const spikaMessanger = (msg) => {
-  console.log("[worker]: spikaMessanger: ", msg);
-  if (msg.channel === "spika_internal" && msg.id === "wallet_locker") {
-    setMem(locker, msg.method);
+const spikaMessanger = async (message, sender, sendResponse) => {
+  console.log("[worker]: spikaMessanger: ", message);
+  if (message.channel === "spika_internal" && message.id === "wallet_locker") {
+    setMem(_locker, message.method);
   }
-  if (msg.channel === "spika_external" && msg.method === "connect") {
-    setMem(messageMethod, "connect");
-    launchPopup();
+  if (message.method === "connect") {
+    // setMem(_method, "connect");
+    // launchPopup(message, sender, sendResponse);
   }
+  if (message.method === "is_connected") {
+    sendResponse(true);
+  }
+  return true;
 };
 
 const walletLocker = async () => {
-  const alarm = await getMem(walletLockStatus);
+  const alarm = await getMem(_walletLockStatus);
   if (alarm) {
-    const status = await getMem(locker);
-    if (status === "lock") {
+    const method = await getMem(_locker);
+    if (method === "lock") {
       removeMem("PWD");
       console.log("[worker]: wallet locked");
-      setMem(locker, false);
+      setMem(_locker, false);
     }
   }
 };
 
 chrome.runtime.onInstalled.addListener(() => {
-  setMem(locker, false); // wallet locker initial state
-  setMem(delayBeforeLock, 1); // delay before wallet lock in minutes
-  setMem(walletLockStatus, "idle");
+  setMem(_locker, false); // wallet locker initial state
+  setMem(_walletLockStatus, "idle");
+  setMem(_delayBeforeLock, 30); // delay before wallet lock in minutes
 });
 
 chrome.runtime.onConnect.addListener(async (port) => {
   if (port.name === "spika") {
     // console.log("[worker]: wallet connected");
-    await chrome.alarms.clear(walletLockStatus);
-    setMem(walletLockStatus, false);
+    await chrome.alarms.clear("lock_trigger");
+    setMem(_walletLockStatus, "idle");
   }
 
   port.onDisconnect.addListener(async () => {
-    const task = await getMem(locker);
-    if (task) {
-      const delay = await getMem(delayBeforeLock);
-      chrome.alarms.create(walletLockStatus, { delayInMinutes: delay });
-      setMem(walletLockStatus, "lock");
+    const method = await getMem(_locker);
+    if (method) {
+      const delay = await getMem(_delayBeforeLock);
+      chrome.alarms.create(_walletLockStatus, { delayInMinutes: delay });
+      setMem(_walletLockStatus, "lock");
     } else {
-      await chrome.alarms.clear(walletLockRequired);
-      setMem(walletLockStatus, "idle");
+      await chrome.alarms.clear(_walletLockStatus);
+      setMem(_walletLockStatus, "idle");
     }
     // console.log("[worker]: wallet disconnected");
   });
