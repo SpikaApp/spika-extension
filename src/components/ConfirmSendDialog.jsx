@@ -61,7 +61,7 @@ const ConfirmSendDialog = () => {
   const handleCancel = () => {
     setOpenConfirmSendDialog(false);
     setIsValidTransaction(false);
-    setEstimatedTxnResult(false);
+    // setEstimatedTxnResult([]);
     setRecipientAddress("");
     setAmount("");
   };

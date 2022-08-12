@@ -29,7 +29,7 @@ import copyToClipboard from "../utils/copy_clipboard";
 
 const Wallet = () => {
   const { darkMode, handleMintUI, handleSendUI, handleReceiveUI } = useContext(UIContext);
-  const { currentAddress, accountImported, balance } = useContext(AccountContext);
+  const { currentAddress, accountImported, currentAsset, balance } = useContext(AccountContext);
   const { getBalance } = useContext(Web3Context);
 
   useEffect(() => {
@@ -69,9 +69,19 @@ const Wallet = () => {
               </Stack>
               <Stack sx={{ display: "flex", alignItems: "center", my: -2 }}>
                 {darkMode ? (
-                  <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos_dark} alt="aptos" />
+                  <CardMedia
+                    sx={{ mb: 1.5 }}
+                    component="img"
+                    image={currentAsset[0].logo_dark}
+                    alt="aptos"
+                  />
                 ) : (
-                  <CardMedia sx={{ mb: 1.5 }} component="img" image={aptos_light} alt="aptos" />
+                  <CardMedia
+                    sx={{ mb: 1.5 }}
+                    component="img"
+                    image={currentAsset[0].logo_light}
+                    alt="aptos"
+                  />
                 )}
 
                 <Typography
@@ -81,14 +91,14 @@ const Wallet = () => {
                   color="textSecondary"
                   gutterBottom
                 >
-                  {balance} APTOS
+                  {balance} {currentAsset[0].ticker}
                 </Typography>
               </Stack>
             </CardContent>
             <CardActions>
               <Stack sx={{ display: "flex", alignItems: "center" }}>
                 <Button sx={{ mb: 2.5 }} variant="outlined" onClick={handleMintUI}>
-                  Mint Test Coins
+                  Faucet
                 </Button>
 
                 <Stack direction="row" sx={{ mt: 2 }}>

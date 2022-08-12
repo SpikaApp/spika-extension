@@ -1,19 +1,22 @@
-export const tokenStore = {
-  address: "0x3",
-  module: "token",
-  name: "TokenStore",
-  generic_type_params: [],
-};
+import aptos_light from "../assets/aptos_light.png";
+import aptos_dark from "../assets/aptos_dark.png";
 
-export const AptosCoin = [
+export const aptosCoin = [
   {
     name: "AptosCoin",
-    ticker: "APTOS",
+    ticker: "APT",
+    logo_light: aptos_light,
+    logo_dark: aptos_dark,
   },
+
   {
-    address: "0x1",
-    module: "coin",
-    name: "CoinStore",
-    generic_type_params: ["0x1::aptos_coin::AptosCoin"],
+    module: "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
+    TypeTagStruct: "0x1::aptos_coin::AptosCoin",
   },
 ];
+
+export const tokenStore = {
+  module: "0x3::token::TokenStore",
+};
+
+export const coinTransferFunction = "0x1::coin::transfer";

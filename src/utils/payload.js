@@ -1,5 +1,23 @@
 import { BCS, TxnBuilderTypes } from "aptos/dist/transaction_builder";
 
+export const transfer = async (recipientAddress, amount) => {
+  const token = new TxnBuilderTypes.TypeTagStruct(
+    TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+  );
+  const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
+    TxnBuilderTypes.ScriptFunction.natural(
+      "0x1::coin",
+      "transfer",
+      [token],
+      [
+        BCS.bcsToBytes(TxnBuilderTypes.AccountAddress.fromHex(recipientAddress)),
+        BCS.bcsSerializeUint64(amount),
+      ]
+    )
+  );
+  return payload;
+};
+
 // create collection payload
 export const collection = async (name, description, uri, maxAmount) => {
   const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
