@@ -70,7 +70,7 @@ const launchPopup = (message, sender, sendResponse) => {
 
 const spikaMessanger = async (message, sender, sendResponse) => {
   console.log("[worker]: spikaMessanger: ", message);
-  if (message.channel === "spika_internal" && message.id === "wallet_locker") {
+  if (message.id === "locker") {
     setMem(_locker, message.method);
   }
   if (message.method === "connect") {

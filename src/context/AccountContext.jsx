@@ -10,7 +10,6 @@ import { client, faucetClient } from "../utils/client";
 import * as token from "../utils/token";
 import { PLATFORM } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
-import sendMessage from "../utils/send_message";
 
 export const AccountContext = React.createContext();
 
@@ -42,8 +41,15 @@ export const AccountProvider = ({ children }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
-  // msg.channel, msg.id, msg.method, msg.data
-  const msg = { channel: "spika_internal", id: "wallet_locker" };
+
+  const locker = (method, id) => {
+    if (PLATFORM === "chrome-extension:") {
+      chrome.runtime.sendMessage({
+        method: method,
+        id: "locker",
+      });
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -64,7 +70,7 @@ export const AccountProvider = ({ children }) => {
 
   useEffect(() => {
     if (isUnlocked) {
-      sendMessage(msg.channel, msg.id, "lock");
+      locker("lock");
       handleLogin();
     }
   }, [isUnlocked === true]);
@@ -102,7 +108,7 @@ export const AccountProvider = ({ children }) => {
       await loadAccount();
       setIsLoading(false);
       setPassword("");
-      sendMessage(msg.channel, msg.id, "lock");
+      locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
       throwAlert(62, "Failed load account", `${error}`);
@@ -113,7 +119,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLogout = () => {
-    sendMessage(msg.channelannel, msg.id, "idle");
+    locker("idle");
     navigate("/");
     setPrivateKey("");
     setCurrentAddress("");
@@ -128,7 +134,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleLock = () => {
-    sendMessage(msg.channel, msg.id, "idle");
+    locker("idle");
     setPrivateKey("");
     setCurrentAddress("");
     setAccount([]);
@@ -236,7 +242,7 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      sendMessage(msg.channel, msg.id, "lock");
+      locker("lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
@@ -274,7 +280,7 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
-      sendMessage(msg.channel, msg.id, "lock");
+      locker("lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
