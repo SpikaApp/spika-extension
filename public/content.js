@@ -13,31 +13,43 @@ const injectScript = () => {
 
 injectScript();
 
-// inpage -> content
-window.addEventListener("spika_injected_script_message", (event) => {
-  console.log("content script window listen message", event);
-  if (event.detail.method) {
+// inpage -> contentscript
+window.addEventListener("message", function (event) {
+  if (event.data.method) {
+    console.log("[content.js]: new event: ", event);
     // contentscript -> background
-    chrome.runtime.sendMessage(
-      {
-        channel: "spika_external",
-        ...event.detail,
-      },
-      (response) => {
-        // Can return null response if window is killed
-        if (!response) {
-          return;
-        }
-        window.dispatchEvent(
-          new CustomEvent("spika_contentscript_message", {
-            detail: {
-              responseMethod: event.detail.method,
-              id: event.detail.id,
-              response,
-            },
-          })
-        );
-      }
-    );
+    chrome.runtime.sendMessage(event.data, function (response) {
+      // contentscript -> inpage
+      window.postMessage({ responseMethod: event.data.method, id: event.data.id, response });
+    });
   }
 });
+
+// // inpage -> content
+// window.addEventListener("spika_injected_script_message", (event) => {
+//   console.log("content script window listen message", event);
+//   if (event.detail.method) {
+//     // content -> background
+//     chrome.runtime.sendMessage(
+//       {
+//         channel: "spika_external",
+//         ...event.detail,
+//       },
+//       (response) => {
+//         // Can return null response if window is killed
+//         if (!response) {
+//           return;
+//         }
+
+//         // background response -> inpage
+//         window.postMessage({
+//           detail: {
+//             responseMethod: event.detail.method,
+//             id: event.detail.id,
+//             response,
+//           },
+//         });
+//       }
+//     );
+//   }
+// });

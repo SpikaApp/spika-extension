@@ -2,7 +2,7 @@ class SpikaWeb3 {
   requestId;
 
   constructor() {
-    this.requestId = 1;
+    this.requestId = 0;
   }
 
   connect() {
@@ -29,25 +29,24 @@ class SpikaWeb3 {
     return this._message("signTransaction", transaction);
   }
 
-  _message(method, data) {
-    const id = this.requestId;
+  _message(method, args) {
+    const id = this.requestId++;
     return new Promise(function (resolve, reject) {
-      const listener = (event) => {
-        if (event.detail.responseMethod === method && event.detail.id === id) {
-          const response = event.detail.response;
-          window.removeEventListener("spika_contentscript_message", listener);
-          if (response.error) {
+      window.postMessage({ method, args, id });
+      window.addEventListener("message", function handler(event) {
+        if (event.data.responseMethod === method && event.data.id === id) {
+          const response = event.data.response;
+          this.removeEventListener("message", handler);
+          if (response === undefined) {
+            reject("no response received");
+          } else if (response.error) {
             reject(response.error ?? "Error");
           } else {
+            console.log("response received: ", response);
             resolve(response);
           }
         }
-      };
-      window.addEventListener("spika_contentscript_message", listener);
-
-      window.dispatchEvent(
-        new CustomEvent("spika_injected_script_message", { detail: { method, data, id } })
-      );
+      });
     });
   }
 }
