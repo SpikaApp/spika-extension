@@ -25,6 +25,5 @@
       "resources": ["app/inpage.js"]
     }
   ],
-  "permissions": ["storage", "alarms", "tabs", "scripting"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": ["storage", "alarms"]
 }
