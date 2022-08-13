@@ -1,15 +1,13 @@
-const responseHandlers = new Map();
-
 // keys
-const _locker = "WALLET_LOCKER";
-const _walletLockStatus = "WALLET_LOCK_STATUS";
-const _delayBeforeLock = "DELAY_BEFORE_LOCK";
-const _currentRoute = "CURRENT_ROUTE";
-const _method = "METHOD";
+const _locker = "walletLocker";
+const _walletLockStatus = "walletLockStatus";
+const _delayBeforeLock = "delayBeforeLock";
+const _currentRoute = "currentRoute";
+const _request = "currentRequest";
+const _sender = "currentSender";
+const _currentAddress = "currentAddress";
+const _connectedApps = "connectedApps";
 
-let result;
-
-// values
 const permissionDialog = "PermissionDialog";
 
 const setMem = (key, value) => {
@@ -40,23 +38,67 @@ const getStore = (key) => {
   });
 };
 
-const launchPopup = (message, sender, sendResponse) => {
+const getApp = async (currentAddress, url) => {
+  if (currentAddress && url) {
+    try {
+      const data = await getStore(_connectedApps);
+      if (data !== undefined || data !== null) {
+        let result = data.find((i) => i.address === currentAddress);
+        if (result === undefined) {
+          return false;
+        } else {
+          let app = result.urls.find((i) => i === url);
+          if (app === undefined) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    return false;
+  }
+};
+
+const removeApp = async (currentAddress, url) => {
+  if (currentAddress && url) {
+    try {
+      const data = await getStore(_connectedApps);
+      if (data !== undefined || data !== null) {
+        let result = data.find((i) => i.address === currentAddress);
+        if (result === undefined) {
+          return false;
+        } else {
+          let app = result.urls.find((i) => i === url);
+          if (app === undefined) {
+            return false;
+          } else {
+            let index = result.urls.indexOf(url);
+            result.urls.splice(index, 1);
+            setStore(_connectedApps, data);
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    return false;
+  }
+};
+
+const launchPopup = (message, sender) => {
   setMem(_currentRoute, permissionDialog);
-
-  const request = JSON.stringify({
-    method: message.method,
-    args: message.args,
-    id: message.id,
-  });
-
-  const searchParams = new URLSearchParams();
-  searchParams.set("request", request);
-  searchParams.set("origin", sender.origin);
-  searchParams.set("isPopUp", true);
+  setMem(_request, message);
+  setMem(_sender, sender);
 
   chrome.windows.getLastFocused(async (focusedWindow) => {
     await chrome.windows.create({
-      url: "index.html?" + searchParams.toString(),
+      url: "index.html",
       type: "popup",
       width: 375,
       height: 600,
@@ -65,20 +107,52 @@ const launchPopup = (message, sender, sendResponse) => {
       focused: true,
     });
   });
-  responseHandlers.set(message.id, sendResponse);
 };
 
-const spikaMessanger = async (message, sender, sendResponse) => {
-  console.log("[worker]: spikaMessanger: ", message);
+const handleIsConnected = async (sender, sendResponse) => {
+  const currentAddress = await getStore(_currentAddress);
+  const url = sender.origin;
+  const result = await getApp(currentAddress, url);
+  sendResponse(result);
+};
+
+const handleDisconnect = async (sender, sendResponse) => {
+  const currentAddress = await getStore(_currentAddress);
+  const url = sender.origin;
+  const result = await removeApp(currentAddress, url);
+  sendResponse(result);
+};
+
+const spikaMessenger = (message, sender, sendResponse) => {
+  console.log("[worker]: spikaMessenger: ", message);
+
   if (message.id === "locker") {
     setMem(_locker, message.method);
   }
-  if (message.method === "connect") {
-    // setMem(_method, "connect");
-    // launchPopup(message, sender, sendResponse);
+  if (
+    message.method === "connect" ||
+    message.method === "account" ||
+    message.method === "signTransaction" ||
+    message.method === "signAndSubmitTransaction"
+  ) {
+    launchPopup(message, sender, sendResponse);
+    chrome.runtime.onMessage.addListener(function responder(response) {
+      if (response.responseMethod === message.method && response.id === message.id) {
+        const result = response.response;
+        this.chrome.runtime.onMessage.removeListener(responder);
+        console.log("[worker]: response received :", result);
+        sendResponse(result);
+      }
+      return true;
+    });
   }
-  if (message.method === "is_connected") {
-    sendResponse(true);
+  if (message.method === "isConnected") {
+    handleIsConnected(sender, sendResponse);
+    return true;
+  }
+  if (message.method === "disconnect") {
+    handleDisconnect(sender, sendResponse);
+    return true;
   }
   return true;
 };
@@ -122,5 +196,5 @@ chrome.runtime.onConnect.addListener(async (port) => {
   });
 });
 
-chrome.runtime.onMessage.addListener(spikaMessanger);
+chrome.runtime.onMessage.addListener(spikaMessenger);
 chrome.alarms.onAlarm.addListener(walletLocker);

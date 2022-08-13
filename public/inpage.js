@@ -14,15 +14,15 @@ class SpikaWeb3 {
   }
 
   isConnected() {
-    return this._message("is_connected", {});
+    return this._message("isConnected", {});
   }
 
   account() {
-    return this._message("getAccountAddress", {});
+    return this._message("account", {});
   }
 
   signAndSubmitTransaction(transaction) {
-    return this._message("signAndSubmit", transaction);
+    return this._message("signAndSubmitTransaction", transaction);
   }
 
   signTransaction(transaction) {
@@ -37,12 +37,12 @@ class SpikaWeb3 {
         if (event.data.responseMethod === method && event.data.id === id) {
           const response = event.data.response;
           this.removeEventListener("message", handler);
-          if (response === undefined) {
-            reject("no response received");
+          if (response === undefined || response === null) {
+            reject("[inpage.js]: no response received");
           } else if (response.error) {
             reject(response.error ?? "Error");
           } else {
-            console.log("response received: ", response);
+            console.log("[inpage.js]: response: ", response);
             resolve(response);
           }
         }

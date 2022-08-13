@@ -10,6 +10,7 @@ import { client, faucetClient } from "../utils/client";
 import * as token from "../utils/token";
 import { PLATFORM } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
+import * as apps from "../utils/apps";
 
 export const AccountContext = React.createContext();
 
@@ -33,7 +34,7 @@ export const AccountProvider = ({ children }) => {
   const [mnemonic, setMnemonic] = useState("");
   const [newMnemonic, setNewMnemonic] = useState("");
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
-  const [currentAddress, setCurrentAddress] = useState(""); // AuthKey in HexString
+  const [currentAddress, setCurrentAddress] = useState("");
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState([]); // AptosAccount
   const [currentAsset] = useState(token.aptosCoin);
@@ -42,7 +43,7 @@ export const AccountProvider = ({ children }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
 
-  const locker = (method, id) => {
+  const locker = (method) => {
     if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
         method: method,
@@ -246,6 +247,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "currentAddress", account.address().toString());
+      apps.addAddress(account.address().toString());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
@@ -284,6 +287,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "currentAddress", account.address().toString());
+      apps.addAddress(account.address().toString());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
@@ -319,6 +324,8 @@ export const AccountProvider = ({ children }) => {
         }
         let resources = await client.getAccountResources(account.address());
         let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+        apps.addAddress(account.address().toString());
+        setStore(PLATFORM, "currentAddress", account.address().toString());
         setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
         setPrivateKey(secretKey);
