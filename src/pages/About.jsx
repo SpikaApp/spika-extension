@@ -37,7 +37,7 @@ const About = () => {
             chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.2.2 <br />
+            Wallet version 0.3.0 <br />
             Aptos SDK version 1.3.6
             <br />
             <Link
