@@ -14,13 +14,14 @@ const injectScript = () => {
 injectScript();
 
 // inpage -> contentscript
-window.addEventListener("message", function (event) {
-  if (event.data.method) {
-    console.log("[content.js]: new event: ", event);
+window.addEventListener("message", function (request) {
+  if (request.data.method) {
+    console.log("[content.js]: new request: ", request.data);
     // contentscript -> background
-    chrome.runtime.sendMessage(event.data, function (response) {
+    chrome.runtime.sendMessage(request.data, function (response) {
       // contentscript -> inpage
-      window.postMessage({ responseMethod: event.data.method, id: event.data.id, response });
+      // console.log("[content.js]: forwarding response: ", response);
+      window.postMessage({ responseMethod: request.data.method, id: request.data.id, response });
     });
   }
 });

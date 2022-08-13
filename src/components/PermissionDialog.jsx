@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo, useCallback } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -20,60 +20,108 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { PLATFORM } from "../utils/constants";
 import { client } from "../utils/client";
-import { setMem } from "../utils/store";
+import { setMem, getMem, setStore, getStore } from "../utils/store";
+import { getConnectedApps, getApp, setApp, removeApp } from "../utils/apps";
 
 const PermissionDialog = () => {
-  const [request, setRequest] = useState();
-  const [method, setMethod] = useState("nil");
-  const [origin, setOrigin] = useState();
+  const [request, setRequest] = useState({});
+  const [method, setMethod] = useState("default");
+  const [requestSender, setRequestSender] = useState();
   const { spikaWallet, openPermissionDialog, setOpenPermissionDialog } = useContext(UIContext);
-  const { accountImported, currentAddress, publicAccount } = useContext(AccountContext);
-  const _currentRoute = "CURRENT_ROUTE";
+  const { accountImported, currentAddress, account, publicAccount } = useContext(AccountContext);
+  const _currentRoute = "currentRoute";
+  const _request = "currentRequest";
+  const _sender = "currentSender";
+
   let response;
 
   useEffect(() => {
-    getRequest();
-  }, [accountImported]);
+    if (openPermissionDialog) {
+      getRequest();
+    }
+  }, [openPermissionDialog]);
 
   useEffect(() => {
-    getOrigin();
+    if (request) {
+      getSender();
+    }
   }, [request]);
 
-  const getRequest = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const rawRequest = urlParams.get("request");
-    setRequest(JSON.parse(rawRequest));
+  const getRequest = async () => {
+    const data = await getMem(PLATFORM, _request);
+    setRequest(data);
+    if (data !== undefined || data !== null) {
+      setMethod(data.method);
+    }
   };
 
-  const getOrigin = () => {
-    const params = new URLSearchParams(window.location.search);
-    setOrigin(params.get("origin"));
+  const getSender = async () => {
+    const data = await getMem(PLATFORM, _sender);
+    setRequestSender(data);
   };
 
   const sendResponse = async () => {
     await chrome.runtime.sendMessage({
-      method: request.method,
-      args: response,
+      responseMethod: request.method,
       id: request.id,
+      response: response,
     });
   };
 
   const handleApprove = async () => {
     if (method === "connect") {
+      const data = await getApp(currentAddress, requestSender.origin);
+      if (!data) {
+        const set = await setApp(currentAddress, requestSender.origin);
+        if (set) {
+          response = publicAccount;
+        } else {
+          // if something went wrong with saving app return false
+          response = false;
+        }
+      } else {
+        response = publicAccount;
+      }
+    }
+    if (method === "account") {
       response = publicAccount;
     }
     if (method === "signTransaction") {
-      const data = await client.generateTransaction(currentAddress, request.payload);
-      response = data;
+      const txnRequest = request.args;
+      try {
+        const signedTxn = await client.signTransaction(account, txnRequest);
+        response = signedTxn;
+      } catch (error) {
+        console.log(error);
+        response = false;
+      }
+    }
+    if (method === "signAndSubmitTransaction") {
+      const txnRequest = request.args;
+      try {
+        const signedTxn = await client.signTransaction(account, txnRequest);
+        const submittedTxn = await client.submitTransaction(signedTxn);
+        response = submittedTxn;
+      } catch (error) {
+        console.log(error);
+        response = false;
+      }
     }
     sendResponse(response);
-    handleCancel();
+    clearDialog();
+    window.close();
   };
 
   const handleCancel = () => {
+    response = false;
+    sendResponse(response);
+    clearDialog();
+    window.close();
+  };
+
+  const clearDialog = () => {
     setOpenPermissionDialog(false);
     setDefaultRoute();
-    window.close();
   };
 
   const setDefaultRoute = () => {
@@ -86,9 +134,9 @@ const PermissionDialog = () => {
         <div>
           {accountImported && (
             <div>
-              {method === "connect" && (
+              {(method === "connect" || method === "account") && (
                 <Dialog fullScreen align="center" open={openPermissionDialog}>
-                  <DialogTitle>Title</DialogTitle>
+                  <DialogTitle> {requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
                     <Box
                       component="img"
@@ -96,11 +144,11 @@ const PermissionDialog = () => {
                         height: 48,
                         width: 48,
                       }}
-                      alt="title"
-                      src="https://www.example.com"
+                      alt="favicon"
+                      src={requestSender.tab.favIconUrl}
                     />
-                    <Typography sx={{ mt: 2, mb: 4 }} variant="body1">
-                      https://example.com
+                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                      {requestSender.tab.title}
                     </Typography>
                     <Typography variant="body1" color="warning.dark">
                       Website is requesting access to the following account information:
@@ -143,6 +191,94 @@ const PermissionDialog = () => {
                   <AlertDialog />
                 </Dialog>
               )}
+              {method === "signTransaction" && (
+                <Dialog fullScreen align="center" open={openPermissionDialog}>
+                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                  <DialogContent sx={{ maxWidth: 375 }}>
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 48,
+                        width: 48,
+                      }}
+                      alt="favicon"
+                      src={requestSender.tab.favIconUrl}
+                    />
+                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                      {requestSender.tab.title}
+                    </Typography>
+                    <Typography variant="body1" color="warning.dark">
+                      Website is requesting the following method:
+                    </Typography>
+                    <Typography sx={{ mt: 4 }} variant="h5">
+                      {method}
+                    </Typography>
+                  </DialogContent>
+                  <Stack
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 2,
+                      mb: 4,
+                    }}
+                  >
+                    <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+                      Reject
+                    </Button>
+                    <Button variant="contained" onClick={handleApprove}>
+                      Approve{" "}
+                    </Button>
+                  </Stack>
+                  <Loading />
+                  <AlertDialog />
+                </Dialog>
+              )}
+              {method === "signAndSubmitTransaction" && (
+                <Dialog fullScreen align="center" open={openPermissionDialog}>
+                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                  <DialogContent sx={{ maxWidth: 375 }}>
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 48,
+                        width: 48,
+                      }}
+                      alt="favicon"
+                      src={requestSender.tab.favIconUrl}
+                    />
+                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                      {requestSender.tab.title}
+                    </Typography>
+                    <Typography variant="body1" color="warning.dark">
+                      Website is requesting the following method:
+                    </Typography>
+                    <Typography sx={{ mt: 4 }} variant="h5">
+                      {method}
+                    </Typography>
+                  </DialogContent>
+                  <Stack
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 2,
+                      mb: 4,
+                    }}
+                  >
+                    <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+                      Reject
+                    </Button>
+                    <Button variant="contained" onClick={handleApprove}>
+                      Approve{" "}
+                    </Button>
+                  </Stack>
+                  <Loading />
+                  <AlertDialog />
+                </Dialog>
+              )}
             </div>
           )}
         </div>
@@ -150,9 +286,9 @@ const PermissionDialog = () => {
         <Dialog fullScreen align="center" open={openPermissionDialog}>
           <DialogTitle>Account not found</DialogTitle>
           <DialogContent sx={{ maxWidth: 375 }}>
-            <Typography variant="body1" color="warning.dark">
-              Spika wallet is not initialized yet. Create or import account before accessing
-              websites.
+            <Typography sx={{ mt: 4 }} variant="body1" color="warning.dark">
+              Spika wallet is not initialized. <br />
+              Create or import account before accessing websites.
             </Typography>
           </DialogContent>
           <DialogActions>

@@ -22,6 +22,7 @@ export const UIProvider = ({ children }) => {
   const [openPermissionDialog, setOpenPermissionDialog] = useState(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState(false);
   const [currentRoute, setCurrentRoute] = useState();
+  const _currentRoute = "currentRoute";
 
   useEffect(() => {
     getWallet();
@@ -43,7 +44,7 @@ export const UIProvider = ({ children }) => {
   };
 
   const getCurrentRoute = async () => {
-    const route = await getMem(PLATFORM, "CURRENT_ROUTE");
+    const route = await getMem(PLATFORM, _currentRoute);
     if (route === undefined || route === null) {
       setCurrentRoute("/");
     } else {
