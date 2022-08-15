@@ -2,10 +2,10 @@ import { useContext } from "react";
 import {
   Button,
   Dialog,
-  DialogActions,
+  DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  Stack,
 } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
@@ -20,21 +20,30 @@ const LogoutDialog = () => {
 
   return (
     <Dialog open={openLogoutDialog}>
-      <DialogTitle>Confirm Logout</DialogTitle>
-      <DialogContent>
-        <DialogContentText sx={{ marginBottom: 2 }}>
-          Make sure to save your mnemonic phrase before logout
+      <DialogTitle align="center">Confirm Logout</DialogTitle>
+      <DialogContent sx={{ maxWidth: 320 }}>
+        <DialogContentText align="center" sx={{ marginBottom: 2 }}>
+          Remember to save secret recovery phrase before logout
           <br />
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{ mb: 1.5, mr: 1 }}>
-        <Button variant="outlined" onClick={handleCancel}>
+      <Stack
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 2,
+          mb: 4,
+        }}
+      >
+        <Button sx={{ mr: 4 }} variant="outlined" onClick={handleCancel}>
           Cancel
         </Button>
         <Button variant="contained" onClick={handleLogout}>
           Confirm
         </Button>
-      </DialogActions>
+      </Stack>
     </Dialog>
   );
 };
