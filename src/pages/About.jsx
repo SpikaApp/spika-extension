@@ -31,10 +31,10 @@ const About = () => {
       <Card sx={{ mb: 2, minHeight: 350 }}>
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-            <Link href="https://aptoslabs.com/" underline="none" target="_blank">
-              Aptos Devnet
+            <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
+              Aptos
             </Link>{" "}
-            chain id {chain_id}
+            Devnet chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
             Wallet version 0.3.0 <br />
@@ -44,6 +44,7 @@ const About = () => {
               href="https://github.com/xorgal/spika/blob/master/LICENSE"
               underline="none"
               target="_blank"
+              color="link"
             >
               {" "}
               License
@@ -53,12 +54,13 @@ const About = () => {
               href="https://github.com/xorgal/spika/blob/master/docs/PRIVACY.md"
               underline="none"
               target="_blank"
+              color="link"
             >
               {" "}
               Privacy Policy
             </Link>
             <br />
-            <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank">
+            <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank" color="link">
               Contacts
             </Link>
             <Stack

@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
-import ReceivedEventCard from "../components/ReceivedEventCard";
-import TransactionCard from "../components/TransactionCard";
+import WithdrawEventCard from "../components/WithdrawEventCard";
+import DepositEventCard from "../components/DepositEventCard";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
@@ -26,8 +26,8 @@ const style = {
 
 const Transactions = () => {
   const { accountImported, currentAddress } = useContext(AccountContext);
-  const { getReceivedEvents, getSentTransactions, receivedEvents, transactions } =
-    useContext(Web3Context);
+  const { getEvents, withdrawEvents, depositEvents } = useContext(Web3Context);
+
   const [value, setValue] = useState("1");
 
   const handleChange = (event, newValue) => {
@@ -36,12 +36,12 @@ const Transactions = () => {
 
   useEffect(() => {
     if (accountImported) {
-      getReceivedEvents();
-      getSentTransactions();
+      getEvents("withdraw_events");
+      getEvents("deposit_events");
       const updateAccountResources = window.setInterval(() => {
-        getReceivedEvents();
-        getSentTransactions();
-      }, 30000);
+        getEvents("withdraw_events");
+        getEvents("deposit_events");
+      }, 5000);
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
@@ -71,7 +71,7 @@ const Transactions = () => {
                   <Tab
                     label={
                       <Typography variant="subtitle1" color="textPrimary">
-                        Sent
+                        Deposit
                       </Typography>
                     }
                     value="1"
@@ -79,23 +79,28 @@ const Transactions = () => {
                   <Tab
                     label={
                       <Typography variant="subtitle1" color="textPrimary">
-                        Received
+                        Withdraw
                       </Typography>
                     }
                     value="2"
                   />
                 </TabList>
               </Box>
-
               <TabPanel value="1">
-                {transactions?.length > 0 ? (
+                {depositEvents?.length > 0 ? (
                   <List
-                    sx={(style, { display: "flex", flexDirection: "column", alignItems: "start" })}
+                    sx={
+                      (style,
+                      {
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "start",
+                      })
+                    }
                     component="nav"
-                    aria-label="sentTxns"
                   >
-                    {transactions.map((transaction, sequence_number) => (
-                      <TransactionCard transaction={transaction} key={sequence_number} />
+                    {depositEvents.map((depositEvent, sequence_number) => (
+                      <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
                     ))}
                   </List>
                 ) : (
@@ -111,14 +116,13 @@ const Transactions = () => {
                 )}
               </TabPanel>
               <TabPanel value="2">
-                {receivedEvents?.length > 0 ? (
+                {withdrawEvents?.length > 0 ? (
                   <List
                     sx={(style, { display: "flex", flexDirection: "column", alignItems: "start" })}
                     component="nav"
-                    aria-label="receivedTxns"
                   >
-                    {receivedEvents.map((receivedEvent, sequence_number) => (
-                      <ReceivedEventCard receivedEvent={receivedEvent} key={sequence_number} />
+                    {withdrawEvents.map((withdrawEvent, sequence_number) => (
+                      <WithdrawEventCard withdrawEvent={withdrawEvent} key={sequence_number} />
                     ))}
                   </List>
                 ) : (
@@ -143,6 +147,7 @@ const Transactions = () => {
               href={`https://explorer.devnet.aptos.dev/account/${currentAddress}`}
               underline="none"
               target="_blank"
+              color="link"
             >
               Aptos Explorer <OpenInNewIcon sx={{ fontSize: 16 }} />
             </Link>

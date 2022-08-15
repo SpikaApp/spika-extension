@@ -1,5 +1,5 @@
-import { useState, useContext, useEffect } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -16,6 +16,7 @@ import {
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockIcon from "@mui/icons-material/Lock";
+import LogoutIcon from "@mui/icons-material/Logout";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { styled, alpha } from "@mui/material/styles";
@@ -24,7 +25,7 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import LogoutDialog from "../components/LogoutDialog";
 import { PLATFORM } from "../utils/constants";
-import { getStore, setStore } from "../utils/store";
+import { setStore } from "../utils/store";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -68,6 +69,8 @@ const Navbar = () => {
   const { accountImported, handleLock } = useContext(AccountContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const navigate = useNavigate();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -192,9 +195,16 @@ const Navbar = () => {
               </Tooltip>
             )}
             {accountImported && (
-              <Button color="inherit" onClick={handleLogoutUI}>
-                Logout
-              </Button>
+              <Tooltip title="Logout">
+                <IconButton
+                  aria-label="logout"
+                  size="normal"
+                  sx={{ color: "white" }}
+                  onClick={handleLogoutUI}
+                >
+                  <LogoutIcon />
+                </IconButton>
+              </Tooltip>
             )}
           </Stack>
         </Toolbar>

@@ -9,6 +9,7 @@ import * as bcsPayload from "../utils/payload";
 export const Web3Context = React.createContext();
 
 export const Web3Provider = ({ children }) => {
+  const { setOpenSendDialog, setOpenTxnDetailsDialog } = useContext(UIContext);
   const {
     throwAlert,
     account,
@@ -18,14 +19,14 @@ export const Web3Provider = ({ children }) => {
     currentAsset,
     setIsLoading,
   } = useContext(AccountContext);
-  const { setOpenSendDialog } = useContext(UIContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
-  const [transactions, setTransactions] = useState([]);
-  const [receivedEvents, setReceivedEvents] = useState([]);
+  const [txnDetails, setTxnDetails] = useState([]);
+  const [depositEvents, setDepositEvents] = useState([]);
+  const [withdrawEvents, setWithdrawEvents] = useState([]);
   const [accountTokens, setAccountTokens] = useState([]);
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
@@ -102,6 +103,14 @@ export const Web3Provider = ({ children }) => {
     setNftSupply("");
   };
 
+  const getTxnDetails = async (version) => {
+    setIsLoading(true);
+    const data = await client.getTransactionByVersion(version);
+    console.log(data);
+    setTxnDetails(data);
+    setIsLoading(false);
+  };
+
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
@@ -130,7 +139,7 @@ export const Web3Provider = ({ children }) => {
       if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn);
-        throwAlert(33, "Transaction is invalid", `${estimatedTxn.vm_status}`);
+        throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`);
         setRecipientAddress("");
         setAmount("");
       }
@@ -204,24 +213,7 @@ export const Web3Provider = ({ children }) => {
     setBalance(accountResource.data.coin.value);
   };
 
-  const getSentTransactions = async () => {
-    let currentAccount = await client.getAccount(currentAddress);
-    let sn = parseInt(currentAccount.sequence_number);
-    if (sn <= 25) {
-      let data = await client.getAccountTransactions(currentAddress);
-      let res = data.reverse((r) => r.type === "version");
-      setTransactions(res);
-    } else {
-      let data = await client.getAccountTransactions(currentAddress, {
-        start: sn - 25,
-        limit: 25,
-      });
-      let res = data.reverse((r) => r.type === "version");
-      setTransactions(res);
-    }
-  };
-
-  const getReceivedEvents = async () => {
+  const getEvents = async (events) => {
     let resources = await client.getAccountResources(currentAddress);
     let accountResource = resources.find((r) => r.type === currentAsset[1].module);
     let counter = parseInt(accountResource.data.deposit_events.counter);
@@ -229,21 +221,31 @@ export const Web3Provider = ({ children }) => {
       let data = await client.getEventsByEventHandle(
         currentAddress,
         currentAsset[1].module,
-        "deposit_events"
+        events
       );
-      let res = data.reverse((r) => r.type === "sequence_number");
-      setReceivedEvents(res);
+      let result = data.reverse((r) => r.type === "sequence_number");
+      if (events === "deposit_events") {
+        setDepositEvents(result);
+      }
+      if (events === "withdraw_events") {
+        setWithdrawEvents(result);
+      }
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
         currentAsset[1].module,
-        "deposit_events",
+        events,
         {
           start: counter - 25,
         }
       );
-      let res = data.reverse((r) => r.type === "sequence_number");
-      setReceivedEvents(res);
+      let result = data.reverse((r) => r.type === "sequence_number");
+      if (events === "deposit_events") {
+        setDepositEvents(result);
+      }
+      if (events === "withdraw_events") {
+        setWithdrawEvents(result);
+      }
     }
   };
 
@@ -331,13 +333,15 @@ export const Web3Provider = ({ children }) => {
         isValidTransaction,
         setIsValidTransaction,
         estimatedTxnResult,
-        transactions,
-        receivedEvents,
+        txnDetails,
+        setTxnDetails,
         nftDetails,
         handleMint,
         handleSend,
-        getReceivedEvents,
-        getSentTransactions,
+        getEvents,
+        withdrawEvents,
+        depositEvents,
+        getTxnDetails,
         handleEstimate,
         accountTokens,
         getAccountTokens,

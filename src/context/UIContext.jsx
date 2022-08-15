@@ -16,6 +16,8 @@ export const UIProvider = ({ children }) => {
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
+  const [txnType, setTxnType] = useState(0); // 0: undefined, 1: inbound, 2: outbound
+  const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState(false);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
@@ -135,6 +137,10 @@ export const UIProvider = ({ children }) => {
         openCreateNftDialog,
         setOpenCreateNftDialog,
         handleCreateNFTUI,
+        openTxnDetailsDialog,
+        setOpenTxnDetailsDialog,
+        txnType,
+        setTxnType,
         openLoginDialog,
         setOpenLoginDialog,
         handleLoginUI,

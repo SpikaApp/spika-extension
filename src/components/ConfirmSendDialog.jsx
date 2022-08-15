@@ -39,7 +39,6 @@ const ConfirmSendDialog = () => {
   useEffect(() => {
     if (isValidTransaction) {
       setOpenConfirmSendDialog(true);
-      console.log(estimatedTxnResult);
       setRows([
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
