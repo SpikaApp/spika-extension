@@ -4,6 +4,7 @@ import {
   Typography,
   Card,
   CardContent,
+  Box,
   CardActions,
   Stack,
   Button,
@@ -11,10 +12,7 @@ import {
   ImageListItem,
   ImageListItemBar,
   CircularProgress,
-  Divider,
-  Box,
 } from "@mui/material";
-import PaletteIcon from "@mui/icons-material/Palette";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
@@ -51,12 +49,27 @@ const NFTs = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        <PaletteIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
-        <br />
-        NFTs
-      </Typography>
-      <Card sx={{ mb: 2, minHeight: 350 }}>
+      <Stack
+        sx={{
+          mt: "100px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-around",
+        }}
+      >
+        <Button
+          sx={{ width: "160px", mr: 2 }}
+          variant="outlined"
+          onClick={handleCreateCollectionUI}
+        >
+          <Typography align="center">Create Collection</Typography>
+        </Button>
+        <Button sx={{ width: "160px" }} variant="outlined" onClick={handleCreateNFTUI}>
+          <Typography align="center">Create NFT</Typography>
+        </Button>
+      </Stack>
+      <Card sx={{ mb: 2, maxHeight: 400 }}>
         <CardContent>
           <Stack
             direction="row"
@@ -67,23 +80,7 @@ const NFTs = () => {
               alignItems: "center",
               justifyContent: "space-between",
             }}
-          >
-            <Stack direction="row" sx={{ mt: 1 }}>
-              <Button
-                sx={{ width: 180, mr: 2 }}
-                variant="outlined"
-                onClick={handleCreateCollectionUI}
-              >
-                <Typography align="center">NEW COLLECTION</Typography>
-              </Button>
-              <Button sx={{ width: 120 }} variant="outlined" onClick={handleCreateNFTUI}>
-                <Typography align="center">New NFT</Typography>
-              </Button>
-            </Stack>
-          </Stack>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
-            <Divider sx={{ mt: 2, width: 320 }} />
-          </Box>
+          ></Stack>
           {isWaiting && (
             <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8 }}>
               <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
@@ -97,7 +94,7 @@ const NFTs = () => {
               No NFTs found
             </Typography>
           ) : (
-            <Stack sx={{ maxWidth: 350 }}>
+            <Stack sx={{ maxWidth: "350px" }}>
               <ImageList
                 gap={10}
                 variant="masonry"
@@ -105,6 +102,9 @@ const NFTs = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  height: "320px",
+                  overflow: "hidden",
+                  overflowY: "scroll",
                 }}
               >
                 {nftDetails.map((nft) => (

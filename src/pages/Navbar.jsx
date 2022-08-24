@@ -4,7 +4,6 @@ import {
   AppBar,
   Box,
   Toolbar,
-  Button,
   Menu,
   MenuItem,
   Divider,
@@ -13,7 +12,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import logo from "../assets/spika_logo_128.png";
+import spika from "../assets/spika.svg";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockIcon from "@mui/icons-material/Lock";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -91,28 +93,31 @@ const Navbar = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="relative">
+      <AppBar color="primary" position="fixed">
         <Toolbar
           sx={{
             display: "flex",
             justifyContent: "space-between",
             flexDirection: "row",
             alignItems: "center",
+            height: "75px",
           }}
         >
           <div className="menu">
-            <Button
-              id="menu-button"
-              aria-controls={open ? "menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              variant="contained"
-              disableElevation
-              onClick={handleClick}
-              endIcon={<KeyboardArrowDownIcon />}
-            >
-              Menu
-            </Button>
+            <Stack direction="row">
+              <IconButton onClick={handleClick}>
+                {!open ? (
+                  <MenuIcon sx={{ color: "white", fontSize: "32px" }} />
+                ) : (
+                  <CloseIcon sx={{ color: "white", fontSize: "32px" }} />
+                )}
+              </IconButton>
+              <Box
+                component="img"
+                src={spika}
+                sx={{ width: "69px", height: "26px", mt: 1.25, ml: "2px" }}
+              />
+            </Stack>
             <StyledMenu
               id="main-menu"
               MenuListProps={{
@@ -179,30 +184,28 @@ const Navbar = () => {
           <Stack direction="row" spacing={1}>
             <Tooltip title="Toggle theme">
               <IconButton aria-label="theme" size="normal" onClick={handleThemeSwitch}>
-                {darkMode ? <DarkModeIcon /> : <LightModeIcon sx={{ color: "white" }} />}
+                {darkMode ? (
+                  <DarkModeIcon sx={{ fontSize: "32px" }} />
+                ) : (
+                  <LightModeIcon sx={{ color: "white", fontSize: "32px" }} />
+                )}
               </IconButton>
             </Tooltip>
             {spikaWallet && (
               <Tooltip title="Lock wallet">
-                <IconButton
-                  aria-label="theme"
-                  size="normal"
-                  sx={{ color: "white" }}
-                  onClick={handleLock}
-                >
-                  {accountImported ? <LockOpenIcon /> : <LockIcon />}
+                <IconButton aria-label="theme" sx={{ color: "white" }} onClick={handleLock}>
+                  {accountImported ? (
+                    <LockOpenIcon sx={{ fontSize: "32px" }} />
+                  ) : (
+                    <LockIcon sx={{ fontSize: "32px" }} />
+                  )}
                 </IconButton>
               </Tooltip>
             )}
             {accountImported && (
               <Tooltip title="Logout">
-                <IconButton
-                  aria-label="logout"
-                  size="normal"
-                  sx={{ color: "white" }}
-                  onClick={handleLogoutUI}
-                >
-                  <LogoutIcon />
+                <IconButton aria-label="logout" sx={{ color: "white" }} onClick={handleLogoutUI}>
+                  <LogoutIcon sx={{ fontSize: "32px" }} />
                 </IconButton>
               </Tooltip>
             )}

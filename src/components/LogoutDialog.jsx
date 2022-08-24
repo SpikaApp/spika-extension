@@ -20,10 +20,10 @@ const LogoutDialog = () => {
 
   return (
     <Dialog open={openLogoutDialog}>
-      <DialogTitle align="center">Confirm Logout</DialogTitle>
+      <DialogTitle align="center">Confirm logout</DialogTitle>
       <DialogContent sx={{ maxWidth: 320 }}>
         <DialogContentText align="center" sx={{ marginBottom: 2 }}>
-          Remember to save secret recovery phrase before logout
+          Remember to save secret recovery phrase before logout.
           <br />
         </DialogContentText>
       </DialogContent>
@@ -37,10 +37,17 @@ const LogoutDialog = () => {
           mb: 4,
         }}
       >
-        <Button sx={{ mr: 4 }} variant="outlined" onClick={handleCancel}>
+        <Button sx={{ width: "121px", mr: 4 }} variant="outlined" onClick={handleCancel}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleLogout}>
+        <Button
+          sx={{
+            background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+            width: "121px",
+          }}
+          variant="contained"
+          onClick={handleLogout}
+        >
           Confirm
         </Button>
       </Stack>

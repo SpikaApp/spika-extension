@@ -144,6 +144,7 @@ const AlertDialog = () => {
                 component={RouterLink}
                 to="/transactions"
                 underline="none"
+                color="link"
                 onClick={handleClose}
               >
                 log
@@ -153,6 +154,7 @@ const AlertDialog = () => {
                 href={`https://explorer.devnet.aptos.dev/txn/${alertMessage}`}
                 target="_blank"
                 underline="none"
+                color="link"
                 onClick={handleClose}
               >
                 Aptos Explorer {""}

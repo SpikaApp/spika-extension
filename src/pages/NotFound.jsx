@@ -21,7 +21,7 @@ const NotFound = () => {
       <Card>
         <CardContent>
           <Typography
-            sx={{ marginTop: 2, minHeight: 350 }}
+            sx={{ marginTop: 2, minHeight: 400 }}
             variant="h5"
             align="center"
             color="textPrimary"

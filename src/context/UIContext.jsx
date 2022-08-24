@@ -68,7 +68,7 @@ export const UIProvider = ({ children }) => {
   const getSessionTheme = async () => {
     const data = await getStore(PLATFORM, "DARK_MODE");
     if (data === undefined || data === null) {
-      setDarkMode(true);
+      setDarkMode(false);
     } else {
       setDarkMode(data);
     }

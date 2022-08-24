@@ -9,7 +9,7 @@ import * as bcsPayload from "../utils/payload";
 export const Web3Context = React.createContext();
 
 export const Web3Provider = ({ children }) => {
-  const { setOpenSendDialog, setOpenTxnDetailsDialog } = useContext(UIContext);
+  const { setOpenSendDialog } = useContext(UIContext);
   const {
     throwAlert,
     account,
@@ -36,6 +36,8 @@ export const Web3Provider = ({ children }) => {
   const [nftUri, setNftUri] = useState("");
   const [nftSupply, setNftSupply] = useState("");
   const [nftDetails, setNftDetails] = useState([]);
+  const [aptosName, setAptosName] = useState("");
+  const [aptosAddress, setAptosAddress] = useState("");
 
   const submitTransactionHelper = async (account, payload) => {
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
@@ -101,6 +103,20 @@ export const Web3Provider = ({ children }) => {
     setNftDescription("");
     setNftUri("");
     setNftSupply("");
+  };
+
+  const getAptosAddress = async (AptosName) => {
+    const name = AptosName;
+    const result = await fetch(`https://www.aptosnames.com/api/v1/address/${name}`);
+    const { address } = await result.json();
+    setAptosAddress(address);
+  };
+
+  const getAptosName = async (AptosAddress) => {
+    const address = AptosAddress;
+    const result = await fetch(`https://www.aptosnames.com/api/v1/name/${address}`);
+    const { name } = await result.json();
+    setAptosName(name);
   };
 
   const getTxnDetails = async (version) => {
@@ -356,6 +372,10 @@ export const Web3Provider = ({ children }) => {
         setNftDescription,
         setNftSupply,
         setNftUri,
+        aptosName,
+        aptosAddress,
+        getAptosName,
+        getAptosAddress,
       }}
     >
       {children}

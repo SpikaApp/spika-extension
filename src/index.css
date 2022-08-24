@@ -5,14 +5,15 @@
 html {
   overflow: scroll;
 }
+
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
 body {
-  min-width: 401px;
-  min-height: 601px;
+  min-width: 375px;
+  min-height: 600px;
 }
 
 .MuiCard-root {
