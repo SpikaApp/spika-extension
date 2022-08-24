@@ -11,7 +11,6 @@ import {
   Link,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import WithdrawEventCard from "../components/WithdrawEventCard";
 import DepositEventCard from "../components/DepositEventCard";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -49,12 +48,7 @@ const Transactions = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-        <CompareArrowsIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
-        <br />
-        Latest Transactions
-      </Typography>
-      <Card sx={{ mb: 2, minHeight: 350 }}>
+      <Card sx={{ mt: "100px", minHeight: "450px" }}>
         <CardContent>
           <Box
             sx={{
@@ -86,74 +80,76 @@ const Transactions = () => {
                   />
                 </TabList>
               </Box>
-              <TabPanel value="1">
-                {depositEvents?.length > 0 ? (
-                  <List
-                    sx={
-                      (style,
-                      {
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "start",
-                      })
-                    }
-                    component="nav"
-                  >
-                    {depositEvents.map((depositEvent, sequence_number) => (
-                      <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
-                    ))}
-                  </List>
-                ) : (
-                  <Typography
-                    sx={{ mt: 4 }}
-                    align="center"
-                    variant="h6"
-                    color="textPrimary"
-                    gutterBottom
-                  >
-                    No transactions found
-                  </Typography>
-                )}
-              </TabPanel>
-              <TabPanel value="2">
-                {withdrawEvents?.length > 0 ? (
-                  <List
-                    sx={(style, { display: "flex", flexDirection: "column", alignItems: "start" })}
-                    component="nav"
-                  >
-                    {withdrawEvents.map((withdrawEvent, sequence_number) => (
-                      <WithdrawEventCard withdrawEvent={withdrawEvent} key={sequence_number} />
-                    ))}
-                  </List>
-                ) : (
-                  <Typography
-                    sx={{ mt: 4 }}
-                    align="center"
-                    variant="h6"
-                    color="textPrimary"
-                    gutterBottom
-                  >
-                    No transactions found
-                  </Typography>
-                )}
-              </TabPanel>
+              <Box sx={{ height: "345px", overflow: "hidden", overflowY: "scroll" }}>
+                <TabPanel value="1">
+                  {depositEvents?.length > 0 ? (
+                    <List
+                      sx={
+                        (style,
+                        {
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "start",
+                        })
+                      }
+                      component="nav"
+                    >
+                      {depositEvents.map((depositEvent, sequence_number) => (
+                        <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography
+                      sx={{ mt: 4 }}
+                      align="center"
+                      variant="h6"
+                      color="textPrimary"
+                      gutterBottom
+                    >
+                      No transactions found
+                    </Typography>
+                  )}
+                </TabPanel>
+                <TabPanel value="2">
+                  {withdrawEvents?.length > 0 ? (
+                    <List
+                      sx={
+                        (style, { display: "flex", flexDirection: "column", alignItems: "start" })
+                      }
+                      component="nav"
+                    >
+                      {withdrawEvents.map((withdrawEvent, sequence_number) => (
+                        <WithdrawEventCard withdrawEvent={withdrawEvent} key={sequence_number} />
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography
+                      sx={{ mt: 4 }}
+                      align="center"
+                      variant="h6"
+                      color="textPrimary"
+                      gutterBottom
+                    >
+                      No transactions found
+                    </Typography>
+                  )}
+                </TabPanel>
+              </Box>
             </TabContext>
           </Box>
         </CardContent>
-        <CardActions>
-          <Typography variant="subtitle1" align="center" color="textPrimary" gutterBottom>
-            View account in{" "}
-            <Link
-              href={`https://explorer.devnet.aptos.dev/account/${currentAddress}`}
-              underline="none"
-              target="_blank"
-              color="link"
-            >
-              Aptos Explorer <OpenInNewIcon sx={{ fontSize: 16 }} />
-            </Link>
-          </Typography>
-        </CardActions>
       </Card>
+      <Typography sx={{ mt: 2 }} variant="subtitle1" align="center" color="textPrimary">
+        View account in{" "}
+        <Link
+          href={`https://explorer.devnet.aptos.dev/account/${currentAddress}`}
+          underline="none"
+          target="_blank"
+          color="link"
+        >
+          Aptos Explorer <OpenInNewIcon sx={{ fontSize: 16 }} />
+        </Link>
+      </Typography>
     </Container>
   );
 };

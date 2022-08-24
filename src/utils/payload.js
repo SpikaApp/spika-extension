@@ -1,11 +1,12 @@
+import { tokenClient } from "./client";
 import { BCS, TxnBuilderTypes } from "aptos/dist/transaction_builder";
 
 export const transfer = async (recipientAddress, amount) => {
   const token = new TxnBuilderTypes.TypeTagStruct(
     TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
   );
-  const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
-    TxnBuilderTypes.ScriptFunction.natural(
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
       "0x1::coin",
       "transfer",
       [token],
@@ -15,25 +16,18 @@ export const transfer = async (recipientAddress, amount) => {
       ]
     )
   );
+
   return payload;
 };
 
 // create collection payload
 export const collection = async (name, description, uri, maxAmount) => {
-  const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
-    TxnBuilderTypes.ScriptFunction.natural(
-      "0x3::token",
-      "create_collection_script",
-      [],
-      [
-        BCS.bcsSerializeStr(name),
-        BCS.bcsSerializeStr(description),
-        BCS.bcsSerializeStr(uri),
-        BCS.bcsSerializeUint64(maxAmount),
-        BCS.serializeVectorWithFunc([false, false, false], "serializeBool"),
-      ]
-    )
+  const payload = tokenClient.transactionBuilder.buildTransactionPayload(
+    "0x3::token::create_collection_script",
+    [],
+    [name, description, uri, maxAmount, [false, false, false]]
   );
+
   return payload;
 };
 
@@ -53,27 +47,24 @@ export const nft = async (
   property_values = [],
   property_types = []
 ) => {
-  const payload = new TxnBuilderTypes.TransactionPayloadScriptFunction(
-    TxnBuilderTypes.ScriptFunction.natural(
-      "0x3::token",
-      "create_token_script",
-      [],
-      [
-        BCS.bcsSerializeStr(collectionName),
-        BCS.bcsSerializeStr(name),
-        BCS.bcsSerializeStr(description),
-        BCS.bcsSerializeUint64(supply),
-        BCS.bcsSerializeUint64(max),
-        BCS.bcsSerializeStr(uri),
-        BCS.bcsToBytes(TxnBuilderTypes.AccountAddress.fromHex(royalty_payee_address)),
-        BCS.bcsSerializeUint64(royalty_points_denominator),
-        BCS.bcsSerializeUint64(royalty_points_numerator),
-        BCS.serializeVectorWithFunc([false, false, false, false, false], "serializeBool"),
-        BCS.serializeVectorWithFunc(property_keys, "serializeStr"),
-        BCS.serializeVectorWithFunc(property_values, "serializeStr"),
-        BCS.serializeVectorWithFunc(property_types, "serializeStr"),
-      ]
-    )
+  const payload = tokenClient.transactionBuilder.buildTransactionPayload(
+    "0x3::token::create_token_script",
+    [],
+    [
+      collectionName,
+      name,
+      description,
+      parseInt(supply),
+      max,
+      uri,
+      royalty_payee_address,
+      royalty_points_denominator,
+      royalty_points_numerator,
+      [false, false, false, false, false],
+      property_keys,
+      property_values,
+      property_types,
+    ]
   );
 
   return payload;

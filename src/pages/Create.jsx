@@ -3,7 +3,6 @@ import {
   Container,
   Typography,
   Card,
-  CardActions,
   CardContent,
   Button,
   TextField,
@@ -38,10 +37,7 @@ const Create = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography variant="h6" sx={{ mt: 3 }} align="center" color="textPrimary" gutterBottom>
-        Create New Account
-      </Typography>
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, mt: "100px" }}>
         {newMnemonic === "" ? (
           <CardContent>
             <Typography variant="body1" align="center" color="textSecondary" gutterBottom>
@@ -114,27 +110,40 @@ const Create = () => {
             </CardContent>
           </form>
         )}
-
-        {newMnemonic === "" ? (
-          <CardActions>
-            {checkedLicenseRules ? (
-              <Button variant="contained" onClick={handleGenerate}>
-                Generate Mnemonic
-              </Button>
-            ) : (
-              <Button variant="contained" disabled>
-                Generate Mnemonic
-              </Button>
-            )}
-          </CardActions>
-        ) : (
-          <CardActions>
-            <Button variant="contained" onClick={handleCreate}>
-              Create Account
-            </Button>
-          </CardActions>
-        )}
       </Card>
+      {newMnemonic === "" ? (
+        <Stack sx={{ display: "flex", alignItems: "center" }}>
+          {checkedLicenseRules ? (
+            <Button
+              variant="contained"
+              sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "210px",
+              }}
+              onClick={handleGenerate}
+            >
+              Generate Mnemonic
+            </Button>
+          ) : (
+            <Button variant="contained" sx={{ width: "210px" }} disabled>
+              Generate Mnemonic
+            </Button>
+          )}
+        </Stack>
+      ) : (
+        <Stack sx={{ display: "flex", alignItems: "center" }}>
+          <Button
+            variant="contained"
+            sx={{
+              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+              width: "191px",
+            }}
+            onClick={handleCreate}
+          >
+            Create Account
+          </Button>
+        </Stack>
+      )}
     </Container>
   );
 };

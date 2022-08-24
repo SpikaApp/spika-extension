@@ -56,27 +56,51 @@ const LoginDialog = () => {
           />
         </form>
         {mnemonicRequired && (
-          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
-            <Button variant="outlined" onClick={handleCancel}>
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mt: 2, mb: 2 }}>
+            <Button sx={{ width: "115px" }} variant="outlined" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealMnemonic}>
+            <Button
+              sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "115px",
+                ml: 4,
+              }}
+              variant="contained"
+              onClick={handleRevealMnemonic}
+            >
               Unlock
             </Button>
           </Stack>
         )}
         {privateKeyRequired && (
-          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mb: 2 }}>
-            <Button variant="outlined" onClick={handleCancel}>
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mt: 2, mb: 2 }}>
+            <Button sx={{ width: "115px" }} variant="outlined" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button variant="contained" sx={{ marginLeft: 4 }} onClick={handleRevealPrivateKey}>
+            <Button
+              variant="contained"
+              sx={{
+                marginLeft: 4,
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "115px",
+              }}
+              onClick={handleRevealPrivateKey}
+            >
               Unlock
             </Button>
           </Stack>
         )}
         {!mnemonicRequired && !privateKeyRequired && (
-          <Button variant="contained" onClick={handleLogin} sx={{ mb: 2 }}>
+          <Button
+            variant="contained"
+            onClick={handleLogin}
+            sx={{
+              mb: 2,
+              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+              width: "115px",
+            }}
+          >
             Login
           </Button>
         )}

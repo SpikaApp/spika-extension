@@ -44,9 +44,18 @@ const CreateNftDialog = () => {
         <Stack sx={{ display: "flex", alignItems: "center" }}>Create NFT</Stack>
       </DialogTitle>
       <DialogContent>
-        <Stack component="span" sx={{ maxWidth: 300 }}>
+        <Stack
+          component="span"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            maxWidth: "300px",
+          }}
+        >
           <TextField
-            sx={{ mt: 1, mb: 1.5, width: 250 }}
+            sx={{ mt: 1, mb: 1.5, width: "275px" }}
             id="collectionName"
             label="Collection Name"
             type="string"
@@ -54,7 +63,7 @@ const CreateNftDialog = () => {
             onChange={(e) => setCollectionName(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, mb: 1.5, width: 250 }}
+            sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="nftName"
             label="NFT Name"
             type="string"
@@ -62,7 +71,7 @@ const CreateNftDialog = () => {
             onChange={(e) => setNftName(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, mb: 1.5, width: 250 }}
+            sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="nftDescription"
             label="Description"
             type="string"
@@ -72,7 +81,11 @@ const CreateNftDialog = () => {
             onChange={(e) => setNftDescription(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, mb: 1.5, width: 150 }}
+            sx={{
+              mt: 1.5,
+              mb: 1.5,
+              width: "275px",
+            }}
             id="nftSupply"
             label="Editions"
             type="number"
@@ -80,7 +93,7 @@ const CreateNftDialog = () => {
             onChange={(e) => setNftSupply(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, width: 250 }}
+            sx={{ mt: 1.5, width: "275px" }}
             id="nftUri"
             label="URL"
             type="string"
@@ -98,10 +111,17 @@ const CreateNftDialog = () => {
             mb: 2,
           }}
         >
-          <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+          <Button sx={{ width: "121px", mr: 4 }} variant="outlined" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleCreateNft}>
+          <Button
+            sx={{
+              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+              width: "121px",
+            }}
+            variant="contained"
+            onClick={handleCreateNft}
+          >
             Create
           </Button>
         </Stack>

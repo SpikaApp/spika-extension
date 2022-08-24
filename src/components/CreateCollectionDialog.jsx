@@ -30,9 +30,18 @@ const CreateCollectionDialog = () => {
         <Stack sx={{ display: "flex", alignItems: "center" }}>Create New Collection</Stack>
       </DialogTitle>
       <DialogContent>
-        <Stack component="span" sx={{ maxWidth: 300 }}>
+        <Stack
+          component="span"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            maxWidth: "300px",
+          }}
+        >
           <TextField
-            sx={{ mt: 1, mb: 1.5, width: 250 }}
+            sx={{ mt: 1, mb: 1.5, width: "275px" }}
             id="collectionName"
             label="Collection Name"
             type="string"
@@ -40,7 +49,7 @@ const CreateCollectionDialog = () => {
             onChange={(e) => setCollectionName(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, mb: 1.5, width: 250 }}
+            sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="collectionDescription"
             label="Collection Description"
             type="string"
@@ -50,7 +59,7 @@ const CreateCollectionDialog = () => {
             onChange={(e) => setCollectionDescription(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, width: 250 }}
+            sx={{ mt: 1.5, width: "275px" }}
             id="collectionUri"
             label="URL"
             type="string"
@@ -68,10 +77,17 @@ const CreateCollectionDialog = () => {
             mb: 2,
           }}
         >
-          <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+          <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleCreateCollection}>
+          <Button
+            sx={{
+              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+              width: "121px",
+            }}
+            variant="contained"
+            onClick={handleCreateCollection}
+          >
             Create
           </Button>
         </Stack>

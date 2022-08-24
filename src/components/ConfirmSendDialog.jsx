@@ -116,10 +116,17 @@ const ConfirmSendDialog = () => {
           mb: 4,
         }}
       >
-        <Button sx={{ mr: 4 }} variant="outlined" onClick={handleCancel}>
+        <Button sx={{ width: "121px", mr: 4 }} variant="outlined" onClick={handleCancel}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleSend}>
+        <Button
+          sx={{
+            background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+            width: "121px",
+          }}
+          variant="contained"
+          onClick={handleSend}
+        >
           Confirm
         </Button>
       </Stack>

@@ -37,10 +37,7 @@ const Import = () => {
 
   return (
     <Container maxWidth="xs">
-      <Typography sx={{ mt: 3 }} variant="h6" align="center" color="textPrimary" gutterBottom>
-        Import Account
-      </Typography>
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, mt: "100px" }}>
         <form className="import-form">
           <input hidden type="text" autoComplete="username" value={undefined}></input>
           <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -96,18 +93,25 @@ const Import = () => {
           }
           control={<Checkbox checked={checkedLicenseRules} onChange={handleChangeLicenseRules} />}
         />
-        <CardActions>
-          {checkedLicenseRules ? (
-            <Button variant="contained" onClick={handleImport}>
-              Import Account
-            </Button>
-          ) : (
-            <Button variant="contained" disabled>
-              Import Account
-            </Button>
-          )}
-        </CardActions>
       </Card>
+      <Stack sx={{ display: "flex", alignItems: "center" }}>
+        {checkedLicenseRules ? (
+          <Button
+            variant="contained"
+            sx={{
+              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+              width: "191px",
+            }}
+            onClick={handleImport}
+          >
+            Import Account
+          </Button>
+        ) : (
+          <Button variant="contained" sx={{ width: "191px" }} disabled>
+            Import Account
+          </Button>
+        )}
+      </Stack>
     </Container>
   );
 };

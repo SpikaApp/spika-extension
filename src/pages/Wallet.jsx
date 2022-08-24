@@ -6,15 +6,11 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardMedia,
   Button,
   Chip,
   Tooltip,
   Stack,
 } from "@mui/material";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import SendIcon from "@mui/icons-material/Send";
-import DownloadIcon from "@mui/icons-material/Download";
 import MintDialog from "../components/MintDialog";
 import SendDialog from "../components/SendDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
@@ -22,8 +18,6 @@ import ReceiveDialog from "../components/ReceiveDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import aptos_light from "../assets/aptos_light.png";
-import aptos_dark from "../assets/aptos_dark.png";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
@@ -50,73 +44,85 @@ const Wallet = () => {
     <Box>
       {accountImported && (
         <Container maxWidth="xs">
-          <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-            <AccountBalanceWalletIcon sx={{ marginTop: 2, fontSize: 48 }} color="primary" />
-            <br />
-            Spika Web Wallet
-          </Typography>
-          <Card sx={{ mb: 2, minHeight: 350 }}>
+          <Card sx={{ mb: 2, minHeight: "198px", mt: "100px" }}>
             <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Stack sx={{ alignItems: "center", mt: 1 }}>
-                <Typography sx={{ mb: 1.5 }}>Network: Aptos Devnet</Typography>
-                <Tooltip title="Copy address">
-                  <Chip
-                    sx={{ mb: 1 }}
-                    label={shortenAddress(currentAddress)}
-                    onClick={handleClick}
-                  />
+              <Stack
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  mt: 1,
+                }}
+              >
+                <Typography sx={{ mr: 6 }}>Aptos Devnet</Typography>
+                <Tooltip sx={{ my: "-3px" }} title="Copy address">
+                  <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
                 </Tooltip>
               </Stack>
-              <Stack sx={{ display: "flex", alignItems: "center", my: -2 }}>
+              <Stack
+                container
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  mt: "24px",
+                }}
+              >
                 {darkMode ? (
-                  <CardMedia
-                    sx={{ mb: 1.5 }}
+                  <Box
                     component="img"
-                    image={currentAsset[0].logo_dark}
-                    alt="aptos"
+                    src={currentAsset[0].logo_dark}
+                    sx={{ maxWidth: "32px", maxHeight: "32px", mr: "12px", mt: "4px", ml: "12px" }}
                   />
                 ) : (
-                  <CardMedia
-                    sx={{ mb: 1.5 }}
+                  <Box
                     component="img"
-                    image={currentAsset[0].logo_light}
-                    alt="aptos"
+                    src={currentAsset[0].logo_light}
+                    sx={{ maxWidth: "32px", maxHeight: "32px", mr: "12px", mt: "4px", ml: "12px" }}
                   />
                 )}
 
                 <Typography
                   sx={{ mb: 1 }}
-                  variant="h6"
+                  variant="h4"
                   align="center"
-                  color="textSecondary"
+                  color="textPrimary"
                   gutterBottom
                 >
-                  {balance} {currentAsset[0].ticker}
+                  {balance}
+                </Typography>
+                <Typography sx={{ ml: "6px" }} color="TextSecondary">
+                  {currentAsset[0].ticker}
                 </Typography>
               </Stack>
             </CardContent>
             <CardActions>
-              <Stack sx={{ display: "flex", alignItems: "center" }}>
-                <Button sx={{ mb: 2.5 }} variant="outlined" onClick={handleMintUI}>
-                  Faucet
-                </Button>
-
-                <Stack direction="row" sx={{ mt: 2 }}>
-                  <Button
-                    sx={{ mr: 4 }}
-                    variant="contained"
-                    endIcon={<SendIcon />}
-                    onClick={handleSendUI}
-                  >
-                    Send
-                  </Button>
-                  <Button variant="contained" endIcon={<DownloadIcon />} onClick={handleReceiveUI}>
-                    Receive
-                  </Button>
-                </Stack>
-              </Stack>
+              <Button
+                sx={{ width: "122px" }}
+                variant="outlined"
+                color="primary"
+                onClick={handleMintUI}
+              >
+                Faucet
+              </Button>
             </CardActions>
           </Card>
+          <Stack
+            direction="row"
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-around", mt: 3 }}
+          >
+            <Button
+              sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "154px",
+              }}
+              variant="contained"
+              onClick={handleSendUI}
+            >
+              Send
+            </Button>
+            <Button variant="outlined" sx={{ width: "154px" }} onClick={handleReceiveUI}>
+              Receive
+            </Button>
+          </Stack>
           <MintDialog />
           <SendDialog />
           <ConfirmSendDialog />

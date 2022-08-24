@@ -180,10 +180,21 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "121px", mr: 4 }}
+                      onClick={handleCancel}
+                    >
                       Reject
                     </Button>
-                    <Button variant="contained" onClick={handleApprove}>
+                    <Button
+                      sx={{
+                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                        width: "121px",
+                      }}
+                      variant="contained"
+                      onClick={handleApprove}
+                    >
                       Approve{" "}
                     </Button>
                   </Stack>
@@ -224,10 +235,21 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "121px", mr: 4 }}
+                      onClick={handleCancel}
+                    >
                       Reject
                     </Button>
-                    <Button variant="contained" onClick={handleApprove}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                        width: "154px",
+                      }}
+                      onClick={handleApprove}
+                    >
                       Approve{" "}
                     </Button>
                   </Stack>
@@ -268,10 +290,17 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button variant="outlined" sx={{ mr: 4 }} onClick={handleCancel}>
+                    <Button variant="outlined" sx={{ with: "121px", mr: 4 }} onClick={handleCancel}>
                       Reject
                     </Button>
-                    <Button variant="contained" onClick={handleApprove}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                        width: "121px",
+                      }}
+                      onClick={handleApprove}
+                    >
                       Approve{" "}
                     </Button>
                   </Stack>
