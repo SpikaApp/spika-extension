@@ -81,7 +81,7 @@ const About = () => {
                 />
               </Link>
               <Link
-                href="https://github.com/xorgal/spika"
+                href="https://www.twitter.com/SpikaApp"
                 color="#1DA1F2"
                 underline="none"
                 target="_blank"
