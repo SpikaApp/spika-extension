@@ -10,7 +10,7 @@ import {
   Stack,
   Button,
 } from "@mui/material";
-import GitHubIcon from "@mui/icons-material/GitHub";
+import TwitterIcon from "@mui/icons-material/Twitter";
 import spika_logo from "../assets/spika_logo_128.png";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
@@ -37,7 +37,7 @@ const About = () => {
             Aptos SDK version 1.3.7
             <br />
             <Link
-              href="https://github.com/xorgal/spika/blob/master/LICENSE"
+              href="https://docs.spika.app/terms-and-conditions/license"
               underline="none"
               target="_blank"
               color="link"
@@ -47,7 +47,7 @@ const About = () => {
             </Link>
             <br />
             <Link
-              href="https://github.com/xorgal/spika/blob/master/docs/PRIVACY.md"
+              href="https://docs.spika.app/terms-and-conditions/privacy-policy"
               underline="none"
               target="_blank"
               color="link"
@@ -56,7 +56,7 @@ const About = () => {
               Privacy Policy
             </Link>
             <br />
-            <Link href="mailto:spika@xorgal.xyz" underline="none" target="_blank" color="link">
+            <Link href="mailto:support@spika.app" underline="none" target="_blank" color="link">
               Contacts
             </Link>
             <Stack
@@ -82,11 +82,11 @@ const About = () => {
               </Link>
               <Link
                 href="https://github.com/xorgal/spika"
-                color={darkMode ? "white" : "black"}
+                color="#1DA1F2"
                 underline="none"
                 target="_blank"
               >
-                <GitHubIcon sx={{ fontSize: 42 }} />
+                <TwitterIcon sx={{ fontSize: 42 }} />
               </Link>
             </Stack>
           </Typography>
