@@ -1,9 +1,9 @@
 import { tokenClient } from "./client";
 import { BCS, TxnBuilderTypes } from "aptos/dist/transaction_builder";
 
-export const transfer = async (recipientAddress, amount) => {
+export const transfer = async (recipientAddress, currentAsset, amount) => {
   const token = new TxnBuilderTypes.TypeTagStruct(
-    TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+    TxnBuilderTypes.StructTag.fromString(currentAsset)
   );
   const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
     TxnBuilderTypes.EntryFunction.natural(

@@ -142,7 +142,11 @@ export const Web3Provider = ({ children }) => {
 
   const estimateTransaction = async () => {
     try {
-      const payload = await bcsPayload.transfer(recipientAddress, amount);
+      const payload = await bcsPayload.transfer(
+        recipientAddress,
+        currentAsset[1].TypeTagStruct,
+        amount
+      );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, rawTxn);
       const estimatedTxn = (await client.submitBCSSimulation(bcsTxn))[0];
@@ -170,7 +174,11 @@ export const Web3Provider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const payload = await bcsPayload.transfer(recipientAddress, amount);
+      const payload = await bcsPayload.transfer(
+        recipientAddress,
+        currentAsset[1].TypeTagStruct,
+        amount
+      );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
       const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
@@ -180,7 +188,44 @@ export const Web3Provider = ({ children }) => {
       throwAlert(32, "Transaction failed", `${error}`);
       console.log(error);
       setIsLoading(false);
+    }
+  };
+
+  const externalSignTransaction = async (args) => {
+    try {
+      const payload = await bcsPayload.transfer(
+        args.arguments[0], // recipient
+        args.type_arguments[0],
+        args.arguments[1] // amount
+      );
+      const rawTxn = await client.generateRawTransaction(currentAddress, payload);
+      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
+      const result = await client.submitSignedBCSTransaction(bcsTxn);
+      throwAlert(31, "Transaction sent", `${result.hash}`);
+    } catch (error) {
+      throwAlert(32, "Transaction failed", `${error}`);
       console.log(error);
+      setIsLoading(false);
+    }
+  };
+
+  const externalSignAndSubmitTransaction = async (args) => {
+    try {
+      const payload = await bcsPayload.transfer(
+        args.arguments[0], // recipient
+        args.type_arguments[0],
+        args.arguments[1] // amount
+      );
+      const rawTxn = await client.generateRawTransaction(currentAddress, payload);
+      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
+      const result = await client.submitSignedBCSTransaction(bcsTxn);
+      throwAlert(31, "Transaction sent", `${result.hash}`);
+      return result;
+    } catch (error) {
+      throwAlert(32, "Transaction failed", `${error}`);
+      console.log(error);
+      setIsLoading(false);
+      return error;
     }
   };
 
@@ -376,6 +421,8 @@ export const Web3Provider = ({ children }) => {
         aptosAddress,
         getAptosName,
         getAptosAddress,
+        externalSignTransaction,
+        externalSignAndSubmitTransaction,
       }}
     >
       {children}

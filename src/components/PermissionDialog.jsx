@@ -8,20 +8,27 @@ import {
   DialogActions,
   Typography,
   Stack,
+  Tooltip,
+  Grid,
+  Chip,
+  Paper,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 import { PLATFORM } from "../utils/constants";
-import { client } from "../utils/client";
 import { setMem, getMem, setStore, getStore } from "../utils/store";
 import { getConnectedApps, getApp, setApp, removeApp } from "../utils/apps";
+import shortenAddress from "../utils/shorten_address";
+import copyToClipboard from "../utils/copy_clipboard";
 
 const PermissionDialog = () => {
   const [request, setRequest] = useState({});
@@ -29,6 +36,7 @@ const PermissionDialog = () => {
   const [requestSender, setRequestSender] = useState();
   const { spikaWallet, openPermissionDialog, setOpenPermissionDialog } = useContext(UIContext);
   const { accountImported, currentAddress, account, publicAccount } = useContext(AccountContext);
+  const { externalSignTransaction, externalSignAndSubmitTransaction } = useContext(Web3Context);
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
   const _sender = "currentSender";
@@ -44,6 +52,19 @@ const PermissionDialog = () => {
   useEffect(() => {
     if (request) {
       getSender();
+    }
+    if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
+      if (request.args === undefined) {
+        handleCancel();
+      }
+      if (
+        request.args.arguments[0] === undefined ||
+        request.args.arguments[1] === undefined ||
+        request.args.function === undefined ||
+        request.args.type_arguments[0] === undefined
+      ) {
+        handleCancel();
+      }
     }
   }, [request]);
 
@@ -87,25 +108,12 @@ const PermissionDialog = () => {
       response = publicAccount;
     }
     if (method === "signTransaction") {
-      const txnRequest = request.args;
-      try {
-        const signedTxn = await client.signTransaction(account, txnRequest);
-        response = signedTxn;
-      } catch (error) {
-        console.log(error);
-        response = false;
-      }
+      const result = await externalSignTransaction(request.args);
+      response = result;
     }
     if (method === "signAndSubmitTransaction") {
-      const txnRequest = request.args;
-      try {
-        const signedTxn = await client.signTransaction(account, txnRequest);
-        const submittedTxn = await client.submitTransaction(signedTxn);
-        response = submittedTxn;
-      } catch (error) {
-        console.log(error);
-        response = false;
-      }
+      const result = await externalSignAndSubmitTransaction(request.args);
+      response = result;
     }
     sendResponse(response);
     clearDialog();
@@ -127,6 +135,14 @@ const PermissionDialog = () => {
   const setDefaultRoute = () => {
     setMem(PLATFORM, _currentRoute, "/");
   };
+
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: "start",
+    color: theme.palette.text.secondary,
+  }));
 
   return (
     <Box>
@@ -219,10 +235,16 @@ const PermissionDialog = () => {
                       {requestSender.tab.title}
                     </Typography>
                     <Typography variant="body1" color="warning.dark">
-                      Website is requesting the following method:
+                      Confirm transaction:
                     </Typography>
-                    <Typography sx={{ mt: 4 }} variant="h5">
-                      {method}
+                    <Typography sx={{ mt: 4 }} variant="body1">
+                      To: {shortenAddress(request.args.arguments[0])}
+                      <br />
+                      Amount: {request.args.arguments[1]}
+                      <br />
+                      Function: {request.args.function}
+                      <br />
+                      Type: {request.args.type_arguments[0]}
                     </Typography>
                   </DialogContent>
                   <Stack
@@ -273,12 +295,28 @@ const PermissionDialog = () => {
                     <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
                       {requestSender.tab.title}
                     </Typography>
-                    <Typography variant="body1" color="warning.dark">
-                      Website is requesting the following method:
-                    </Typography>
-                    <Typography sx={{ mt: 4 }} variant="h5">
-                      {method}
-                    </Typography>
+                    <Typography variant="body1">Approval required</Typography>
+                    {/* <Grid container spacing={1}> */}
+                    <Grid item xs={12} sx={{ mt: 2 }}>
+                      <Item>
+                        <Typography variant="subtitle1" sx={{ mt: 1, ml: 1 }}>
+                          To:{" "}
+                          <Tooltip title={request.args.arguments[0]}>
+                            <Chip
+                              sx={{ mt: "-4px" }}
+                              label={shortenAddress(request.args.arguments[0])}
+                              onClick={() => copyToClipboard(request.args.arguments[0])}
+                            />
+                          </Tooltip>
+                          <br />
+                          Amount: {request.args.arguments[1]}
+                          <br />
+                          Function: {request.args.function} <br />
+                          Type: {request.args.type_arguments[0]}
+                        </Typography>
+                      </Item>
+                    </Grid>
+                    {/* </Grid> */}
                   </DialogContent>
                   <Stack
                     sx={{
@@ -290,7 +328,11 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button variant="outlined" sx={{ with: "121px", mr: 4 }} onClick={handleCancel}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "121px", mr: 4 }}
+                      onClick={handleCancel}
+                    >
                       Reject
                     </Button>
                     <Button
