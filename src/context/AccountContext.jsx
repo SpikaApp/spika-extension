@@ -255,8 +255,9 @@ export const AccountProvider = ({ children }) => {
       setPrivateKey(secretKey);
       setAccount(account);
       setPublicAccount({
-        account: account.address().toString(),
         publicKey: account.pubKey().toString(),
+        address: account.address().toString(),
+        authKey: account.authKey().toString(),
       });
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
@@ -295,8 +296,9 @@ export const AccountProvider = ({ children }) => {
       setPrivateKey(secretKey);
       setAccount(account);
       setPublicAccount({
-        account: account.address().toString(),
         publicKey: account.pubKey().toString(),
+        address: account.address().toString(),
+        authKey: account.authKey().toString(),
       });
       setCurrentAddress(account.address().toString());
       setBalance(accountResource.data.coin.value);
@@ -331,8 +333,9 @@ export const AccountProvider = ({ children }) => {
         setPrivateKey(secretKey);
         setAccount(account);
         setPublicAccount({
-          account: account.address().toString(),
           publicKey: account.pubKey().toString(),
+          address: account.address().toString(),
+          authKey: account.authKey().toString(),
         });
         setCurrentAddress(account.address().toString());
         setBalance(accountResource.data.coin.value);
