@@ -33,8 +33,8 @@ const About = () => {
             Devnet chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.3.5 <br />
-            Aptos SDK version 1.3.7
+            Wallet version 0.3.6 <br />
+            Aptos SDK version 1.3.10
             <br />
             <Link
               href="https://docs.spika.app/terms-and-conditions/license"
