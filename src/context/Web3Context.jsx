@@ -122,7 +122,7 @@ export const Web3Provider = ({ children }) => {
   const getTxnDetails = async (version) => {
     setIsLoading(true);
     const data = await client.getTransactionByVersion(version);
-    console.log(data);
+    // console.log(data);
     setTxnDetails(data);
     setIsLoading(false);
   };
@@ -130,7 +130,6 @@ export const Web3Provider = ({ children }) => {
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
-      const account = new aptos.AptosAccount(privateKey, currentAddress);
       await faucetClient.fundAccount(account.address(), amount);
       throwAlert(21, "Success", `Received ${amount} ${token.aptosCoin[0].ticker}`);
     } catch (error) {
@@ -238,7 +237,6 @@ export const Web3Provider = ({ children }) => {
         1
       );
       await submitTransactionHelper(account, collection);
-
       throwAlert(61, "Transaction sent", `${collection}`);
     } catch (error) {
       throwAlert(62, "Transaction failed", `${error}`);
@@ -338,7 +336,7 @@ export const Web3Provider = ({ children }) => {
           // Returns an array of tokenId and value
           const accountTokensBalances = await Promise.all(
             tokenIds.map(async (i) => {
-              let data = await tokenClient.getTokenBalanceForAccount(currentAddress, i);
+              let data = await tokenClient.getTokenForAccount(currentAddress, i);
               return data;
             })
           );
