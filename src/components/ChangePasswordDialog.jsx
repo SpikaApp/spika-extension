@@ -15,8 +15,6 @@ import { AccountContext } from "../context/AccountContext";
 const ChangePasswordDialog = () => {
   const { openChangePasswordDialog, setOpenChangePasswordDialog } = useContext(UIContext);
   const {
-    isLoading,
-    setIsLoading,
     password,
     setPassword,
     newPassword,

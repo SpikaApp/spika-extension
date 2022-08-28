@@ -10,15 +10,8 @@ export const Web3Context = React.createContext();
 
 export const Web3Provider = ({ children }) => {
   const { setOpenSendDialog } = useContext(UIContext);
-  const {
-    throwAlert,
-    account,
-    currentAddress,
-    privateKey,
-    setBalance,
-    currentAsset,
-    setIsLoading,
-  } = useContext(AccountContext);
+  const { throwAlert, account, currentAddress, setBalance, currentAsset, setIsLoading } =
+    useContext(AccountContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
