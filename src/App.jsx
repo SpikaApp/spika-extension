@@ -1,6 +1,16 @@
 import React, { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Navbar, Onboarding, Wallet, Create, Import, NFTs, Transactions, About } from "./pages";
+import {
+  Navbar,
+  Onboarding,
+  Wallet,
+  Create,
+  Import,
+  NFTs,
+  Transactions,
+  Settings,
+  About,
+} from "./pages";
 import { ThemeProvider } from "@mui/material";
 import { UIContext } from "./context/UIContext";
 import { AccountProvider } from "./context/AccountContext";
@@ -51,6 +61,7 @@ const App = () => {
                           )}
                           <Route path="nfts" element={<NFTs />} />
                           <Route path="transactions" element={<Transactions />} />
+                          <Route path="settings" element={<Settings />} />
                           <Route path="about" element={<About />} />
                         </Routes>
                       )}

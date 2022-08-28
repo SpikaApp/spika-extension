@@ -1,30 +1,18 @@
 import { useContext } from "react";
-import {
-  Container,
-  Typography,
-  Link,
-  Card,
-  Box,
-  CardContent,
-  CardActions,
-  Stack,
-  Button,
-} from "@mui/material";
+import { Container, Typography, Link, Card, Box, CardContent, Stack } from "@mui/material";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import spika_logo from "../assets/spika_logo_128.png";
-import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import useAxios from "../utils/use_axios";
 import { NODE_URL } from "../utils/constants";
 
 const About = () => {
-  const { accountImported } = useContext(AccountContext);
-  const { handleMnemonicUI, handlePrivateKeyUI, darkMode } = useContext(UIContext);
+  const { darkMode } = useContext(UIContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   return (
     <Container maxWidth="xs">
-      <Card sx={{ mb: 2, mt: "100px", minHeight: "400px" }}>
+      <Card sx={{ mb: 2, mt: "100px", minHeight: "315px" }}>
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
             <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
@@ -33,7 +21,7 @@ const About = () => {
             Devnet chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.3.6 <br />
+            Wallet version 0.3.7 <br />
             Aptos SDK version 1.3.10
             <br />
             <Link
@@ -91,18 +79,6 @@ const About = () => {
             </Stack>
           </Typography>
         </CardContent>
-        <CardActions>
-          {accountImported && (
-            <Stack>
-              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
-                Show Mnemonic
-              </Button>
-              <Button variant="outlined" onClick={handlePrivateKeyUI}>
-                Show Private Key
-              </Button>
-            </Stack>
-          )}
-        </CardActions>
       </Card>
     </Container>
   );
