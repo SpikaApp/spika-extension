@@ -172,6 +172,15 @@ const Navbar = () => {
                   <Divider sx={{ my: 0.5 }} />
                 </Stack>
               )}
+              {accountImported && (
+                <MenuItem onClick={handleClose} disableRipple>
+                  <Link underline="none" component={RouterLink} to="settings">
+                    <Typography variant="h6" color="textPrimary">
+                      Settings
+                    </Typography>
+                  </Link>
+                </MenuItem>
+              )}
               <MenuItem onClick={handleClose} disableRipple>
                 <Link underline="none" component={RouterLink} to="about">
                   <Typography variant="h6" color="textPrimary">

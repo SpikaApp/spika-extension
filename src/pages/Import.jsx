@@ -57,7 +57,7 @@ const Import = () => {
             <TextField
               sx={{ mt: 2 }}
               id="password"
-              label="New Password"
+              label="New password"
               type="password"
               autoFocus={false}
               autoComplete="new-password"
