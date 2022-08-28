@@ -59,7 +59,6 @@ const Wallet = () => {
                 </Tooltip>
               </Stack>
               <Stack
-                container
                 sx={{
                   display: "flex",
                   flexDirection: "row",
