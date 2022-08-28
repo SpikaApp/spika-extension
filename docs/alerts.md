@@ -34,10 +34,13 @@
 
 ---
 
-- 52: Password field cannot be empty
-- 53: Passwords do not match
-- 54: Password must be at least 6 characters long
+- 52: Incorrect password, Password field cannot be empty
+- 53: Incorrect password, Passwords do not match
+- 54: Incorrect password, Password must be at least 6 characters long
 - 55: Incorrect password
+- 56: Success, Password successfully changed
+- 57: Incorrect current password
+- 58: Incorrect password, New password shall not be the same
 
 ---
 

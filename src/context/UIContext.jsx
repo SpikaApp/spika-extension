@@ -14,6 +14,7 @@ export const UIProvider = ({ children }) => {
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
+  const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
   const [txnType, setTxnType] = useState(0); // 0: undefined, 1: inbound, 2: outbound
@@ -111,6 +112,10 @@ export const UIProvider = ({ children }) => {
     setOpenLoginDialog(true);
   };
 
+  const handleChangePasswordUI = () => {
+    setOpenChangePasswordDialog(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -153,6 +158,9 @@ export const UIProvider = ({ children }) => {
         handlePrivateKeyUI,
         privateKeyRequired,
         setPrivateKeyRequired,
+        handleChangePasswordUI,
+        openChangePasswordDialog,
+        setOpenChangePasswordDialog,
         accountRoutesEnabled,
         setAccountRoutesEnabled,
         openPermissionDialog,

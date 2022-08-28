@@ -27,6 +27,7 @@ const AlertDialog = () => {
     setOpenConfirmSendDialog,
     setOpenCreateCollectionDialog,
     setOpenCreateNftDialog,
+    setOpenChangePasswordDialog,
   } = useContext(UIContext);
   const {
     alertSignal,
@@ -79,6 +80,9 @@ const AlertDialog = () => {
         setOpenConfirmSendDialog(false);
         setIsTransaction(false);
         break;
+      case 56: // Password successfully changed
+        setOpenAlertDialog(false);
+        setOpenChangePasswordDialog(false);
       case 61: // Collection Created
         setOpenAlertDialog(false);
         setOpenCreateCollectionDialog(false);
@@ -110,6 +114,8 @@ const AlertDialog = () => {
       case 53: // Passwords do not match
       case 54: // Password must at least 6 characters long
       case 55: // Failed load account
+      case 57: // Incorrect current password
+      case 58: // New password shall not be the same
       case 62: // Failed create collection
       case 72: // Failed create nft
       case 92: // No mnemonic phrase found
