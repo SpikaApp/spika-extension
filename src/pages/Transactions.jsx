@@ -1,15 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  Card,
-  CardActions,
-  CardContent,
-  List,
-  Box,
-  Tab,
-  Link,
-} from "@mui/material";
+import { Container, Typography, Card, CardContent, List, Box, Tab, Link } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import WithdrawEventCard from "../components/WithdrawEventCard";
 import DepositEventCard from "../components/DepositEventCard";

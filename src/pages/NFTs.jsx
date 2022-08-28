@@ -4,7 +4,6 @@ import {
   Typography,
   Card,
   CardContent,
-  CardActions,
   Stack,
   Button,
   ImageList,
@@ -126,7 +125,6 @@ const NFTs = () => {
             </Stack>
           )}
         </CardContent>
-        <CardActions></CardActions>
       </Card>
       <CreateCollectionDialog />
       <CreateNftDialog />
