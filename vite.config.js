@@ -1,8 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import nodePolyfills from "rollup-plugin-node-polyfills";
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      process: "rollup-plugin-node-polyfills/polyfills/process-es6",
+      stream: "rollup-plugin-node-polyfills/polyfills/stream",
+      events: "rollup-plugin-node-polyfills/polyfills/events",
+      util: "rollup-plugin-node-polyfills/polyfills/util",
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: "es2020",
+    },
+  },
   build: {
     rollupOptions: {
       output: {
@@ -10,27 +23,11 @@ export default defineConfig({
         chunkFileNames: "app/[name].js",
         assetFileNames: "app/assets/[name].[ext]",
       },
+      plugins: [nodePolyfills()],
     },
     module: "commonjs",
     target: "es2020",
     chunkSizeWarningLimit: 1024,
-  },
-
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://fullnode.devnet.aptoslabs.com/v1",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      "/faucet": {
-        target: "https://faucet.devnet.aptoslabs.com",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/faucet/, ""),
-      },
-    },
   },
   plugins: [react({ fastRefresh: true })],
 });

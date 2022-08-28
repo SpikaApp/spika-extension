@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import * as aptos from "aptos";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
-import { sign } from "tweetnacl";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../utils/client";
 import * as token from "../utils/token";
-import { PLATFORM } from "../utils/constants";
+import { APTOS_DERIVE_PATH, PLATFORM } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
 import * as apps from "../utils/apps";
 
@@ -41,6 +40,7 @@ export const AccountProvider = ({ children }) => {
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
 
   const locker = (method) => {
@@ -145,9 +145,56 @@ export const AccountProvider = ({ children }) => {
     handleLoginUI();
   };
 
+  const handleChangePassword = async () => {
+    const oldPassword = await getMem(PLATFORM, "PWD");
+    if (oldPassword === password) {
+      if (newPassword === password) {
+        throwAlert(58, "Incorrect password", "New password shall not be the same");
+        clearPasswords();
+      } else if (newPassword === confirmPassword && newPassword.length > 5) {
+        setIsLoading(true);
+        await changePassword();
+        clearPasswords();
+        setIsLoading(false);
+      } else if (newPassword === "") {
+        throwAlert(52, "Incorrect password", "Password field cannot be empty");
+        clearPasswords();
+      } else if (newPassword !== confirmPassword) {
+        throwAlert(53, "Incorrect password", "Passwords do not match");
+        clearPasswords();
+      } else if ([newPassword.length > 5]) {
+        throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+        clearPasswords();
+      }
+    } else {
+      throwAlert(57, "Incorrect password", "Current password is wrong");
+      clearPasswords();
+    }
+  };
+
+  const changePassword = async () => {
+    try {
+      let encryptedMnemonic = await getStore(PLATFORM, "DATA0");
+      let encryptedPrivateKey = await getStore(PLATFORM, "DATA1");
+      const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      const decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
+      encryptedMnemonic = await passworder.encrypt(newPassword, decryptedMnemonic);
+      encryptedPrivateKey = await passworder.encrypt(newPassword, decryptedPrivateKey);
+      setStore(PLATFORM, "DATA0", encryptedMnemonic);
+      setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setMem(PLATFORM, "PWD", newPassword);
+      clearPasswords();
+      throwAlert(56, "Success", "Password successfully changed");
+    } catch (error) {
+      clearPasswords();
+      console.log(error);
+    }
+  };
+
   const clearPasswords = () => {
     setPassword("");
     setConfirmPassword("");
+    setNewPassword("");
   };
 
   const handleCreate = async () => {
@@ -231,39 +278,34 @@ export const AccountProvider = ({ children }) => {
 
   const createAccount = async () => {
     try {
-      const accountSeed = bip39.mnemonicToSeedSync(newMnemonic);
-      const seed = new Uint8Array(accountSeed).slice(0, 32);
-      const keypair = sign.keyPair.fromSeed(seed);
-      const secretKey = keypair.secretKey;
-      const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
-      const address = keypair.publicKey.Hex;
-      const account = new aptos.AptosAccount(secretKey, address);
-      await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
-      let resources = await client.getAccountResources(account.address());
+      const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, newMnemonic);
+      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+      await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+      let resources = await client.getAccountResources(_account.address());
       let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
-      let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
+      let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      setStore(PLATFORM, "currentAddress", account.address().toString());
-      apps.addAddress(account.address().toString());
+      setStore(PLATFORM, "currentAddress", _account.address().hex());
+      apps.addAddress(_account.address().hex());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
-      setPrivateKey(secretKey);
-      setAccount(account);
+      setPrivateKey(_privateKey);
+      setAccount(_account);
       setPublicAccount({
-        publicKey: account.pubKey().toString(),
-        address: account.address().toString(),
-        authKey: account.authKey().toString(),
+        publicKey: _account.pubKey().hex(),
+        address: _account.address().hex(),
+        authKey: _account.authKey().hex(),
       });
-      setCurrentAddress(account.address().toString());
+      setCurrentAddress(_account.address().hex());
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
-      throwAlert(1, "Account created", `${account.address().toString()}`);
+      throwAlert(1, "Account created", `${_account.address().hex()}`);
     } catch (error) {
       throwAlert(2, "Failed create account", `${error}`);
       console.log(error);
@@ -272,38 +314,34 @@ export const AccountProvider = ({ children }) => {
 
   const importAccount = async () => {
     try {
-      const accountSeed = bip39.mnemonicToSeedSync(mnemonic);
-      const seed = new Uint8Array(accountSeed).slice(0, 32);
-      const keypair = sign.keyPair.fromSeed(seed);
-      const secretKey = keypair.secretKey;
-      const secretKeyHex64 = Buffer.from(keypair.secretKey).toString("hex").slice(0, 64);
-      const address = keypair.publicKey.Hex;
-      const account = new aptos.AptosAccount(secretKey, address);
-      await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
-      let resources = await client.getAccountResources(account.address());
+      const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
+      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+      await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+      let resources = await client.getAccountResources(_account.address());
       let accountResource = resources.find((r) => r.type === currentAsset[1].module);
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
-      let encryptedPrivateKey = await passworder.encrypt(password, secretKeyHex64);
+      let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      setStore(PLATFORM, "currentAddress", account.address().toString());
-      apps.addAddress(account.address().toString());
+      setStore(PLATFORM, "currentAddress", _account.address().hex());
+      apps.addAddress(_account.address().hex());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
-      setPrivateKey(secretKey);
-      setAccount(account);
+      setPrivateKey(_privateKey);
+      setAccount(_account);
       setPublicAccount({
-        publicKey: account.pubKey().toString(),
-        address: account.address().toString(),
-        authKey: account.authKey().toString(),
+        publicKey: _account.pubKey().hex(),
+        address: _account.address().hex(),
+        authKey: _account.authKey().hex(),
       });
-      setCurrentAddress(account.address().toString());
+      setCurrentAddress(_account.address().hex());
       setBalance(accountResource.data.coin.value);
+      setNewMnemonic("");
       setMnemonic("");
-      throwAlert(11, "Account imported", `${account.address().toString()}`);
+      throwAlert(11, "Account imported", `${_account.address().hex()}`);
     } catch (error) {
       throwAlert(12, "Failed import account", `${error}`);
       console.log(error);
@@ -315,29 +353,25 @@ export const AccountProvider = ({ children }) => {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
       try {
-        const accountSeed = bip39.mnemonicToSeedSync(decryptedMnemonic);
-        const seed = new Uint8Array(accountSeed).slice(0, 32);
-        const keypair = sign.keyPair.fromSeed(seed);
-        const secretKey = keypair.secretKey;
-        const address = keypair.publicKey.Hex;
-        const account = new aptos.AptosAccount(secretKey, address);
+        const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
+        const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
         if (!isUnlocked) {
-          await faucetClient.fundAccount(account.address(), 0); // Workaround during devnet
+          await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
         }
-        let resources = await client.getAccountResources(account.address());
+        let resources = await client.getAccountResources(_account.address());
         let accountResource = resources.find((r) => r.type === currentAsset[1].module);
-        apps.addAddress(account.address().toString());
-        setStore(PLATFORM, "currentAddress", account.address().toString());
+        apps.addAddress(_account.address().hex());
+        setStore(PLATFORM, "currentAddress", _account.address().hex());
         setMem(PLATFORM, "PWD", password);
         setAccountImported(true);
-        setPrivateKey(secretKey);
-        setAccount(account);
+        setPrivateKey(_privateKey);
+        setAccount(_account);
         setPublicAccount({
-          publicKey: account.pubKey().toString(),
-          address: account.address().toString(),
-          authKey: account.authKey().toString(),
+          publicKey: _account.pubKey().hex(),
+          address: _account.address().hex(),
+          authKey: _account.authKey().hex(),
         });
-        setCurrentAddress(account.address().toString());
+        setCurrentAddress(_account.address().hex());
         setBalance(accountResource.data.coin.value);
       } catch (error) {
         console.log(error);
@@ -374,8 +408,12 @@ export const AccountProvider = ({ children }) => {
         setMnemonic,
         password,
         setPassword,
+        newPassword,
+        setNewPassword,
         confirmPassword,
         setConfirmPassword,
+        clearPasswords,
+        handleChangePassword,
         spikaWallet,
         accountImported,
         account,
