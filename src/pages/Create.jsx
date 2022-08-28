@@ -92,7 +92,7 @@ const Create = () => {
               <TextField
                 sx={{ mt: 2 }}
                 id="password"
-                label="New Password"
+                label="New password"
                 type="password"
                 autoFocus={true}
                 autoComplete="new-password"
