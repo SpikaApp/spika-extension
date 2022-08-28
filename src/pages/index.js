@@ -5,5 +5,6 @@ export { default as Import } from "./Import";
 export { default as Wallet } from "./Wallet";
 export { default as NFTs } from "./NFTs";
 export { default as Transactions } from "./Transactions";
+export { default as Settings } from "./Settings";
 export { default as About } from "./About";
 export { default as NotFound } from "./NotFound";
