@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
 import * as aptos from "aptos";
-import { client, faucetClient, tokenClient } from "../utils/client";
+import { client, faucetClient, tokenClient } from "../lib/client";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
-import * as token from "../utils/token";
-import * as bcsPayload from "../utils/payload";
+import * as token from "../lib/token";
+import * as bcsPayload from "../lib/payload";
 
 export const Web3Context = React.createContext();
 
@@ -265,8 +265,13 @@ export const Web3Provider = ({ children }) => {
     setBalance(accountResource.data.coin.value);
   };
 
+  const getTransactions = async () => {
+    let transactions = await client.getAccountTransactions(account.address());
+    return transactions;
+  };
+
   const getEvents = async (events) => {
-    let resources = await client.getAccountResources(currentAddress);
+    let resources = await client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === currentAsset[1].module);
     let counter = parseInt(accountResource.data.deposit_events.counter);
     if (counter <= 25) {
@@ -304,7 +309,7 @@ export const Web3Provider = ({ children }) => {
   const getAccountTokens = async () => {
     try {
       // Get total number of Token deposit_events received by an account
-      let resources = await client.getAccountResources(currentAddress);
+      let resources = await client.getAccountResources(account.address());
       let tokenStore = resources.find((r) => r.type === token.tokenStore.module);
 
       const getTokens = async () => {
@@ -398,6 +403,7 @@ export const Web3Provider = ({ children }) => {
         accountTokens,
         getAccountTokens,
         getBalance,
+        getTransactions,
         handleCreateCollection,
         handleCreateNft,
         getNftDetails,

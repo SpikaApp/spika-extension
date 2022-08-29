@@ -26,8 +26,8 @@ import Link from "@mui/material/Link";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import LogoutDialog from "../components/LogoutDialog";
+import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
-import { setStore } from "../utils/store";
 
 const StyledMenu = styled((props) => (
   <Menu

@@ -1,4 +1,4 @@
-import { PLATFORM } from "./constants";
+import { PLATFORM } from "../utils/constants";
 import { setStore, getStore } from "./store";
 
 const _connectedApps = "connectedApps";

@@ -5,11 +5,11 @@ import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
-import { client, faucetClient } from "../utils/client";
-import * as token from "../utils/token";
+import { client, faucetClient } from "../lib/client";
+import * as token from "../lib/token";
 import { APTOS_DERIVE_PATH, PLATFORM } from "../utils/constants";
-import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../utils/store";
-import * as apps from "../utils/apps";
+import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
+import * as apps from "../lib/apps";
 
 export const AccountContext = React.createContext();
 
