@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Container, Typography, Card, CardContent, List, Box, Tab, Link } from "@mui/material";
+import { Container, Typography, Card, CardContent, List, Box, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import Footer from "../components/Footer";
 import WithdrawEventCard from "../components/WithdrawEventCard";
 import DepositEventCard from "../components/DepositEventCard";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 
@@ -129,17 +129,7 @@ const Transactions = () => {
           </Box>
         </CardContent>
       </Card>
-      <Typography sx={{ mt: 2 }} variant="subtitle1" align="center" color="textPrimary">
-        View account in{" "}
-        <Link
-          href={`https://explorer.devnet.aptos.dev/account/${currentAddress}`}
-          underline="none"
-          target="_blank"
-          color="link"
-        >
-          Aptos Explorer <OpenInNewIcon sx={{ fontSize: 16 }} />
-        </Link>
-      </Typography>
+      <Footer />
     </Container>
   );
 };

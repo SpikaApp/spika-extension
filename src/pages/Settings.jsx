@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Container, Card, CardContent, Stack, Button, Tooltip, Chip } from "@mui/material";
+import Footer from "../components/Footer";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
@@ -16,7 +17,7 @@ const Settings = () => {
 
   return (
     <Container maxWidth="xs">
-      <Card sx={{ mb: 2, mt: "100px", minHeight: "400px" }}>
+      <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
         <CardContent align="center">
           {accountImported && (
             <Tooltip sx={{ mb: 3 }} title="Copy address">
@@ -41,6 +42,7 @@ const Settings = () => {
           )}
         </CardContent>
       </Card>
+      <Footer />
       <ChangePasswordDialog />
     </Container>
   );

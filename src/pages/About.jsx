@@ -12,7 +12,7 @@ const About = () => {
 
   return (
     <Container maxWidth="xs">
-      <Card sx={{ mb: 2, mt: "100px", minHeight: "315px" }}>
+      <Card sx={{ mb: 2, mt: "100px", minHeight: "305px" }}>
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
             <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
@@ -45,7 +45,7 @@ const About = () => {
             </Link>
             <br />
             <Link href="mailto:support@spika.app" underline="none" target="_blank" color="link">
-              Contacts
+              Support
             </Link>
             <Stack
               sx={{
