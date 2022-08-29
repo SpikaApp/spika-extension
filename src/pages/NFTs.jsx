@@ -11,6 +11,7 @@ import {
   ImageListItemBar,
   CircularProgress,
 } from "@mui/material";
+import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
@@ -20,7 +21,7 @@ import default_nft from "../assets/default_nft.jpg";
 
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
-  const { accountImported } = useContext(AccountContext);
+  const { accountImported, currentAddress } = useContext(AccountContext);
   const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState(false);
 
@@ -49,7 +50,7 @@ const NFTs = () => {
     <Container maxWidth="xs">
       <Stack
         sx={{
-          mt: "100px",
+          mt: "90px",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -67,7 +68,7 @@ const NFTs = () => {
           <Typography align="center">Create NFT</Typography>
         </Button>
       </Stack>
-      <Card sx={{ mb: 2, maxHeight: 400 }}>
+      <Card sx={{ mb: 2, minHeight: 400, maxHeight: 400 }}>
         <CardContent>
           <Stack
             direction="row"
@@ -126,6 +127,7 @@ const NFTs = () => {
           )}
         </CardContent>
       </Card>
+      <Footer />
       <CreateCollectionDialog />
       <CreateNftDialog />
     </Container>
