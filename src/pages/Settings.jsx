@@ -1,12 +1,10 @@
 import { useContext } from "react";
-import { Container, Card, CardContent, Stack, Button, Tooltip, Chip } from "@mui/material";
+import { Container, Card, CardContent, Stack, Button } from "@mui/material";
 import Footer from "../components/Footer";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
-import shortenAddress from "../utils/shorten_address";
-import copyToClipboard from "../utils/copy_clipboard";
 
 const Settings = () => {
   const {
@@ -15,21 +13,12 @@ const Settings = () => {
     handleChangePasswordUI,
     setOpenAccountDetailsDialog,
   } = useContext(UIContext);
-  const { accountImported, currentAddress } = useContext(AccountContext);
-
-  const handleClick = () => {
-    copyToClipboard(currentAddress);
-  };
+  const { accountImported } = useContext(AccountContext);
 
   return (
     <Container maxWidth="xs">
       <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
-        <CardContent align="center">
-          {accountImported && (
-            <Tooltip sx={{ mb: 3 }} title="Copy address">
-              <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
-            </Tooltip>
-          )}
+        <CardContent align="center" sx={{ mt: 1 }}>
           {accountImported && (
             <Stack sx={{ width: "200px" }}>
               <Button
