@@ -25,8 +25,8 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { PLATFORM } from "../utils/constants";
-import { setMem, getMem, setStore, getStore } from "../utils/store";
-import { getConnectedApps, getApp, setApp, removeApp } from "../utils/apps";
+import { setMem, getMem, setStore, getStore } from "../lib/store";
+import { getConnectedApps, getApp, setApp, removeApp } from "../lib/apps";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMem, getStore } from "../utils/store";
+import { getMem, getStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 
 export const UIContext = React.createContext();
@@ -14,6 +14,7 @@ export const UIProvider = ({ children }) => {
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
+  const [openAccountDetailsDialog, setOpenAccountDetailsDialog] = useState(false);
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
@@ -159,6 +160,8 @@ export const UIProvider = ({ children }) => {
         privateKeyRequired,
         setPrivateKeyRequired,
         handleChangePasswordUI,
+        openAccountDetailsDialog,
+        setOpenAccountDetailsDialog,
         openChangePasswordDialog,
         setOpenChangePasswordDialog,
         accountRoutesEnabled,
