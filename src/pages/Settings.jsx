@@ -3,13 +3,19 @@ import { Container, Card, CardContent, Stack, Button, Tooltip, Chip } from "@mui
 import Footer from "../components/Footer";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
+import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
 const Settings = () => {
+  const {
+    handleMnemonicUI,
+    handlePrivateKeyUI,
+    handleChangePasswordUI,
+    setOpenAccountDetailsDialog,
+  } = useContext(UIContext);
   const { accountImported, currentAddress } = useContext(AccountContext);
-  const { handleMnemonicUI, handlePrivateKeyUI, handleChangePasswordUI } = useContext(UIContext);
 
   const handleClick = () => {
     copyToClipboard(currentAddress);
@@ -25,7 +31,16 @@ const Settings = () => {
             </Tooltip>
           )}
           {accountImported && (
-            <Stack>
+            <Stack sx={{ width: "200px" }}>
+              <Button
+                sx={{ mb: 2 }}
+                variant="outlined"
+                onClick={() => {
+                  setOpenAccountDetailsDialog(true);
+                }}
+              >
+                Public Account Details
+              </Button>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
                 Show Recovery Phrase
               </Button>
@@ -43,6 +58,7 @@ const Settings = () => {
         </CardContent>
       </Card>
       <Footer />
+      <AccountDetailsDialog />
       <ChangePasswordDialog />
     </Container>
   );
