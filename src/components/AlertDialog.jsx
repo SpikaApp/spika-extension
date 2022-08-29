@@ -173,19 +173,19 @@ const AlertDialog = () => {
           <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <TextField
               sx={{ width: 250, marginBottom: 2 }}
-              error
               multiline
               maxRows={6}
+              variant="outlined"
               value={alertMessage}
             />
             <Stack component="span" sx={{ maxWidth: 250 }}>
-              <Typography component="span" align="center" sx={{ mb: 2 }} color="error.main">
+              <Typography component="span" align="center" sx={{ mb: 2 }} color="warning.dark">
                 Never share your secret phrase or private key with anyone.
                 <br />
                 Use with caution.
               </Typography>
             </Stack>
-            <Button variant="outlined" color="error" onClick={handleClick}>
+            <Button variant="outlined" onClick={handleClick}>
               Copy to clipboard
             </Button>
           </Stack>
