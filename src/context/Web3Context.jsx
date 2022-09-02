@@ -124,7 +124,7 @@ export const Web3Provider = ({ children }) => {
   const mintCoins = async () => {
     try {
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} ${token.aptosCoin[0].ticker}`);
+      throwAlert(21, "Success", `Received ${amount} ${token.aptosCoin.ticker}`);
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
