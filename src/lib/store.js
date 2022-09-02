@@ -36,7 +36,14 @@ export const removeMem = (platform, key) => {
 
 export const setStore = (platform, key, value) => {
   if (platform === "http:" || platform === "https:") {
-    localStorage.setItem(key, value);
+    if (key === "currentAsset") {
+      let _value = JSON.stringify(value);
+      console.log(value);
+      console.log(_value);
+      localStorage.setItem(key, _value);
+    } else {
+      localStorage.setItem(key, value);
+    }
   }
   if (platform === "chrome-extension:") {
     chrome.storage.local.set({ [key]: value });
@@ -46,7 +53,13 @@ export const setStore = (platform, key, value) => {
 export const getStore = (platform, key) => {
   if ((platform === "http:") | (platform === "https:")) {
     const value = localStorage.getItem(key);
-    if (value === "true" || value === "false" || value === "undefined" || value === "null") {
+    if (
+      value === "true" ||
+      value === "false" ||
+      value === "undefined" ||
+      value === "null" ||
+      key === "currentAsset"
+    ) {
       return JSON.parse(value);
     } else {
       return value;
