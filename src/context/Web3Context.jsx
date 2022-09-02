@@ -136,7 +136,7 @@ export const Web3Provider = ({ children }) => {
     try {
       const payload = await bcsPayload.transfer(
         recipientAddress,
-        currentAsset[1].TypeTagStruct,
+        currentAsset.TypeTagStruct,
         amount
       );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
@@ -168,7 +168,7 @@ export const Web3Provider = ({ children }) => {
     try {
       const payload = await bcsPayload.transfer(
         recipientAddress,
-        currentAsset[1].TypeTagStruct,
+        currentAsset.TypeTagStruct,
         amount
       );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
@@ -261,7 +261,7 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+    let accountResource = resources.find((r) => r.type === currentAsset.module);
     setBalance(accountResource.data.coin.value);
   };
 
@@ -272,14 +272,10 @@ export const Web3Provider = ({ children }) => {
 
   const getEvents = async (events) => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+    let accountResource = resources.find((r) => r.type === currentAsset.module);
     let counter = parseInt(accountResource.data.deposit_events.counter);
     if (counter <= 25) {
-      let data = await client.getEventsByEventHandle(
-        currentAddress,
-        currentAsset[1].module,
-        events
-      );
+      let data = await client.getEventsByEventHandle(currentAddress, currentAsset.module, events);
       let result = data.reverse((r) => r.type === "sequence_number");
       if (events === "deposit_events") {
         setDepositEvents(result);
@@ -288,14 +284,9 @@ export const Web3Provider = ({ children }) => {
         setWithdrawEvents(result);
       }
     } else {
-      let data = await client.getEventsByEventHandle(
-        currentAddress,
-        currentAsset[1].module,
-        events,
-        {
-          start: counter - 25,
-        }
-      );
+      let data = await client.getEventsByEventHandle(currentAddress, currentAsset.module, events, {
+        start: counter - 25,
+      });
       let result = data.reverse((r) => r.type === "sequence_number");
       if (events === "deposit_events") {
         setDepositEvents(result);

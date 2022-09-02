@@ -282,7 +282,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+      let accountResource = resources.find((r) => r.type === currentAsset.module);
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -318,7 +318,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+      let accountResource = resources.find((r) => r.type === currentAsset.module);
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -359,7 +359,7 @@ export const AccountProvider = ({ children }) => {
           await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
         }
         let resources = await client.getAccountResources(_account.address());
-        let accountResource = resources.find((r) => r.type === currentAsset[1].module);
+        let accountResource = resources.find((r) => r.type === currentAsset.module);
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());
         setMem(PLATFORM, "PWD", password);

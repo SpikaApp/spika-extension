@@ -31,7 +31,7 @@ const DepositEventCard = ({
             <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
               <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
               <Typography sx={{ mr: 0.5 }}>
-                {amount} {currentAsset[0].ticker}
+                {amount} {currentAsset.ticker}
               </Typography>
             </Stack>
           </Stack>
