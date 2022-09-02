@@ -89,7 +89,7 @@ const Wallet = () => {
                   {balance}
                 </Typography>
                 <Typography sx={{ ml: "6px" }} color="TextSecondary">
-                  {currentAsset.ticker}
+                  {currentAsset.symbol}
                 </Typography>
               </Stack>
             </CardContent>

@@ -31,7 +31,7 @@ const SentEventCard = ({
             <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
               <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
               <Typography sx={{ mr: 0.5 }}>
-                {amount} {currentAsset.ticker}
+                {amount} {currentAsset.symbol}
               </Typography>
             </Stack>
           </Stack>
