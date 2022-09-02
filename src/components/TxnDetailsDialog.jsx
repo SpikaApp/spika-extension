@@ -39,7 +39,7 @@ const TxnDetailsDialog = () => {
         createData("Txn Hash", txnDetails.hash),
         createData("Sender", txnDetails.sender),
         createData("Recipient", txnDetails.payload.arguments[0]),
-        createData("Amount", `${txnDetails.payload.arguments[1]} ${currentAsset[0].ticker}`),
+        createData("Amount", `${txnDetails.payload.arguments[1]} ${currentAsset.ticker}`),
         createData("Gas fee", txnDetails.gas_used),
         createData("Max gas", txnDetails.max_gas_amount),
         createData("Gas price", txnDetails.gas_unit_price),

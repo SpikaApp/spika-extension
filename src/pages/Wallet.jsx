@@ -68,13 +68,13 @@ const Wallet = () => {
                 {darkMode ? (
                   <Box
                     component="img"
-                    src={currentAsset[0].logo_dark}
+                    src={currentAsset.logo_dark}
                     sx={{ maxWidth: "32px", maxHeight: "32px", mr: "12px", mt: "4px", ml: "12px" }}
                   />
                 ) : (
                   <Box
                     component="img"
-                    src={currentAsset[0].logo_light}
+                    src={currentAsset.logo_light}
                     sx={{ maxWidth: "32px", maxHeight: "32px", mr: "12px", mt: "4px", ml: "12px" }}
                   />
                 )}
@@ -89,7 +89,7 @@ const Wallet = () => {
                   {balance}
                 </Typography>
                 <Typography sx={{ ml: "6px" }} color="TextSecondary">
-                  {currentAsset[0].ticker}
+                  {currentAsset.ticker}
                 </Typography>
               </Stack>
             </CardContent>
