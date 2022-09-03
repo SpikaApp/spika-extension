@@ -1,13 +1,16 @@
 import { useContext } from "react";
 import { Container, Typography, Link, Card, Box, CardContent, Stack } from "@mui/material";
+import Footer from "../components/Footer";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
+import { AccountContext } from "../context/AccountContext";
 import useAxios from "../utils/use_axios";
 import { NODE_URL } from "../utils/constants";
 
 const About = () => {
   const { darkMode } = useContext(UIContext);
+  const { accountImported } = useContext(AccountContext);
   const { result: chain_id } = useAxios(NODE_URL, "chain_id");
 
   return (
@@ -80,6 +83,11 @@ const About = () => {
           </Typography>
         </CardContent>
       </Card>
+      {accountImported && (
+        <Box sx={{ mt: "161px" }}>
+          <Footer />
+        </Box>
+      )}
     </Container>
   );
 };

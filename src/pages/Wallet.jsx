@@ -55,7 +55,7 @@ const Wallet = () => {
     <Box>
       {accountImported && (
         <Container maxWidth="xs">
-          <Card sx={{ mb: 2, minHeight: "227px", mt: "100px" }}>
+          <Card sx={{ mb: 2, minHeight: "240px", mt: "100px" }}>
             <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <Stack
                 sx={{
@@ -129,7 +129,7 @@ const Wallet = () => {
               <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
                 {currentAsset.id === "aptosCoin" && (
                   <Button
-                    sx={{ width: "160px", mt: "-24px" }}
+                    sx={{ width: "160px", mt: "-10px" }}
                     color="primary"
                     onClick={handleMintUI}
                   >
@@ -163,17 +163,17 @@ const Wallet = () => {
                 variant="outlined"
                 sx={{
                   width: "90%",
-                  height: "35px",
+                  height: "38px",
                   mt: 8,
                 }}
                 onClick={handleAddAssetUI}
               >
-                Import New Asset
+                Import Asset
               </Button>
             </Stack>
           )}
           {accountImported && (
-            <Box sx={{ mt: 9 }}>
+            <Box sx={{ mt: "59px" }}>
               <Footer />
             </Box>
           )}

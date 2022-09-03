@@ -60,7 +60,7 @@ const AccountAssetsDialog = () => {
 
   return (
     <Dialog open={openAccountAssetsDialog}>
-      <DialogTitle align="center">Select asset</DialogTitle>
+      <DialogTitle align="center">Select Asset</DialogTitle>
       <DialogContent sx={{ minHeight: "200px" }}>
         <Box sx={{ width: "260px", bgcolor: "background.paper" }}>
           <List component="nav">
