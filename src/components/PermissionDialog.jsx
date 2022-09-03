@@ -183,6 +183,12 @@ const PermissionDialog = () => {
                           </ListItemIcon>
                           <ListItemText primary="View account public key" />
                         </ListItem>
+                        <ListItem disablePadding>
+                          <ListItemIcon sx={{ ml: 2 }}>
+                            <InfoIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="View account auth key" />
+                        </ListItem>
                       </List>
                     </Box>
                   </DialogContent>

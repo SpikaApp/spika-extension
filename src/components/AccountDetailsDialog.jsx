@@ -21,7 +21,7 @@ const AccountDetailsDialog = () => {
 
   const title = `Spika wallet public account credentials:`;
   const breakLine = "========================================";
-  const address = `address: ${publicAccount.address}`;
+  const address = `address: ${publicAccount.account}`;
   const publicKey = `publicKey: ${publicAccount.publicKey}`;
   const authKey = `authKey: ${publicAccount.authKey}`;
 
@@ -67,7 +67,7 @@ const AccountDetailsDialog = () => {
               multiline
               rows={3}
               variant="outlined"
-              value={publicAccount.address}
+              value={publicAccount.account}
             />
             <TextField
               sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
