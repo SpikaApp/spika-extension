@@ -106,9 +106,9 @@ const AddAssetDialog = () => {
   return (
     <Dialog open={openAddAssetDialog}>
       {isCustomToken ? (
-        <DialogTitle align="center">Import custom token</DialogTitle>
+        <DialogTitle align="center">Add Custom Token</DialogTitle>
       ) : (
-        <DialogTitle align="center">Import new asset</DialogTitle>
+        <DialogTitle align="center">Import Asset</DialogTitle>
       )}
       <DialogContent sx={{ display: "flex", flexDirection: "column" }}>
         {isCustomToken ? (
@@ -193,7 +193,7 @@ const AddAssetDialog = () => {
                 mt: 2,
               }}
             >
-              <Button onClick={handleAddCustomToken}>Custom token</Button>
+              <Button onClick={handleAddCustomToken}>Add Custom Token</Button>
             </Stack>
           )}
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "center", mt: 2, mb: 2 }}>
