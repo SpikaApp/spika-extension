@@ -173,7 +173,7 @@ const Wallet = () => {
             </Stack>
           )}
           {accountImported && (
-            <Box sx={{ mt: "59px" }}>
+            <Box sx={{ mt: "56px" }}>
               <Footer />
             </Box>
           )}
