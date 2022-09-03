@@ -1,4 +1,6 @@
-# Spika Web Wallet for Aptos Blockchain
+# Spika web wallet on the Aptos blockchain
+
+![Spika web wallet](https://github.com/SpikaApp/spika-extension/raw/main/assets/header.png)
 
 ## **Description**
 
@@ -6,49 +8,28 @@ Wallet was created during early stages of Aptos blockchain development and serve
 
 ## **Installation**
 
-[![Available in Chrome Web Store](./docs/assets/chrome_web_store.png)](https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb)
+[![Available in Chrome Web Store](https://github.com/SpikaApp/spika-extension/raw/main/assets/chrome_web_store.png)](https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb)
 
-There are 3 ways to install web wallet:
+There are 2 ways to install web wallet:
+
 - Download latest version from Chrome Web Store
 - Download zipped package from GitHub
-- Build from source
 
 ### **Chrome Web Store**
+
 Navigate to [Chrome Web Store](https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb) page and select **Add to Chrome**:
 
-![Add To Chrome](./docs/assets/add_to_chrome.png)
+![Add To Chrome](https://github.com/SpikaApp/spika-extension/raw/main/assets/add_to_chrome.png)
 
 Web wallet will be installed and appear in the list of active extensions:
 
-![Extension](./docs/assets/extension.png)
+![Extension](https://github.com/SpikaApp/spika-extension/raw/main/assets/extension.png)
 
-*NOTE: It might not be latest version of web wallet available in Chrome Web Store as publishing updates usually takes several days. See steps below for other options to update to latest version.*
+_NOTE: It might not be latest version of web wallet available in Chrome Web Store as publishing updates usually takes several days. See steps below for other options to update to latest version._
 
 ### **Download zipped package from GitHub**
+
 1. Navigate to **Releases** section and download latest zipped package
 2. Unzip package's content
-2. In Chrome browser open **Manage Extensions** tab (`chrome://extensions/`)and enable **Developer mode**
-3. Select **Load Unpacked** and upload package. Web wallet will be installed and appear in **Active Extensions**
-
-### **Build from source**
-Use this method to build extension from source and upload it to Chrome browser using steps described in [previous section](#download-zipped-package-from-github).
-
-**Requirements:**
-- Nodejs
-- npm
-- git
-
-Clone this repository:
-```shell
-git clone https://github.com/xorgal/spika.git
-cd spika
-```
-Install dependencies:
-```
-npm install
-```
-Build extension:
-```
-npm run build
-```
-Copy all files from `public` directory to `build` directory and upload content of `build` directory to Chrome browser using steps described in [previous section](#download-zipped-package-from-github). 
+3. In Chrome browser open **Manage Extensions** tab (`chrome://extensions/`)and enable **Developer mode**
+4. Select **Load Unpacked** and upload package. Web wallet will be installed and appear in **Active Extensions**
