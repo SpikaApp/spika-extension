@@ -61,7 +61,7 @@ const AccountAssetsDialog = () => {
     <Dialog open={openAccountAssetsDialog}>
       <DialogTitle align="center">Select Asset</DialogTitle>
       <DialogContent sx={{ minHeight: "200px" }}>
-        <Box sx={{ width: "260px", bgcolor: "background.paper" }}>
+        <Box sx={{ width: "260px", borderRadius: "12px", bgcolor: "background.paper" }}>
           <List component="nav">
             {assets.map((asset) => (
               <Stack key={asset.id}>
