@@ -24,7 +24,7 @@ const About = () => {
             Devnet chain id {chain_id}
           </Typography>
           <Typography variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.3.9 <br />
+            Wallet version 0.3.11 <br />
             Aptos SDK version 1.3.10
             <br />
             <Link
