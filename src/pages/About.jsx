@@ -15,7 +15,7 @@ const About = () => {
 
   return (
     <Container maxWidth="xs">
-      <Card sx={{ mb: 2, mt: "100px", minHeight: "305px" }}>
+      <Card sx={{ mt: "100px", minHeight: "305px" }}>
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
             <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
@@ -23,7 +23,7 @@ const About = () => {
             </Link>{" "}
             Devnet chain id {chain_id}
           </Typography>
-          <Typography variant="subtitle1" align="center" color="textPrimary">
+          <Typography sx={{ mb: "-12px" }} variant="subtitle1" align="center" color="textPrimary">
             Wallet version 0.3.11 <br />
             Aptos SDK version 1.3.10
             <br />
@@ -57,6 +57,7 @@ const About = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 mt: 2,
+                mb: 2,
               }}
             >
               <Link
@@ -83,11 +84,11 @@ const About = () => {
           </Typography>
         </CardContent>
       </Card>
-      {accountImported && (
-        <Box sx={{ mt: "161px" }}>
-          <Footer />
-        </Box>
-      )}
+      <Box sx={{ mt: "158px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Typography align="center" variant="overline">
+          © 2022 Spika. All rights reserved.
+        </Typography>
+      </Box>
     </Container>
   );
 };
