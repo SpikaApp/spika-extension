@@ -169,7 +169,7 @@ const PermissionDialog = () => {
                     <Typography variant="body1" color="warning.dark">
                       Website is requesting access to the following account information:
                     </Typography>
-                    <Box sx={{ width: "100%", maxWidth: 320, mt: 4 }}>
+                    <Box sx={{ width: "100%", borderRadius: "12px", maxWidth: 320, mt: 4 }}>
                       <List>
                         <ListItem disablePadding>
                           <ListItemIcon sx={{ ml: 2 }}>
@@ -303,7 +303,7 @@ const PermissionDialog = () => {
                     </Typography>
                     <Typography variant="body1">Approval required</Typography>
                     {/* <Grid container spacing={1}> */}
-                    <Grid item xs={12} sx={{ mt: 2 }}>
+                    <Grid item xs={12} sx={{ mt: 2, borderRadius: "12px" }}>
                       <Item>
                         <Typography variant="subtitle1" sx={{ mt: 1, ml: 1 }}>
                           To:{" "}

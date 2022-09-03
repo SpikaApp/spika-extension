@@ -158,7 +158,7 @@ const AddAssetDialog = () => {
             </Stack>
           </form>
         ) : (
-          <Box sx={{ width: "260px", bgcolor: "background.paper" }}>
+          <Box sx={{ width: "260px", borderRadius: "12px", bgcolor: "background.paper" }}>
             <List component="nav">
               {coin.map((asset) => (
                 <Stack key={asset.id}>
