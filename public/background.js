@@ -124,7 +124,7 @@ const handleDisconnect = async (sender, sendResponse) => {
 };
 
 const spikaMessenger = (message, sender, sendResponse) => {
-  console.log("[worker]: spikaMessenger: ", message);
+  // console.log("[worker]: spikaMessenger: ", message);
 
   if (message.id === "locker") {
     setMem(_locker, message.method);
@@ -140,7 +140,7 @@ const spikaMessenger = (message, sender, sendResponse) => {
       if (response.responseMethod === message.method && response.id === message.id) {
         const result = response.response;
         this.chrome.runtime.onMessage.removeListener(responder);
-        console.log("[worker]: response received :", result);
+        // console.log("[worker]: response received :", result);
         sendResponse(result);
       }
       return true;
@@ -163,7 +163,7 @@ const walletLocker = async () => {
     const method = await getMem(_locker);
     if (method === "lock") {
       removeMem("PWD");
-      console.log("[worker]: wallet locked");
+      // console.log("[worker]: wallet locked");
       setMem(_locker, false);
     }
   }

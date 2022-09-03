@@ -35,7 +35,6 @@ const AccountAssetsDialog = () => {
 
   const accountAssets = async () => {
     const data = await getAccountAssets(currentAddress);
-    console.log(data);
     if (data !== undefined || data !== null) {
       setAssets(data.assets);
     }
