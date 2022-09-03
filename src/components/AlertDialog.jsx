@@ -119,6 +119,10 @@ const AlertDialog = () => {
       case 62: // Failed create collection
       case 72: // Failed create nft
       case 92: // No mnemonic phrase found
+      case 101: // New asset successfully added
+      case 102: // New custom asset successfully added
+      case 103: // Failed to add new asset
+      case 104: // Error, Select asset from the list or add custom token to continue.
         setOpenAlertDialog(false);
         break;
       case 93: // Unencrypted data is not supported in this version. Please login again to start using encryption

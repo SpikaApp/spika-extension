@@ -14,6 +14,8 @@ export const UIProvider = ({ children }) => {
   const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
+  const [openAccountAssetsDialog, setOpenAccountAssetsDialog] = useState(false);
+  const [openAddAssetDialog, setOpenAddAssetDialog] = useState(false);
   const [openAccountDetailsDialog, setOpenAccountDetailsDialog] = useState(false);
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
@@ -117,6 +119,14 @@ export const UIProvider = ({ children }) => {
     setOpenChangePasswordDialog(true);
   };
 
+  const handleAccountAssetsUI = () => {
+    setOpenAccountAssetsDialog(true);
+  };
+
+  const handleAddAssetUI = () => {
+    setOpenAddAssetDialog(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -160,6 +170,12 @@ export const UIProvider = ({ children }) => {
         privateKeyRequired,
         setPrivateKeyRequired,
         handleChangePasswordUI,
+        openAccountAssetsDialog,
+        setOpenAccountAssetsDialog,
+        handleAccountAssetsUI,
+        openAddAssetDialog,
+        setOpenAddAssetDialog,
+        handleAddAssetUI,
         openAccountDetailsDialog,
         setOpenAccountDetailsDialog,
         openChangePasswordDialog,

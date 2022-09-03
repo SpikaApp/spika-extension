@@ -31,7 +31,7 @@ const SendDialog = () => {
 
   return (
     <Dialog align="center" open={openSendDialog} onClose={handleCancel}>
-      <DialogTitle>Send {currentAsset.symbol}</DialogTitle>
+      <DialogTitle>Send {currentAsset.data.symbol}</DialogTitle>
       <DialogContent sx={{ maxWidth: 375 }}>
         <Typography variant="body1" color="warning.dark">
           Transaction will be submitted on chain id {chain_id}

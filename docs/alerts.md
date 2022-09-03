@@ -64,3 +64,8 @@
 - 93: Unencrypted mnemonic found and logout performed. Please re-login to start using encryption
 
 ---
+
+- 101: New asset successfully added
+- 102: New custom asset successfully added
+- 103: Failed to add new asset
+- 104: Error, select asset from the list or add custom token to continue

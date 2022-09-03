@@ -6,9 +6,10 @@ import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../lib/client";
-import * as token from "../lib/token";
+import coin from "../lib/coin";
 import { APTOS_DERIVE_PATH, PLATFORM } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
+import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
 
 export const AccountContext = React.createContext();
@@ -36,7 +37,7 @@ export const AccountProvider = ({ children }) => {
   const [currentAddress, setCurrentAddress] = useState("");
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState([]); // AptosAccount
-  const [currentAsset, setCurrentAsset] = useState(token.aptosCoin);
+  const [currentAsset, setCurrentAsset] = useState([]);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -282,7 +283,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === token.aptosCoin.module);
+      let accountResource = resources.find((r) => r.type === coin[0].data.module);
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -290,7 +291,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentAsset", token.aptosCoin);
+      setStore(PLATFORM, "currentAsset", coin[0]);
+      assetStore.addAssetStore(_account.address().hex(), coin[0]);
       apps.addAddress(_account.address().hex());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
@@ -303,7 +305,7 @@ export const AccountProvider = ({ children }) => {
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
-      setCurrentAsset(token.aptosCoin);
+      setCurrentAsset(coin[0]);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
@@ -320,7 +322,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === token.aptosCoin.module);
+      let accountResource = resources.find((r) => r.type === coin[0].data.module);
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -328,7 +330,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentAsset", token.aptosCoin);
+      setStore(PLATFORM, "currentAsset", coin[0]);
+      assetStore.addAssetStore(_account.address().hex(), coin[0]);
       apps.addAddress(_account.address().hex());
       setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
@@ -341,7 +344,7 @@ export const AccountProvider = ({ children }) => {
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
-      setCurrentAsset(token.aptosCoin);
+      setCurrentAsset(coin[0]);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
@@ -364,11 +367,12 @@ export const AccountProvider = ({ children }) => {
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
-          setStore(PLATFORM, "currentAsset", token.aptosCoin);
-          _currentAsset = token.aptosCoin;
+          setStore(PLATFORM, "currentAsset", coin[1]);
+          _currentAsset = coin[0];
         }
         let resources = await client.getAccountResources(_account.address());
-        let accountResource = resources.find((r) => r.type === _currentAsset.module);
+        let accountResource = resources.find((r) => r.type === _currentAsset.data.module);
+        assetStore.addAssetStore(_account.address().hex(), coin[0]);
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());
         setMem(PLATFORM, "PWD", password);
@@ -381,8 +385,13 @@ export const AccountProvider = ({ children }) => {
           authKey: _account.authKey().hex(),
         });
         setCurrentAddress(_account.address().hex());
+
         setCurrentAsset(_currentAsset);
-        setBalance(accountResource.data.coin.value);
+        if (accountResource === undefined || accountResource === null) {
+          setBalance(0);
+        } else {
+          setBalance(accountResource.data.coin.value);
+        }
       } catch (error) {
         console.log(error);
         throwAlert(42, "Failed to load account", `${error}`);
@@ -431,6 +440,7 @@ export const AccountProvider = ({ children }) => {
         privateKey,
         currentAddress,
         currentAsset,
+        setCurrentAsset,
         balance,
         setBalance,
         handleGenerate,

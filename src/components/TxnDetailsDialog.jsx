@@ -14,7 +14,6 @@ import {
   Tooltip,
   Chip,
   Link,
-  Stack,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import AlertDialog from "./AlertDialog";
@@ -28,18 +27,28 @@ import copyToClipboard from "../utils/copy_clipboard";
 const TxnDetailsDialog = () => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, txnType, setTxnType } =
     useContext(UIContext);
-  const { currentAsset } = useContext(AccountContext);
+  const { currentAsset, currentAddress } = useContext(AccountContext);
   const { txnDetails, setTxnDetails } = useContext(Web3Context);
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
+      let amount;
+      let recipient;
+
+      if (txnDetails.payload.arguments.length === 1) {
+        recipient = currentAddress;
+        amount = txnDetails.payload.arguments[0];
+      } else {
+        recipient = txnDetails.payload.arguments[0];
+        amount = txnDetails.payload.arguments[1];
+      }
       setRows([
         createData("Time", convertTimestamp(txnDetails.timestamp)),
         createData("Txn Hash", txnDetails.hash),
         createData("Sender", txnDetails.sender),
-        createData("Recipient", txnDetails.payload.arguments[0]),
-        createData("Amount", `${txnDetails.payload.arguments[1]} ${currentAsset.ticker}`),
+        createData("Recipient", recipient),
+        createData("Amount", `${amount} ${currentAsset.data.symbol}`),
         createData("Gas fee", txnDetails.gas_used),
         createData("Max gas", txnDetails.max_gas_amount),
         createData("Gas price", txnDetails.gas_unit_price),
