@@ -301,7 +301,7 @@ export const AccountProvider = ({ children }) => {
       setAccount(_account);
       setPublicAccount({
         publicKey: _account.pubKey().hex(),
-        address: _account.address().hex(),
+        account: _account.address().hex(),
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
@@ -340,7 +340,7 @@ export const AccountProvider = ({ children }) => {
       setAccount(_account);
       setPublicAccount({
         publicKey: _account.pubKey().hex(),
-        address: _account.address().hex(),
+        account: _account.address().hex(),
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
@@ -381,7 +381,7 @@ export const AccountProvider = ({ children }) => {
         setAccount(_account);
         setPublicAccount({
           publicKey: _account.pubKey().hex(),
-          address: _account.address().hex(),
+          account: _account.address().hex(),
           authKey: _account.authKey().hex(),
         });
         setCurrentAddress(_account.address().hex());
