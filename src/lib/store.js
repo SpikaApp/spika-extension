@@ -36,10 +36,8 @@ export const removeMem = (platform, key) => {
 
 export const setStore = (platform, key, value) => {
   if (platform === "http:" || platform === "https:") {
-    if (key === "currentAsset") {
+    if (key === "currentAsset" || key === "accountAssets") {
       let _value = JSON.stringify(value);
-      console.log(value);
-      console.log(_value);
       localStorage.setItem(key, _value);
     } else {
       localStorage.setItem(key, value);
@@ -58,7 +56,8 @@ export const getStore = (platform, key) => {
       value === "false" ||
       value === "undefined" ||
       value === "null" ||
-      key === "currentAsset"
+      key === "currentAsset" ||
+      key === "accountAssets"
     ) {
       return JSON.parse(value);
     } else {

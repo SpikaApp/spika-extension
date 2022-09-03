@@ -1,8 +1,9 @@
 import React, { useState, useContext } from "react";
 import * as aptos from "aptos";
-import { client, faucetClient, tokenClient } from "../lib/client";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
+import { client, faucetClient, tokenClient } from "../lib/client";
+import coin from "../lib/coin";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
 
@@ -124,7 +125,7 @@ export const Web3Provider = ({ children }) => {
   const mintCoins = async () => {
     try {
       await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} ${token.aptosCoin.ticker}`);
+      throwAlert(21, "Success", `Received ${amount} ${coin[0].data.symbol}`);
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
@@ -136,7 +137,7 @@ export const Web3Provider = ({ children }) => {
     try {
       const payload = await bcsPayload.transfer(
         recipientAddress,
-        currentAsset.TypeTagStruct,
+        currentAsset.data.TypeTagStruct,
         amount
       );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
@@ -168,7 +169,7 @@ export const Web3Provider = ({ children }) => {
     try {
       const payload = await bcsPayload.transfer(
         recipientAddress,
-        currentAsset.TypeTagStruct,
+        currentAsset.data.TypeTagStruct,
         amount
       );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
@@ -261,8 +262,22 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset.module);
-    setBalance(accountResource.data.coin.value);
+    let accountResource = resources.find((r) => r.type === currentAsset.data.module);
+    if (accountResource === undefined || accountResource === null) {
+      setBalance(0);
+    } else {
+      setBalance(accountResource.data.coin.value);
+    }
+  };
+
+  const updateBalance = async (asset) => {
+    let resources = await client.getAccountResources(account.address());
+    let accountResource = resources.find((r) => r.type === asset.data.module);
+    if (accountResource === undefined || accountResource === null) {
+      setBalance(0);
+    } else {
+      setBalance(accountResource.data.coin.value);
+    }
   };
 
   const getTransactions = async () => {
@@ -272,10 +287,17 @@ export const Web3Provider = ({ children }) => {
 
   const getEvents = async (events) => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset.module);
+    let accountResource = resources.find((r) => r.type === currentAsset.data.module);
+    if (accountResource === undefined || accountResource === null) {
+      return;
+    }
     let counter = parseInt(accountResource.data.deposit_events.counter);
     if (counter <= 25) {
-      let data = await client.getEventsByEventHandle(currentAddress, currentAsset.module, events);
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        currentAsset.data.module,
+        events
+      );
       let result = data.reverse((r) => r.type === "sequence_number");
       if (events === "deposit_events") {
         setDepositEvents(result);
@@ -284,9 +306,14 @@ export const Web3Provider = ({ children }) => {
         setWithdrawEvents(result);
       }
     } else {
-      let data = await client.getEventsByEventHandle(currentAddress, currentAsset.module, events, {
-        start: counter - 25,
-      });
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        currentAsset.data.module,
+        events,
+        {
+          start: counter - 25,
+        }
+      );
       let result = data.reverse((r) => r.type === "sequence_number");
       if (events === "deposit_events") {
         setDepositEvents(result);
@@ -394,6 +421,7 @@ export const Web3Provider = ({ children }) => {
         accountTokens,
         getAccountTokens,
         getBalance,
+        updateBalance,
         getTransactions,
         handleCreateCollection,
         handleCreateNft,

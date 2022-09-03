@@ -42,7 +42,10 @@ const ConfirmSendDialog = () => {
       setRows([
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData("Amount", `${estimatedTxnResult.payload.arguments[1]} ${currentAsset.symbol}`),
+        createData(
+          "Amount",
+          `${estimatedTxnResult.payload.arguments[1]} ${currentAsset.data.symbol}`
+        ),
         createData("Gas fee", estimatedTxnResult.gas_used),
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
