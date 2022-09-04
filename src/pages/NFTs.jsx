@@ -10,6 +10,7 @@ import {
   ImageListItem,
   ImageListItemBar,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
@@ -17,11 +18,12 @@ import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import CreateCollectionDialog from "../components/CreateCollectionDialog";
 import CreateNftDialog from "../components/CreateNftDialog";
+import NftDetailsDialog from "../components/NftDetailsDialog";
 import default_nft from "../assets/default_nft.jpg";
 
 const NFTs = () => {
-  const { handleCreateCollectionUI, handleCreateNFTUI } = useContext(UIContext);
-  const { accountImported, currentAddress } = useContext(AccountContext);
+  const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
+  const { accountImported } = useContext(AccountContext);
   const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState(false);
 
@@ -31,7 +33,7 @@ const NFTs = () => {
       getAccountTokens();
       const updateAccountResources = window.setInterval(() => {
         getAccountTokens();
-      }, 30000);
+      }, 60000);
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
@@ -45,6 +47,10 @@ const NFTs = () => {
       setIsWaiting(false);
     }
   }, [accountTokens]);
+
+  const openNftDetails = (nft) => {
+    setOpenNftDetailsDialog(true);
+  };
 
   return (
     <Container maxWidth="xs">
@@ -93,22 +99,29 @@ const NFTs = () => {
               No NFTs found
             </Typography>
           ) : (
-            <Stack sx={{ maxWidth: "350px" }}>
-              <ImageList
-                gap={10}
-                variant="masonry"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  height: "320px",
-                  overflow: "hidden",
-                  overflowY: "scroll",
-                }}
-              >
-                {nftDetails.map((nft) => (
-                  <ImageListItem key={nft.name + nft.description}>
-                    <img
+            <ImageList
+              gap={10}
+              variant="standard"
+              sx={{
+                width: "260px",
+                height: "385px",
+                overflow: "hidden",
+                overflowY: "scroll",
+                alignItems: "",
+                justifyContent: "center",
+                mt: "-8.5px",
+              }}
+            >
+              {nftDetails.map((nft) => (
+                <Button
+                  key={nft.name + nft.description + nft.uri}
+                  sx={{ width: "125px", height: "120px" }}
+                  onClick={() => handleNftDetailsUI(nft)}
+                >
+                  <ImageListItem>
+                    <Paper
+                      component="img"
+                      sx={{ width: "125px", height: "120px" }}
                       src={`${nft.uri}`}
                       onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
@@ -116,20 +129,31 @@ const NFTs = () => {
                       }}
                     />
                     <ImageListItemBar
-                      title={<span>{nft.name}</span>}
+                      align="center"
+                      title={
+                        <Typography variant="inherit" sx={{ fontSize: "12px" }}>
+                          {nft.name}
+                        </Typography>
+                      }
                       // subtitle={<span>{nft.collection}</span>}
                       position="bottom"
+                      sx={{
+                        height: "28px",
+                        borderBottomLeftRadius: "8px",
+                        borderBottomRightRadius: "8px",
+                      }}
                     />
                   </ImageListItem>
-                ))}
-              </ImageList>
-            </Stack>
+                </Button>
+              ))}
+            </ImageList>
           )}
         </CardContent>
       </Card>
       <Footer />
       <CreateCollectionDialog />
       <CreateNftDialog />
+      <NftDetailsDialog />
     </Container>
   );
 };
