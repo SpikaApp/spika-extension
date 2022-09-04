@@ -71,7 +71,7 @@ const Wallet = () => {
               </Stack>
               {isLoading ? (
                 <Typography sx={{ mt: 4 }} variant="h6">
-                  Updatin balance...
+                  Updating balance...
                 </Typography>
               ) : (
                 <Tooltip title="Switch active asset">
