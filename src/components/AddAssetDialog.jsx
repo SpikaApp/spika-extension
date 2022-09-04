@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
   TextField,
+  Paper,
 } from "@mui/material";
 import pixel_coin from "../assets/pixel_coin.png";
 import { UIContext } from "../context/UIContext";
@@ -158,7 +159,7 @@ const AddAssetDialog = () => {
             </Stack>
           </form>
         ) : (
-          <Box sx={{ width: "260px", borderRadius: "12px", bgcolor: "background.paper" }}>
+          <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
             <List component="nav">
               {coin.map((asset) => (
                 <Stack key={asset.id}>
@@ -178,7 +179,7 @@ const AddAssetDialog = () => {
                 </Stack>
               ))}
             </List>
-          </Box>
+          </Paper>
         )}
       </DialogContent>
       <DialogActions sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>

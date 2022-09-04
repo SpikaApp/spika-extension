@@ -11,6 +11,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Paper,
 } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
@@ -60,8 +61,8 @@ const AccountAssetsDialog = () => {
   return (
     <Dialog open={openAccountAssetsDialog}>
       <DialogTitle align="center">Select Asset</DialogTitle>
-      <DialogContent sx={{ minHeight: "200px" }}>
-        <Box sx={{ width: "260px", borderRadius: "12px", bgcolor: "background.paper" }}>
+      <DialogContent sx={{ minHeight: "145px" }}>
+        <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
           <List component="nav">
             {assets.map((asset) => (
               <Stack key={asset.id}>
@@ -82,7 +83,7 @@ const AccountAssetsDialog = () => {
               </Stack>
             ))}
           </List>
-        </Box>
+        </Paper>
       </DialogContent>
 
       <DialogActions>
