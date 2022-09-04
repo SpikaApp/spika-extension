@@ -22,6 +22,8 @@ export const UIProvider = ({ children }) => {
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
   const [txnType, setTxnType] = useState(0); // 0: undefined, 1: inbound, 2: outbound
   const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState(false);
+  const [openNftDetailsDialog, setOpenNftDetailsDialog] = useState(false);
+  const [selectedNft, setSelectedNft] = useState([]);
   const [mnemonicRequired, setMnemonicRequired] = useState(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
@@ -127,6 +129,11 @@ export const UIProvider = ({ children }) => {
     setOpenAddAssetDialog(true);
   };
 
+  const handleNftDetailsUI = (nft) => {
+    setSelectedNft(nft);
+    setOpenNftDetailsDialog(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -157,6 +164,11 @@ export const UIProvider = ({ children }) => {
         setOpenTxnDetailsDialog,
         txnType,
         setTxnType,
+        openNftDetailsDialog,
+        setOpenNftDetailsDialog,
+        selectedNft,
+        setSelectedNft,
+        handleNftDetailsUI,
         openLoginDialog,
         setOpenLoginDialog,
         handleLoginUI,
