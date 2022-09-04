@@ -2,16 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Container,
   Typography,
-  Card,
-  CardContent,
   Stack,
   Button,
   ImageList,
   ImageListItem,
-  ImageListItemBar,
   CircularProgress,
   Paper,
+  Box,
+  Tooltip,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
@@ -20,6 +20,13 @@ import CreateCollectionDialog from "../components/CreateCollectionDialog";
 import CreateNftDialog from "../components/CreateNftDialog";
 import NftDetailsDialog from "../components/NftDetailsDialog";
 import default_nft from "../assets/default_nft.jpg";
+
+const NftButton = styled(Button)(() => ({
+  borderRadius: "8px",
+  "&:hover": {
+    background: "none",
+  },
+}));
 
 const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
@@ -48,10 +55,6 @@ const NFTs = () => {
     }
   }, [accountTokens]);
 
-  const openNftDetails = (nft) => {
-    setOpenNftDetailsDialog(true);
-  };
-
   return (
     <Container maxWidth="xs">
       <Stack
@@ -74,83 +77,68 @@ const NFTs = () => {
           <Typography align="center">Create NFT</Typography>
         </Button>
       </Stack>
-      <Card sx={{ mb: 2, minHeight: 400, maxHeight: 400 }}>
-        <CardContent>
-          <Stack
-            direction="row"
-            spacing={2}
+      {isWaiting === true && accountImported && (
+        <Stack
+          direction="column"
+          sx={{ display: "flex", alignItems: "center", mt: 8, mb: "257px" }}
+        >
+          <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
+            Updating metadata...
+          </Typography>
+          <CircularProgress sx={{ mt: 4 }} color="info" />
+        </Stack>
+      )}
+      {accountTokens === 0 && isWaiting === false && (
+        <Typography
+          sx={{ mt: 8, mb: "336px" }}
+          variant="h6"
+          align="center"
+          color="textPrimary"
+          gutterBottom
+        >
+          No NFTs found
+        </Typography>
+      )}
+      {accountTokens !== 0 && !isWaiting && accountImported && (
+        <Box align="center" sx={{ height: "400px" }}>
+          <ImageList
+            gap={18}
+            cols={3}
+            rowHeight={101}
+            variant="quilted"
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
+              overflow: "hidden",
+              overflowY: "visible",
+              width: "335px",
+              maxHeight: "385px",
             }}
-          ></Stack>
-          {isWaiting && (
-            <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8 }}>
-              <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
-                Pulling metadata...
-              </Typography>
-              <CircularProgress sx={{ mt: 4 }} color="info" />
-            </Stack>
-          )}
-          {accountTokens === 0 ? (
-            <Typography sx={{ mt: 8 }} variant="h6" align="center" color="textPrimary" gutterBottom>
-              No NFTs found
-            </Typography>
-          ) : (
-            <ImageList
-              gap={10}
-              variant="standard"
-              sx={{
-                width: "260px",
-                height: "385px",
-                overflow: "hidden",
-                overflowY: "scroll",
-                alignItems: "",
-                justifyContent: "center",
-                mt: "-8.5px",
-              }}
-            >
-              {nftDetails.map((nft) => (
-                <Button
-                  key={nft.name + nft.description + nft.uri}
-                  sx={{ width: "125px", height: "120px" }}
-                  onClick={() => handleNftDetailsUI(nft)}
-                >
-                  <ImageListItem>
+          >
+            {nftDetails.map((nft) => (
+              <ImageListItem key={nft.name + nft.description + nft.uri}>
+                <Tooltip title={nft.name}>
+                  <NftButton
+                    disableRipple
+                    sx={{ width: "100px", height: "100px" }}
+                    onClick={() => handleNftDetailsUI(nft)}
+                  >
                     <Paper
                       component="img"
-                      sx={{ width: "125px", height: "120px" }}
+                      sx={{ width: "100px", height: "100px" }}
                       src={`${nft.uri}`}
+                      loading="lazy"
                       onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
                         currentTarget.src = default_nft;
                       }}
                     />
-                    <ImageListItemBar
-                      align="center"
-                      title={
-                        <Typography variant="inherit" sx={{ fontSize: "12px" }}>
-                          {nft.name}
-                        </Typography>
-                      }
-                      // subtitle={<span>{nft.collection}</span>}
-                      position="bottom"
-                      sx={{
-                        height: "28px",
-                        borderBottomLeftRadius: "8px",
-                        borderBottomRightRadius: "8px",
-                      }}
-                    />
-                  </ImageListItem>
-                </Button>
-              ))}
-            </ImageList>
-          )}
-        </CardContent>
-      </Card>
-      <Footer />
+                  </NftButton>
+                </Tooltip>
+              </ImageListItem>
+            ))}
+          </ImageList>
+        </Box>
+      )}
+      {accountImported && <Footer />}
       <CreateCollectionDialog />
       <CreateNftDialog />
       <NftDetailsDialog />
