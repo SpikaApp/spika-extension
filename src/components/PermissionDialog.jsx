@@ -25,8 +25,8 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { PLATFORM } from "../utils/constants";
-import { setMem, getMem, setStore, getStore } from "../lib/store";
-import { getConnectedApps, getApp, setApp, removeApp } from "../lib/apps";
+import { setMem, getMem } from "../lib/store";
+import { getApp, setApp } from "../lib/apps";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
@@ -35,7 +35,7 @@ const PermissionDialog = () => {
   const [method, setMethod] = useState("default");
   const [requestSender, setRequestSender] = useState();
   const { spikaWallet, openPermissionDialog, setOpenPermissionDialog } = useContext(UIContext);
-  const { accountImported, currentAddress, account, publicAccount } = useContext(AccountContext);
+  const { accountImported, currentAddress, publicAccount } = useContext(AccountContext);
   const { externalSignTransaction, externalSignAndSubmitTransaction } = useContext(Web3Context);
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
