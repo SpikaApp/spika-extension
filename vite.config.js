@@ -18,6 +18,9 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      input: {
+        "service-worker": "app/background.js",
+      },
       output: {
         entryFileNames: "app/[name].js",
         chunkFileNames: "app/[name].js",
