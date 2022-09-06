@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Spika",
   "description": "Crypto wallet on the Aptos Blockchain",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "icons": {
     "16": "app/assets/spika_logo_16.png",
     "48": "app/assets/spika_logo_48.png",
