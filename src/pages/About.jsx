@@ -6,7 +6,7 @@ import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import useAxios from "../utils/use_axios";
-import { NODE_URL } from "../utils/constants";
+import { EXTENSION_VERSION, APTOS_SDK_VERSION, NODE_URL } from "../utils/constants";
 
 const About = () => {
   const { darkMode } = useContext(UIContext);
@@ -24,8 +24,8 @@ const About = () => {
             Devnet chain id {chain_id}
           </Typography>
           <Typography sx={{ mb: "-12px" }} variant="subtitle1" align="center" color="textPrimary">
-            Wallet version 0.3.13 <br />
-            Aptos SDK version 1.3.10
+            Wallet version {EXTENSION_VERSION} <br />
+            Aptos SDK version {APTOS_SDK_VERSION}
             <br />
             <Link
               href="https://docs.spika.app/terms-and-conditions/license"
