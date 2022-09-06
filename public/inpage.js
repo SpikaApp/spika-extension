@@ -30,9 +30,10 @@ class SpikaWeb3 {
   }
 
   _message(method, args) {
+    const wallet = "spika";
     const id = this.requestId++;
     return new Promise(function (resolve, reject) {
-      window.postMessage({ method, args, id });
+      window.postMessage({ wallet, method, args, id });
       window.addEventListener("message", function handler(event) {
         if (event.data.responseMethod === method && event.data.id === id) {
           const response = event.data.response;
@@ -42,7 +43,7 @@ class SpikaWeb3 {
           } else if (response.error) {
             reject(response.error ?? "Error");
           } else {
-            console.log("[inpage.js]: response: ", response);
+            // console.log("[inpage.js]: response: ", response);
             resolve(response);
           }
         }
