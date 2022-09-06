@@ -7,7 +7,7 @@ import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../lib/client";
 import coin from "../lib/coin";
-import { APTOS_DERIVE_PATH, PLATFORM } from "../utils/constants";
+import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
@@ -290,11 +290,11 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
       setStore(PLATFORM, "currentAsset", coin[0]);
       assetStore.addAssetStore(_account.address().hex(), coin[0]);
       apps.addAddress(_account.address().hex());
-      setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
       setPrivateKey(_privateKey);
@@ -329,11 +329,11 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
       setStore(PLATFORM, "currentAsset", coin[0]);
       assetStore.addAssetStore(_account.address().hex(), coin[0]);
       apps.addAddress(_account.address().hex());
-      setMem(PLATFORM, "PWD", password);
       setAccountImported(true);
       setSpikaWallet(true);
       setPrivateKey(_privateKey);
@@ -367,7 +367,7 @@ export const AccountProvider = ({ children }) => {
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
-          setStore(PLATFORM, "currentAsset", coin[1]);
+          setStore(PLATFORM, "currentAsset", coin[0]);
           _currentAsset = coin[0];
         }
         let resources = await client.getAccountResources(_account.address());
