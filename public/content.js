@@ -16,7 +16,7 @@ injectScript();
 // inpage -> contentscript
 window.addEventListener("message", function (request) {
   if (request.data.wallet === "spika" && request.data.method) {
-    // console.log("[content.js]: new request: ", request.data);
+    console.log("[content.js]: new request: ", request.data);
     // contentscript -> background
     chrome.runtime.sendMessage(request.data, function (response) {
       // contentscript -> inpage
