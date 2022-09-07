@@ -10,18 +10,14 @@ const transaction = () => {
 
   useEffect(() => {
     if (isTest) {
-      testSignAndSubmitTransaction(payload.hippoFaucet);
+      testSignTransaction(payload.hippoSwap);
     }
   }, [isTest === true]);
 
   const testSignTransaction = async (transaction) => {
     try {
-      console.log(transaction);
       const test = await signTransaction(transaction);
-      const convert = Buffer.from(test).toString();
-      console.log(convert);
       setResult(test);
-      console.log(test);
       setIsTest(false);
     } catch (error) {
       console.log(error);
@@ -33,7 +29,6 @@ const transaction = () => {
     try {
       const test = await signAndSubmitTransaction(transaction);
       setResult(test);
-      console.log(test);
       setIsTest(false);
     } catch (error) {
       console.log(error);
