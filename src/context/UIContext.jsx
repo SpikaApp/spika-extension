@@ -30,6 +30,9 @@ export const UIProvider = ({ children }) => {
   const [openPermissionDialog, setOpenPermissionDialog] = useState(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState(false);
   const [currentRoute, setCurrentRoute] = useState();
+  const [isPopup, setIsPopup] = useState(false);
+  const [devMode, setDevMode] = useState(true);
+  const [isTest, setIsTest] = useState(false);
   const _currentRoute = "currentRoute";
 
   useEffect(() => {
@@ -198,6 +201,12 @@ export const UIProvider = ({ children }) => {
         setOpenPermissionDialog,
         disableAllRoutes,
         setDisableAllRoutes,
+        devMode,
+        setDevMode,
+        isTest,
+        setIsTest,
+        isPopup,
+        setIsPopup,
       }}
     >
       {children}
