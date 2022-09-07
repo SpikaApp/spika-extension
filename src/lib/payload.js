@@ -1,5 +1,5 @@
 import { tokenClient } from "./client";
-import { BCS, TxnBuilderTypes } from "aptos/dist/transaction_builder";
+import { BCS, TxnBuilderTypes } from "aptos";
 
 export const transfer = async (recipientAddress, currentAsset, amount) => {
   const token = new TxnBuilderTypes.TypeTagStruct(
