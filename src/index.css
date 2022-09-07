@@ -41,3 +41,9 @@ body {
 .MuiAlert-root {
   margin-top: 2rem;
 }
+
+pre {
+  white-space: pre-wrap;
+  word-break: keep-all;
+  word-wrap: break-word;
+}
