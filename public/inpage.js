@@ -43,7 +43,7 @@ class SpikaWeb3 {
           } else if (response.error) {
             reject(response.error ?? "Error");
           } else {
-            // console.log("[inpage.js]: response: ", response);
+            console.log("[inpage.js]: response: ", response);
             resolve(response);
           }
         }
