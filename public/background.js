@@ -135,16 +135,20 @@ const spikaMessenger = (message, sender, sendResponse) => {
     message.method === "signTransaction" ||
     message.method === "signAndSubmitTransaction"
   ) {
-    launchPopup(message, sender, sendResponse);
-    chrome.runtime.onMessage.addListener(function responder(response) {
-      if (response.responseMethod === message.method && response.id === message.id) {
-        const result = response.response;
-        this.chrome.runtime.onMessage.removeListener(responder);
-        // console.log("[worker]: response received :", result);
-        sendResponse(result);
-      }
-      return true;
-    });
+    if (message.args === undefined || message.args === null) {
+      sendResponse(false);
+    } else {
+      launchPopup(message, sender, sendResponse);
+      chrome.runtime.onMessage.addListener(function responder(response) {
+        if (response.responseMethod === message.method && response.id === message.id) {
+          const result = response.response;
+          this.chrome.runtime.onMessage.removeListener(responder);
+          // console.log("[worker]: response received :", result);
+          sendResponse(result);
+        }
+        return true;
+      });
+    }
   }
   if (message.method === "isConnected") {
     handleIsConnected(sender, sendResponse);
