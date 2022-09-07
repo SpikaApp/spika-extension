@@ -28,6 +28,7 @@ const AlertDialog = () => {
     setOpenCreateCollectionDialog,
     setOpenCreateNftDialog,
     setOpenChangePasswordDialog,
+    setIsPopup,
   } = useContext(UIContext);
   const {
     alertSignal,
@@ -79,6 +80,7 @@ const AlertDialog = () => {
         setOpenSendDialog(false);
         setOpenConfirmSendDialog(false);
         setIsTransaction(false);
+        setIsPopup(false);
         break;
       case 56: // Password successfully changed
         setOpenAlertDialog(false);
