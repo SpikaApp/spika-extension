@@ -29,5 +29,5 @@ export default defineConfig({
     target: "es2020",
     chunkSizeWarningLimit: 1024,
   },
-  plugins: [react({ fastRefresh: true })],
+  plugins: [react({ fastRefresh: false })],
 });
