@@ -23,6 +23,7 @@ import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
+import transaction from "../tests/transaction.test";
 
 const Wallet = () => {
   const {
@@ -32,10 +33,14 @@ const Wallet = () => {
     handleReceiveUI,
     handleAccountAssetsUI,
     handleAddAssetUI,
+    devMode,
+    setIsTest,
   } = useContext(UIContext);
   const { isLoading, currentAddress, accountImported, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance } = useContext(Web3Context);
+
+  const { result: testResult } = transaction();
 
   useEffect(() => {
     if (accountImported) {
@@ -126,14 +131,33 @@ const Wallet = () => {
               )}
             </CardContent>
             <CardActions>
-              <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                {currentAsset.id === "aptosCoin" && (
+              <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
+                {currentAsset.id === "aptosCoin" && devMode ? (
                   <Button
-                    sx={{ width: "160px", mt: "-10px" }}
+                    sx={{ width: "100px", mt: "-10px", mr: 4 }}
+                    color="primary"
+                    variant="outlined"
+                    onClick={handleMintUI}
+                  >
+                    Faucet
+                  </Button>
+                ) : (
+                  <Button
+                    sx={{ width: "100px", mt: "-10px" }}
                     color="primary"
                     onClick={handleMintUI}
                   >
                     Faucet
+                  </Button>
+                )}
+                {devMode && (
+                  <Button
+                    sx={{ width: "100px", mt: "-10px", ml: 4 }}
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => setIsTest(true)}
+                  >
+                    Start Test
                   </Button>
                 )}
               </Stack>

@@ -34,9 +34,17 @@ const PermissionDialog = () => {
   const [request, setRequest] = useState({});
   const [method, setMethod] = useState("default");
   const [requestSender, setRequestSender] = useState();
-  const { spikaWallet, openPermissionDialog, setOpenPermissionDialog } = useContext(UIContext);
-  const { accountImported, currentAddress, publicAccount } = useContext(AccountContext);
-  const { externalSignTransaction, externalSignAndSubmitTransaction } = useContext(Web3Context);
+  const { spikaWallet, openPermissionDialog, setOpenPermissionDialog, isPopup, setIsPopup } =
+    useContext(UIContext);
+  const { alertSignal, accountImported, currentAddress, publicAccount } =
+    useContext(AccountContext);
+  const {
+    isValidTransaction,
+    estimatedTxnResult,
+    estimateTransaction,
+    signTransaction,
+    signAndSubmitTransaction,
+  } = useContext(Web3Context);
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
   const _sender = "currentSender";
@@ -45,6 +53,7 @@ const PermissionDialog = () => {
 
   useEffect(() => {
     if (openPermissionDialog) {
+      setIsPopup(true);
       getRequest();
     }
   }, [openPermissionDialog]);
@@ -53,20 +62,29 @@ const PermissionDialog = () => {
     if (request) {
       getSender();
     }
-    if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
-      if (request.args === undefined) {
-        handleCancel();
-      }
-      if (
-        request.args.arguments[0] === undefined ||
-        request.args.arguments[1] === undefined ||
-        request.args.function === undefined ||
-        request.args.type_arguments[0] === undefined
-      ) {
-        handleCancel();
+  }, [request]);
+
+  useEffect(() => {
+    if (accountImported) {
+      if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
+        estimateTransaction(request.args);
       }
     }
-  }, [request]);
+  }, [accountImported]);
+
+  useEffect(() => {
+    if (alertSignal === 33 || alertSignal === 34) {
+      response = false;
+      sendResponse();
+    }
+  }, [alertSignal]);
+
+  useEffect(() => {
+    if (accountImported && !isPopup) {
+      clearDialog();
+      window.close();
+    }
+  }, [isPopup]);
 
   const getRequest = async () => {
     const data = await getMem(PLATFORM, _request);
@@ -108,11 +126,11 @@ const PermissionDialog = () => {
       response = publicAccount;
     }
     if (method === "signTransaction") {
-      const result = await externalSignTransaction(request.args);
+      const result = await signTransaction(request.args);
       response = result;
     }
     if (method === "signAndSubmitTransaction") {
-      const result = await externalSignAndSubmitTransaction(request.args);
+      const result = await signAndSubmitTransaction(request.args);
       response = result;
     }
     sendResponse(response);
@@ -142,6 +160,9 @@ const PermissionDialog = () => {
     padding: theme.spacing(1),
     textAlign: "start",
     color: theme.palette.text.secondary,
+    "& textarea": {
+      fontFamily: "monospace",
+    },
   }));
 
   return (
@@ -224,7 +245,7 @@ const PermissionDialog = () => {
                   <AlertDialog />
                 </Dialog>
               )}
-              {method === "signTransaction" && (
+              {(method === "signTransaction" || method === "signAndSubmitTransaction") && (
                 <Dialog fullScreen align="center" open={openPermissionDialog}>
                   <DialogTitle> {requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
@@ -240,18 +261,47 @@ const PermissionDialog = () => {
                     <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
                       {requestSender.tab.title}
                     </Typography>
-                    <Typography variant="body1" color="warning.dark">
-                      Confirm transaction:
-                    </Typography>
-                    <Typography sx={{ mt: 4 }} variant="body1">
-                      To: {shortenAddress(request.args.arguments[0])}
-                      <br />
-                      Amount: {request.args.arguments[1]}
-                      <br />
-                      Function: {request.args.function}
-                      <br />
-                      Type: {request.args.type_arguments[0]}
-                    </Typography>
+                    {isValidTransaction && (
+                      <div>
+                        <Typography variant="body1">Transaction approval required</Typography>
+                        <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
+                          <Grid item xs={6}>
+                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                              Network fee
+                            </Typography>
+                            <Item>~ {estimatedTxnResult.gas_used}</Item>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                              Max gas amount
+                            </Typography>
+                            <Item>{estimatedTxnResult.max_gas_amount}</Item>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                              Sender
+                            </Typography>
+                            <Tooltip sx={{ cursor: "pointer" }} title={estimatedTxnResult.sender}>
+                              <Item>{shortenAddress(estimatedTxnResult.sender)}</Item>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                              Sequence number
+                            </Typography>
+                            <Item>{estimatedTxnResult.sequence_number}</Item>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                              Payload
+                            </Typography>
+                            <Item>
+                              <pre>{JSON.stringify(request.args, null, 2)}</pre>
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </div>
+                    )}
                   </DialogContent>
                   <Stack
                     sx={{
@@ -270,85 +320,23 @@ const PermissionDialog = () => {
                     >
                       Reject
                     </Button>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                        width: "154px",
-                      }}
-                      onClick={handleApprove}
-                    >
-                      Approve{" "}
-                    </Button>
-                  </Stack>
-                  <Loading />
-                  <AlertDialog />
-                </Dialog>
-              )}
-              {method === "signAndSubmitTransaction" && (
-                <Dialog fullScreen align="center" open={openPermissionDialog}>
-                  <DialogTitle> {requestSender.origin}</DialogTitle>
-                  <DialogContent sx={{ maxWidth: 375 }}>
-                    <Box
-                      component="img"
-                      sx={{
-                        height: 48,
-                        width: 48,
-                      }}
-                      alt="favicon"
-                      src={requestSender.tab.favIconUrl}
-                    />
-                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
-                      {requestSender.tab.title}
-                    </Typography>
-                    <Typography variant="body1">Approval required</Typography>
-                    <Grid item xs={12} sx={{ mt: 2 }}>
-                      <Item>
-                        <Typography variant="subtitle1" sx={{ mt: 1, ml: 1 }}>
-                          To:{" "}
-                          <Tooltip title={request.args.arguments[0]}>
-                            <Chip
-                              sx={{ mt: "-4px" }}
-                              label={shortenAddress(request.args.arguments[0])}
-                              onClick={() => copyToClipboard(request.args.arguments[0])}
-                            />
-                          </Tooltip>
-                          <br />
-                          Amount: {request.args.arguments[1]}
-                          <br />
-                          Function: {request.args.function} <br />
-                          Type: {request.args.type_arguments[0]}
-                        </Typography>
-                      </Item>
-                    </Grid>
-                  </DialogContent>
-                  <Stack
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mt: 2,
-                      mb: 4,
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      sx={{ width: "121px", mr: 4 }}
-                      onClick={handleCancel}
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                        width: "121px",
-                      }}
-                      onClick={handleApprove}
-                    >
-                      Approve{" "}
-                    </Button>
+                    {isValidTransaction ? (
+                      <Button
+                        variant="contained"
+                        sx={{
+                          background:
+                            "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                          width: "121px",
+                        }}
+                        onClick={handleApprove}
+                      >
+                        Approve{" "}
+                      </Button>
+                    ) : (
+                      <Button variant="contained" disabled sx={{ width: "121px" }}>
+                        Approve{" "}
+                      </Button>
+                    )}
                   </Stack>
                   <Loading />
                   <AlertDialog />
