@@ -46,7 +46,7 @@ const ConfirmSendDialog = () => {
           "Amount",
           `${estimatedTxnResult.payload.arguments[1]} ${currentAsset.data.symbol}`
         ),
-        createData("Gas fee", estimatedTxnResult.gas_used),
+        createData("Network fee", `~ ${estimatedTxnResult.gas_used}`),
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
       ]);
@@ -76,11 +76,11 @@ const ConfirmSendDialog = () => {
             wordWrap: "break-word",
           }}
         >
-          <Table aria-label="transaction-data">
+          <Table aria-label="transaction-data" sx={{ width: "260px" }}>
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ maxWidth: 60 }} component="th" scope="row">
+                  <TableCell sx={{ maxWidth: 80 }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: 100 }}>
@@ -102,9 +102,9 @@ const ConfirmSendDialog = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Typography sx={{ mt: 1 }} align="center" variant="body2" color="warning.dark">
+        {/* <Typography sx={{ mt: 1 }} align="center" variant="body2" color="warning.dark">
           Gas values are valid at time when transaction was calculated
-        </Typography>
+        </Typography> */}
       </DialogContent>
       <Stack
         sx={{
