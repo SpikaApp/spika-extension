@@ -81,7 +81,7 @@ const PermissionDialog = () => {
   }, [alertSignal]);
 
   useEffect(() => {
-    if (accountImported && !isPopup) {
+    if (method !== "default" && !isPopup) {
       clearDialog();
       window.close();
     }
@@ -148,6 +148,7 @@ const PermissionDialog = () => {
 
   const clearDialog = () => {
     setOpenPermissionDialog(false);
+    setMethod("default");
     setDefaultRoute();
   };
 
