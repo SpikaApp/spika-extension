@@ -10,12 +10,12 @@ import {
   Stack,
   Tooltip,
   Grid,
-  Chip,
   Paper,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Link,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
@@ -28,7 +28,8 @@ import { PLATFORM } from "../utils/constants";
 import { setMem, getMem } from "../lib/store";
 import { getApp, setApp } from "../lib/apps";
 import shortenAddress from "../utils/shorten_address";
-import copyToClipboard from "../utils/copy_clipboard";
+import logo from "../assets/spika_logo_200.png";
+import spika from "../assets/spika_color.svg";
 
 const PermissionDialog = () => {
   const [request, setRequest] = useState({});
@@ -44,7 +45,6 @@ const PermissionDialog = () => {
     estimateTransaction,
     signTransaction,
     signAndSubmitTransaction,
-    getAccountAssets,
   } = useContext(Web3Context);
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
@@ -349,12 +349,48 @@ const PermissionDialog = () => {
         </div>
       ) : (
         <Dialog fullScreen align="center" open={openPermissionDialog}>
-          <DialogTitle>Account not found</DialogTitle>
-          <DialogContent sx={{ maxWidth: 375 }}>
-            <Typography sx={{ mt: 4 }} variant="body1" color="warning.dark">
-              Spika wallet is not initialized. <br />
-              Create or import account before accessing websites.
-            </Typography>
+          <DialogTitle align="center"> </DialogTitle>
+          <DialogContent>
+            <Stack
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                maxWidth: "270px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box component="img" src={spika} sx={{ width: "100px", height: "50px", mt: 2 }} />
+              <Box
+                component="img"
+                src={logo}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "128px",
+                  height: "128px",
+                }}
+              />
+
+              <Typography align="center" sx={{ mt: 4 }} variant="subtitle2">
+                Wallet is not initialized yet. <br />
+                Valid address is required in order to interact with this website. Open Spika
+                extension and create or import account first.
+              </Typography>
+
+              <Typography align="center" sx={{ mt: 2 }} variant="subtitle2">
+                Need help? <br />
+                Check official{" "}
+                <Link href="https://docs.spika.app" underline="none" target="_blank" color="link">
+                  guidelines
+                </Link>{" "}
+                or contact{" "}
+                <Link href="mailto:support@spika.app" underline="none" target="_blank" color="link">
+                  support
+                </Link>{" "}
+                for assistance.
+              </Typography>
+            </Stack>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCancel}>Close</Button>
