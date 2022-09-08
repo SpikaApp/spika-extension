@@ -5,7 +5,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
-import useAxios from "../utils/use_axios";
+import useAxios from "../hooks/useAxios";
 import { EXTENSION_VERSION, APTOS_SDK_VERSION, NODE_URL } from "../utils/constants";
 
 const About = () => {
