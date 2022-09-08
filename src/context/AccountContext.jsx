@@ -6,7 +6,7 @@ import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../lib/client";
-import coin from "../lib/coin";
+import coin, { coinStore } from "../lib/coin";
 import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
@@ -283,7 +283,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === coin[0].data.module);
+      let accountResource = resources.find((r) => r.type === coinStore(coin[0].type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -322,7 +322,7 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === coin[0].data.module);
+      let accountResource = resources.find((r) => r.type === coinStore(coin[0].type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
@@ -371,7 +371,7 @@ export const AccountProvider = ({ children }) => {
           _currentAsset = coin[0];
         }
         let resources = await client.getAccountResources(_account.address());
-        let accountResource = resources.find((r) => r.type === _currentAsset.data.module);
+        let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
         assetStore.addAssetStore(_account.address().hex(), coin[0]);
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());

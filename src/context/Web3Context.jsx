@@ -6,6 +6,7 @@ import { client, faucetClient, tokenClient } from "../lib/client";
 import coin, { coinStore, coinInfo } from "../lib/coin";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
+import { stringToValue, valueToString } from "../utils/values";
 
 export const Web3Context = React.createContext();
 
@@ -124,8 +125,13 @@ export const Web3Provider = ({ children }) => {
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
-      await faucetClient.fundAccount(account.address(), amount);
-      throwAlert(21, "Success", `Received ${amount} ${coin[0].data.symbol}`);
+      const _amount = "1000000";
+      await faucetClient.fundAccount(account.address(), _amount);
+      throwAlert(
+        21,
+        "Success",
+        `Received ${Number(stringToValue(coin[0], _amount)).toFixed(2)} ${coin[0].data.symbol}`
+      );
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
       setIsLoading(false);
@@ -138,18 +144,18 @@ export const Web3Provider = ({ children }) => {
     let transaction;
     try {
       if (payload === undefined) {
-        _payload = await bcsPayload.transfer(recipientAddress, currentAsset.type, amount);
+        _payload = await bcsPayload.transfer(
+          recipientAddress,
+          currentAsset.type,
+          valueToString(currentAsset, amount)
+        );
         transaction = await client.generateRawTransaction(account.address(), _payload);
       } else {
         _payload = payload;
         transaction = await client.generateTransaction(account.address(), _payload);
-        console.log(transaction);
       }
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
       const estimatedTxn = (await client.submitBCSSimulation(bcsTxn))[0];
-      console.log(estimatedTxn);
-      console.log(estimatedTxn.sender);
-      console.log(currentAddress);
       if (estimatedTxn.success === true) {
         // logic if Move says wagmi
         setIsValidTransaction(true);
@@ -174,7 +180,11 @@ export const Web3Provider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const payload = await bcsPayload.transfer(recipientAddress, currentAsset.type, amount);
+      const payload = await bcsPayload.transfer(
+        recipientAddress,
+        currentAsset.type,
+        valueToString(currentAsset, amount)
+      );
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
       const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
@@ -272,7 +282,7 @@ export const Web3Provider = ({ children }) => {
     return transactions;
   };
 
-  const getEvents = async (events) => {
+  const getDepositEvents = async () => {
     let resources = await client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
@@ -283,31 +293,52 @@ export const Web3Provider = ({ children }) => {
       let data = await client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
-        events
+        "deposit_events"
       );
       let result = data.reverse((r) => r.type === "sequence_number");
-      if (events === "deposit_events") {
-        setDepositEvents(result);
-      }
-      if (events === "withdraw_events") {
-        setWithdrawEvents(result);
-      }
+
+      setDepositEvents(result);
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
-        events,
+        "deposit_events",
         {
           start: counter - 25,
         }
       );
       let result = data.reverse((r) => r.type === "sequence_number");
-      if (events === "deposit_events") {
-        setDepositEvents(result);
-      }
-      if (events === "withdraw_events") {
-        setWithdrawEvents(result);
-      }
+      setDepositEvents(result);
+    }
+  };
+
+  const getWithdrawEvents = async () => {
+    let resources = await client.getAccountResources(account.address());
+    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
+    if (accountResource === undefined || accountResource === null) {
+      return;
+    }
+    let counter = parseInt(accountResource.data.withdraw_events.counter);
+    if (counter <= 25) {
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        coinStore(currentAsset.type),
+        "withdraw_events"
+      );
+      let result = data.reverse((r) => r.type === "sequence_number");
+
+      setWithdrawEvents(result);
+    } else {
+      let data = await client.getEventsByEventHandle(
+        currentAddress,
+        coinStore(currentAsset.type),
+        "withdraw_events",
+        {
+          start: counter - 25,
+        }
+      );
+      let result = data.reverse((r) => r.type === "sequence_number");
+      setWithdrawEvents(result);
     }
   };
 
@@ -435,7 +466,8 @@ export const Web3Provider = ({ children }) => {
         nftDetails,
         handleMint,
         handleSend,
-        getEvents,
+        getDepositEvents,
+        getWithdrawEvents,
         withdrawEvents,
         depositEvents,
         getTxnDetails,

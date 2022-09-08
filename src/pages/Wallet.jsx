@@ -21,6 +21,7 @@ import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 import transaction from "../tests/transaction.test";
@@ -38,7 +39,7 @@ const Wallet = () => {
   } = useContext(UIContext);
   const { isLoading, currentAddress, accountImported, currentAsset, balance } =
     useContext(AccountContext);
-  const { getBalance } = useContext(Web3Context);
+  const { getBalance, handleMint } = useContext(Web3Context);
 
   const { result: testResult } = transaction();
 
@@ -120,7 +121,7 @@ const Wallet = () => {
                       )}
 
                       <Typography sx={{ mb: 1 }} variant="h4" align="center" color="textPrimary">
-                        {balance}
+                        {stringToValue(currentAsset, balance)}
                       </Typography>
                       <Typography sx={{ ml: "6px" }} color="TextSecondary">
                         {currentAsset.data.symbol}
@@ -132,21 +133,8 @@ const Wallet = () => {
             </CardContent>
             <CardActions>
               <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
-                {currentAsset.data.name === "AptosCoin" && devMode ? (
-                  <Button
-                    sx={{ width: "100px", mt: "-10px", mr: 4 }}
-                    color="primary"
-                    variant="outlined"
-                    onClick={handleMintUI}
-                  >
-                    Faucet
-                  </Button>
-                ) : (
-                  <Button
-                    sx={{ width: "100px", mt: "-10px" }}
-                    color="primary"
-                    onClick={handleMintUI}
-                  >
+                {currentAsset.data.name === "AptosCoin" && !devMode && (
+                  <Button sx={{ width: "100px", mt: "-10px" }} color="primary" onClick={handleMint}>
                     Faucet
                   </Button>
                 )}

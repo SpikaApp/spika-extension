@@ -19,6 +19,7 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
@@ -38,14 +39,12 @@ const ConfirmSendDialog = () => {
 
   useEffect(() => {
     if (isValidTransaction) {
+      const _amount = estimatedTxnResult.payload.arguments[1];
       setOpenConfirmSendDialog(true);
       setRows([
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData(
-          "Amount",
-          `${estimatedTxnResult.payload.arguments[1]} ${currentAsset.data.symbol}`
-        ),
+        createData("Amount", `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`),
         createData("Network fee", `~ ${estimatedTxnResult.gas_used}`),
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
@@ -83,7 +82,7 @@ const ConfirmSendDialog = () => {
                   <TableCell sx={{ maxWidth: 80 }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
-                  <TableCell sx={{ maxWidth: 100 }}>
+                  <TableCell sx={{ maxWidth: 120 }}>
                     {row.name === "Sender" || row.name === "Recipient" ? (
                       <Tooltip title="Copy address" sx={{ ml: -1.5 }}>
                         <Chip
