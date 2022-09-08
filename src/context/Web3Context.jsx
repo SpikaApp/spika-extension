@@ -3,7 +3,7 @@ import * as aptos from "aptos";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import { client, faucetClient, tokenClient } from "../lib/client";
-import coin from "../lib/coin";
+import coin, { coinStore, coinInfo } from "../lib/coin";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
 
@@ -138,11 +138,7 @@ export const Web3Provider = ({ children }) => {
     let transaction;
     try {
       if (payload === undefined) {
-        _payload = await bcsPayload.transfer(
-          recipientAddress,
-          currentAsset.data.TypeTagStruct,
-          amount
-        );
+        _payload = await bcsPayload.transfer(recipientAddress, currentAsset.type, amount);
         transaction = await client.generateRawTransaction(account.address(), _payload);
       } else {
         _payload = payload;
@@ -178,11 +174,7 @@ export const Web3Provider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const payload = await bcsPayload.transfer(
-        recipientAddress,
-        currentAsset.data.TypeTagStruct,
-        amount
-      );
+      const payload = await bcsPayload.transfer(recipientAddress, currentAsset.type, amount);
       const rawTxn = await client.generateRawTransaction(currentAddress, payload);
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
       const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
@@ -257,7 +249,7 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset.data.module);
+    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
       setBalance(0);
     } else {
@@ -267,7 +259,7 @@ export const Web3Provider = ({ children }) => {
 
   const updateBalance = async (asset) => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === asset.data.module);
+    let accountResource = resources.find((r) => r.type === asset.type);
     if (accountResource === undefined || accountResource === null) {
       setBalance(0);
     } else {
@@ -282,7 +274,7 @@ export const Web3Provider = ({ children }) => {
 
   const getEvents = async (events) => {
     let resources = await client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === currentAsset.data.module);
+    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
       return;
     }
@@ -290,7 +282,7 @@ export const Web3Provider = ({ children }) => {
     if (counter <= 25) {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset.data.module,
+        coinStore(currentAsset.type),
         events
       );
       let result = data.reverse((r) => r.type === "sequence_number");
@@ -303,7 +295,7 @@ export const Web3Provider = ({ children }) => {
     } else {
       let data = await client.getEventsByEventHandle(
         currentAddress,
-        currentAsset.data.module,
+        coinStore(currentAsset.type),
         events,
         {
           start: counter - 25,
@@ -319,11 +311,46 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  const getAssetData = async (type) => {
+    const data = await client.getAccountResource(type.split("::")[0], coinInfo(type));
+    return data;
+  };
+
+  const updateAccountAssets = async () => {
+    const result = [];
+    const resources = await client.getAccountResources(account.address());
+    await Promise.all(
+      Object.values(resources).map(async (value) => {
+        if (
+          value.type.startsWith("0x1::coin::CoinStore") &&
+          value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
+        ) {
+          const type = value.type.substring(
+            value.type.indexOf("<") + 1,
+            value.type.lastIndexOf(">")
+          );
+          const asset = await getAssetData(address);
+          result.push({
+            type: type,
+            data: {
+              name: asset.data.name,
+              symbol: asset.data.symbol,
+              decimals: asset.data.decimals,
+              balance: value.data.coin.value,
+            },
+          });
+        }
+      })
+    );
+
+    return result;
+  };
+
   const getAccountTokens = async () => {
     try {
       // Get total number of Token deposit_events received by an account
       let resources = await client.getAccountResources(account.address());
-      let tokenStore = resources.find((r) => r.type === token.tokenStore.module);
+      let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
 
       const getTokens = async () => {
         if (tokenStore === undefined) {
@@ -435,6 +462,7 @@ export const Web3Provider = ({ children }) => {
         estimateTransaction,
         signTransaction,
         signAndSubmitTransaction,
+        updateAccountAssets,
       }}
     >
       {children}

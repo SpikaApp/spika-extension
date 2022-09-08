@@ -65,7 +65,7 @@ const AccountAssetsDialog = () => {
         <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
           <List component="nav">
             {assets.map((asset) => (
-              <Stack key={asset.id}>
+              <Stack key={asset.type}>
                 <ListItemButton
                   onClick={() => {
                     handleSwitchAsset(asset);
@@ -74,7 +74,7 @@ const AccountAssetsDialog = () => {
                   <ListItemIcon sx={{ ml: 8 }}>
                     <Box
                       component="img"
-                      src={darkMode ? asset.data.logo_dark : asset.data.logo_light}
+                      src={darkMode ? asset.data.logo_alt : asset.data.logo}
                       sx={{ width: 32, height: 32 }}
                     ></Box>
                   </ListItemIcon>

@@ -44,6 +44,7 @@ const PermissionDialog = () => {
     estimateTransaction,
     signTransaction,
     signAndSubmitTransaction,
+    getAccountAssets,
   } = useContext(Web3Context);
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
