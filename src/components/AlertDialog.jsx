@@ -126,9 +126,11 @@ const AlertDialog = () => {
       case 103: // Failed to add new asset
       case 104: // Error, Select asset from the list or add custom token to continue.
         setOpenAlertDialog(false);
+        setIsPopup(false);
         break;
       case 93: // Unencrypted data is not supported in this version. Please login again to start using encryption
         setOpenAlertDialog(false);
+        setIsPopup(false);
         handleLogout();
     }
     setAlertSignal(0);
