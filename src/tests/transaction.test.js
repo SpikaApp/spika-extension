@@ -11,6 +11,8 @@ const transaction = () => {
   useEffect(() => {
     if (isTest) {
       testSignTransaction(payload.hippoSwap);
+      // testSignAndSubmitTransaction(payload.hippoFaucet);
+      setIsTest(false);
     }
   }, [isTest === true]);
 
@@ -18,7 +20,6 @@ const transaction = () => {
     try {
       const test = await signTransaction(transaction);
       setResult(test);
-      setIsTest(false);
     } catch (error) {
       console.log(error);
       setIsTest(false);
@@ -29,7 +30,6 @@ const transaction = () => {
     try {
       const test = await signAndSubmitTransaction(transaction);
       setResult(test);
-      setIsTest(false);
     } catch (error) {
       console.log(error);
       setIsTest(false);
