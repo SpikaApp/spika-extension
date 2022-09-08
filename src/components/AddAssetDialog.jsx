@@ -32,9 +32,7 @@ const AddAssetDialog = () => {
   const [selectedIndex, setSelectedIndex] = useState("");
   const [selectedAsset, setSelectedAsset] = useState([]);
   const [isCustomToken, setIsCustomToken] = useState(false);
-  const [contractAddress, setContractAddress] = useState("");
-  const [customType, setCustomType] = useState("");
-  const [struct, setStruct] = useState("");
+  const [coinType, setCoinType] = useState("");
 
   const _currentAsset = "currentAsset";
 
@@ -60,15 +58,16 @@ const AddAssetDialog = () => {
   const handleAddAsset = async () => {
     if (isCustomToken) {
       try {
-        const custom = await client.getAccountResource(contractAddress, customType);
+        const _address = coinType.split("::")[0];
+        const custom = await client.getAccountResource(_address, coinInfo(coinType));
         const result = {
-          type: coinStore(`${contractAddress}::${struct}`),
+          type: coinType,
           data: {
             name: `${custom.data.name}`,
             symbol: `${custom.data.symbol}`,
             decimals: custom.data.decimals,
             logo: pixel_coin,
-            logo_alt: logo,
+            logo_alt: pixel_coin,
           },
         };
         setCurrentAsset(result);
@@ -98,9 +97,7 @@ const AddAssetDialog = () => {
     setSelectedIndex("");
     setSelectedAsset([]);
     setIsCustomToken(false);
-    setContractAddress("");
-    setCustomType("");
-    setStruct("");
+    setCoinType("");
   };
 
   return (
@@ -127,33 +124,11 @@ const AddAssetDialog = () => {
                 InputLabelProps={{ shrink: true }}
                 multiline
                 rows={3}
-                label="Contract address"
-                placeholder="0x1"
+                label="Asset type"
+                placeholder="0x1::aptos_coin::AptosCoin"
                 autoFocus={false}
-                value={contractAddress}
-                onChange={(e) => setContractAddress(e.target.value)}
-              />
-              <TextField
-                sx={{ mt: 2, mr: 2, ml: 2, width: 260 }}
-                InputLabelProps={{ shrink: true }}
-                multiline
-                rows={5}
-                label="Type"
-                placeholder="0x1::coin::CoinInfo<0x1::aptos_coin::AptosCoin>"
-                autoFocus={false}
-                value={customType}
-                onChange={(e) => setCustomType(e.target.value)}
-              />
-              <TextField
-                sx={{ mb: 1, mt: 2, mr: 2, ml: 2, width: 260 }}
-                InputLabelProps={{ shrink: true }}
-                multiline
-                rows={1}
-                label="Struct"
-                placeholder="aptos_coin::AptosCoin"
-                autoFocus={false}
-                value={struct}
-                onChange={(e) => setStruct(e.target.value)}
+                value={coinType}
+                onChange={(e) => setCoinType(e.target.value)}
               />
             </Stack>
           </form>
