@@ -1,9 +1,22 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Container, Typography, Card, CardContent, List, Box, Tab } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  List,
+  Box,
+  Tab,
+  IconButton,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Footer from "../components/Footer";
 import WithdrawEventCard from "../components/WithdrawEventCard";
 import DepositEventCard from "../components/DepositEventCard";
+import AccountAssetsDialog from "../components/AccountAssetsDialog";
+import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 
@@ -14,7 +27,8 @@ const style = {
 };
 
 const Transactions = () => {
-  const { accountImported, currentAddress } = useContext(AccountContext);
+  const { darkMode, handleAccountAssetsUI } = useContext(UIContext);
+  const { accountImported, currentAddress, currentAsset } = useContext(AccountContext);
   const { getDepositEvents, getWithdrawEvents, withdrawEvents, depositEvents } =
     useContext(Web3Context);
 
@@ -35,7 +49,7 @@ const Transactions = () => {
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
-  }, [accountImported]);
+  }, [currentAsset]);
 
   return (
     <Container maxWidth="xs">
@@ -51,30 +65,62 @@ const Transactions = () => {
             }}
           >
             <TabContext value={value}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <TabList onChange={handleChange} aria-label="lab API tabs example">
-                  <Tab
-                    label={
-                      <Typography variant="subtitle1" color="textPrimary">
-                        Deposit
-                      </Typography>
-                    }
-                    value="1"
-                  />
-                  <Tab
-                    label={
-                      <Typography variant="subtitle1" color="textPrimary">
-                        Withdraw
-                      </Typography>
-                    }
-                    value="2"
-                  />
-                </TabList>
+              <Box
+                sx={{
+                  borderColor: "divider",
+                }}
+              >
+                <Stack
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {accountImported && (
+                    <Tooltip title={"Switch active asset"}>
+                      <IconButton onClick={handleAccountAssetsUI}>
+                        <Box
+                          sx={{ width: "24px", height: "24px" }}
+                          component="img"
+                          src={darkMode ? currentAsset.data.logo_alt : currentAsset.data.logo}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  <TabList onChange={handleChange} aria-label="lab API tabs example">
+                    <Tab
+                      label={
+                        <Typography variant="subtitle1" color="textPrimary">
+                          Deposit
+                        </Typography>
+                      }
+                      value="1"
+                    />
+                    <Tab
+                      label={
+                        <Typography variant="subtitle1" color="textPrimary">
+                          Withdraw
+                        </Typography>
+                      }
+                      value="2"
+                    />
+                  </TabList>
+                </Stack>
               </Box>
-              <Box sx={{ height: "345px", overflow: "hidden", overflowY: "scroll" }}>
+              <Box
+                sx={{
+                  height: "345px",
+                  width: "295px",
+                  overflow: "hidden",
+                  overflowY: "scroll",
+                }}
+              >
                 <TabPanel value="1">
                   {depositEvents?.length > 0 ? (
                     <List
+                      align="start"
                       sx={
                         (style,
                         {
@@ -85,9 +131,11 @@ const Transactions = () => {
                       }
                       component="nav"
                     >
-                      {depositEvents.map((depositEvent, sequence_number) => (
-                        <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
-                      ))}
+                      <Typography noWrap>
+                        {depositEvents.map((depositEvent, sequence_number) => (
+                          <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
+                        ))}
+                      </Typography>
                     </List>
                   ) : (
                     <Typography
@@ -131,6 +179,7 @@ const Transactions = () => {
         </CardContent>
       </Card>
       <Footer />
+      <AccountAssetsDialog />
     </Container>
   );
 };

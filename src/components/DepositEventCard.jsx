@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ListItem, Divider, Stack, Typography, Button } from "@mui/material";
+import { ListItem, Box, Stack, Typography, Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import TxnDetailsDialog from "./TxnDetailsDialog";
 import { UIContext } from "../context/UIContext";
@@ -25,23 +25,26 @@ const DepositEventCard = ({
   };
 
   return (
-    <div>
-      <ListItem>
-        <Button sx={{ textTransform: "none" }} onClick={handleOpenTxnDetailsDialog}>
-          <DownloadIcon sx={{ fontSize: 24, mr: 2 }} color="primary" />
-          <Stack>
-            <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
-              <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
-              <Typography sx={{ mr: 0.5 }}>
-                {stringToValue(currentAsset, amount)} {currentAsset.data.symbol}
+    <ListItem>
+      <Button
+        sx={{ ml: 1.5, textTransform: "none", maxWidth: "290px" }}
+        onClick={handleOpenTxnDetailsDialog}
+      >
+        <DownloadIcon sx={{ fontSize: 24, mr: 2 }} color="primary" />
+        <Stack>
+          <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
+            <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
+            <Stack direction="row">
+              <Typography noWrap sx={{ mr: 0.5, maxWidth: "90px" }}>
+                {stringToValue(currentAsset, amount)}
               </Typography>
+              <Typography sx={{ mr: 0.5, maxWidth: "40px" }}>{currentAsset.data.symbol}</Typography>
             </Stack>
           </Stack>
-        </Button>
-      </ListItem>
-      <Divider />
+        </Stack>
+      </Button>
       <TxnDetailsDialog />
-    </div>
+    </ListItem>
   );
 };
 
