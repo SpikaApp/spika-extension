@@ -96,7 +96,7 @@ const Wallet = () => {
                       {darkMode ? (
                         <Box
                           component="img"
-                          src={currentAsset.data.logo_dark}
+                          src={currentAsset.data.logo_alt}
                           sx={{
                             maxWidth: "32px",
                             maxHeight: "32px",
@@ -108,7 +108,7 @@ const Wallet = () => {
                       ) : (
                         <Box
                           component="img"
-                          src={currentAsset.data.logo_light}
+                          src={currentAsset.data.logo}
                           sx={{
                             maxWidth: "32px",
                             maxHeight: "32px",
@@ -132,7 +132,7 @@ const Wallet = () => {
             </CardContent>
             <CardActions>
               <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
-                {currentAsset.id === "aptosCoin" && devMode ? (
+                {currentAsset.data.name === "AptosCoin" && devMode ? (
                   <Button
                     sx={{ width: "100px", mt: "-10px", mr: 4 }}
                     color="primary"

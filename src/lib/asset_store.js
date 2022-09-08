@@ -42,7 +42,7 @@ export const setAsset = async (currentAddress, asset) => {
         if (result === undefined) {
           return false;
         } else {
-          let _asset = result.assets.find((i) => i.id === asset.id);
+          let _asset = result.assets.find((i) => i.type === asset.type);
           if (_asset === undefined) {
             result.assets.push(asset);
             setStore(PLATFORM, _accountAssets, data);

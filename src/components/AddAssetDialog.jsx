@@ -18,7 +18,7 @@ import pixel_coin from "../assets/pixel_coin.png";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import coin from "../lib/coin";
+import coin, { coinStore, coinInfo } from "../lib/coin";
 import { client } from "../lib/client";
 import { setStore } from "../lib/store";
 import { setAsset } from "../lib/asset_store";
@@ -62,14 +62,13 @@ const AddAssetDialog = () => {
       try {
         const custom = await client.getAccountResource(contractAddress, customType);
         const result = {
-          id: `custom_${custom.data.name}`,
+          type: coinStore(`${contractAddress}::${struct}`),
           data: {
             name: `${custom.data.name}`,
             symbol: `${custom.data.symbol}`,
-            logo_light: pixel_coin,
-            logo_dark: pixel_coin,
-            module: `0x1::coin::CoinStore<${contractAddress}::${struct}>`,
-            TypeTagStruct: `${contractAddress}::${struct}`,
+            decimals: custom.data.decimals,
+            logo: pixel_coin,
+            logo_alt: logo,
           },
         };
         setCurrentAsset(result);
@@ -162,15 +161,15 @@ const AddAssetDialog = () => {
           <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
             <List component="nav">
               {coin.map((asset) => (
-                <Stack key={asset.id}>
+                <Stack key={asset.type}>
                   <ListItemButton
-                    selected={selectedIndex === asset.id}
-                    onClick={(event) => handleListItemClick(event, asset.id, asset)}
+                    selected={selectedIndex === asset.data.name}
+                    onClick={(event) => handleListItemClick(event, asset.data.name, asset)}
                   >
                     <ListItemIcon>
                       <Box
                         component="img"
-                        src={darkMode ? asset.data.logo_dark : asset.data.logo_light}
+                        src={darkMode ? asset.data.logo_alt : asset.data.logo}
                         sx={{ width: 24, height: 24 }}
                       ></Box>
                     </ListItemIcon>
