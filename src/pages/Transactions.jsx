@@ -29,8 +29,8 @@ const Transactions = () => {
       getDepositEvents();
       getWithdrawEvents();
       const updateAccountResources = window.setInterval(() => {
-        getEvents("withdraw_events");
-        getEvents("deposit_events");
+        getDepositEvents();
+        getWithdrawEvents();
       }, 10000);
       return () => window.clearInterval(updateAccountResources);
     }
