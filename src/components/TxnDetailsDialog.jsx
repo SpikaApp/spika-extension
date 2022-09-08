@@ -21,6 +21,7 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import convertTimestamp from "../utils/convert_timestamp";
+import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
@@ -28,31 +29,59 @@ const TxnDetailsDialog = () => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, txnType, setTxnType } =
     useContext(UIContext);
   const { currentAsset, currentAddress } = useContext(AccountContext);
-  const { txnDetails, setTxnDetails } = useContext(Web3Context);
+  const { txnDetails, setTxnDetails, amount, setAmount } = useContext(Web3Context);
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
-      let amount;
-      let recipient;
+      if (
+        txnDetails.payload.function === "0x1::coin::transfer" ||
+        txnDetails.payload.function === "0x1::aptos_coin::mint"
+      ) {
+        let _amount = "";
+        let recipient = "";
+        if (txnDetails.payload.arguments.length === 1) {
+          recipient = currentAddress;
+          _amount = txnDetails.payload.arguments[0];
+        } else if (txnDetails.payload.arguments.length === 2) {
+          recipient = txnDetails.payload.arguments[0];
+          _amount = txnDetails.payload.arguments[1];
+        }
 
-      if (txnDetails.payload.arguments.length === 1) {
-        recipient = currentAddress;
-        amount = txnDetails.payload.arguments[0];
+        setRows([
+          createData("Time", convertTimestamp(txnDetails.timestamp)),
+          createData("Txn Hash", txnDetails.hash),
+          createData("Sender", txnDetails.sender),
+          createData("Recipient", recipient),
+          createData(
+            "Amount",
+            `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`
+          ),
+          createData("Gas fee", txnDetails.gas_used),
+          createData("Max gas", txnDetails.max_gas_amount),
+          createData("Gas price", txnDetails.gas_unit_price),
+        ]);
       } else {
-        recipient = txnDetails.payload.arguments[0];
-        amount = txnDetails.payload.arguments[1];
+        setRows([
+          createData("Time", convertTimestamp(txnDetails.timestamp)),
+          createData("Txn Hash", txnDetails.hash),
+          createData("Sender", txnDetails.sender),
+          createData(
+            "Function",
+            txnDetails.payload.function
+              .substring(txnDetails.payload.function.indexOf("0x") + 66)
+              .split("::")
+              .join(" ")
+          ),
+          createData(
+            "Amount",
+            `${stringToValue(currentAsset, amount)} ${currentAsset.data.symbol}`
+          ),
+          createData("Gas fee", txnDetails.gas_used),
+          createData("Max gas", txnDetails.max_gas_amount),
+          createData("Gas price", txnDetails.gas_unit_price),
+        ]);
       }
-      setRows([
-        createData("Time", convertTimestamp(txnDetails.timestamp)),
-        createData("Txn Hash", txnDetails.hash),
-        createData("Sender", txnDetails.sender),
-        createData("Recipient", recipient),
-        createData("Amount", `${amount} ${currentAsset.data.symbol}`),
-        createData("Gas fee", txnDetails.gas_used),
-        createData("Max gas", txnDetails.max_gas_amount),
-        createData("Gas price", txnDetails.gas_unit_price),
-      ]);
     }
   }, [openTxnDetailsDialog]);
 
@@ -62,6 +91,7 @@ const TxnDetailsDialog = () => {
 
   const handleClose = () => {
     setTxnDetails("");
+    setAmount("");
     setTxnType(0);
     setOpenTxnDetailsDialog(false);
   };

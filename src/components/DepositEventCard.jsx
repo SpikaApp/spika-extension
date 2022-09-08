@@ -5,6 +5,7 @@ import TxnDetailsDialog from "./TxnDetailsDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { stringToValue } from "../utils/values";
 
 const DepositEventCard = ({
   depositEvent: {
@@ -14,10 +15,11 @@ const DepositEventCard = ({
 }) => {
   const { setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
-  const { getTxnDetails } = useContext(Web3Context);
+  const { getTxnDetails, setAmount } = useContext(Web3Context);
 
   const handleOpenTxnDetailsDialog = async () => {
     setTxnType(2);
+    setAmount(amount);
     await getTxnDetails(version);
     setOpenTxnDetailsDialog(true);
   };
@@ -31,7 +33,7 @@ const DepositEventCard = ({
             <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
               <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
               <Typography sx={{ mr: 0.5 }}>
-                {amount} {currentAsset.data.symbol}
+                {stringToValue(currentAsset, amount)} {currentAsset.data.symbol}
               </Typography>
             </Stack>
           </Stack>
