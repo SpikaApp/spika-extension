@@ -31,7 +31,7 @@ export const UIProvider = ({ children }) => {
   const [disableAllRoutes, setDisableAllRoutes] = useState(false);
   const [currentRoute, setCurrentRoute] = useState();
   const [isPopup, setIsPopup] = useState(false);
-  const [devMode, setDevMode] = useState(true);
+  const [devMode, setDevMode] = useState(false);
   const [isTest, setIsTest] = useState(false);
   const _currentRoute = "currentRoute";
 
