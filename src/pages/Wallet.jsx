@@ -10,7 +10,10 @@ import {
   Chip,
   Tooltip,
   Stack,
+  IconButton,
 } from "@mui/material";
+import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MintDialog from "../components/MintDialog";
 import SendDialog from "../components/SendDialog";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
@@ -61,95 +64,100 @@ const Wallet = () => {
     <Box>
       {accountImported && (
         <Container maxWidth="xs">
-          <Card sx={{ mb: 2, minHeight: "240px", mt: "100px" }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Card sx={{ mb: 2, height: "175px", mt: "100px" }}>
+            <CardContent>
               <Stack
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  mt: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
                 }}
               >
-                <Typography sx={{ mr: 6 }}>Aptos Devnet</Typography>
-                <Tooltip sx={{ my: "-3px" }} title="Copy address">
+                <Typography sx={{ mr: 5, mt: "3px" }}>Aptos Devnet</Typography>
+                <Tooltip title="Copy address">
                   <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
                 </Tooltip>
               </Stack>
               {isLoading ? (
-                <Typography sx={{ mt: 4 }} variant="h6">
+                <Typography sx={{ mt: "22px" }} align="center" variant="h6">
                   Updating balance...
                 </Typography>
               ) : (
-                <Tooltip title="Switch active asset">
-                  <Button
-                    variant="outlined"
-                    sx={{ width: "260px", height: "64px", mt: "28px" }}
-                    onClick={handleAccountAssetsUI}
+                <div>
+                  <Stack
+                    direction="column"
+                    sx={{
+                      alignItems: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      mt: "16px",
+                    }}
                   >
-                    <Stack
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        mt: 1,
-                        py: 2,
-                      }}
-                    >
-                      {darkMode ? (
-                        <Box
-                          component="img"
-                          src={currentAsset.data.logo_alt}
-                          sx={{
-                            maxWidth: "32px",
-                            maxHeight: "32px",
-                            mr: "12px",
-                            mt: "4px",
-                            ml: "12px",
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          component="img"
-                          src={currentAsset.data.logo}
-                          sx={{
-                            maxWidth: "32px",
-                            maxHeight: "32px",
-                            mr: "12px",
-                            mt: "4px",
-                            ml: "12px",
-                          }}
-                        />
-                      )}
-
-                      <Typography sx={{ mb: 1 }} variant="h4" align="center" color="textPrimary">
-                        {stringToValue(currentAsset, balance)}
-                      </Typography>
-                      <Typography sx={{ ml: "6px" }} color="TextSecondary">
-                        {currentAsset.data.symbol}
-                      </Typography>
+                    <Stack direction="row">
+                      <Tooltip title="Switch active asset">
+                        <Button
+                          sx={{ mr: "2px", width: "220px", display: "flex" }}
+                          variant="outlined"
+                          onClick={handleAccountAssetsUI}
+                        >
+                          <Box
+                            sx={{
+                              width: "24px",
+                              height: "24px",
+                            }}
+                            component="img"
+                            src={darkMode ? currentAsset.data.logo_alt : currentAsset.data.logo}
+                          />
+                          <ArrowDropDownIcon sx={{ position: "absolute", ml: "190px" }} />
+                          <Typography noWrap sx={{ ml: "8px" }} variant="h6" color="textPrimary">
+                            {currentAsset.data.name}
+                          </Typography>
+                        </Button>
+                      </Tooltip>
                     </Stack>
-                  </Button>
+                    <Stack>
+                      <Stack direction="row" sx={{ mt: "8px", maxWidth: "300px" }}>
+                        <Tooltip
+                          title={`${stringToValue(currentAsset, balance)} ${
+                            currentAsset.data.symbol
+                          }`}
+                        >
+                          <Typography
+                            noWrap
+                            sx={{ fontSize: "24px", cursor: "default" }}
+                            variant="button"
+                            align="center"
+                            color="textSecondary"
+                          >
+                            {stringToValue(currentAsset, balance)}
+                          </Typography>
+                        </Tooltip>
+                        <Typography
+                          sx={{ ml: "8px", fontSize: "24px", cursor: "default" }}
+                          variant="button"
+                          color="TextSecondary"
+                        >
+                          {currentAsset.data.symbol}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Stack>
+                </div>
+              )}
+              {currentAsset.data.name === "AptosCoin" && !isLoading && (
+                <Tooltip title={"Faucet"}>
+                  <IconButton
+                    position="absolute"
+                    sx={{ mt: "-170px", ml: "270px" }}
+                    onClick={handleMint}
+                  >
+                    <LocalGasStationIcon />
+                  </IconButton>
                 </Tooltip>
               )}
             </CardContent>
-            <CardActions>
-              <Stack sx={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
-                {currentAsset.data.name === "AptosCoin" && !devMode && (
-                  <Button sx={{ width: "100px", mt: "-10px" }} color="primary" onClick={handleMint}>
-                    Faucet
-                  </Button>
-                )}
-                {devMode && (
-                  <Button
-                    sx={{ width: "100px", mt: "-10px", ml: 4 }}
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => setIsTest(true)}
-                  >
-                    Start Test
-                  </Button>
-                )}
-              </Stack>
-            </CardActions>
           </Card>
           <Stack
             direction="row"
@@ -170,13 +178,24 @@ const Wallet = () => {
             </Button>
           </Stack>
           {accountImported && (
-            <Stack sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{
+                backgroundColor: "#F19223",
+                width: "100%",
+                height: "155px",
+                mt: "28px",
+                mb: "28px",
+                position: "relative",
+              }}
+            ></Box>
+          )}
+          {accountImported && (
+            <Stack position="relative" sx={{ alignItems: "center", justifyContent: "center" }}>
               <Button
                 variant="outlined"
                 sx={{
                   width: "90%",
-                  height: "38px",
-                  mt: 8,
+                  height: "35px",
                 }}
                 onClick={handleAddAssetUI}
               >
@@ -184,11 +203,11 @@ const Wallet = () => {
               </Button>
             </Stack>
           )}
-          {accountImported && (
-            <Box sx={{ mt: "56px" }}>
+          {/* {accountImported && (
+            <Box sx={{ mt: "1px" }}>
               <Footer />
             </Box>
-          )}
+          )} */}
           <AccountAssetsDialog />
           <AddAssetDialog />
           <MintDialog />
