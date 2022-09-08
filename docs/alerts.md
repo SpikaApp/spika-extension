@@ -69,3 +69,8 @@
 - 102: New custom asset successfully added
 - 103: Failed to add new asset
 - 104: Error, select asset from the list or add custom token to continue
+
+---
+
+- 111: Asset successfully registered
+- 112: Failed to register asset
