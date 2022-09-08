@@ -15,7 +15,8 @@ const style = {
 
 const Transactions = () => {
   const { accountImported, currentAddress } = useContext(AccountContext);
-  const { getEvents, withdrawEvents, depositEvents } = useContext(Web3Context);
+  const { getDepositEvents, getWithdrawEvents, withdrawEvents, depositEvents } =
+    useContext(Web3Context);
 
   const [value, setValue] = useState("1");
 
@@ -25,8 +26,8 @@ const Transactions = () => {
 
   useEffect(() => {
     if (accountImported) {
-      getEvents("withdraw_events");
-      getEvents("deposit_events");
+      getDepositEvents();
+      getWithdrawEvents();
       const updateAccountResources = window.setInterval(() => {
         getEvents("withdraw_events");
         getEvents("deposit_events");
