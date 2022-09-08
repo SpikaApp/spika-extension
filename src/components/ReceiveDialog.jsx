@@ -14,7 +14,7 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { QRCodeCanvas } from "qrcode.react";
-import useAxios from "../utils/use_axios";
+import useAxios from "../hooks/useAxios";
 import { NODE_URL } from "../utils/constants";
 import copyToClipboard from "../utils/copy_clipboard";
 

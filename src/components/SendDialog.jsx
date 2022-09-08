@@ -13,7 +13,7 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import useAxios from "../utils/use_axios";
+import useAxios from "../hooks/useAxios";
 import { NODE_URL } from "../utils/constants";
 
 const SendDialog = () => {
