@@ -6,11 +6,12 @@ import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../lib/client";
-import coin, { coinStore } from "../lib/coin";
+import { aptosCoin, coinList, coinStore } from "../lib/coin";
 import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
+import applyUpdate from "../utils/apply_update";
 
 export const AccountContext = React.createContext();
 
@@ -283,17 +284,17 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === coinStore(coin[0].type));
+      let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
-      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentAsset", coin[0]);
-      assetStore.addAssetStore(_account.address().hex(), coin[0]);
+      setStore(PLATFORM, "currentAsset", aptosCoin);
+      assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       apps.addAddress(_account.address().hex());
       setAccountImported(true);
       setSpikaWallet(true);
@@ -305,7 +306,7 @@ export const AccountProvider = ({ children }) => {
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
-      setCurrentAsset(coin[0]);
+      setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
@@ -322,17 +323,17 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
       let resources = await client.getAccountResources(_account.address());
-      let accountResource = resources.find((r) => r.type === coinStore(coin[0].type));
+      let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       locker("lock");
-      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentAsset", coin[0]);
-      assetStore.addAssetStore(_account.address().hex(), coin[0]);
+      setStore(PLATFORM, "currentAsset", aptosCoin);
+      assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       apps.addAddress(_account.address().hex());
       setAccountImported(true);
       setSpikaWallet(true);
@@ -344,7 +345,7 @@ export const AccountProvider = ({ children }) => {
         authKey: _account.authKey().hex(),
       });
       setCurrentAddress(_account.address().hex());
-      setCurrentAsset(coin[0]);
+      setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
@@ -356,6 +357,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const loadAccount = async () => {
+    applyUpdate();
     try {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
@@ -367,12 +369,12 @@ export const AccountProvider = ({ children }) => {
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
-          setStore(PLATFORM, "currentAsset", coin[0]);
-          _currentAsset = coin[0];
+          setStore(PLATFORM, "currentAsset", aptosCoin);
+          _currentAsset = aptosCoin;
         }
         let resources = await client.getAccountResources(_account.address());
         let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
-        assetStore.addAssetStore(_account.address().hex(), coin[0]);
+        assetStore.addAssetStore(_account.address().hex(), aptosCoin);
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());
         setMem(PLATFORM, "PWD", password);
