@@ -125,6 +125,7 @@ const AlertDialog = () => {
       case 102: // New custom asset successfully added
       case 103: // Failed to add new asset
       case 104: // Error, Select asset from the list or add custom token to continue.
+      case 112: // Failed to find asset on chain
         setOpenAlertDialog(false);
         setIsPopup(false);
         break;

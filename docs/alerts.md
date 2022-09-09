@@ -72,5 +72,4 @@
 
 ---
 
-- 111: Asset successfully registered
-- 112: Failed to register asset
+- 112: Failed to find asset on chain
