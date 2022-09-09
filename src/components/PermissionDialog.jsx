@@ -74,9 +74,11 @@ const PermissionDialog = () => {
   }, [accountImported]);
 
   useEffect(() => {
-    if (alertSignal === 33 || alertSignal === 34) {
-      response = false;
-      sendResponse();
+    if (isPopup) {
+      if (alertSignal === 33 || alertSignal === 34) {
+        response = false;
+        sendResponse();
+      }
     }
   }, [alertSignal]);
 
@@ -372,15 +374,15 @@ const PermissionDialog = () => {
                 }}
               />
 
-              <Typography align="center" sx={{ mt: 4 }} variant="subtitle2">
-                Wallet is not initialized yet. <br />
+              <Typography align="center" sx={{ mt: 2 }} variant="subtitle2">
+                Wallet is not initialized. <br />
                 Valid address is required in order to interact with this website. Open Spika
-                extension and create or import account first.
+                extension and setup your account first.
               </Typography>
 
               <Typography align="center" sx={{ mt: 2 }} variant="subtitle2">
                 Need help? <br />
-                Check official{" "}
+                Check{" "}
                 <Link href="https://docs.spika.app" underline="none" target="_blank" color="link">
                   guidelines
                 </Link>{" "}
