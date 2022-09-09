@@ -146,7 +146,7 @@ const Wallet = () => {
                   </Stack>
                 </div>
               )}
-              {currentAsset.data.name === "AptosCoin" && !isLoading && (
+              {currentAsset.data.name === "Aptos Coin" && !isLoading && (
                 <Tooltip title={"Faucet"}>
                   <IconButton
                     position="absolute"
@@ -180,7 +180,7 @@ const Wallet = () => {
           {accountImported && (
             <Box
               sx={{
-                backgroundColor: "#F19223",
+                // backgroundColor: "#F19223",
                 width: "100%",
                 height: "155px",
                 mt: "28px",
