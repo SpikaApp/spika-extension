@@ -57,7 +57,7 @@ const TxnDetailsDialog = () => {
             "Amount",
             `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`
           ),
-          createData("Gas fee", `${~txnDetails.gas_used}`),
+          createData("Gas used", txnDetails.gas_used),
           createData("Max gas", txnDetails.max_gas_amount),
           createData("Gas price", txnDetails.gas_unit_price),
         ]);
@@ -77,7 +77,7 @@ const TxnDetailsDialog = () => {
             "Amount",
             `${stringToValue(currentAsset, amount)} ${currentAsset.data.symbol}`
           ),
-          createData("Gas fee", txnDetails.gas_used),
+          createData("Gas used", txnDetails.gas_used),
           createData("Max gas", txnDetails.max_gas_amount),
           createData("Gas price", txnDetails.gas_unit_price),
         ]);
@@ -124,7 +124,7 @@ const TxnDetailsDialog = () => {
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ width: "90px" }} component="th" scope="row">
+                  <TableCell sx={{ width: "95px" }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: "110px" }}>

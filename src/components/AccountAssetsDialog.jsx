@@ -63,7 +63,10 @@ const AccountAssetsDialog = () => {
       <DialogTitle align="center">Select Asset</DialogTitle>
       <DialogContent sx={{ minHeight: "145px" }}>
         <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
-          <List component="nav">
+          <List
+            component="nav"
+            sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}
+          >
             {assets.map((asset) => (
               <Stack key={asset.type}>
                 <ListItemButton

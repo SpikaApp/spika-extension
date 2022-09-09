@@ -24,7 +24,8 @@ import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
 const ConfirmSendDialog = () => {
-  const { openConfirmSendDialog, setOpenConfirmSendDialog } = useContext(UIContext);
+  const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } =
+    useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const {
     isValidTransaction,
@@ -38,7 +39,7 @@ const ConfirmSendDialog = () => {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    if (isValidTransaction) {
+    if (isValidTransaction && !openAddAssetDialog) {
       const _amount = estimatedTxnResult.payload.arguments[1];
       setOpenConfirmSendDialog(true);
       setRows([
@@ -59,7 +60,7 @@ const ConfirmSendDialog = () => {
   const handleCancel = () => {
     setOpenConfirmSendDialog(false);
     setIsValidTransaction(false);
-    // setEstimatedTxnResult([]);
+    setEstimatedTxnResult([]);
     setRecipientAddress("");
     setAmount("");
   };
@@ -79,10 +80,10 @@ const ConfirmSendDialog = () => {
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ maxWidth: 80 }} component="th" scope="row">
+                  <TableCell sx={{ maxWidth: "95px" }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
-                  <TableCell sx={{ maxWidth: 120 }}>
+                  <TableCell sx={{ maxWidth: "110px" }}>
                     {row.name === "Sender" || row.name === "Recipient" ? (
                       <Tooltip title="Copy address" sx={{ ml: -1.5 }}>
                         <Chip
