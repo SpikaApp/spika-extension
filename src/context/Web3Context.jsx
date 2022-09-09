@@ -1,19 +1,27 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import * as aptos from "aptos";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import { client, faucetClient, tokenClient } from "../lib/client";
-import coin, { coinStore, coinInfo } from "../lib/coin";
+import { aptosCoin, coinStore, coinInfo } from "../lib/coin";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
 import { stringToValue, valueToString } from "../utils/values";
+import pixel_coin from "../assets/pixel_coin.png";
 
 export const Web3Context = React.createContext();
 
 export const Web3Provider = ({ children }) => {
   const { setOpenSendDialog } = useContext(UIContext);
-  const { throwAlert, account, currentAddress, setBalance, currentAsset, setIsLoading } =
-    useContext(AccountContext);
+  const {
+    accountImported,
+    throwAlert,
+    account,
+    currentAddress,
+    setBalance,
+    currentAsset,
+    setIsLoading,
+  } = useContext(AccountContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
@@ -23,6 +31,8 @@ export const Web3Provider = ({ children }) => {
   const [depositEvents, setDepositEvents] = useState([]);
   const [withdrawEvents, setWithdrawEvents] = useState([]);
   const [accountTokens, setAccountTokens] = useState([]);
+  const [isValidAsset, setIsValidAsset] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState([]);
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
   const [collectionUri, setCollectionUri] = useState("");
@@ -33,6 +43,11 @@ export const Web3Provider = ({ children }) => {
   const [nftDetails, setNftDetails] = useState([]);
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
+  const [chainId, setChainId] = useState();
+
+  useEffect(() => {
+    getChainId();
+  }, [accountImported]);
 
   const submitTransactionHelper = async (account, payload) => {
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
@@ -100,6 +115,11 @@ export const Web3Provider = ({ children }) => {
     setNftSupply("");
   };
 
+  const getChainId = async () => {
+    const result = await client.getChainId();
+    setChainId(result);
+  };
+
   const getAptosAddress = async (AptosName) => {
     const name = AptosName;
     const result = await fetch(`https://www.aptosnames.com/api/v1/address/${name}`);
@@ -130,7 +150,7 @@ export const Web3Provider = ({ children }) => {
       throwAlert(
         21,
         "Success",
-        `Received ${Number(stringToValue(coin[0], _amount)).toFixed(2)} ${coin[0].data.symbol}`
+        `Received ${Number(stringToValue(aptosCoin, _amount)).toFixed(2)} ${aptosCoin.data.symbol}`
       );
     } catch (error) {
       throwAlert(22, "Transaction failed", `${error}`);
@@ -139,9 +159,13 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const estimateTransaction = async (payload) => {
+  const estimateTransaction = async (payload, isBcs, silent) => {
     let _payload;
+    let isSilent = false;
     let transaction;
+    if (silent) {
+      isSilent = true;
+    }
     try {
       if (payload === undefined) {
         _payload = await bcsPayload.transfer(
@@ -150,9 +174,12 @@ export const Web3Provider = ({ children }) => {
           valueToString(currentAsset, amount)
         );
         transaction = await client.generateRawTransaction(account.address(), _payload);
-      } else {
+      } else if (isBcs === undefined || !isBcs) {
         _payload = payload;
         transaction = await client.generateTransaction(account.address(), _payload);
+      } else {
+        _payload = payload;
+        transaction = await client.generateRawTransaction(account.address(), _payload);
       }
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
       const estimatedTxn = (await client.submitBCSSimulation(bcsTxn))[0];
@@ -165,13 +192,17 @@ export const Web3Provider = ({ children }) => {
       if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn);
-        throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`);
+        if (!isSilent) {
+          throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`);
+        }
         setRecipientAddress("");
         setAmount("");
       }
     } catch (error) {
       // logic if txn body doesn't looks good to be submitted to VM
-      throwAlert(34, "Failed to estimate", `${error}`);
+      if (!isSilent) {
+        throwAlert(34, "Failed to estimate", `${error}`);
+      }
       setRecipientAddress("");
       setAmount("");
       console.log(error);
@@ -192,6 +223,50 @@ export const Web3Provider = ({ children }) => {
       throwAlert(31, "Transaction sent", `${transactionRes.hash}`);
     } catch (error) {
       throwAlert(32, "Transaction failed", `${error}`);
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
+
+  const findAsset = async (coinType, address) => {
+    try {
+      let _address;
+      if (!address) {
+        _address = coinType.split("::")[0];
+      } else {
+        _address = address;
+      }
+      const asset = await client.getAccountResource(_address, coinInfo(coinType));
+      const result = {
+        type: coinType,
+        data: {
+          name: `${asset.data.name}`,
+          symbol: `${asset.data.symbol}`,
+          decimals: asset.data.decimals,
+          logo: pixel_coin,
+          logo_alt: pixel_coin,
+        },
+      };
+      setSelectedAsset(result);
+      setIsValidAsset(true);
+      return result;
+    } catch (error) {
+      setSelectedAsset([]);
+      setIsValidAsset(false);
+      console.log(error);
+    }
+  };
+
+  const registerAsset = async (coinType) => {
+    try {
+      const payload = await bcsPayload.register(coinType);
+      const transaction = await client.generateRawTransaction(account.address(), payload);
+      const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const submitTxn = await client.submitSignedBCSTransaction(signedTxn);
+      await client.waitForTransaction(submitTxn.hash);
+      throwAlert(101, "Asset successfully registered", `${submitTxn.hash}`);
+    } catch (error) {
+      throwAlert(102, "Failed to register asset", `${error}`);
       console.log(error);
       setIsLoading(false);
     }
@@ -455,12 +530,14 @@ export const Web3Provider = ({ children }) => {
   return (
     <Web3Context.Provider
       value={{
+        chainId,
         setRecipientAddress,
         amount,
         setAmount,
         isValidTransaction,
         setIsValidTransaction,
         estimatedTxnResult,
+        setEstimatedTxnResult,
         txnDetails,
         setTxnDetails,
         nftDetails,
@@ -487,6 +564,10 @@ export const Web3Provider = ({ children }) => {
         setNftDescription,
         setNftSupply,
         setNftUri,
+        isValidAsset,
+        setIsValidAsset,
+        selectedAsset,
+        setSelectedAsset,
         aptosName,
         aptosAddress,
         getAptosName,
@@ -495,6 +576,8 @@ export const Web3Provider = ({ children }) => {
         signTransaction,
         signAndSubmitTransaction,
         updateAccountAssets,
+        findAsset,
+        registerAsset,
       }}
     >
       {children}
