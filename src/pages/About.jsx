@@ -1,17 +1,14 @@
 import { useContext } from "react";
 import { Container, Typography, Link, Card, Box, CardContent, Stack } from "@mui/material";
-import Footer from "../components/Footer";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
-import useAxios from "../hooks/useAxios";
-import { EXTENSION_VERSION, APTOS_SDK_VERSION, NODE_URL } from "../utils/constants";
+import { Web3Context } from "../context/Web3Context";
+import { EXTENSION_VERSION, APTOS_SDK_VERSION } from "../utils/constants";
 
 const About = () => {
   const { darkMode } = useContext(UIContext);
-  const { accountImported } = useContext(AccountContext);
-  const { result: chain_id } = useAxios(NODE_URL, "chain_id");
+  const { chainId } = useContext(Web3Context);
 
   return (
     <Container maxWidth="xs">
@@ -21,7 +18,7 @@ const About = () => {
             <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
               Aptos
             </Link>{" "}
-            Devnet chain id {chain_id}
+            Devnet chain id {chainId}
           </Typography>
           <Typography sx={{ mb: "-12px" }} variant="subtitle1" align="center" color="textPrimary">
             Wallet version {EXTENSION_VERSION} <br />
