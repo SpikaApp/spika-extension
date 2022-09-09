@@ -1,6 +1,15 @@
 import { tokenClient } from "./client";
 import { BCS, TxnBuilderTypes } from "aptos";
 
+export const register = async (coinType) => {
+  const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(coinType));
+
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural("0x1::managed_coin", "register", [token], [])
+  );
+  return payload;
+};
+
 export const transfer = async (recipientAddress, currentAsset, amount) => {
   const token = new TxnBuilderTypes.TypeTagStruct(
     TxnBuilderTypes.StructTag.fromString(currentAsset)
