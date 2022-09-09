@@ -59,3 +59,28 @@ export const setAsset = async (currentAddress, asset) => {
     return false;
   }
 };
+
+export const getAsset = async (currentAddress, asset) => {
+  if (currentAddress && asset) {
+    try {
+      const data = await getStore(PLATFORM, _accountAssets);
+      if (data !== undefined || data !== null) {
+        let result = data.find((i) => i.address === currentAddress);
+        if (result === undefined) {
+          return false;
+        } else {
+          let _asset = result.assets.find((i) => i.type === asset.type);
+          if (_asset === undefined) {
+            return false;
+          } else {
+            return _asset;
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    return false;
+  }
+};
