@@ -13,15 +13,14 @@ import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { Web3Context } from "../context/Web3Context";
 import { QRCodeCanvas } from "qrcode.react";
-import useAxios from "../hooks/useAxios";
-import { NODE_URL } from "../utils/constants";
 import copyToClipboard from "../utils/copy_clipboard";
 
 const ReceiveDialog = () => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
   const { currentAddress } = useContext(AccountContext);
-  const { result: chain_id } = useAxios(NODE_URL, "chain_id");
+  const { chainId } = useContext(Web3Context);
 
   const handleClick = () => {
     copyToClipboard(currentAddress);
@@ -51,7 +50,7 @@ const ReceiveDialog = () => {
             Copy to clipboard
           </Button>
           <Typography align="center" variant="body1" sx={{ my: 3 }} color="warning.dark">
-            Aptos Devnet chain id {chain_id}
+            Aptos Devnet chain id {chainId}
           </Typography>
         </Stack>
       </DialogContent>
