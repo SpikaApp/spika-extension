@@ -1,17 +1,18 @@
 import aptos_light from "../assets/aptos_light.png";
 import aptos_dark from "../assets/aptos_dark.png";
 
-const coin = [
-  {
-    type: "0x1::aptos_coin::AptosCoin",
-    data: {
-      name: "AptosCoin",
-      symbol: "APT",
-      decimals: 8,
-      logo: aptos_light,
-      logo_alt: aptos_dark,
-    },
+export const aptosCoin = {
+  type: "0x1::aptos_coin::AptosCoin",
+  data: {
+    name: "Aptos Coin",
+    symbol: "APT",
+    decimals: 8,
+    logo: aptos_light,
+    logo_alt: aptos_dark,
   },
+};
+
+export const coinList = [
   {
     type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDT",
     data: {
@@ -43,16 +44,6 @@ const coin = [
     },
   },
   {
-    type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetSOL",
-    data: {
-      name: "Solana",
-      symbol: "SOL",
-      decimals: 8,
-      logo: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
-      logo_alt: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
-    },
-  },
-  {
     type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetETH",
     data: {
       name: "Ethereum",
@@ -60,6 +51,16 @@ const coin = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
       logo_alt: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
+    },
+  },
+  {
+    type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetSOL",
+    data: {
+      name: "Solana",
+      symbol: "SOL",
+      decimals: 8,
+      logo: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
+      logo_alt: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
     },
   },
   {
@@ -83,5 +84,3 @@ export const coinInfo = (type) => {
   const data = `0x1::coin::CoinInfo<${type}>`;
   return data;
 };
-
-export default coin;
