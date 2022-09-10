@@ -1,6 +1,11 @@
 export const setMem = (platform, key, value) => {
   if (platform === "http:" || platform === "https:") {
-    sessionStorage.setItem(key, value);
+    if (key === "PWD") {
+      let _value = JSON.stringify(value);
+      sessionStorage.setItem(key, _value);
+    } else {
+      sessionStorage.setItem(key, value);
+    }
   }
   if (platform === "chrome-extension:") {
     chrome.storage.session.set({ [key]: value });
@@ -10,7 +15,13 @@ export const setMem = (platform, key, value) => {
 export const getMem = (platform, key) => {
   if ((platform === "http:") | (platform === "https:")) {
     const value = sessionStorage.getItem(key);
-    if (value === "true" || value === "false" || value === "undefined" || value === "null") {
+    if (
+      value === "true" ||
+      value === "false" ||
+      value === "undefined" ||
+      value === "null" ||
+      key === "PWD"
+    ) {
       return JSON.parse(value);
     } else {
       return value;
