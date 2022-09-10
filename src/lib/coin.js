@@ -14,6 +14,16 @@ export const aptosCoin = {
 
 export const coinList = [
   {
+    type: "0x1::aptos_coin::AptosCoin",
+    data: {
+      name: "Aptos Coin",
+      symbol: "APT",
+      decimals: 8,
+      logo: aptos_light,
+      logo_alt: aptos_dark,
+    },
+  },
+  {
     type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDT",
     data: {
       name: "Tether",
