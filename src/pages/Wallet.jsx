@@ -199,7 +199,7 @@ const Wallet = () => {
                 }}
                 onClick={handleAddAssetUI}
               >
-                Import Asset
+                Register Asset
               </Button>
             </Stack>
           )}
