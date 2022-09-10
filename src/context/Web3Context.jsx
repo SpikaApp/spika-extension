@@ -257,16 +257,16 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const registerAsset = async (coinType) => {
+  const registerAsset = async (coinType, name) => {
     try {
       const payload = await bcsPayload.register(coinType);
       const transaction = await client.generateRawTransaction(account.address(), payload);
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       const submitTxn = await client.submitSignedBCSTransaction(signedTxn);
       await client.waitForTransaction(submitTxn.hash);
-      throwAlert(101, "Asset successfully registered", `${submitTxn.hash}`);
+      throwAlert(101, "Success", `${name} successfully registered.`);
     } catch (error) {
-      throwAlert(102, "Failed to register asset", `${error}`);
+      throwAlert(102, "Failed to register asset.", `${error}`);
       console.log(error);
       setIsLoading(false);
     }
