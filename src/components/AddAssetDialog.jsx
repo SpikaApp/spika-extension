@@ -41,6 +41,7 @@ const AddAssetDialog = () => {
     estimatedTxnResult,
     setEstimatedTxnResult,
     registerAsset,
+    updateAccountAssets,
   } = useContext(Web3Context);
   const [selectedIndex, setSelectedIndex] = useState("");
   const [isCustomToken, setIsCustomToken] = useState(false);
@@ -141,10 +142,12 @@ const AddAssetDialog = () => {
     setSelectedAsset([]);
     setIsCustomToken(false);
     setCoinType("");
+    updateAccountAssets();
   };
 
   const handleCancel = () => {
     setOpenAddAssetDialog(false);
+    clearPrevEstimation();
     clearDialog();
   };
 
@@ -220,7 +223,12 @@ const AddAssetDialog = () => {
           >
             <List
               component="nav"
-              sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "200px" }}
+              sx={{
+                overflow: "hidden",
+                overflowY: "visible",
+                maxHeight: "200px",
+                minHeight: "50px",
+              }}
             >
               {assetList.map((asset) => (
                 <Stack key={asset.type}>
@@ -246,7 +254,6 @@ const AddAssetDialog = () => {
           <Stack
             sx={{
               display: "flex",
-
               alignItems: "center",
               justifyContent: "center",
               mt: 1,
@@ -261,44 +268,60 @@ const AddAssetDialog = () => {
             </Button>
           </Stack>
         )}
-        <Box
-          sx={{
-            // backgroundColor: "#F19223",
-            minHeight: "24px",
-            alignSelf: "center",
-            mt: "4px",
-          }}
-        >
-          {isValidTransaction && (
-            <Typography
-              variant="subtitle2"
-              color="warning.dark"
+        <Stack sx={{ minHeight: "54px" }}>
+          {(selectedIndex !== "" || isCustomToken) && (
+            <Paper
               sx={{
+                backgroundColor: "background.paper",
+                minHeight: "24px",
+                alignSelf: "center",
+                mt: isCustomToken ? "12px" : "4px",
                 maxWidth: "260px",
+                // bgcolor: "background.paper",
               }}
             >
-              Estimated network fee: {estimatedTxnResult.gas_used}
-            </Typography>
-          )}
-          {estimatedTxnResult && !isValidTransaction && (
-            <Stack>
-              {estimatedTxnResult && (
+              {isValidTransaction && (
                 <Typography
+                  noWrap
+                  align="center"
                   variant="subtitle2"
-                  color="error.dark"
+                  color="warning.dark"
                   sx={{
                     maxWidth: "260px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    wordWrap: "break-word",
+                    mt: "2px",
+                    ml: "12px",
+                    mr: "12px",
                   }}
                 >
-                  {estimatedTxnResult.vm_status}
+                  Estimated network fee: {estimatedTxnResult.gas_used}
                 </Typography>
               )}
-            </Stack>
+              {estimatedTxnResult && !isValidTransaction && (
+                <Stack>
+                  {estimatedTxnResult && (
+                    <Typography
+                      variant="subtitle2"
+                      color="error.dark"
+                      sx={{
+                        maxWidth: "260px",
+                        overflow: "hidden",
+                        overflowY: "scroll",
+                        textOverflow: "ellipsis",
+                        wordWrap: "break-word",
+                        maxHeight: "48px",
+                        mt: "2px",
+                        ml: "12px",
+                        mr: "12px",
+                      }}
+                    >
+                      {estimatedTxnResult.vm_status}
+                    </Typography>
+                  )}
+                </Stack>
+              )}
+            </Paper>
           )}
-        </Box>
+        </Stack>
       </DialogContent>
       <DialogActions sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Stack>
