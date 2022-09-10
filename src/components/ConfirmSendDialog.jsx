@@ -46,7 +46,7 @@ const ConfirmSendDialog = () => {
         createData("Sender", estimatedTxnResult.sender),
         createData("Recipient", estimatedTxnResult.payload.arguments[0]),
         createData("Amount", `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`),
-        createData("Network fee", `~ ${estimatedTxnResult.gas_used}`),
+        createData("Gas fee", `~ ${estimatedTxnResult.gas_used}`),
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
       ]);
@@ -80,10 +80,10 @@ const ConfirmSendDialog = () => {
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ maxWidth: "95px" }} component="th" scope="row">
+                  <TableCell sx={{ maxWidth: "65px" }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
-                  <TableCell sx={{ maxWidth: "110px" }}>
+                  <TableCell sx={{ maxWidth: "90px" }}>
                     {row.name === "Sender" || row.name === "Recipient" ? (
                       <Tooltip title="Copy address" sx={{ ml: -1.5 }}>
                         <Chip
