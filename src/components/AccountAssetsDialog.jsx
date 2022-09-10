@@ -17,29 +17,23 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { setStore } from "../lib/store";
+import { coinList } from "../lib/coin";
 import { getAccountAssets } from "../lib/asset_store";
 import { PLATFORM } from "../utils/constants";
 
 const AccountAssetsDialog = () => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, currentAddress, setCurrentAsset } = useContext(AccountContext);
-  const { updateBalance } = useContext(Web3Context);
-  const [assets, setAssets] = useState([]);
+  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets } =
+    useContext(AccountContext);
+  const { updateAccountAssets, updateBalance } = useContext(Web3Context);
 
   const _currentAsset = "currentAsset";
 
   useEffect(() => {
     if (openAccountAssetsDialog === true) {
-      accountAssets();
+      updateAccountAssets();
     }
   }, [openAccountAssetsDialog === true]);
-
-  const accountAssets = async () => {
-    const data = await getAccountAssets(currentAddress);
-    if (data !== undefined || data !== null) {
-      setAssets(data.assets);
-    }
-  };
 
   const handleSwitchAsset = (asset) => {
     setStore(PLATFORM, _currentAsset, asset);
@@ -67,7 +61,7 @@ const AccountAssetsDialog = () => {
             component="nav"
             sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}
           >
-            {assets.map((asset) => (
+            {accountAssets.map((asset) => (
               <Stack key={asset.type}>
                 <ListItemButton
                   onClick={() => {

@@ -3,11 +3,14 @@ import * as aptos from "aptos";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import { client, faucetClient, tokenClient } from "../lib/client";
-import { aptosCoin, coinStore, coinInfo } from "../lib/coin";
+import { aptosCoin, coinList, coinStore, coinInfo } from "../lib/coin";
+import { setAsset, getAccountAssets } from "../lib/asset_store";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
+import { PLATFORM } from "../utils/constants";
 import { stringToValue, valueToString } from "../utils/values";
 import pixel_coin from "../assets/pixel_coin.png";
+import { setStore } from "../lib/store";
 
 export const Web3Context = React.createContext();
 
@@ -21,6 +24,8 @@ export const Web3Provider = ({ children }) => {
     setBalance,
     currentAsset,
     setIsLoading,
+    accountAssets,
+    setAccountAssets,
   } = useContext(AccountContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
@@ -45,8 +50,13 @@ export const Web3Provider = ({ children }) => {
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState();
 
+  const _accountAssets = "accountAssets";
+
   useEffect(() => {
     getChainId();
+    if (accountImported) {
+      updateAccountAssets();
+    }
   }, [accountImported]);
 
   const submitTransactionHelper = async (account, payload) => {
@@ -247,6 +257,7 @@ export const Web3Provider = ({ children }) => {
           logo_alt: pixel_coin,
         },
       };
+
       setSelectedAsset(result);
       setIsValidAsset(true);
       return result;
@@ -422,20 +433,20 @@ export const Web3Provider = ({ children }) => {
     return data;
   };
 
-  const updateAccountAssets = async () => {
+  const getRegisteredAssets = async () => {
     const result = [];
     const resources = await client.getAccountResources(account.address());
     await Promise.all(
       Object.values(resources).map(async (value) => {
         if (
-          value.type.startsWith("0x1::coin::CoinStore") &&
-          value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
+          value.type.startsWith("0x1::coin::CoinStore") //&&
+          // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
         ) {
           const type = value.type.substring(
             value.type.indexOf("<") + 1,
             value.type.lastIndexOf(">")
           );
-          const asset = await getAssetData(address);
+          const asset = await getAssetData(type);
           result.push({
             type: type,
             data: {
@@ -443,6 +454,8 @@ export const Web3Provider = ({ children }) => {
               symbol: asset.data.symbol,
               decimals: asset.data.decimals,
               balance: value.data.coin.value,
+              logo: pixel_coin,
+              logo_alt: pixel_coin,
             },
           });
         }
@@ -450,6 +463,25 @@ export const Web3Provider = ({ children }) => {
     );
 
     return result;
+  };
+
+  const updateAccountAssets = async () => {
+    const registeredAssets = await getRegisteredAssets();
+    const result = registeredAssets.reduce((acc, curr) => {
+      const stored = coinList.find(({ type }) => type === curr.type);
+      if (stored) {
+        stored.data.balance = curr.data.balance;
+        stored.data.logo = stored.data.logo;
+        stored.data.logo_alt = stored.data.logo_alt;
+        acc.push(stored);
+      } else {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+    result.sort((a, b) => a.data.name.localeCompare(b.data.name));
+    setAccountAssets(result);
+    setStore(PLATFORM, _accountAssets, result);
   };
 
   const getAccountTokens = async () => {

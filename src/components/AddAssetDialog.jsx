@@ -16,19 +16,17 @@ import {
   Typography,
 } from "@mui/material";
 import Loading from "../components/Loading";
-import pixel_coin from "../assets/pixel_coin.png";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
-import { setAsset } from "../lib/asset_store";
 import { PLATFORM } from "../utils/constants";
 import { register } from "../lib/payload";
 
 const AddAssetDialog = () => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, currentAddress, currentAsset, setCurrentAsset, throwAlert } =
+  const { setIsLoading, alertSignal, accountAssets, currentAsset, setCurrentAsset, throwAlert } =
     useContext(AccountContext);
   const {
     getBalance,
@@ -48,8 +46,9 @@ const AddAssetDialog = () => {
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [estimationRequired, setEstimationRequired] = useState(false);
   const [coinType, setCoinType] = useState("");
-
   const _currentAsset = "currentAsset";
+  const assetList = coinList.filter((i) => !accountAssets.includes(i));
+  assetList.sort((a, b) => a.data.name.localeCompare(b.data.name));
 
   const handleListItemClick = (event, index, asset) => {
     clearPrevEstimation();
@@ -69,6 +68,15 @@ const AddAssetDialog = () => {
   useEffect(() => {
     handleGetBalance();
   }, [currentAsset]);
+
+  useEffect(() => {
+    if (openAddAssetDialog) {
+      if (alertSignal === 101) {
+        clearPrevEstimation();
+        clearDialog();
+      }
+    }
+  }, [alertSignal]);
 
   const handleGetBalance = async () => {
     setIsLoading(true);
@@ -118,7 +126,6 @@ const AddAssetDialog = () => {
 
   const registerAssetInAccount = async (coinType) => {
     await registerAsset(coinType, selectedAsset.data.name);
-    setAsset(currentAddress, selectedAsset);
     setCurrentAsset(selectedAsset);
     setStore(PLATFORM, _currentAsset, selectedAsset);
   };
@@ -215,7 +222,7 @@ const AddAssetDialog = () => {
               component="nav"
               sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "200px" }}
             >
-              {coinList.map((asset) => (
+              {assetList.map((asset) => (
                 <Stack key={asset.type}>
                   <ListItemButton
                     selected={selectedIndex === asset.data.name}
