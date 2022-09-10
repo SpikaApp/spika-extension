@@ -20,10 +20,9 @@ import pixel_coin from "../assets/pixel_coin.png";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import { coinList, coinStore, coinInfo } from "../lib/coin";
-import { client } from "../lib/client";
+import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
-import { setAsset, getAsset } from "../lib/asset_store";
+import { setAsset } from "../lib/asset_store";
 import { PLATFORM } from "../utils/constants";
 import { register } from "../lib/payload";
 
@@ -48,12 +47,12 @@ const AddAssetDialog = () => {
   const [selectedIndex, setSelectedIndex] = useState("");
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [estimationRequired, setEstimationRequired] = useState(false);
-  const [registerAssetRequired, setRegisterAssetRequired] = useState(false);
   const [coinType, setCoinType] = useState("");
 
   const _currentAsset = "currentAsset";
 
   const handleListItemClick = (event, index, asset) => {
+    clearPrevEstimation();
     setSelectedIndex(index);
     setSelectedAsset(asset);
     setCoinType(asset.type);
@@ -61,51 +60,11 @@ const AddAssetDialog = () => {
   };
 
   useEffect(() => {
-    if (estimationRequired || isValidAsset) {
+    if (estimationRequired) {
       handleEstimateTransaction(coinType);
       setEstimationRequired(false);
     }
-  }, [estimationRequired || isValidAsset]);
-
-  //  useEffect(() => {
-  //    if (isCustomToken && isValidAsset) {
-  //      handleEstimateTransaction(coinType);
-  //      setEstimationRequired(false);
-  //    }
-  //  }, [isCustomToken && isValidAsset]);
-
-  useEffect(() => {
-    if (registerAssetRequired && openAddAssetDialog) {
-      try {
-        setIsLoading(true);
-        if (isValidTransaction && isCustomToken) {
-          setIsLoading(true);
-          registerAsset(coinType);
-          setCurrentAsset(selectedAsset);
-          setAsset(currentAddress, selectedAsset);
-          setStore(PLATFORM, _currentAsset, selectedAsset);
-          setIsLoading(false);
-          throwAlert(
-            102,
-            "Success",
-            `New asset ${selectedAsset.data.name} successfully registered.`
-          );
-        }
-        if (isValidTransaction && !isCustomToken) {
-          registerAsset(coinType);
-          setAsset(currentAddress, selectedAsset);
-          setCurrentAsset(selectedAsset);
-          setStore(PLATFORM, _currentAsset, selectedAsset);
-          throwAlert(101, "Success", `New asset ${selectedAsset.data.name} successfully added.`);
-        }
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-        throwAlert(103, "Error", `${error}`);
-      }
-      setRegisterAssetRequired(false);
-    }
-  }, [isValidTransaction]);
+  }, [estimationRequired]);
 
   useEffect(() => {
     handleGetBalance();
@@ -117,9 +76,9 @@ const AddAssetDialog = () => {
     setIsLoading(false);
   };
 
-  const handleAddCustomToken = async () => {
-    clearDialog();
-    setIsCustomToken(true);
+  const handleEstimateTransaction = async (coinType) => {
+    const payload = await register(coinType);
+    await estimateTransaction(payload, true, true);
   };
 
   const handleFindAsset = async () => {
@@ -127,42 +86,54 @@ const AddAssetDialog = () => {
     const data = await findAsset(coinType);
     if (!data) {
       throwAlert(112, "Error", "Asset not found on chain.");
+      clearPrevEstimation();
+      clearDialog();
+    } else {
+      handleRegisterAsset();
     }
     setIsLoading(false);
-  };
-
-  const handleEstimateTransaction = async (coinType) => {
-    const payload = await register(coinType);
-    await estimateTransaction(payload, true, true);
   };
 
   const handleRegisterAsset = async () => {
     if (selectedIndex !== "" || isCustomToken) {
       const assetData = await findAsset(coinType);
       if (assetData) {
-        const assetRegistered = await findAssetInCurrentAccount(coinType);
-        if (!assetRegistered) {
-          setEstimationRequired(true);
-          setRegisterAssetRequired(true);
-          console.log("Asset not found. Estimating gas...");
-        } else {
-          const assetInStore = getAsset(currentAddress, coinType);
-          if (!assetInStore) {
-            setCurrentAsset(selectedAsset);
-            setStore(PLATFORM, _currentAsset, selectedAsset);
-            handleCancel();
-            console.log("Asset already registered. Saving in wallet's store.");
-          } else {
-            console.log("Asset already registered and already saved in wallet's store.");
-            handleCancel();
-          }
-        }
+        setEstimationRequired(true);
+        await registerAssetInAccount(coinType);
+        clearPrevEstimation();
+        clearDialog();
       } else {
         throwAlert(112, "Error", "Asset not found on chain.");
+        clearPrevEstimation();
+        clearDialog();
       }
-    } else {
-      throwAlert(104, "Error", "Select asset from the list or add custom token to continue.");
     }
+  };
+
+  const handleAddCustomToken = async () => {
+    clearPrevEstimation();
+    clearDialog();
+    setIsCustomToken(true);
+  };
+
+  const registerAssetInAccount = async (coinType) => {
+    await registerAsset(coinType, selectedAsset.data.name);
+    setAsset(currentAddress, selectedAsset);
+    setCurrentAsset(selectedAsset);
+    setStore(PLATFORM, _currentAsset, selectedAsset);
+  };
+
+  const clearPrevEstimation = () => {
+    setIsValidTransaction(false);
+    setEstimatedTxnResult(false);
+  };
+
+  const clearDialog = () => {
+    setIsValidAsset(false);
+    setSelectedIndex("");
+    setSelectedAsset([]);
+    setIsCustomToken(false);
+    setCoinType("");
   };
 
   const handleCancel = () => {
@@ -170,22 +141,12 @@ const AddAssetDialog = () => {
     clearDialog();
   };
 
-  const clearDialog = () => {
-    setIsValidAsset(false);
-    setIsValidTransaction(false);
-    setEstimatedTxnResult([]);
-    setSelectedIndex("");
-    setSelectedAsset([]);
-    setIsCustomToken(false);
-    setCoinType("");
-  };
-
   return (
     <Dialog open={openAddAssetDialog}>
       {isCustomToken ? (
-        <DialogTitle align="center">Add Custom Token</DialogTitle>
+        <DialogTitle align="center">Register Custom Asset</DialogTitle>
       ) : (
-        <DialogTitle align="center">Import Asset</DialogTitle>
+        <DialogTitle align="center">Register Asset</DialogTitle>
       )}
       <DialogContent sx={{ display: "flex", flexDirection: "column" }}>
         {isCustomToken ? (
@@ -252,7 +213,7 @@ const AddAssetDialog = () => {
           >
             <List
               component="nav"
-              sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}
+              sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "200px" }}
             >
               {coinList.map((asset) => (
                 <Stack key={asset.type}>
@@ -312,7 +273,7 @@ const AddAssetDialog = () => {
               Estimated network fee: {estimatedTxnResult.gas_used}
             </Typography>
           )}
-          {isCustomToken && isValidAsset && !isValidTransaction && (
+          {estimatedTxnResult && !isValidTransaction && (
             <Stack>
               {estimatedTxnResult && (
                 <Typography
@@ -323,7 +284,6 @@ const AddAssetDialog = () => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     wordWrap: "break-word",
-                    mt: 1,
                   }}
                 >
                   {estimatedTxnResult.vm_status}
@@ -374,7 +334,7 @@ const AddAssetDialog = () => {
                 variant="contained"
                 onClick={handleRegisterAsset}
               >
-                Import
+                Register
               </Button>
             )}
             {!isCustomToken && isValidTransaction && (
