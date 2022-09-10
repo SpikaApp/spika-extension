@@ -6,12 +6,12 @@ import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { client, faucetClient } from "../lib/client";
-import { aptosCoin, coinList, coinStore } from "../lib/coin";
+import { aptosCoin, coinStore } from "../lib/coin";
 import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
-import applyUpdate from "../utils/apply_update";
+import { encryptPassword, decryptPassword } from "../utils/pwd";
 
 export const AccountContext = React.createContext();
 
@@ -62,15 +62,12 @@ export const AccountProvider = ({ children }) => {
       setIsLoading(true);
     } else {
       setIsLoading(false);
+      if (PLATFORM === "chrome-extension:") {
+        chrome.runtime.connect({ name: "spika" });
+      }
+      walletState();
     }
   }, [spikaWallet]);
-
-  useEffect(() => {
-    if (PLATFORM === "chrome-extension:") {
-      chrome.runtime.connect({ name: "spika" });
-    }
-    walletState();
-  }, []);
 
   useEffect(() => {
     if (isUnlocked) {
@@ -84,7 +81,8 @@ export const AccountProvider = ({ children }) => {
     if (data === undefined || data === null) {
       checkIfLoginRequired();
     } else {
-      setPassword(data);
+      const pwd = await decryptPassword(data);
+      setPassword(pwd);
       setIsUnlocked(true);
     }
   };
@@ -149,7 +147,8 @@ export const AccountProvider = ({ children }) => {
   };
 
   const handleChangePassword = async () => {
-    const oldPassword = await getMem(PLATFORM, "PWD");
+    const data = await getMem(PLATFORM, "PWD");
+    const oldPassword = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
         throwAlert(58, "Incorrect password", "New password shall not be the same");
@@ -185,7 +184,8 @@ export const AccountProvider = ({ children }) => {
       encryptedPrivateKey = await passworder.encrypt(newPassword, decryptedPrivateKey);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      setMem(PLATFORM, "PWD", newPassword);
+      const encryptedPassword = await encryptPassword(newPassword);
+      setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
       throwAlert(56, "Success", "Password successfully changed");
     } catch (error) {
@@ -294,6 +294,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      const encryptedPassword = await encryptPassword(password);
+      setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       apps.addAddress(_account.address().hex());
@@ -333,6 +335,8 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      const encryptedPassword = await encryptPassword(password);
+      setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       apps.addAddress(_account.address().hex());
@@ -358,7 +362,6 @@ export const AccountProvider = ({ children }) => {
   };
 
   const loadAccount = async () => {
-    applyUpdate();
     try {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
@@ -378,7 +381,8 @@ export const AccountProvider = ({ children }) => {
         assetStore.addAssetStore(_account.address().hex(), aptosCoin);
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());
-        setMem(PLATFORM, "PWD", password);
+        const encryptedPassword = await encryptPassword(password);
+        setMem(PLATFORM, "PWD", encryptedPassword);
         setAccountImported(true);
         setPrivateKey(_privateKey);
         setAccount(_account);
