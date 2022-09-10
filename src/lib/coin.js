@@ -54,6 +54,16 @@ export const coinList = [
     },
   },
   {
+    type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetBTC",
+    data: {
+      name: "Bitcoin",
+      symbol: "BTC",
+      decimals: 8,
+      logo: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579",
+      logo_alt: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579",
+    },
+  },
+  {
     type: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetETH",
     data: {
       name: "Ethereum",
