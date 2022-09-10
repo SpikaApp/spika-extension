@@ -39,6 +39,7 @@ export const AccountProvider = ({ children }) => {
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState([]); // AptosAccount
   const [currentAsset, setCurrentAsset] = useState([]);
+  const [accountAssets, setAccountAssets] = useState([]);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -442,6 +443,8 @@ export const AccountProvider = ({ children }) => {
         privateKey,
         currentAddress,
         currentAsset,
+        accountAssets,
+        setAccountAssets,
         setCurrentAsset,
         balance,
         setBalance,
