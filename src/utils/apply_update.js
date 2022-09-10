@@ -1,14 +1,18 @@
-import { setStore, getStore, removeStore } from "../lib/store";
+import { setStore, getStore, removeStore, removeMem } from "../lib/store";
 import { PLATFORM, EXTENSION_VERSION } from "../utils/constants";
+import { compare } from "compare-versions";
 
-let version;
 const _accountVersion = "accountVersion";
 const _currentAsset = "currentAsset";
 const _accountAssets = "accountAssets";
+const _pwd = "PWD";
+
+let version;
 
 const applyUpdate = async () => {
   await getVersion();
   await v0_4_0();
+  await v0_4_5();
 };
 
 const getVersion = async () => {
@@ -24,12 +28,26 @@ const logUpdate = (update) => {
   console.log(`Spika update v${update} applied.`);
 };
 
-// uptdate from v0.3.x to 0.4.x
+const pendingUpdate = (version, currentUpdate) => {
+  return compare(version, currentUpdate, "<");
+};
+
 const v0_4_0 = async () => {
   const currentUpdate = "0.4.0";
-  if (version !== EXTENSION_VERSION) {
+  const required = pendingUpdate(version, currentUpdate);
+  if (required) {
     removeStore(PLATFORM, _currentAsset);
     removeStore(PLATFORM, _accountAssets);
+    setVersion();
+    logUpdate(currentUpdate);
+  }
+};
+
+const v0_4_5 = async () => {
+  const currentUpdate = "0.4.5";
+  const required = pendingUpdate(version, currentUpdate);
+  if (required) {
+    removeMem(PLATFORM, _pwd);
     setVersion();
     logUpdate(currentUpdate);
   }
