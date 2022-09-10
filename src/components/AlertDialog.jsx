@@ -28,6 +28,7 @@ const AlertDialog = () => {
     setOpenCreateCollectionDialog,
     setOpenCreateNftDialog,
     setOpenChangePasswordDialog,
+    setOpenAddAssetDialog,
     setIsPopup,
   } = useContext(UIContext);
   const {
@@ -106,6 +107,10 @@ const AlertDialog = () => {
         setAlertMessage("");
         setMnemonic("");
         break;
+
+      case 101: // New asset successfully added
+        setOpenAlertDialog(false);
+        setOpenAddAssetDialog(false);
       case 2: // Failed create account
       case 12: // Failed import account
       case 22: // Failed mint coins
@@ -121,7 +126,6 @@ const AlertDialog = () => {
       case 62: // Failed create collection
       case 72: // Failed create nft
       case 92: // No mnemonic phrase found
-      case 101: // New asset successfully added
       case 102: // New custom asset successfully added
       case 103: // Failed to add new asset
       case 104: // Error, Select asset from the list or add custom token to continue.
