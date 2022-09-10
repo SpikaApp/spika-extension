@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getMem, getStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
+import applyUpdate from "../utils/apply_update";
 
 export const UIContext = React.createContext();
 
@@ -36,6 +37,7 @@ export const UIProvider = ({ children }) => {
   const _currentRoute = "currentRoute";
 
   useEffect(() => {
+    applyUpdate();
     getWallet();
     getCurrentRoute();
     getSessionTheme();
