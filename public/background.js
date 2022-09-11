@@ -132,6 +132,7 @@ const spikaMessenger = (message, sender, sendResponse) => {
   if (
     message.method === "connect" ||
     message.method === "account" ||
+    message.method === "signMessage" ||
     message.method === "signTransaction" ||
     message.method === "signAndSubmitTransaction"
   ) {
