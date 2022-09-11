@@ -22,6 +22,16 @@ export const lightTheme = createTheme({
         },
       },
     },
+    MuiDialog: {
+      styleOverrides: {
+        paperFullScreen: {
+          borderRadius: "0",
+        },
+        paper: {
+          borderRadius: "22px",
+        },
+      },
+    },
   },
   palette: {
     primary: {
@@ -65,6 +75,16 @@ export const darkTheme = createTheme({
           textTransform: "none",
           height: "44px",
           color: "#FFFFFF",
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paperFullScreen: {
+          borderRadius: "0",
+        },
+        paper: {
+          borderRadius: "22px",
         },
       },
     },
