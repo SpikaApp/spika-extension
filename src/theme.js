@@ -33,6 +33,7 @@ export const lightTheme = createTheme({
       },
     },
   },
+
   palette: {
     primary: {
       main: "#212121",
@@ -43,7 +44,7 @@ export const lightTheme = createTheme({
     divider: "#212121",
     background: {
       default: "#FFFFFF",
-      paper: "#FFFFFF",
+      paper: "#f5f5f5",
     },
     text: {
       primary: "#232323",

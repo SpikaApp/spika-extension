@@ -25,6 +25,7 @@ export const AccountProvider = ({ children }) => {
     setPrivateKeyRequired,
     setOpenLogoutDialog,
     setAccountRoutesEnabled,
+    setIsError,
   } = useContext(UIContext);
 
   const [alertSignal, setAlertSignal] = useState(0);
@@ -113,7 +114,7 @@ export const AccountProvider = ({ children }) => {
       locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
-      throwAlert(62, "Failed load account", `${error}`);
+      throwAlert(62, "Failed load account", `${error}`, true);
       setPassword("");
       console.log("Error occured during loading account");
       setAccountRoutesEnabled(true);
@@ -151,7 +152,7 @@ export const AccountProvider = ({ children }) => {
     const oldPassword = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
-        throwAlert(58, "Incorrect password", "New password shall not be the same");
+        throwAlert(58, "Incorrect password", "New password shall not be the same", true);
         clearPasswords();
       } else if (newPassword === confirmPassword && newPassword.length > 5) {
         setIsLoading(true);
@@ -159,17 +160,17 @@ export const AccountProvider = ({ children }) => {
         clearPasswords();
         setIsLoading(false);
       } else if (newPassword === "") {
-        throwAlert(52, "Incorrect password", "Password field cannot be empty");
+        throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
         clearPasswords();
       } else if (newPassword !== confirmPassword) {
-        throwAlert(53, "Incorrect password", "Passwords do not match");
+        throwAlert(53, "Incorrect password", "Passwords do not match", true);
         clearPasswords();
       } else if ([newPassword.length > 5]) {
-        throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+        throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
         clearPasswords();
       }
     } else {
-      throwAlert(57, "Incorrect password", "Current password is wrong");
+      throwAlert(57, "Incorrect password", "Current password is wrong", true);
       clearPasswords();
     }
   };
@@ -187,7 +188,7 @@ export const AccountProvider = ({ children }) => {
       const encryptedPassword = await encryptPassword(newPassword);
       setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
-      throwAlert(56, "Success", "Password successfully changed");
+      throwAlert(56, "Success", "Password successfully changed", false);
     } catch (error) {
       clearPasswords();
       console.log(error);
@@ -208,13 +209,13 @@ export const AccountProvider = ({ children }) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
-      throwAlert(52, "Incorrect password", "Password field cannot be empty");
+      throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
       clearPasswords();
     } else if (password !== confirmPassword) {
-      throwAlert(53, "Incorrect password", "Passwords do not match");
+      throwAlert(53, "Incorrect password", "Passwords do not match", true);
       clearPasswords();
     } else if ([password.length > 5]) {
-      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
       clearPasswords();
     }
   };
@@ -227,13 +228,13 @@ export const AccountProvider = ({ children }) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
-      throwAlert(52, "Incorrect password", "Password field cannot be empty");
+      throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
       clearPasswords();
     } else if (password !== confirmPassword) {
-      throwAlert(53, "Incorrect password", "Passwords do not match");
+      throwAlert(53, "Incorrect password", "Passwords do not match", true);
       clearPasswords();
     } else if ([password.length > 5]) {
-      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long");
+      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
       clearPasswords();
     }
   };
@@ -251,12 +252,12 @@ export const AccountProvider = ({ children }) => {
     try {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
-      throwAlert(91, "Secret Recovery Phrase", decryptedMnemonic);
+      throwAlert(91, "Secret Recovery Phrase", decryptedMnemonic, false);
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
-      throwAlert(92, "Error", "Incorrect password");
+      throwAlert(92, "Error", "Incorrect password", true);
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
@@ -267,12 +268,12 @@ export const AccountProvider = ({ children }) => {
     try {
       const encryptedPrivateKey = await getStore(PLATFORM, "DATA1");
       let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
-      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`);
+      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`, false);
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
-      throwAlert(92, "Error", "Incorrect password");
+      throwAlert(92, "Error", "Incorrect password", true);
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
@@ -313,9 +314,9 @@ export const AccountProvider = ({ children }) => {
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
-      throwAlert(1, "Account created", `${_account.address().hex()}`);
+      throwAlert(1, "Account created", `${_account.address().hex()}`, false);
     } catch (error) {
-      throwAlert(2, "Failed create account", `${error}`);
+      throwAlert(2, "Failed create account", `${error}`, true);
       console.log(error);
     }
   };
@@ -354,9 +355,9 @@ export const AccountProvider = ({ children }) => {
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
-      throwAlert(11, "Account imported", `${_account.address().hex()}`);
+      throwAlert(11, "Account imported", `${_account.address().hex()}`, false);
     } catch (error) {
-      throwAlert(12, "Failed import account", `${error}`);
+      throwAlert(12, "Failed import account", `${error}`, true);
       console.log(error);
     }
   };
@@ -401,21 +402,30 @@ export const AccountProvider = ({ children }) => {
         }
       } catch (error) {
         console.log(error);
-        throwAlert(42, "Failed to load account", `${error}`);
+        throwAlert(42, "Failed to load account", `${error}`, true);
       }
     } catch (error) {
       console.log(error);
-      throwAlert(55, "Error", "Incorrect password");
+      throwAlert(55, "Error", "Incorrect password", true);
       setPassword("");
       setOpenLoginDialog(true);
     }
   };
 
-  const throwAlert = (signal, title, message) => {
+  const throwAlert = (signal, title, message, error) => {
     setAlertSignal(signal);
     setAlertTitle(title);
     setAlertMessage(message);
+    setIsError(error);
   };
+
+  const clearAlert = () => {
+    setAlertSignal(0);
+    setAlertTitle("");
+    setAlertMessage("");
+    setIsError();
+  };
+
   return (
     <AccountContext.Provider
       value={{
@@ -426,6 +436,7 @@ export const AccountProvider = ({ children }) => {
         alertMessage,
         setAlertMessage,
         throwAlert,
+        clearAlert,
         isLoading,
         setIsLoading,
         mnemonic,
