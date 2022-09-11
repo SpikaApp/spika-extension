@@ -21,6 +21,10 @@ class SpikaWeb3 {
     return this._message("account", {});
   }
 
+  signMessage(message) {
+    return this._message("signMessage", message);
+  }
+
   signAndSubmitTransaction(transaction) {
     return this._message("signAndSubmitTransaction", transaction);
   }

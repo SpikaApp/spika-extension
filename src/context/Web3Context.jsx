@@ -283,6 +283,13 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  const signMessage = async (message) => {
+    const messageToSign = Buffer.from(message);
+    const signedMessage = await account.signBuffer(messageToSign);
+    const response = { signedMessage: signedMessage.hexString };
+    return response;
+  };
+
   const signTransaction = async (payload) => {
     try {
       const transaction = await client.generateTransaction(account.address(), payload);
@@ -605,6 +612,7 @@ export const Web3Provider = ({ children }) => {
         getAptosName,
         getAptosAddress,
         estimateTransaction,
+        signMessage,
         signTransaction,
         signAndSubmitTransaction,
         updateAccountAssets,

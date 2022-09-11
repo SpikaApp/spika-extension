@@ -16,6 +16,7 @@ import {
   ListItemIcon,
   ListItemText,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
@@ -37,12 +38,13 @@ const PermissionDialog = () => {
   const [requestSender, setRequestSender] = useState();
   const { spikaWallet, openPermissionDialog, setOpenPermissionDialog, isPopup, setIsPopup } =
     useContext(UIContext);
-  const { alertSignal, accountImported, currentAddress, publicAccount } =
+  const { isLoading, setIsLoading, alertSignal, accountImported, currentAddress, publicAccount } =
     useContext(AccountContext);
   const {
     isValidTransaction,
     estimatedTxnResult,
     estimateTransaction,
+    signMessage,
     signTransaction,
     signAndSubmitTransaction,
   } = useContext(Web3Context);
@@ -68,7 +70,7 @@ const PermissionDialog = () => {
   useEffect(() => {
     if (accountImported) {
       if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
-        estimateTransaction(request.args);
+        estimate();
       }
     }
   }, [accountImported]);
@@ -110,31 +112,44 @@ const PermissionDialog = () => {
     });
   };
 
+  const estimate = async () => {
+    setIsLoading(true);
+    await estimateTransaction(request.args);
+    setIsLoading(false);
+  };
+
   const handleApprove = async () => {
-    if (method === "connect") {
-      const data = await getApp(currentAddress, requestSender.origin);
-      if (!data) {
-        const set = await setApp(currentAddress, requestSender.origin);
-        if (set) {
-          response = publicAccount;
+    switch (method) {
+      case "connect":
+        const data = await getApp(currentAddress, requestSender.origin);
+        if (!data) {
+          const set = await setApp(currentAddress, requestSender.origin);
+          if (set) {
+            response = publicAccount;
+          } else {
+            // if something went wrong with saving app return false
+            response = false;
+          }
         } else {
-          // if something went wrong with saving app return false
-          response = false;
+          response = publicAccount;
         }
-      } else {
+        break;
+      case "account":
         response = publicAccount;
-      }
-    }
-    if (method === "account") {
-      response = publicAccount;
-    }
-    if (method === "signTransaction") {
-      const result = await signTransaction(request.args);
-      response = result;
-    }
-    if (method === "signAndSubmitTransaction") {
-      const result = await signAndSubmitTransaction(request.args);
-      response = result;
+        break;
+      case "signMessage":
+        response = await signMessage(request.args);
+        break;
+      case "signTransaction":
+        setIsLoading(true);
+        response = await signTransaction(request.args);
+        setIsLoading(false);
+        break;
+      case "signAndSubmitTransaction":
+        setIsLoading(true);
+        response = await signAndSubmitTransaction(request.args);
+        setIsLoading(false);
+        break;
     }
     sendResponse(response);
     clearDialog();
@@ -176,7 +191,12 @@ const PermissionDialog = () => {
           {accountImported && (
             <div>
               {(method === "connect" || method === "account") && (
-                <Dialog fullScreen align="center" open={openPermissionDialog}>
+                <Dialog
+                  fullScreen
+                  sx={{ borderRadius: "0" }}
+                  align="center"
+                  open={openPermissionDialog}
+                >
                   <DialogTitle> {requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
                     <Box
@@ -191,7 +211,7 @@ const PermissionDialog = () => {
                     <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
                       {requestSender.tab.title}
                     </Typography>
-                    <Typography variant="body1" color="warning.dark">
+                    <Typography variant="body1">
                       Website is requesting access to the following account information:
                     </Typography>
                     <Box sx={{ width: "100%", maxWidth: 320, mt: 4 }}>
@@ -242,11 +262,71 @@ const PermissionDialog = () => {
                       variant="contained"
                       onClick={handleApprove}
                     >
-                      Approve{" "}
+                      Approve
                     </Button>
                   </Stack>
-                  <Loading />
-                  <AlertDialog />
+                </Dialog>
+              )}
+              {method === "signMessage" && (
+                <Dialog fullScreen align="center" open={openPermissionDialog}>
+                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                  <DialogContent sx={{ maxWidth: 375 }}>
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 48,
+                        width: 48,
+                      }}
+                      alt="favicon"
+                      src={requestSender.tab.favIconUrl}
+                    />
+                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                      {requestSender.tab.title}
+                    </Typography>
+                    <div>
+                      <Typography variant="body1">
+                        This website is requesting to sign the following:
+                      </Typography>
+                      <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
+                        <Grid item xs={12}>
+                          <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            Message
+                          </Typography>
+                          <Item>
+                            <pre>{JSON.stringify(request.args, null, 2)}</pre>
+                          </Item>
+                        </Grid>
+                      </Grid>
+                    </div>
+                  </DialogContent>
+                  <Stack
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mt: 2,
+                      mb: 4,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "121px", mr: 4 }}
+                      onClick={handleCancel}
+                    >
+                      Reject
+                    </Button>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                        width: "121px",
+                      }}
+                      onClick={handleApprove}
+                    >
+                      Sign
+                    </Button>
+                  </Stack>
                 </Dialog>
               )}
               {(method === "signTransaction" || method === "signAndSubmitTransaction") && (
@@ -343,7 +423,6 @@ const PermissionDialog = () => {
                     )}
                   </Stack>
                   <Loading />
-                  <AlertDialog />
                 </Dialog>
               )}
             </div>
