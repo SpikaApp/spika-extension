@@ -137,6 +137,7 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setIsPopup(false);
         handleLogout();
+        break;
     }
     setAlertSignal(0);
   };
