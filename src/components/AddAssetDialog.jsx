@@ -42,6 +42,7 @@ const AddAssetDialog = () => {
     setEstimatedTxnResult,
     registerAsset,
     updateAccountAssets,
+    clearPrevEstimation,
   } = useContext(Web3Context);
   const [selectedIndex, setSelectedIndex] = useState("");
   const [isCustomToken, setIsCustomToken] = useState(false);
@@ -131,11 +132,6 @@ const AddAssetDialog = () => {
     await registerAsset(coinType, selectedAsset.data.name);
     setCurrentAsset(selectedAsset);
     setStore(PLATFORM, _currentAsset, selectedAsset);
-  };
-
-  const clearPrevEstimation = () => {
-    setIsValidTransaction(false);
-    setEstimatedTxnResult(false);
   };
 
   const clearDialog = () => {
