@@ -13,6 +13,8 @@ import {
   Link,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import copyToClipboard from "../utils/copy_clipboard";
@@ -30,6 +32,7 @@ const AlertDialog = () => {
     setOpenChangePasswordDialog,
     setOpenAddAssetDialog,
     setIsPopup,
+    isError,
   } = useContext(UIContext);
   const {
     alertSignal,
@@ -38,9 +41,15 @@ const AlertDialog = () => {
     setAlertTitle,
     alertMessage,
     setAlertMessage,
+    clearAlert,
     setMnemonic,
     handleLogout,
   } = useContext(AccountContext);
+
+  useEffect(() => {
+    checkDialogType();
+    handleOpen();
+  }, [alertSignal]);
 
   const checkDialogType = async () => {
     if (alertSignal === 31 || alertSignal === 61 || alertSignal === 71) {
@@ -95,17 +104,10 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setOpenCreateNftDialog(false);
         setIsTransaction(false);
-      case 81:
+      case 81: // Private key required
         setOpenAlertDialog(false);
-        setAlertSignal(0);
-        setAlertTitle("");
-        setAlertMessage("");
-      case 91:
+      case 91: // Mnemonic required
         setOpenAlertDialog(false);
-        setAlertSignal(0);
-        setAlertTitle("");
-        setAlertMessage("");
-        setMnemonic("");
         break;
 
       case 101: // New asset successfully added
@@ -139,20 +141,25 @@ const AlertDialog = () => {
         handleLogout();
         break;
     }
-    setAlertSignal(0);
+    clearAlert();
   };
-
-  useEffect(() => {
-    checkDialogType();
-    handleOpen();
-  }, [alertSignal]);
 
   return (
     <Dialog open={openAlertDialog} onClose={handleClose}>
       {alertSignal === 81 || alertSignal === 91 ? (
         <DialogTitle align="center">{alertTitle}</DialogTitle>
       ) : (
-        <DialogTitle>{alertTitle}</DialogTitle>
+        <DialogTitle>
+          <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "start", mr: 2 }}>
+            {isError && <ErrorIcon sx={{ mt: "4px", mr: "6px", color: "error.main" }} />}
+            {isError === false && (
+              <CheckCircleIcon sx={{ mt: "4px", mr: "6px", color: "success.main" }} />
+            )}
+            <Typography variant="h6" sx={{ color: isError ? "error.main" : "success.main" }}>
+              {alertTitle}
+            </Typography>
+          </Stack>
+        </DialogTitle>
       )}
       <DialogContent sx={{ minWidth: 250, maxWidth: 375 }}>
         {isTransaction && (

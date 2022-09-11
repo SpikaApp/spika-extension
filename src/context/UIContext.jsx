@@ -34,6 +34,7 @@ export const UIProvider = ({ children }) => {
   const [isPopup, setIsPopup] = useState(false);
   const [devMode, setDevMode] = useState(false);
   const [isTest, setIsTest] = useState(false);
+  const [isError, setIsError] = useState();
   const _currentRoute = "currentRoute";
 
   useEffect(() => {
@@ -209,6 +210,8 @@ export const UIProvider = ({ children }) => {
         setIsTest,
         isPopup,
         setIsPopup,
+        isError,
+        setIsError,
       }}
     >
       {children}
