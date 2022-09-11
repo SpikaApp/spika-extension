@@ -36,13 +36,6 @@ export const Web3Provider = ({ children }) => {
   const [accountTokens, setAccountTokens] = useState([]);
   const [isValidAsset, setIsValidAsset] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState([]);
-  const [collectionName, setCollectionName] = useState("");
-  const [collectionDescription, setCollectionDescription] = useState("");
-  const [collectionUri, setCollectionUri] = useState("");
-  const [nftName, setNftName] = useState("");
-  const [nftDescription, setNftDescription] = useState("");
-  const [nftUri, setNftUri] = useState("");
-  const [nftSupply, setNftSupply] = useState("");
   const [nftDetails, setNftDetails] = useState([]);
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
@@ -101,26 +94,6 @@ export const Web3Provider = ({ children }) => {
     setEstimatedTxnResult([]);
     setRecipientAddress("");
     setAmount("");
-  };
-
-  const handleCreateCollection = async () => {
-    setIsLoading(true);
-    await createCollection();
-    setIsLoading(false);
-    setCollectionName("");
-    setCollectionDescription("");
-    setCollectionUri("");
-  };
-
-  const handleCreateNft = async () => {
-    setIsLoading(true);
-    await createNft();
-    setIsLoading(false);
-    setCollectionName("");
-    setNftName("");
-    setNftDescription("");
-    setNftUri("");
-    setNftSupply("");
   };
 
   const getChainId = async () => {
@@ -311,39 +284,12 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const createCollection = async () => {
+  const createToken = async (payload) => {
     try {
-      const collection = await bcsPayload.collection(
-        collectionName,
-        collectionDescription,
-        collectionUri,
-        1
-      );
-      await submitTransactionHelper(account, collection);
-      throwAlert(61, "Transaction sent", `${collection}`, false);
+      await submitTransactionHelper(account, payload);
+      throwAlert(61, "Transaction sent", `${payload}`, false);
     } catch (error) {
       throwAlert(62, "Transaction failed", `${error}`, true);
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
-  const createNft = async () => {
-    try {
-      const nft = await bcsPayload.nft(
-        currentAddress,
-        collectionName,
-        nftName,
-        nftDescription,
-        nftSupply,
-        nftUri,
-        1
-      );
-
-      await submitTransactionHelper(account, nft);
-      throwAlert(71, "Transaction sent", `${nft}`, false);
-    } catch (error) {
-      throwAlert(72, "Transaction failed", `${error}`, true);
       setIsLoading(false);
       console.log(error);
     }
@@ -565,6 +511,11 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  const clearPrevEstimation = () => {
+    setIsValidTransaction(false);
+    setEstimatedTxnResult(false);
+  };
+
   return (
     <Web3Context.Provider
       value={{
@@ -592,16 +543,8 @@ export const Web3Provider = ({ children }) => {
         getBalance,
         updateBalance,
         getTransactions,
-        handleCreateCollection,
-        handleCreateNft,
         getNftDetails,
-        setCollectionName,
-        setCollectionDescription,
-        setCollectionUri,
-        setNftName,
-        setNftDescription,
-        setNftSupply,
-        setNftUri,
+        createToken,
         isValidAsset,
         setIsValidAsset,
         selectedAsset,
@@ -617,6 +560,7 @@ export const Web3Provider = ({ children }) => {
         updateAccountAssets,
         findAsset,
         registerAsset,
+        clearPrevEstimation,
       }}
     >
       {children}
