@@ -160,10 +160,11 @@ export const Web3Provider = ({ children }) => {
       throwAlert(
         21,
         "Success",
-        `Received ${Number(stringToValue(aptosCoin, _amount)).toFixed(2)} ${aptosCoin.data.symbol}`
+        `Received ${Number(stringToValue(aptosCoin, _amount)).toFixed(2)} ${aptosCoin.data.symbol}`,
+        false
       );
     } catch (error) {
-      throwAlert(22, "Transaction failed", `${error}`);
+      throwAlert(22, "Transaction failed", `${error}`, true);
       setIsLoading(false);
       console.log(error);
     }
@@ -197,13 +198,13 @@ export const Web3Provider = ({ children }) => {
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn);
-        throwAlert(30, "Transaction is valid", `${estimatedTxn.vm_status}`);
+        throwAlert(30, "Transaction is valid", `${estimatedTxn.vm_status}`, false);
       }
       if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn);
         if (!isSilent) {
-          throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`);
+          throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`, true);
         }
         setRecipientAddress("");
         setAmount("");
@@ -211,7 +212,7 @@ export const Web3Provider = ({ children }) => {
     } catch (error) {
       // logic if txn body doesn't looks good to be submitted to VM
       if (!isSilent) {
-        throwAlert(34, "Failed to estimate", `${error}`);
+        throwAlert(34, "Failed to estimate", `${error}`, true);
       }
       setRecipientAddress("");
       setAmount("");
@@ -230,9 +231,9 @@ export const Web3Provider = ({ children }) => {
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
       const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
       await client.waitForTransaction(transactionRes.hash);
-      throwAlert(31, "Transaction sent", `${transactionRes.hash}`);
+      throwAlert(31, "Transaction sent", `${transactionRes.hash}`, false);
     } catch (error) {
-      throwAlert(32, "Transaction failed", `${error}`);
+      throwAlert(32, "Transaction failed", `${error}`, true);
       console.log(error);
       setIsLoading(false);
     }
@@ -275,9 +276,9 @@ export const Web3Provider = ({ children }) => {
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       const submitTxn = await client.submitSignedBCSTransaction(signedTxn);
       await client.waitForTransaction(submitTxn.hash);
-      throwAlert(101, "Success", `${name} successfully registered.`);
+      throwAlert(101, "Success", `${name} successfully registered`, false);
     } catch (error) {
-      throwAlert(102, "Failed to register asset.", `${error}`);
+      throwAlert(102, "Failed to register asset", `${error}`, true);
       console.log(error);
       setIsLoading(false);
     }
@@ -321,9 +322,9 @@ export const Web3Provider = ({ children }) => {
         1
       );
       await submitTransactionHelper(account, collection);
-      throwAlert(61, "Transaction sent", `${collection}`);
+      throwAlert(61, "Transaction sent", `${collection}`, false);
     } catch (error) {
-      throwAlert(62, "Transaction failed", `${error}`);
+      throwAlert(62, "Transaction failed", `${error}`, true);
       setIsLoading(false);
       console.log(error);
     }
@@ -342,9 +343,9 @@ export const Web3Provider = ({ children }) => {
       );
 
       await submitTransactionHelper(account, nft);
-      throwAlert(71, "Transaction sent", `${nft}`);
+      throwAlert(71, "Transaction sent", `${nft}`, false);
     } catch (error) {
-      throwAlert(72, "Transaction failed", `${error}`);
+      throwAlert(72, "Transaction failed", `${error}`, true);
       setIsLoading(false);
       console.log(error);
     }

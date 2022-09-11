@@ -94,9 +94,11 @@ const AddAssetDialog = () => {
     setIsLoading(true);
     const data = await findAsset(coinType);
     if (!data) {
-      throwAlert(112, "Error", "Asset not found on chain.");
-      clearPrevEstimation();
-      clearDialog();
+      throwAlert(112, "Error", "Asset doesn't exist on chain", true);
+      if (!isCustomToken) {
+        clearPrevEstimation();
+        clearDialog();
+      }
     } else {
       handleRegisterAsset();
     }
@@ -112,7 +114,7 @@ const AddAssetDialog = () => {
         clearPrevEstimation();
         clearDialog();
       } else {
-        throwAlert(112, "Error", "Asset not found on chain.");
+        throwAlert(112, "Error", "Asset doesn't exist on chain", true);
         clearPrevEstimation();
         clearDialog();
       }
@@ -270,9 +272,9 @@ const AddAssetDialog = () => {
         )}
         <Stack sx={{ minHeight: "54px" }}>
           {(selectedIndex !== "" || isCustomToken) && (
-            <Paper
+            <Box
               sx={{
-                backgroundColor: "background.paper",
+                // backgroundColor: "background.paper",
                 minHeight: "24px",
                 alignSelf: "center",
                 mt: isCustomToken ? "12px" : "4px",
@@ -319,7 +321,7 @@ const AddAssetDialog = () => {
                   )}
                 </Stack>
               )}
-            </Paper>
+            </Box>
           )}
         </Stack>
       </DialogContent>

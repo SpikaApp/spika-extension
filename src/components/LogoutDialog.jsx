@@ -6,7 +6,9 @@ import {
   DialogContent,
   DialogContentText,
   Stack,
+  Typography,
 } from "@mui/material";
+import ReportIcon from "@mui/icons-material/Report";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 
@@ -20,10 +22,18 @@ const LogoutDialog = () => {
 
   return (
     <Dialog open={openLogoutDialog}>
-      <DialogTitle align="center">Confirm logout</DialogTitle>
+      <DialogTitle>
+        <Stack sx={{ display: "flex", flexDirection: "row" }}>
+          <ReportIcon sx={{ color: "warning.main", mt: "4px", mr: 1 }} />
+          <Typography variant="h6" sx={{ color: "warning.main" }}>
+            Confirm action
+          </Typography>
+        </Stack>
+      </DialogTitle>
       <DialogContent sx={{ maxWidth: 320 }}>
-        <DialogContentText align="center" sx={{ marginBottom: 2 }}>
-          Remember to save secret recovery phrase before logout.
+        <DialogContentText sx={{ display: "flex", flexDirection: "row", mb: 2 }}>
+          This will delete all stored data from Spika. Remember to export recovery phrase and any
+          imported keys before proceeding.
           <br />
         </DialogContentText>
       </DialogContent>
@@ -48,7 +58,7 @@ const LogoutDialog = () => {
           variant="contained"
           onClick={handleLogout}
         >
-          Confirm
+          Exit
         </Button>
       </Stack>
     </Dialog>
