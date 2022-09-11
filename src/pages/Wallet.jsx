@@ -64,7 +64,7 @@ const Wallet = () => {
     <Box>
       {accountImported && (
         <Container maxWidth="xs">
-          <Card sx={{ mb: 2, height: "175px", mt: "100px" }}>
+          <Card sx={{ mb: 2, height: "185px", mt: "100px" }}>
             <CardContent>
               <Stack
                 sx={{
@@ -110,7 +110,7 @@ const Wallet = () => {
                             component="img"
                             src={darkMode ? currentAsset.data.logo_alt : currentAsset.data.logo}
                           />
-                          <ArrowDropDownIcon sx={{ position: "absolute", ml: "190px" }} />
+                          <ArrowDropDownIcon sx={{ position: "absolute", ml: "180px" }} />
                           <Typography noWrap sx={{ ml: "8px" }} variant="h6" color="textPrimary">
                             {currentAsset.data.name}
                           </Typography>
@@ -161,7 +161,7 @@ const Wallet = () => {
           </Card>
           <Stack
             direction="row"
-            sx={{ display: "flex", alignItems: "center", justifyContent: "space-around", mt: 3 }}
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 3 }}
           >
             <Button
               sx={{
@@ -182,7 +182,7 @@ const Wallet = () => {
               sx={{
                 // backgroundColor: "#F19223",
                 width: "100%",
-                height: "155px",
+                height: "145px",
                 mt: "28px",
                 mb: "28px",
                 position: "relative",
@@ -194,7 +194,7 @@ const Wallet = () => {
               <Button
                 variant="outlined"
                 sx={{
-                  width: "90%",
+                  width: "75%",
                   height: "35px",
                 }}
                 onClick={handleAddAssetUI}
