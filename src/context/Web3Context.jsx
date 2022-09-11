@@ -4,7 +4,6 @@ import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import { client, faucetClient, tokenClient } from "../lib/client";
 import { aptosCoin, coinList, coinStore, coinInfo } from "../lib/coin";
-import { setAsset, getAccountAssets } from "../lib/asset_store";
 import * as token from "../lib/token";
 import * as bcsPayload from "../lib/payload";
 import { PLATFORM } from "../utils/constants";
@@ -24,7 +23,6 @@ export const Web3Provider = ({ children }) => {
     setBalance,
     currentAsset,
     setIsLoading,
-    accountAssets,
     setAccountAssets,
   } = useContext(AccountContext);
   const [recipientAddress, setRecipientAddress] = useState("");
