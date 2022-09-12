@@ -213,7 +213,7 @@ const AlertDialog = () => {
         ) : (
           !isTransaction && (
             <Stack sx={{ overflow: "hidden", textOverflow: "ellipsis", wordWrap: "break-word" }}>
-              <Typography variant="subtitle2">{alertMessage}</Typography>
+              <Typography variant="body2">{alertMessage}</Typography>
             </Stack>
           )
         )}
