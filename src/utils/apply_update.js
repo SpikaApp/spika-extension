@@ -10,9 +10,11 @@ const _pwd = "PWD";
 let version;
 
 const applyUpdate = async () => {
-  await getVersion();
-  await v0_4_0();
-  await v0_4_5();
+  if (version) {
+    await getVersion();
+    await v0_4_0();
+    await v0_4_5();
+  }
 };
 
 const getVersion = async () => {
