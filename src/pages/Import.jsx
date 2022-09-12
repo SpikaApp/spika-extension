@@ -81,7 +81,7 @@ const Import = () => {
             <Typography>
               I accept the license{" "}
               <Link
-                href="https://github.com/xorgal/spika/blob/master/LICENSE"
+                href="https://docs.spika.app/terms-and-conditions/license"
                 underline="none"
                 target="_blank"
               >
