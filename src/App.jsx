@@ -1,16 +1,7 @@
 import React, { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import {
-  Navbar,
-  Onboarding,
-  Wallet,
-  Create,
-  Import,
-  NFTs,
-  Transactions,
-  Settings,
-  About,
-} from "./pages";
+import Navbar from "./components/Navbar";
+import { Onboarding, Wallet, Create, Import, NFTs, Transactions, Settings, About } from "./pages";
 import { ThemeProvider } from "@mui/material";
 import { UIContext } from "./context/UIContext";
 import { AccountProvider } from "./context/AccountContext";
