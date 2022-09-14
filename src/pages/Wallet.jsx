@@ -87,42 +87,41 @@ const Wallet = () => {
       {accountImported && (
         <Container maxWidth="xs">
           <Card sx={{ mb: 2, height: "185px", mt: "100px" }}>
+            <Stack
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                mt: "18px",
+                mb: "-18px",
+              }}
+            >
+              <Tooltip sx={{ mr: "85px" }} title="Change network">
+                <Chip
+                  label={
+                    <Stack sx={{ display: "flex", flexDirection: "row" }}>
+                      <CircleIcon
+                        sx={{
+                          color: isOnline ? "success.light" : "error.main",
+                          width: "12px",
+                          height: "12px",
+                          mt: "4px",
+                        }}
+                      />
+                      <Typography noWrap sx={{ ml: "5px", maxWidth: "100px" }} variant="body2">
+                        {currentNetwork.name}
+                      </Typography>
+                    </Stack>
+                  }
+                  onClick={handleChangeNetworkUI}
+                />
+              </Tooltip>
+              <Tooltip title="Copy address">
+                <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
+              </Tooltip>
+            </Stack>
             <CardContent>
-              <Stack
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-around",
-                  width: "100%",
-                }}
-              >
-                <Tooltip title="Change network">
-                  <Chip
-                    label={
-                      <Stack sx={{ display: "flex", flexDirection: "row" }}>
-                        <CircleIcon
-                          sx={{
-                            color: isOnline ? "success.light" : "error.main",
-                            width: "12px",
-                            height: "12px",
-                            mt: "4px",
-                          }}
-                        />
-                        <Typography noWrap sx={{ ml: "5px", maxWidth: "100px" }} variant="body2">
-                          {currentNetwork.name}
-                        </Typography>
-                      </Stack>
-                    }
-                    onClick={handleChangeNetworkUI}
-                  />
-                </Tooltip>
-                <Tooltip title="Copy address">
-                  <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
-                </Tooltip>
-              </Stack>
               {isLoading ? (
-                <Typography sx={{ mt: "22px" }} align="center" variant="h6">
+                <Typography sx={{ mt: "-90px" }} align="center" variant="h6">
                   Updating balance...
                 </Typography>
               ) : (
