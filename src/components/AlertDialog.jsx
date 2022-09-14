@@ -31,6 +31,7 @@ const AlertDialog = () => {
     setOpenCreateNftDialog,
     setOpenChangePasswordDialog,
     setOpenAddAssetDialog,
+    setOpenNetworkDialog,
     setIsPopup,
     isError,
   } = useContext(UIContext);
@@ -113,6 +114,9 @@ const AlertDialog = () => {
       case 101: // New asset successfully added
         setOpenAlertDialog(false);
         setOpenAddAssetDialog(false);
+      case 121: // Network changed successfully
+        setOpenAlertDialog(false);
+        setOpenNetworkDialog(false);
       case 2: // Failed create account
       case 12: // Failed import account
       case 22: // Failed mint coins
@@ -132,6 +136,7 @@ const AlertDialog = () => {
       case 103: // Failed to add new asset
       case 104: // Error, Select asset from the list or add custom token to continue.
       case 112: // Failed to find asset on chain
+      case 122: // Network registration failed
         setOpenAlertDialog(false);
         setIsPopup(false);
         break;
