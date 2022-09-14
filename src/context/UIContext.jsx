@@ -17,6 +17,8 @@ export const UIProvider = ({ children }) => {
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [openAccountAssetsDialog, setOpenAccountAssetsDialog] = useState(false);
   const [openAddAssetDialog, setOpenAddAssetDialog] = useState(false);
+  const [openNetworkDialog, setOpenNetworkDialog] = useState(false);
+  const [openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog] = useState(false);
   const [openAccountDetailsDialog, setOpenAccountDetailsDialog] = useState(false);
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
@@ -31,6 +33,7 @@ export const UIProvider = ({ children }) => {
   const [openPermissionDialog, setOpenPermissionDialog] = useState(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState(false);
   const [currentRoute, setCurrentRoute] = useState();
+  const [somethingChanged, setSomethingChanged] = useState(false);
   const [isPopup, setIsPopup] = useState(false);
   const [devMode, setDevMode] = useState(false);
   const [isTest, setIsTest] = useState(false);
@@ -135,6 +138,14 @@ export const UIProvider = ({ children }) => {
     setOpenAddAssetDialog(true);
   };
 
+  const handleChangeNetworkUI = () => {
+    setOpenNetworkDialog(true);
+  };
+
+  const handleAddCustomNetworkUI = () => {
+    setOpenAddCustomNetworkDialog(true);
+  };
+
   const handleNftDetailsUI = (nft) => {
     setSelectedNft(nft);
     setOpenNftDetailsDialog(true);
@@ -194,6 +205,12 @@ export const UIProvider = ({ children }) => {
         openAddAssetDialog,
         setOpenAddAssetDialog,
         handleAddAssetUI,
+        openNetworkDialog,
+        setOpenNetworkDialog,
+        handleChangeNetworkUI,
+        openAddCustomNetworkDialog,
+        setOpenAddCustomNetworkDialog,
+        handleAddCustomNetworkUI,
         openAccountDetailsDialog,
         setOpenAccountDetailsDialog,
         openChangePasswordDialog,
@@ -204,6 +221,8 @@ export const UIProvider = ({ children }) => {
         setOpenPermissionDialog,
         disableAllRoutes,
         setDisableAllRoutes,
+        somethingChanged,
+        setSomethingChanged,
         devMode,
         setDevMode,
         isTest,
