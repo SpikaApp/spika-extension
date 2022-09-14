@@ -1,10 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Container,
   Typography,
   Card,
-  CardActions,
   CardContent,
   Button,
   Chip,
@@ -14,37 +13,36 @@ import {
 } from "@mui/material";
 import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CircleIcon from "@mui/icons-material/Circle";
+import NetworkDialog from "../components/NetworkDialog";
 import MintDialog from "../components/MintDialog";
 import SendDialog from "../components/SendDialog";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import AddAssetDialog from "../components/AddAssetDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
 import ReceiveDialog from "../components/ReceiveDialog";
-import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { AptosClient } from "aptos";
 import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
-import transaction from "../tests/transaction.test";
 
 const Wallet = () => {
   const {
     darkMode,
-    handleMintUI,
     handleSendUI,
     handleReceiveUI,
     handleAccountAssetsUI,
     handleAddAssetUI,
-    devMode,
-    setIsTest,
+    handleChangeNetworkUI,
   } = useContext(UIContext);
-  const { isLoading, currentAddress, accountImported, currentAsset, balance } =
+  const { isLoading, currentAddress, accountImported, currentNetwork, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance, handleMint } = useContext(Web3Context);
-
-  const { result: testResult } = transaction();
+  const [isOnline, setIsOnline] = useState(false);
+  const [chainId, setChainId] = useState();
 
   useEffect(() => {
     if (accountImported) {
@@ -55,6 +53,30 @@ const Wallet = () => {
     }
     return undefined;
   }, [currentAsset]);
+
+  useEffect(() => {
+    if (currentNetwork) {
+      getChainId(currentNetwork.data.node_url);
+    }
+  }, [currentNetwork]);
+
+  useEffect(() => {
+    if (chainId !== undefined) {
+      setIsOnline(true);
+    } else {
+      setIsOnline(false);
+    }
+  }, [chainId]);
+
+  const getChainId = async (nodeUrl) => {
+    const client = new AptosClient(nodeUrl);
+    try {
+      const id = await client.getChainId();
+      setChainId(id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClick = () => {
     copyToClipboard(currentAddress);
@@ -71,11 +93,30 @@ const Wallet = () => {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "space-around",
                   width: "100%",
                 }}
               >
-                <Typography sx={{ mr: 5, mt: "3px" }}>Aptos Devnet</Typography>
+                <Tooltip title="Change network">
+                  <Chip
+                    label={
+                      <Stack sx={{ display: "flex", flexDirection: "row" }}>
+                        <CircleIcon
+                          sx={{
+                            color: isOnline ? "success.light" : "error.main",
+                            width: "12px",
+                            height: "12px",
+                            mt: "4px",
+                          }}
+                        />
+                        <Typography noWrap sx={{ ml: "5px", maxWidth: "100px" }} variant="body2">
+                          {currentNetwork.name}
+                        </Typography>
+                      </Stack>
+                    }
+                    onClick={handleChangeNetworkUI}
+                  />
+                </Tooltip>
                 <Tooltip title="Copy address">
                   <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
                 </Tooltip>
@@ -203,11 +244,7 @@ const Wallet = () => {
               </Button>
             </Stack>
           )}
-          {/* {accountImported && (
-            <Box sx={{ mt: "1px" }}>
-              <Footer />
-            </Box>
-          )} */}
+          <NetworkDialog />
           <AccountAssetsDialog />
           <AddAssetDialog />
           <MintDialog />

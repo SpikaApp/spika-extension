@@ -17,23 +17,20 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { setStore } from "../lib/store";
-import { coinList } from "../lib/coin";
-import { getAccountAssets } from "../lib/asset_store";
 import { PLATFORM } from "../utils/constants";
 
 const AccountAssetsDialog = () => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets } =
-    useContext(AccountContext);
+  const { setIsLoading, setCurrentAsset, accountAssets } = useContext(AccountContext);
   const { updateAccountAssets, updateBalance } = useContext(Web3Context);
 
   const _currentAsset = "currentAsset";
 
   useEffect(() => {
-    if (openAccountAssetsDialog === true) {
+    if (openAccountAssetsDialog) {
       updateAccountAssets();
     }
-  }, [openAccountAssetsDialog === true]);
+  }, [openAccountAssetsDialog]);
 
   const handleSwitchAsset = (asset) => {
     setStore(PLATFORM, _currentAsset, asset);
