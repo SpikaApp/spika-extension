@@ -14,20 +14,29 @@ import {
   TextField,
   Paper,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import Loading from "../components/Loading";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { PayloadContext } from "../context/PayloadContext";
 import { Web3Context } from "../context/Web3Context";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
-import { register } from "../lib/payload";
 
 const AddAssetDialog = () => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, alertSignal, accountAssets, currentAsset, setCurrentAsset, throwAlert } =
-    useContext(AccountContext);
+  const {
+    setIsLoading,
+    alertSignal,
+    currentNetwork,
+    accountAssets,
+    currentAsset,
+    setCurrentAsset,
+    throwAlert,
+  } = useContext(AccountContext);
+  const { register } = useContext(PayloadContext);
   const {
     getBalance,
     findAsset,
@@ -37,9 +46,7 @@ const AddAssetDialog = () => {
     setSelectedAsset,
     estimateTransaction,
     isValidTransaction,
-    setIsValidTransaction,
     estimatedTxnResult,
-    setEstimatedTxnResult,
     registerAsset,
     updateAccountAssets,
     clearPrevEstimation,
@@ -79,6 +86,18 @@ const AddAssetDialog = () => {
       }
     }
   }, [alertSignal]);
+
+  useEffect(() => {
+    if (openAddAssetDialog) {
+      updateAccountAssets();
+    }
+  }, [openAddAssetDialog]);
+
+  useEffect(() => {
+    if (currentNetwork) {
+      clearDialog();
+    }
+  }, [currentNetwork]);
 
   const handleGetBalance = async () => {
     setIsLoading(true);
@@ -137,7 +156,7 @@ const AddAssetDialog = () => {
   const clearDialog = () => {
     setIsValidAsset(false);
     setSelectedIndex("");
-    setSelectedAsset([]);
+    setSelectedAsset({});
     setIsCustomToken(false);
     setCoinType("");
     updateAccountAssets();
@@ -213,40 +232,47 @@ const AddAssetDialog = () => {
             </Stack>
           </form>
         ) : (
-          <Paper
-            sx={{
-              width: "260px",
-              bgcolor: "background.paper",
-            }}
-          >
-            <List
-              component="nav"
-              sx={{
-                overflow: "hidden",
-                overflowY: "visible",
-                maxHeight: "200px",
-                minHeight: "50px",
-              }}
-            >
-              {assetList.map((asset) => (
-                <Stack key={asset.type}>
-                  <ListItemButton
-                    selected={selectedIndex === asset.data.name}
-                    onClick={(event) => handleListItemClick(event, asset.data.name, asset)}
-                  >
-                    <ListItemIcon>
-                      <Box
-                        component="img"
-                        src={darkMode ? asset.data.logo_alt : asset.data.logo}
-                        sx={{ width: 24, height: 24 }}
-                      ></Box>
-                    </ListItemIcon>
-                    <ListItemText primary={`${asset.data.name} (${asset.data.symbol})`} />
-                  </ListItemButton>
-                </Stack>
-              ))}
-            </List>
-          </Paper>
+          <div>
+            {currentNetwork.name === "Devnet" && (
+              <Paper
+                sx={{
+                  width: "260px",
+                  bgcolor: "background.paper",
+                }}
+              >
+                <List
+                  component="nav"
+                  sx={{
+                    overflow: "hidden",
+                    overflowY: "visible",
+                    maxHeight: "200px",
+                    minHeight: "50px",
+                  }}
+                >
+                  {assetList.map((asset) => (
+                    <Stack key={asset.type}>
+                      <ListItemButton
+                        selected={selectedIndex === asset.data.name}
+                        onClick={(event) => handleListItemClick(event, asset.data.name, asset)}
+                      >
+                        <ListItemIcon>
+                          <Box
+                            component="img"
+                            src={darkMode ? asset.data.logo_alt : asset.data.logo}
+                            sx={{ width: 24, height: 24, ml: "4px" }}
+                          ></Box>
+                        </ListItemIcon>
+                        <ListItemText
+                          sx={{ ml: "-16px" }}
+                          primary={`${asset.data.name} (${asset.data.symbol})`}
+                        />
+                      </ListItemButton>
+                    </Stack>
+                  ))}
+                </List>
+              </Paper>
+            )}
+          </div>
         )}
         {!isCustomToken && (
           <Stack
