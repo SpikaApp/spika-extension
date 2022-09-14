@@ -5,12 +5,14 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import NetworkDialog from "../components/NetworkDialog";
 
 const Settings = () => {
   const {
     handleMnemonicUI,
     handlePrivateKeyUI,
     handleChangePasswordUI,
+    handleChangeNetworkUI,
     setOpenAccountDetailsDialog,
   } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
@@ -21,6 +23,12 @@ const Settings = () => {
         <CardContent align="center" sx={{ mt: 1 }}>
           {accountImported && (
             <Stack sx={{ width: "200px" }}>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
+                Show Recovery Phrase
+              </Button>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={handlePrivateKeyUI}>
+                Show Private Key
+              </Button>
               <Button
                 sx={{ mb: 2 }}
                 variant="outlined"
@@ -30,16 +38,10 @@ const Settings = () => {
               >
                 Public Account Details
               </Button>
-              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
-                Show Recovery Phrase
-              </Button>
-              <Button sx={{ mb: 2 }} variant="outlined" onClick={handlePrivateKeyUI}>
-                Show Private Key
-              </Button>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleChangePasswordUI}>
                 Change Password
               </Button>
-              <Button sx={{ mb: 2 }} variant="outlined" disabled>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleChangeNetworkUI}>
                 Change Network
               </Button>
             </Stack>
@@ -49,6 +51,7 @@ const Settings = () => {
       <Footer />
       <AccountDetailsDialog />
       <ChangePasswordDialog />
+      <NetworkDialog />
     </Container>
   );
 };

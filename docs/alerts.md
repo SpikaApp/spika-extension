@@ -73,3 +73,8 @@
 ---
 
 - 112: Failed to find asset on chain
+
+---
+
+- 121: Successfully registered in new network
+- 122: Network registration failed
