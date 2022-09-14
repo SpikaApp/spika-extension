@@ -5,12 +5,13 @@ import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
-import { client, faucetClient } from "../lib/client";
+import useSpika from "../hooks/useSpika";
 import { aptosCoin, coinStore } from "../lib/coin";
-import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
+import * as network from "../lib/network";
+import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { encryptPassword, decryptPassword } from "../utils/pwd";
 
 export const AccountContext = React.createContext();
@@ -38,7 +39,8 @@ export const AccountProvider = ({ children }) => {
   const [privateKey, setPrivateKey] = useState([]); // Uint8Array
   const [currentAddress, setCurrentAddress] = useState("");
   const [publicAccount, setPublicAccount] = useState({});
-  const [account, setAccount] = useState([]); // AptosAccount
+  const [account, setAccount] = useState({}); // AptosAccount
+  const [currentNetwork, setCurrentNetwork] = useState(network.networkList[0]);
   const [currentAsset, setCurrentAsset] = useState([]);
   const [accountAssets, setAccountAssets] = useState([]);
   const [balance, setBalance] = useState([]);
@@ -46,6 +48,7 @@ export const AccountProvider = ({ children }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const { spikaClient: spika } = useSpika(currentNetwork);
 
   const locker = (method) => {
     if (PLATFORM === "chrome-extension:") {
@@ -284,8 +287,8 @@ export const AccountProvider = ({ children }) => {
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, newMnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-      let resources = await client.getAccountResources(_account.address());
+      await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+      let resources = await spika.client.getAccountResources(_account.address());
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
@@ -295,10 +298,12 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       const encryptedPassword = await encryptPassword(password);
       setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+      network.addNetworkStore(_account.address().hex());
       apps.addAddress(_account.address().hex());
       setAccountImported(true);
       setSpikaWallet(true);
@@ -325,8 +330,8 @@ export const AccountProvider = ({ children }) => {
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-      let resources = await client.getAccountResources(_account.address());
+      await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+      let resources = await spika.client.getAccountResources(_account.address());
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
@@ -336,10 +341,12 @@ export const AccountProvider = ({ children }) => {
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       const encryptedPassword = await encryptPassword(password);
       setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+      network.addNetworkStore(_account.address().hex());
       apps.addAddress(_account.address().hex());
       setAccountImported(true);
       setSpikaWallet(true);
@@ -370,16 +377,22 @@ export const AccountProvider = ({ children }) => {
         const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
         if (!isUnlocked) {
-          await faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+          await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
           setStore(PLATFORM, "currentAsset", aptosCoin);
           _currentAsset = aptosCoin;
         }
-        let resources = await client.getAccountResources(_account.address());
+        let resources = await spika.client.getAccountResources(_account.address());
         let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
+        let _currentNetwork = await getStore(PLATFORM, "currentNetwork");
+        if (_currentNetwork === undefined || _currentNetwork === null) {
+          setStore(PLATFORM, "currentNetwork", network.networkList[0]);
+          _currentNetwork = network.networkList[0];
+        }
         assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+        network.addNetworkStore(_account.address().hex());
         apps.addAddress(_account.address().hex());
         setStore(PLATFORM, "currentAddress", _account.address().hex());
         const encryptedPassword = await encryptPassword(password);
@@ -393,7 +406,7 @@ export const AccountProvider = ({ children }) => {
           authKey: _account.authKey().hex(),
         });
         setCurrentAddress(_account.address().hex());
-
+        setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
         if (accountResource === undefined || accountResource === null) {
           setBalance(0);
@@ -454,6 +467,8 @@ export const AccountProvider = ({ children }) => {
         spikaWallet,
         accountImported,
         account,
+        currentNetwork,
+        setCurrentNetwork,
         publicAccount,
         privateKey,
         currentAddress,

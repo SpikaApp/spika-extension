@@ -2,10 +2,10 @@ import React, { useState, useContext, useEffect } from "react";
 import * as aptos from "aptos";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
-import { client, faucetClient, tokenClient } from "../lib/client";
+import { PayloadContext } from "./PayloadContext";
+import useSpika from "../hooks/useSpika";
 import { aptosCoin, coinList, coinStore, coinInfo } from "../lib/coin";
 import * as token from "../lib/token";
-import * as bcsPayload from "../lib/payload";
 import { PLATFORM } from "../utils/constants";
 import { stringToValue, valueToString } from "../utils/values";
 import pixel_coin from "../assets/pixel_coin.png";
@@ -14,17 +14,19 @@ import { setStore } from "../lib/store";
 export const Web3Context = React.createContext();
 
 export const Web3Provider = ({ children }) => {
-  const { setOpenSendDialog } = useContext(UIContext);
+  const { spikaWallet, setOpenSendDialog } = useContext(UIContext);
   const {
     accountImported,
     throwAlert,
     account,
     currentAddress,
+    currentNetwork,
     setBalance,
     currentAsset,
     setIsLoading,
     setAccountAssets,
   } = useContext(AccountContext);
+  const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
@@ -35,16 +37,19 @@ export const Web3Provider = ({ children }) => {
   const [withdrawEvents, setWithdrawEvents] = useState([]);
   const [accountTokens, setAccountTokens] = useState([]);
   const [isValidAsset, setIsValidAsset] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState([]);
+  const [selectedAsset, setSelectedAsset] = useState({});
   const [nftDetails, setNftDetails] = useState([]);
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState();
+  const { spikaClient: spika } = useSpika(currentNetwork);
 
   const _accountAssets = "accountAssets";
 
   useEffect(() => {
-    getChainId();
+    if (spikaWallet) {
+      getChainId();
+    }
     if (accountImported) {
       updateAccountAssets();
     }
@@ -52,8 +57,8 @@ export const Web3Provider = ({ children }) => {
 
   const submitTransactionHelper = async (account, payload) => {
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
-      client.getAccount(account.address()),
-      client.getChainId(),
+      spika.client.getAccount(account.address()),
+      spika.client.getChainId(),
     ]);
 
     const rawTxn = new aptos.TxnBuilderTypes.RawTransaction(
@@ -67,7 +72,7 @@ export const Web3Provider = ({ children }) => {
     );
 
     const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
-    const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
+    const transactionRes = await spika.client.submitSignedBCSTransaction(bcsTxn);
 
     return transactionRes.hash;
   };
@@ -97,7 +102,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getChainId = async () => {
-    const result = await client.getChainId();
+    const result = await spika.client.getChainId();
     setChainId(result);
   };
 
@@ -117,7 +122,7 @@ export const Web3Provider = ({ children }) => {
 
   const getTxnDetails = async (version) => {
     setIsLoading(true);
-    const data = await client.getTransactionByVersion(version);
+    const data = await spika.client.getTransactionByVersion(version);
     // console.log(data);
     setTxnDetails(data);
     setIsLoading(false);
@@ -127,7 +132,7 @@ export const Web3Provider = ({ children }) => {
   const mintCoins = async () => {
     try {
       const _amount = "1000000";
-      await faucetClient.fundAccount(account.address(), _amount);
+      await spika.faucetClient.fundAccount(account.address(), _amount);
       throwAlert(
         21,
         "Success",
@@ -150,21 +155,21 @@ export const Web3Provider = ({ children }) => {
     }
     try {
       if (payload === undefined) {
-        _payload = await bcsPayload.transfer(
+        _payload = await transfer(
           recipientAddress,
           currentAsset.type,
           valueToString(currentAsset, amount)
         );
-        transaction = await client.generateRawTransaction(account.address(), _payload);
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload);
       } else if (isBcs === undefined || !isBcs) {
         _payload = payload;
-        transaction = await client.generateTransaction(account.address(), _payload);
+        transaction = await spika.client.generateTransaction(account.address(), _payload);
       } else {
         _payload = payload;
-        transaction = await client.generateRawTransaction(account.address(), _payload);
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload);
       }
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
-      const estimatedTxn = (await client.submitBCSSimulation(bcsTxn))[0];
+      const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
       if (estimatedTxn.success === true) {
         // logic if Move says wagmi
         setIsValidTransaction(true);
@@ -193,15 +198,15 @@ export const Web3Provider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      const payload = await bcsPayload.transfer(
+      const payload = await transfer(
         recipientAddress,
         currentAsset.type,
         valueToString(currentAsset, amount)
       );
-      const rawTxn = await client.generateRawTransaction(currentAddress, payload);
+      const rawTxn = await spika.client.generateRawTransaction(currentAddress, payload);
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
-      const transactionRes = await client.submitSignedBCSTransaction(bcsTxn);
-      await client.waitForTransaction(transactionRes.hash);
+      const transactionRes = await spika.client.submitSignedBCSTransaction(bcsTxn);
+      await spika.client.waitForTransaction(transactionRes.hash);
       throwAlert(31, "Transaction sent", `${transactionRes.hash}`, false);
     } catch (error) {
       throwAlert(32, "Transaction failed", `${error}`, true);
@@ -218,7 +223,7 @@ export const Web3Provider = ({ children }) => {
       } else {
         _address = address;
       }
-      const asset = await client.getAccountResource(_address, coinInfo(coinType));
+      const asset = await spika.client.getAccountResource(_address, coinInfo(coinType));
       const result = {
         type: coinType,
         data: {
@@ -242,11 +247,11 @@ export const Web3Provider = ({ children }) => {
 
   const registerAsset = async (coinType, name) => {
     try {
-      const payload = await bcsPayload.register(coinType);
-      const transaction = await client.generateRawTransaction(account.address(), payload);
+      const payload = await register(coinType);
+      const transaction = await spika.client.generateRawTransaction(account.address(), payload);
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
-      const submitTxn = await client.submitSignedBCSTransaction(signedTxn);
-      await client.waitForTransaction(submitTxn.hash);
+      const submitTxn = await spika.client.submitSignedBCSTransaction(signedTxn);
+      await spika.client.waitForTransaction(submitTxn.hash);
       throwAlert(101, "Success", `${name} successfully registered`, false);
     } catch (error) {
       throwAlert(102, "Failed to register asset", `${error}`, true);
@@ -264,7 +269,7 @@ export const Web3Provider = ({ children }) => {
 
   const signTransaction = async (payload) => {
     try {
-      const transaction = await client.generateTransaction(account.address(), payload);
+      const transaction = await spika.client.generateTransaction(account.address(), payload);
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       return signedTxn;
     } catch (error) {
@@ -275,9 +280,9 @@ export const Web3Provider = ({ children }) => {
 
   const signAndSubmitTransaction = async (payload) => {
     try {
-      const transaction = await client.generateTransaction(account.address(), payload);
+      const transaction = await spika.client.generateTransaction(account.address(), payload);
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
-      const result = await client.submitSignedBCSTransaction(signedTxn);
+      const result = await spika.client.submitSignedBCSTransaction(signedTxn);
       return result;
     } catch (error) {
       return error;
@@ -296,7 +301,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getBalance = async () => {
-    let resources = await client.getAccountResources(account.address());
+    let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
       setBalance(0);
@@ -306,7 +311,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const updateBalance = async (asset) => {
-    let resources = await client.getAccountResources(account.address());
+    let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === asset.type);
     if (accountResource === undefined || accountResource === null) {
       setBalance(0);
@@ -316,19 +321,19 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getTransactions = async () => {
-    let transactions = await client.getAccountTransactions(account.address());
+    let transactions = await spika.client.getAccountTransactions(account.address());
     return transactions;
   };
 
   const getDepositEvents = async () => {
-    let resources = await client.getAccountResources(account.address());
+    let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
       return;
     }
     let counter = parseInt(accountResource.data.deposit_events.counter);
     if (counter <= 25) {
-      let data = await client.getEventsByEventHandle(
+      let data = await spika.client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
         "deposit_events"
@@ -337,7 +342,7 @@ export const Web3Provider = ({ children }) => {
 
       setDepositEvents(result);
     } else {
-      let data = await client.getEventsByEventHandle(
+      let data = await spika.client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
         "deposit_events",
@@ -351,14 +356,14 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getWithdrawEvents = async () => {
-    let resources = await client.getAccountResources(account.address());
+    let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource === undefined || accountResource === null) {
       return;
     }
     let counter = parseInt(accountResource.data.withdraw_events.counter);
     if (counter <= 25) {
-      let data = await client.getEventsByEventHandle(
+      let data = await spika.client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
         "withdraw_events"
@@ -367,7 +372,7 @@ export const Web3Provider = ({ children }) => {
 
       setWithdrawEvents(result);
     } else {
-      let data = await client.getEventsByEventHandle(
+      let data = await spika.client.getEventsByEventHandle(
         currentAddress,
         coinStore(currentAsset.type),
         "withdraw_events",
@@ -381,13 +386,13 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getAssetData = async (type) => {
-    const data = await client.getAccountResource(type.split("::")[0], coinInfo(type));
+    const data = await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
     return data;
   };
 
   const getRegisteredAssets = async () => {
     const result = [];
-    const resources = await client.getAccountResources(account.address());
+    const resources = await spika.client.getAccountResources(account.address());
     await Promise.all(
       Object.values(resources).map(async (value) => {
         if (
@@ -439,7 +444,7 @@ export const Web3Provider = ({ children }) => {
   const getAccountTokens = async () => {
     try {
       // Get total number of Token deposit_events received by an account
-      let resources = await client.getAccountResources(account.address());
+      let resources = await spika.client.getAccountResources(account.address());
       let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
 
       const getTokens = async () => {
@@ -449,7 +454,7 @@ export const Web3Provider = ({ children }) => {
         } else {
           let counter = parseInt(tokenStore.data.deposit_events.counter);
           // Get Token deposit_events
-          let data = await client.getEventsByEventHandle(
+          let data = await spika.client.getEventsByEventHandle(
             currentAddress,
             tokenStore.type,
             "deposit_events",
@@ -464,7 +469,7 @@ export const Web3Provider = ({ children }) => {
           // Returns an array of tokenId and value
           const accountTokensBalances = await Promise.all(
             tokenIds.map(async (i) => {
-              let data = await tokenClient.getTokenForAccount(currentAddress, i);
+              let data = await spika.tokenClient.getTokenForAccount(currentAddress, i);
               return data;
             })
           );
@@ -496,7 +501,7 @@ export const Web3Provider = ({ children }) => {
         let data = await Promise.all(
           accountTokens.map(
             async (i) =>
-              await tokenClient.getTokenData(
+              await spika.tokenClient.getTokenData(
                 i.id.token_data_id.creator,
                 i.id.token_data_id.collection,
                 i.id.token_data_id.name
