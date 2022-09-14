@@ -16,11 +16,12 @@ import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
-import { nft } from "../lib/payload";
+import { PayloadContext } from "../context/PayloadContext";
 
 const CreateNftDialog = () => {
   const { openCreateNftDialog, setOpenCreateNftDialog } = useContext(UIContext);
   const { currentAddress } = useContext(AccountContext);
+  const { nft } = useContext(PayloadContext);
   const {
     estimateTransaction,
     isValidTransaction,

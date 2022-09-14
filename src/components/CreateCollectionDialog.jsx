@@ -14,11 +14,12 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
+import { PayloadContext } from "../context/PayloadContext";
 import { Web3Context } from "../context/Web3Context";
-import { collection } from "../lib/payload";
 
 const CreateCollectionDialog = () => {
   const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
+  const { collection } = useContext(PayloadContext);
   const {
     estimateTransaction,
     createToken,
