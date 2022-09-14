@@ -15,13 +15,9 @@ const About = () => {
       <Card sx={{ mt: "100px", minHeight: "305px" }}>
         <CardContent>
           <Typography variant="h6" align="center" color="textPrimary" gutterBottom>
-            <Link href="https://aptoslabs.com/" underline="none" target="_blank" color="link">
-              Aptos
-            </Link>{" "}
-            Devnet chain id {chainId}
+            Spika Aptos Wallet v{EXTENSION_VERSION}
           </Typography>
           <Typography sx={{ mb: "-12px" }} variant="subtitle1" align="center" color="textPrimary">
-            Wallet version {EXTENSION_VERSION} <br />
             Aptos SDK version {APTOS_SDK_VERSION}
             <br />
             <Link
