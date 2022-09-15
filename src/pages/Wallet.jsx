@@ -46,19 +46,16 @@ const Wallet = () => {
 
   useEffect(() => {
     if (accountImported) {
-      const updateAccountResources = window.setInterval(() => {
+      getChainId(currentNetwork.data.node_url);
+      getBalance();
+      const updateBalance = window.setInterval(() => {
         getBalance();
+        getChainId(currentNetwork.data.node_url);
       }, 10000);
-      return () => window.clearInterval(updateAccountResources);
+      return () => window.clearInterval(updateBalance);
     }
     return undefined;
   }, [currentAsset]);
-
-  useEffect(() => {
-    if (currentNetwork) {
-      getChainId(currentNetwork.data.node_url);
-    }
-  }, [currentNetwork]);
 
   useEffect(() => {
     if (chainId !== undefined) {
