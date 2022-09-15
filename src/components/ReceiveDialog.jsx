@@ -23,7 +23,7 @@ import aptos from "../assets/aptos_light.png";
 
 const ReceiveDialog = () => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
-  const { currentAddress } = useContext(AccountContext);
+  const { currentAddress, currentNetwork } = useContext(AccountContext);
   const { chainId } = useContext(Web3Context);
 
   const handleClick = () => {
@@ -70,8 +70,14 @@ const ReceiveDialog = () => {
           <Button variant="outlined" onClick={handleClick}>
             Copy to clipboard
           </Button>
-          <Typography align="center" variant="body1" sx={{ my: 3 }} color="warning.dark">
-            Aptos Devnet chain id {chainId}
+          <Typography
+            noWrap
+            align="left"
+            variant="body1"
+            sx={{ ml: "75px", my: 3, width: "200px" }}
+          >
+            Network: {currentNetwork.name} <br />
+            Chain id: {chainId}
           </Typography>
         </Stack>
       </DialogContent>
