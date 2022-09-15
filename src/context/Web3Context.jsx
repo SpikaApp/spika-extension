@@ -29,7 +29,7 @@ export const Web3Provider = ({ children }) => {
   const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [maxGasAmount] = useState("1000"); // todo: integrate to SendDialog
+  const [maxGasAmount, setMaxGasAmount] = useState("1000"); // todo: integrate to SendDialog
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
   const [txnDetails, setTxnDetails] = useState([]);
@@ -45,7 +45,6 @@ export const Web3Provider = ({ children }) => {
   const { spikaClient: spika } = useSpika(currentNetwork);
 
   const _accountAssets = "accountAssets";
-  const _currentAsset = "currentAsset";
 
   useEffect(() => {
     if (spikaWallet) {
@@ -132,12 +131,15 @@ export const Web3Provider = ({ children }) => {
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
-      const _amount = "1000000";
+      let _amount = "100000";
+      if (currentNetwork.name === "Devnet") {
+        _amount = "1000000";
+      }
       await spika.faucetClient.fundAccount(account.address(), _amount);
       throwAlert(
         21,
         "Success",
-        `Received ${Number(stringToValue(aptosCoin, _amount)).toFixed(2)} ${aptosCoin.data.symbol}`,
+        `Received ${Number(stringToValue(aptosCoin, _amount))} ${aptosCoin.data.symbol}`,
         false
       );
     } catch (error) {
@@ -161,13 +163,19 @@ export const Web3Provider = ({ children }) => {
           currentAsset.type,
           valueToString(currentAsset, amount)
         );
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload);
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
       } else if (isBcs === undefined || !isBcs) {
         _payload = payload;
-        transaction = await spika.client.generateTransaction(account.address(), _payload);
+        transaction = await spika.client.generateTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
       } else {
         _payload = payload;
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload);
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
       }
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
       const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
@@ -204,7 +212,9 @@ export const Web3Provider = ({ children }) => {
         currentAsset.type,
         valueToString(currentAsset, amount)
       );
-      const rawTxn = await spika.client.generateRawTransaction(currentAddress, payload);
+      const rawTxn = await spika.client.generateRawTransaction(currentAddress, payload, {
+        maxGasAmount: maxGasAmount,
+      });
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
       const transactionRes = await spika.client.submitSignedBCSTransaction(bcsTxn);
       await spika.client.waitForTransaction(transactionRes.hash);
@@ -529,6 +539,8 @@ export const Web3Provider = ({ children }) => {
         setRecipientAddress,
         amount,
         setAmount,
+        maxGasAmount,
+        setMaxGasAmount,
         isValidTransaction,
         setIsValidTransaction,
         estimatedTxnResult,
