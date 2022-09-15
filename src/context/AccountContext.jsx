@@ -416,6 +416,7 @@ export const AccountProvider = ({ children }) => {
       } catch (error) {
         console.log(error);
         throwAlert(42, "Failed to load account", `${error}`, true);
+        setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }
     } catch (error) {
       console.log(error);

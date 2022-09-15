@@ -116,12 +116,15 @@ const AlertDialog = () => {
         setOpenNetworkDialog(false);
         setAccountImported(true);
         setCurrentAsset(aptosCoin);
+        break;
       case 2: // Failed create account
       case 12: // Failed import account
       case 22: // Failed mint coins
       case 32: // Transaction failed
       case 41: // Account loaded from localStorage
       case 42: // Failed load account
+        setAccountImported(false);
+        navigate(0);
       case 52: // Password field cannot be empty
       case 53: // Passwords do not match
       case 54: // Password must at least 6 characters long
