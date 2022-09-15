@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   Button,
   Dialog,
@@ -17,6 +16,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { aptosCoin } from "../lib/coin";
 import copyToClipboard from "../utils/copy_clipboard";
 
 const AlertDialog = () => {
@@ -36,14 +36,12 @@ const AlertDialog = () => {
     isError,
   } = useContext(UIContext);
   const {
+    setAccountImported,
     alertSignal,
-    setAlertSignal,
     alertTitle,
-    setAlertTitle,
     alertMessage,
-    setAlertMessage,
     clearAlert,
-    setMnemonic,
+    setCurrentAsset,
     handleLogout,
   } = useContext(AccountContext);
 
@@ -110,13 +108,14 @@ const AlertDialog = () => {
       case 91: // Mnemonic required
         setOpenAlertDialog(false);
         break;
-
       case 101: // New asset successfully added
         setOpenAlertDialog(false);
         setOpenAddAssetDialog(false);
       case 121: // Network changed successfully
         setOpenAlertDialog(false);
         setOpenNetworkDialog(false);
+        setAccountImported(true);
+        setCurrentAsset(aptosCoin);
       case 2: // Failed create account
       case 12: // Failed import account
       case 22: // Failed mint coins

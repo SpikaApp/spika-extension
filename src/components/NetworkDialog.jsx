@@ -25,8 +25,9 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { AptosClient, FaucetClient } from "aptos";
+import useSpika from "../hooks/useSpika";
 import { getNetworks, removeNetwork } from "../lib/network";
-import { setStore } from "../lib/store";
+import { setMem, setStore } from "../lib/store";
 import { aptosCoin } from "../lib/coin";
 import { PLATFORM } from "../utils/constants";
 
@@ -40,11 +41,14 @@ const NetworkDialog = () => {
   } = useContext(UIContext);
   const {
     alertSignal,
+    accountImported,
     currentAddress,
     currentNetwork,
+    currentAsset,
     setCurrentNetwork,
     setCurrentAsset,
     throwAlert,
+    setAccountImported,
   } = useContext(AccountContext);
   const { updateAccountAssets, getAccountTokens } = useContext(Web3Context);
   const [selectedIndex, setSelectedIndex] = useState("");
@@ -54,6 +58,7 @@ const NetworkDialog = () => {
   const [networkOnline, setNetworkOnline] = useState(false);
   const navigate = useNavigate();
   const _currentNetwork = "currentNetwork";
+  const _currentAsset = "currentAsset";
 
   const handleListItemClick = async (event, index, network) => {
     await getAccountNetworks(true);
@@ -80,19 +85,20 @@ const NetworkDialog = () => {
   }, [somethingChanged]);
 
   useEffect(() => {
+    if (alertSignal === 121) {
+      clearDialog();
+    }
+  }, [alertSignal]);
+
+  useEffect(() => {
     if (currentNetwork && openNetworkDialog) {
       updateAccountAssets();
       getAccountTokens();
-      setCurrentAsset(aptosCoin);
+      setAccountImported(false);
+      setCurrentAsset({}); // reset to initial state and set to aptosCoin in AlertDialog
+      setStore(PLATFORM, _currentAsset, aptosCoin);
     }
   }, [currentNetwork]);
-
-  useEffect(() => {
-    if (alertSignal === 121) {
-      clearDialog();
-      navigate("/");
-    }
-  }, [alertSignal]);
 
   const handleChange = async () => {
     try {

@@ -9,7 +9,7 @@ import * as token from "../lib/token";
 import { PLATFORM } from "../utils/constants";
 import { stringToValue, valueToString } from "../utils/values";
 import pixel_coin from "../assets/pixel_coin.png";
-import { setStore } from "../lib/store";
+import { setStore, getStore } from "../lib/store";
 
 export const Web3Context = React.createContext();
 
@@ -45,6 +45,7 @@ export const Web3Provider = ({ children }) => {
   const { spikaClient: spika } = useSpika(currentNetwork);
 
   const _accountAssets = "accountAssets";
+  const _currentAsset = "currentAsset";
 
   useEffect(() => {
     if (spikaWallet) {
@@ -302,21 +303,21 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async () => {
     let resources = await spika.client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    if (accountResource === undefined || accountResource === null) {
+    let resource = resources.find((r) => r.type === coinStore(currentAsset.type));
+    if (resource === undefined || resource === null) {
       setBalance(0);
     } else {
-      setBalance(accountResource.data.coin.value);
+      setBalance(resource.data.coin.value);
     }
   };
 
   const updateBalance = async (asset) => {
     let resources = await spika.client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === asset.type);
-    if (accountResource === undefined || accountResource === null) {
+    let _asset = resources.find((r) => r.type === asset.type);
+    if (_asset === undefined || _asset === null) {
       setBalance(0);
     } else {
-      setBalance(accountResource.data.coin.value);
+      setBalance(_asset.data.coin.value);
     }
   };
 

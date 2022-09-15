@@ -41,7 +41,7 @@ export const AccountProvider = ({ children }) => {
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState({}); // AptosAccount
   const [currentNetwork, setCurrentNetwork] = useState(network.networkList[0]);
-  const [currentAsset, setCurrentAsset] = useState([]);
+  const [currentAsset, setCurrentAsset] = useState({});
   const [accountAssets, setAccountAssets] = useState([]);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
@@ -466,6 +466,7 @@ export const AccountProvider = ({ children }) => {
         handleChangePassword,
         spikaWallet,
         accountImported,
+        setAccountImported,
         account,
         currentNetwork,
         setCurrentNetwork,
