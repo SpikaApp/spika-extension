@@ -126,17 +126,10 @@ export const AccountProvider = ({ children }) => {
 
   const handleLogout = () => {
     locker("idle");
-    navigate("/");
-    setPrivateKey("");
-    setCurrentAddress("");
-    setAccount([]);
-    clearPasswords();
     removeMem(PLATFORM, "PWD");
-    setAccountImported(false);
-    setSpikaWallet(false);
     clearStore(PLATFORM);
-    setOpenLogoutDialog(false);
-    setAccountRoutesEnabled(true);
+    navigate(0);
+    window.close();
   };
 
   const handleLock = () => {
