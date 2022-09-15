@@ -102,9 +102,6 @@ const ConfirmSendDialog = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        {/* <Typography sx={{ mt: 1 }} align="center" variant="body2" color="warning.dark">
-          Gas values are valid at time when transaction was calculated
-        </Typography> */}
       </DialogContent>
       <Stack
         sx={{

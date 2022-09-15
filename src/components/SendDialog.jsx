@@ -17,8 +17,16 @@ import { Web3Context } from "../context/Web3Context";
 const SendDialog = () => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
-  const { chainId, recipientAddress, setRecipientAddress, amount, setAmount, handleEstimate } =
-    useContext(Web3Context);
+  const {
+    chainId,
+    recipientAddress,
+    setRecipientAddress,
+    amount,
+    setAmount,
+    maxGasAmount,
+    setMaxGasAmount,
+    handleEstimate,
+  } = useContext(Web3Context);
 
   const handleCancel = () => {
     setRecipientAddress("");
@@ -33,23 +41,40 @@ const SendDialog = () => {
         <Typography variant="body1" color="warning.dark">
           Transaction will be submitted on chain id {chainId}
         </Typography>
-        <Stack>
+        <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField
             sx={{ mt: 4, mb: 4 }}
             id="recipientAddress"
             label="Address"
+            InputLabelProps={{ shrink: true }}
+            multiline={true}
+            rows={3}
             fullWidth={true}
+            placeholder="0x..."
             type="string"
             value={recipientAddress}
             onChange={(e) => setRecipientAddress(e.target.value)}
           />
           <TextField
+            sx={{ mb: 4, width: "200px" }}
             id="amount"
             label="Amount"
+            InputLabelProps={{ shrink: true }}
             fullWidth={true}
+            placeholder={`Amount in ${currentAsset.data.symbol}`}
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+          />
+          <TextField
+            sx={{ width: "200px" }}
+            id="maxGasAmount"
+            label="Max Gas Amount"
+            InputLabelProps={{ shrink: true }}
+            fullWidth={false}
+            type="number"
+            value={maxGasAmount}
+            onChange={(e) => setMaxGasAmount(e.target.value.toString())}
           />
         </Stack>
       </DialogContent>
