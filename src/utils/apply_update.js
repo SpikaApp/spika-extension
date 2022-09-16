@@ -12,9 +12,11 @@ let version;
 
 const applyUpdate = async () => {
   await getVersion();
-  await v0_4_0();
-  await v0_4_5();
-  await v0_4_14();
+  if (version) {
+    await v0_4_0();
+    await v0_4_5();
+    await v0_4_14();
+  }
 };
 
 const getVersion = async () => {
