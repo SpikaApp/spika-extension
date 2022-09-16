@@ -143,7 +143,6 @@ const handleIsConnected = async (sender, sendResponse) => {
   const url = sender.origin;
   const result = await getApp(publicAccount, url);
   if (result) {
-    console.log(result);
     setMem(_lastConnectedApp, { publicAccount: publicAccount, url: url });
   }
   sendResponse(result);
@@ -151,7 +150,6 @@ const handleIsConnected = async (sender, sendResponse) => {
 
 const handleDisconnect = async (sender, sendResponse) => {
   const publicAccount = await getStore(_currentPubAccount);
-  console.log(publicAccount);
   const url = sender.origin;
   const result = await removeApp(publicAccount, url);
   removeMem(_lastConnectedApp);
