@@ -16,7 +16,6 @@ import {
   ListItemIcon,
   ListItemText,
   Link,
-  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
@@ -121,9 +120,9 @@ const PermissionDialog = () => {
   const handleApprove = async () => {
     switch (method) {
       case "connect":
-        const data = await getApp(currentAddress, requestSender.origin);
+        const data = await getApp(publicAccount, requestSender.origin);
         if (!data) {
-          const set = await setApp(currentAddress, requestSender.origin);
+          const set = await setApp(publicAccount, requestSender.origin);
           if (set) {
             response = publicAccount;
           } else {

@@ -6,7 +6,9 @@ const _currentRoute = "currentRoute";
 const _request = "currentRequest";
 const _sender = "currentSender";
 const _currentAddress = "currentAddress";
+const _currentPubAccount = "currentPubAccount";
 const _connectedApps = "connectedApps";
+const _lastConnectedApp = "lastConnectedApp";
 
 const permissionDialog = "PermissionDialog";
 
@@ -38,12 +40,12 @@ const getStore = (key) => {
   });
 };
 
-const getApp = async (currentAddress, url) => {
-  if (currentAddress && url) {
+const getApp = async (publicAccount, url) => {
+  if (publicAccount && url) {
     try {
       const data = await getStore(_connectedApps);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        let result = data.find((i) => i.publicAccount.account === publicAccount.account);
         if (result === undefined) {
           return false;
         } else {
@@ -63,12 +65,12 @@ const getApp = async (currentAddress, url) => {
   }
 };
 
-const removeApp = async (currentAddress, url) => {
-  if (currentAddress && url) {
+const removeApp = async (publicAccount, url) => {
+  if (publicAccount && url) {
     try {
       const data = await getStore(_connectedApps);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        let result = data.find((i) => i.publicAccount.account === publicAccount.account);
         if (result === undefined) {
           return false;
         } else {
@@ -109,28 +111,66 @@ const launchPopup = (message, sender) => {
   });
 };
 
+const handleLaunchPopup = (message, sender, sendResponse) => {
+  launchPopup(message, sender, sendResponse);
+  chrome.runtime.onMessage.addListener(function responder(response) {
+    if (response.responseMethod === message.method && response.id === message.id) {
+      const result = response.response;
+      this.chrome.runtime.onMessage.removeListener(responder);
+      // console.log("[worker]: response received :", result);
+      sendResponse(result);
+    }
+    return true;
+  });
+};
+
+const handleAutoConnect = async (message, sender, sendResponse) => {
+  const data = await getMem(_lastConnectedApp);
+  console.log(data);
+  if (data) {
+    if (data.url === sender.origin) {
+      sendResponse(data.publicAccount);
+    } else {
+      handleLaunchPopup(message, sender, sendResponse);
+    }
+  } else {
+    handleLaunchPopup(message, sender, sendResponse);
+  }
+};
+
 const handleIsConnected = async (sender, sendResponse) => {
-  const currentAddress = await getStore(_currentAddress);
+  const publicAccount = await getStore(_currentPubAccount);
   const url = sender.origin;
-  const result = await getApp(currentAddress, url);
+  const result = await getApp(publicAccount, url);
+  if (result) {
+    console.log(result);
+    setMem(_lastConnectedApp, { publicAccount: publicAccount, url: url });
+  }
   sendResponse(result);
 };
 
 const handleDisconnect = async (sender, sendResponse) => {
-  const currentAddress = await getStore(_currentAddress);
+  const publicAccount = await getStore(_currentPubAccount);
+  console.log(publicAccount);
   const url = sender.origin;
-  const result = await removeApp(currentAddress, url);
+  const result = await removeApp(publicAccount, url);
+  removeMem(_lastConnectedApp);
   sendResponse(result);
 };
 
 const spikaMessenger = (message, sender, sendResponse) => {
   // console.log("[worker]: spikaMessenger: ", message);
-
   if (message.id === "locker") {
     setMem(_locker, message.method);
-  }
-  if (
-    message.method === "connect" ||
+  } else if (message.method === "connect") {
+    handleAutoConnect(message, sender, sendResponse);
+  } else if (message.method === "account") {
+    handleLaunchPopup(message, sender, sendResponse);
+  } else if (message.method === "isConnected") {
+    handleIsConnected(sender, sendResponse);
+  } else if (message.method === "disconnect") {
+    handleDisconnect(sender, sendResponse);
+  } else if (
     message.method === "account" ||
     message.method === "signMessage" ||
     message.method === "signTransaction" ||
@@ -139,25 +179,8 @@ const spikaMessenger = (message, sender, sendResponse) => {
     if (message.args === undefined || message.args === null) {
       sendResponse(false);
     } else {
-      launchPopup(message, sender, sendResponse);
-      chrome.runtime.onMessage.addListener(function responder(response) {
-        if (response.responseMethod === message.method && response.id === message.id) {
-          const result = response.response;
-          this.chrome.runtime.onMessage.removeListener(responder);
-          // console.log("[worker]: response received :", result);
-          sendResponse(result);
-        }
-        return true;
-      });
+      handleLaunchPopup(message, sender, sendResponse);
     }
-  }
-  if (message.method === "isConnected") {
-    handleIsConnected(sender, sendResponse);
-    return true;
-  }
-  if (message.method === "disconnect") {
-    handleDisconnect(sender, sendResponse);
-    return true;
   }
   return true;
 };
