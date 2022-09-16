@@ -285,28 +285,31 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
+      let _publicAccount = {
+        publicKey: _account.pubKey().hex(),
+        account: _account.address().hex(),
+        authKey: _account.authKey().hex(),
+      };
       locker("lock");
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      setStore(PLATFORM, "currentPubAccount", _publicAccount);
       setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       const encryptedPassword = await encryptPassword(password);
       setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       network.addNetworkStore(_account.address().hex());
-      apps.addAddress(_account.address().hex());
+      apps.addAddress(_publicAccount);
       setAccountImported(true);
       setSpikaWallet(true);
       setPrivateKey(_privateKey);
       setAccount(_account);
-      setPublicAccount({
-        publicKey: _account.pubKey().hex(),
-        account: _account.address().hex(),
-        authKey: _account.authKey().hex(),
-      });
+
+      setPublicAccount(_publicAccount);
       setCurrentAddress(_account.address().hex());
       setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
@@ -328,28 +331,30 @@ export const AccountProvider = ({ children }) => {
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
+      let _publicAccount = {
+        publicKey: _account.pubKey().hex(),
+        account: _account.address().hex(),
+        authKey: _account.authKey().hex(),
+      };
       locker("lock");
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
       setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
       setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
+      setStore(PLATFORM, "currentPubAccount", _publicAccount);
       setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       const encryptedPassword = await encryptPassword(password);
       setMem(PLATFORM, "PWD", encryptedPassword);
       setStore(PLATFORM, "currentAsset", aptosCoin);
       assetStore.addAssetStore(_account.address().hex(), aptosCoin);
       network.addNetworkStore(_account.address().hex());
-      apps.addAddress(_account.address().hex());
+      apps.addAddress(_publicAccount);
       setAccountImported(true);
       setSpikaWallet(true);
       setPrivateKey(_privateKey);
       setAccount(_account);
-      setPublicAccount({
-        publicKey: _account.pubKey().hex(),
-        account: _account.address().hex(),
-        authKey: _account.authKey().hex(),
-      });
+      setPublicAccount(_publicAccount);
       setCurrentAddress(_account.address().hex());
       setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
@@ -384,20 +389,22 @@ export const AccountProvider = ({ children }) => {
           setStore(PLATFORM, "currentNetwork", network.networkList[0]);
           _currentNetwork = network.networkList[0];
         }
+        let _publicAccount = {
+          publicKey: _account.pubKey().hex(),
+          account: _account.address().hex(),
+          authKey: _account.authKey().hex(),
+        };
         assetStore.addAssetStore(_account.address().hex(), aptosCoin);
         network.addNetworkStore(_account.address().hex());
-        apps.addAddress(_account.address().hex());
+        apps.addAddress(_publicAccount);
         setStore(PLATFORM, "currentAddress", _account.address().hex());
+        setStore(PLATFORM, "currentPubAccount", _publicAccount);
         const encryptedPassword = await encryptPassword(password);
         setMem(PLATFORM, "PWD", encryptedPassword);
         setAccountImported(true);
         setPrivateKey(_privateKey);
         setAccount(_account);
-        setPublicAccount({
-          publicKey: _account.pubKey().hex(),
-          account: _account.address().hex(),
-          authKey: _account.authKey().hex(),
-        });
+        setPublicAccount(_publicAccount);
         setCurrentAddress(_account.address().hex());
         setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
