@@ -3,31 +3,31 @@ import { setStore, getStore } from "./store";
 
 const _connectedApps = "connectedApps";
 
-export const addAddress = async (currentAddress) => {
+export const addAddress = async (publicAccount) => {
   if (PLATFORM === "chrome-extension:") {
     const connectedApps = await getStore(PLATFORM, _connectedApps);
     if (!connectedApps) {
       setStore(PLATFORM, _connectedApps, [
         {
-          address: currentAddress,
+          publicAccount: publicAccount,
           urls: [],
         },
       ]);
     } else {
-      let data = connectedApps.find((i) => i.address === currentAddress);
+      let data = connectedApps.find((i) => i.publicAccount.account === publicAccount.account);
       if (!data) {
-        connectedApps.push({ address: currentAddress, urls: [] });
+        connectedApps.push({ publicAccount: publicAccount, urls: [] });
         setStore(PLATFORM, _connectedApps, connectedApps);
       }
     }
   }
 };
 
-export const getConnectedApps = async (currentAddress) => {
+export const getConnectedApps = async (publicAccount) => {
   try {
     const data = await getStore(PLATFORM, _connectedApps);
     if (data !== undefined || data !== null) {
-      let result = data.find((i) => i.address === currentAddress);
+      let result = data.find((i) => i.publicAccount.account === publicAccount.account);
       return result;
     }
   } catch (error) {
@@ -35,12 +35,12 @@ export const getConnectedApps = async (currentAddress) => {
   }
 };
 
-export const setApp = async (currentAddress, url) => {
-  if (currentAddress && url) {
+export const setApp = async (publicAccount, url) => {
+  if (publicAccount && url) {
     try {
       const data = await getStore(PLATFORM, _connectedApps);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        let result = data.find((i) => i.publicAccount.account === publicAccount.account);
         if (result === undefined) {
           return false;
         } else {
@@ -62,12 +62,12 @@ export const setApp = async (currentAddress, url) => {
   }
 };
 
-export const getApp = async (currentAddress, url) => {
-  if (currentAddress && url) {
+export const getApp = async (publicAccount, url) => {
+  if (publicAccount && url) {
     try {
       const data = await getStore(PLATFORM, _connectedApps);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        let result = data.find((i) => i.publicAccount.account === publicAccount.account);
         if (result === undefined) {
           return false;
         } else {
@@ -87,12 +87,12 @@ export const getApp = async (currentAddress, url) => {
   }
 };
 
-export const removeApp = async (currentAddress, url) => {
-  if (currentAddress && url) {
+export const removeApp = async (publicAccount, url) => {
+  if (publicAccount && url) {
     try {
       const data = await getStore(PLATFORM, _connectedApps);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        let result = data.find((i) => i.publicAccount.account === publicAccount.account);
         if (result === undefined) {
           return false;
         } else {
