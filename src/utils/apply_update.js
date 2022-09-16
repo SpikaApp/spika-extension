@@ -5,16 +5,16 @@ import { compare } from "compare-versions";
 const _accountVersion = "accountVersion";
 const _currentAsset = "currentAsset";
 const _accountAssets = "accountAssets";
+const _connectedApps = "connectedApps";
 const _pwd = "PWD";
 
 let version;
 
 const applyUpdate = async () => {
-  if (version) {
-    await getVersion();
-    await v0_4_0();
-    await v0_4_5();
-  }
+  await getVersion();
+  await v0_4_0();
+  await v0_4_5();
+  await v0_4_14();
 };
 
 const getVersion = async () => {
@@ -50,6 +50,16 @@ const v0_4_5 = async () => {
   const required = pendingUpdate(version, currentUpdate);
   if (required) {
     removeMem(PLATFORM, _pwd);
+    setVersion();
+    logUpdate(currentUpdate);
+  }
+};
+
+const v0_4_14 = async () => {
+  const currentUpdate = "0.4.14";
+  const required = pendingUpdate(version, currentUpdate);
+  if (required) {
+    removeStore(PLATFORM, _connectedApps);
     setVersion();
     logUpdate(currentUpdate);
   }
