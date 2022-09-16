@@ -274,7 +274,7 @@ export const Web3Provider = ({ children }) => {
   const signMessage = async (message) => {
     const messageToSign = Buffer.from(message);
     const signedMessage = await account.signBuffer(messageToSign);
-    const response = { signedMessage: signedMessage.hexString };
+    const response = signedMessage.hexString;
     return response;
   };
 
