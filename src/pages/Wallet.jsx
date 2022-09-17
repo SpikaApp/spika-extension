@@ -174,7 +174,7 @@ const Wallet = () => {
                         <Typography
                           sx={{ ml: "8px", fontSize: "24px", cursor: "default" }}
                           variant="button"
-                          color="TextSecondary"
+                          color="textSecondary"
                         >
                           {currentAsset.data.symbol}
                         </Typography>
