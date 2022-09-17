@@ -42,6 +42,8 @@ export const AccountProvider = ({ children }) => {
   const [account, setAccount] = useState({}); // AptosAccount
   const [currentNetwork, setCurrentNetwork] = useState(network.networkList[0]);
   const [currentAsset, setCurrentAsset] = useState({});
+  const [baseCoin, setBaseCoin] = useState(aptosCoin);
+  const [quoteCoin, setQuoteCoin] = useState(aptosCoin);
   const [accountAssets, setAccountAssets] = useState([]);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
@@ -475,6 +477,10 @@ export const AccountProvider = ({ children }) => {
         privateKey,
         currentAddress,
         currentAsset,
+        baseCoin,
+        setBaseCoin,
+        quoteCoin,
+        setQuoteCoin,
         accountAssets,
         setAccountAssets,
         setCurrentAsset,
