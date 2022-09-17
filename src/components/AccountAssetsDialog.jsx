@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -19,9 +19,10 @@ import { Web3Context } from "../context/Web3Context";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 
-const AccountAssetsDialog = () => {
+const AccountAssetsDialog = (props) => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, setCurrentAsset, accountAssets } = useContext(AccountContext);
+  const { setIsLoading, setCurrentAsset, accountAssets, setBaseCoin, setQuoteCoin } =
+    useContext(AccountContext);
   const { updateAccountAssets, updateBalance } = useContext(Web3Context);
 
   const _currentAsset = "currentAsset";
@@ -33,10 +34,22 @@ const AccountAssetsDialog = () => {
   }, [openAccountAssetsDialog]);
 
   const handleSwitchAsset = (asset) => {
-    setStore(PLATFORM, _currentAsset, asset);
-    setCurrentAsset(asset);
-    handleUpdateBalance(asset);
-    setOpenAccountAssetsDialog(false);
+    console.log(props);
+
+    if (props.type === "base") {
+      setBaseCoin(asset);
+      handleUpdateBalance(asset);
+      setOpenAccountAssetsDialog(false);
+    } else if (props.type === "quote") {
+      setQuoteCoin(asset);
+      handleUpdateBalance(asset);
+      setOpenAccountAssetsDialog(false);
+    } else {
+      setStore(PLATFORM, _currentAsset, asset);
+      setCurrentAsset(asset);
+      handleUpdateBalance(asset);
+      setOpenAccountAssetsDialog(false);
+    }
   };
 
   const handleUpdateBalance = async (asset) => {
@@ -79,7 +92,6 @@ const AccountAssetsDialog = () => {
           </List>
         </Paper>
       </DialogContent>
-
       <DialogActions>
         <Button onClick={handleCancel}>Close</Button>
       </DialogActions>
