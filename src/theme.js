@@ -32,6 +32,20 @@ export const lightTheme = createTheme({
         },
       },
     },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          input: {
+            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+              WebkitAppearance: "none",
+              display: "none",
+            },
+          },
+          borderRadius: "8px",
+          // backgroundColor: "#FFFFFF",
+        },
+      },
+    },
   },
 
   palette: {
@@ -48,7 +62,7 @@ export const lightTheme = createTheme({
     },
     text: {
       primary: "#232323",
-      secondary: "#212121",
+      secondary: "#9e9e9e",
     },
     link: "#1F2CFF",
   },
@@ -89,6 +103,20 @@ export const darkTheme = createTheme({
         },
       },
     },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          input: {
+            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+              WebkitAppearance: "none",
+              display: "none",
+            },
+          },
+          borderRadius: "8px",
+          // backgroundColor: "#232323",
+        },
+      },
+    },
   },
   palette: {
     mode: "dark",
@@ -105,7 +133,7 @@ export const darkTheme = createTheme({
     },
     text: {
       primary: "#FFFFFF",
-      secondary: "#FFFFFF",
+      secondary: "#9e9e9e",
     },
     link: "#bcbcbc",
   },
