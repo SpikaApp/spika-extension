@@ -2,6 +2,7 @@ export { default as Onboarding } from "./Onboarding";
 export { default as Create } from "./Create";
 export { default as Import } from "./Import";
 export { default as Wallet } from "./Wallet";
+export { default as Swap } from "./Swap";
 export { default as NFTs } from "./NFTs";
 export { default as Transactions } from "./Transactions";
 export { default as Settings } from "./Settings";

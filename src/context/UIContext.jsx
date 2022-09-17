@@ -35,7 +35,7 @@ export const UIProvider = ({ children }) => {
   const [currentRoute, setCurrentRoute] = useState();
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isPopup, setIsPopup] = useState(false);
-  const [devMode, setDevMode] = useState(false);
+  const [devMode, setDevMode] = useState(PLATFORM === "http:" ? true : false);
   const [isTest, setIsTest] = useState(false);
   const [isError, setIsError] = useState();
   const _currentRoute = "currentRoute";
@@ -224,7 +224,6 @@ export const UIProvider = ({ children }) => {
         somethingChanged,
         setSomethingChanged,
         devMode,
-        setDevMode,
         isTest,
         setIsTest,
         isPopup,

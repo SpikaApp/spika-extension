@@ -1,7 +1,17 @@
 import React, { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import { Onboarding, Wallet, Create, Import, NFTs, Transactions, Settings, About } from "./pages";
+import {
+  Onboarding,
+  Wallet,
+  Create,
+  Import,
+  Swap,
+  NFTs,
+  Transactions,
+  Settings,
+  About,
+} from "./pages";
 import { ThemeProvider } from "@mui/material";
 import { UIContext } from "./context/UIContext";
 import { AccountProvider } from "./context/AccountContext";
@@ -17,7 +27,8 @@ import PermissionDialog from "./components/PermissionDialog";
 import "./index.css";
 
 const App = () => {
-  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes } = useContext(UIContext);
+  const { spikaWallet, darkMode, devMode, accountRoutesEnabled, disableAllRoutes } =
+    useContext(UIContext);
 
   return (
     <Router>
@@ -52,6 +63,7 @@ const App = () => {
                             {accountRoutesEnabled === true && (
                               <Route path="import" element={<Import />} />
                             )}
+                            {devMode && <Route path="swap" element={<Swap />} />}
                             <Route path="nfts" element={<NFTs />} />
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="settings" element={<Settings />} />
