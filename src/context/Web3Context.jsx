@@ -343,27 +343,16 @@ export const Web3Provider = ({ children }) => {
       return;
     }
     let counter = parseInt(accountResource.data.deposit_events.counter);
-    if (counter <= 25) {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "deposit_events"
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-
-      setDepositEvents(result);
-    } else {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "deposit_events",
-        {
-          start: counter - 25,
-        }
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-      setDepositEvents(result);
-    }
+    let data = await spika.client.getEventsByEventHandle(
+      currentAddress,
+      coinStore(currentAsset.type),
+      "deposit_events",
+      {
+        limit: counter === 0 ? 1 : counter,
+      }
+    );
+    let result = data.reverse((r) => r.type === "sequence_number");
+    setDepositEvents(result);
   };
 
   const getWithdrawEvents = async () => {
@@ -373,27 +362,16 @@ export const Web3Provider = ({ children }) => {
       return;
     }
     let counter = parseInt(accountResource.data.withdraw_events.counter);
-    if (counter <= 25) {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "withdraw_events"
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-
-      setWithdrawEvents(result);
-    } else {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "withdraw_events",
-        {
-          start: counter - 25,
-        }
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-      setWithdrawEvents(result);
-    }
+    let data = await spika.client.getEventsByEventHandle(
+      currentAddress,
+      coinStore(currentAsset.type),
+      "withdraw_events",
+      {
+        limit: counter === 0 ? 1 : counter,
+      }
+    );
+    let result = data.reverse((r) => r.type === "sequence_number");
+    setWithdrawEvents(result);
   };
 
   const getAssetData = async (type) => {
@@ -470,7 +448,7 @@ export const Web3Provider = ({ children }) => {
             tokenStore.type,
             "deposit_events",
             {
-              limit: counter,
+              limit: counter === 0 ? 1 : counter,
             }
           );
 
