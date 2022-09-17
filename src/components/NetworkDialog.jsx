@@ -56,7 +56,6 @@ const NetworkDialog = () => {
   const [networks, setNetworks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [networkOnline, setNetworkOnline] = useState(false);
-  const navigate = useNavigate();
   const _currentNetwork = "currentNetwork";
   const _currentAsset = "currentAsset";
 
@@ -275,7 +274,12 @@ const NetworkDialog = () => {
                         </Stack>
                       }
                       secondary={
-                        <Typography noWrap variant="subtitle2" sx={{ maxWidth: "210px" }}>
+                        <Typography
+                          noWrap
+                          variant="subtitle2"
+                          color="textSecondary"
+                          sx={{ maxWidth: "210px" }}
+                        >
                           {normalizeAddress(network.data.node_url)}
                         </Typography>
                       }
