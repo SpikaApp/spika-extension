@@ -32,6 +32,13 @@ export const lightTheme = createTheme({
         },
       },
     },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          borderRadius: "12px",
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -40,6 +47,21 @@ export const lightTheme = createTheme({
               WebkitAppearance: "none",
               display: "none",
             },
+          },
+          borderRadius: "8px",
+          // backgroundColor: "#FFFFFF",
+        },
+      },
+    },
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          input: {
+            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+              WebkitAppearance: "none",
+              display: "none",
+            },
+            color: "#636363",
           },
           borderRadius: "8px",
           // backgroundColor: "#FFFFFF",
@@ -62,7 +84,7 @@ export const lightTheme = createTheme({
     },
     text: {
       primary: "#232323",
-      secondary: "#9e9e9e",
+      secondary: "#636363",
     },
     link: "#1F2CFF",
   },
@@ -103,6 +125,13 @@ export const darkTheme = createTheme({
         },
       },
     },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          borderRadius: "12px",
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -114,6 +143,20 @@ export const darkTheme = createTheme({
           },
           borderRadius: "8px",
           // backgroundColor: "#232323",
+        },
+      },
+    },
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          input: {
+            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+              WebkitAppearance: "none",
+              display: "none",
+            },
+            color: "#9e9e9e",
+          },
+          borderRadius: "8px",
         },
       },
     },
