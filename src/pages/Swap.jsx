@@ -94,7 +94,7 @@ const Swap = () => {
       setBaseCoin(aptosCoin);
       setQuoteCoin(aptosCoin);
       setDataFetched(true);
-      debug.log("not on Devnet, swap enabled: ", false);
+      debug.log("not on Devnet, swap enabled", false);
     }
   }, [swapSupportedAssets]);
 
@@ -132,7 +132,7 @@ const Swap = () => {
     } else if (type === "quoteCoin") {
       setQuoteCoinBalance(balance);
     } else {
-      console.log("Unknown or undefined coin type");
+      debug.log("unknown or undefined coin type");
     }
   };
 
@@ -172,14 +172,20 @@ const Swap = () => {
         if (Number(baseCoinBalance) <= Number(valueToString(baseCoin, swapAmount))) {
           setInsufficientBalance(true);
           setQuoteAmount("");
-          debug.log("insufficient balance");
-          debug.log("balance", baseCoinBalance);
-          debug.log("swapAmount", valueToString(baseCoin, swapAmount));
+          debug.log(
+            `insufficient balance, balance: ${baseCoinBalance}, swapAmount: ${valueToString(
+              baseCoin,
+              swapAmount
+            )}`
+          );
         } else {
           setInsufficientBalance(false);
-          debug.log("balance OK");
-          debug.log("balance", baseCoinBalance);
-          debug.log("swapAmount", valueToString(baseCoin, swapAmount));
+          debug.log(
+            `balance ok, balance: ${baseCoinBalance}, swapAmount: ${valueToString(
+              baseCoin,
+              swapAmount
+            )}`
+          );
         }
       }
     } else {
