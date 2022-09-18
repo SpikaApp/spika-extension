@@ -9,6 +9,7 @@ export const aptosCoin = {
     decimals: 8,
     logo: aptos_light,
     logo_alt: aptos_dark,
+    swap: false,
   },
 };
 
@@ -21,6 +22,7 @@ export const coinList = [
       decimals: 8,
       logo: aptos_light,
       logo_alt: aptos_dark,
+      swap: false,
     },
   },
   {
@@ -31,6 +33,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/325/small/Tether-logo.png?1598003707",
       logo_alt: "https://assets.coingecko.com/coins/images/325/small/Tether-logo.png?1598003707",
+      swap: true,
     },
   },
   {
@@ -41,6 +44,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png?1547042389",
       logo_alt: "https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png?1547042389",
+      swap: true,
     },
   },
   {
@@ -51,6 +55,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/9956/small/4943.png?1636636734",
       logo_alt: "https://assets.coingecko.com/coins/images/9956/small/4943.png?1636636734",
+      swap: true,
     },
   },
   {
@@ -61,6 +66,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579",
       logo_alt: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579",
+      swap: true,
     },
   },
   {
@@ -71,6 +77,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
       logo_alt: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
+      swap: false,
     },
   },
   {
@@ -81,6 +88,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
       logo_alt: "https://assets.coingecko.com/coins/images/4128/small/solana.png?1640133422",
+      swap: true,
     },
   },
   {
@@ -91,6 +99,7 @@ export const coinList = [
       decimals: 8,
       logo: "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1644979850",
       logo_alt: "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1644979850",
+      swap: false,
     },
   },
 ];

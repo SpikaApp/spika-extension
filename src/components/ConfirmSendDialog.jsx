@@ -23,7 +23,7 @@ import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
 
-const ConfirmSendDialog = () => {
+const ConfirmSendDialog = (props) => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } =
     useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
@@ -39,7 +39,7 @@ const ConfirmSendDialog = () => {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    if (isValidTransaction && !openAddAssetDialog) {
+    if (isValidTransaction && !openAddAssetDialog && props.type !== "swap") {
       const _amount = estimatedTxnResult.payload.arguments[1];
       setOpenConfirmSendDialog(true);
       setRows([
@@ -50,11 +50,31 @@ const ConfirmSendDialog = () => {
         createData("Max gas", estimatedTxnResult.max_gas_amount),
         createData("Gas price", estimatedTxnResult.gas_unit_price),
       ]);
+    } else if (isValidTransaction && props.type === "swap") {
+      setRows([
+        createData(
+          "Avg. rate",
+          `1 ${props.quote.quote.inputSymbol} ≈ ${props.quote.quote.avgPrice} ${props.quote.quote.outputSymbol}`
+        ),
+        createData("Base", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
+        createData("Quote", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
+        createData("Gas fee", `≈ ${estimatedTxnResult.gas_used}`),
+        createData("Max gas", estimatedTxnResult.max_gas_amount),
+        createData("Gas price", estimatedTxnResult.gas_unit_price),
+      ]);
     }
   }, [isValidTransaction]);
 
   const createData = (name, value) => {
     return { name, value };
+  };
+
+  const handleConfirm = () => {
+    if (props.type === "swap") {
+      handleSend(props.args.payload, props.args.isBcs, props.args.silent);
+    } else {
+      handleSend();
+    }
   };
 
   const handleCancel = () => {
@@ -122,7 +142,7 @@ const ConfirmSendDialog = () => {
             width: "121px",
           }}
           variant="contained"
-          onClick={handleSend}
+          onClick={handleConfirm}
         >
           Confirm
         </Button>

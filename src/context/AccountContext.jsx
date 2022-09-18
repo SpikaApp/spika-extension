@@ -33,6 +33,7 @@ export const AccountProvider = ({ children }) => {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [accountImported, setAccountImported] = useState(false);
   const [mnemonic, setMnemonic] = useState("");
   const [newMnemonic, setNewMnemonic] = useState("");
@@ -45,6 +46,7 @@ export const AccountProvider = ({ children }) => {
   const [baseCoin, setBaseCoin] = useState(aptosCoin);
   const [quoteCoin, setQuoteCoin] = useState(aptosCoin);
   const [accountAssets, setAccountAssets] = useState([]);
+  const [swapSupportedAssets, setSwapSupportedAssets] = useState([]);
   const [balance, setBalance] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -455,6 +457,8 @@ export const AccountProvider = ({ children }) => {
         clearAlert,
         isLoading,
         setIsLoading,
+        isFetching,
+        setIsFetching,
         mnemonic,
         newMnemonic,
         setNewMnemonic,
@@ -483,6 +487,8 @@ export const AccountProvider = ({ children }) => {
         setQuoteCoin,
         accountAssets,
         setAccountAssets,
+        swapSupportedAssets,
+        setSwapSupportedAssets,
         setCurrentAsset,
         balance,
         setBalance,
