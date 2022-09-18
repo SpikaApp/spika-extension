@@ -61,7 +61,7 @@ const AccountAssetsDialog = (props) => {
         }
       });
       setSwapSupportedAssets(swapSupported);
-      debug.log("swap assets updated");
+      debug.log("swap supported assets updated");
       setIsFetching(false);
     }
   }, [accountAssets.length > 0]);
