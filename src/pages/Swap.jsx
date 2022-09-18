@@ -285,7 +285,7 @@ const Swap = () => {
       {accountImported && (
         <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
           <CardContent align="center" sx={{ mt: 1 }}>
-            <Stack sx={{ display: "flex", alignItems: "center" }}>
+            <Stack sx={{ display: "flex", alignItems: "center", maxWidth: "295px" }}>
               <Typography
                 variant="subtitle2"
                 color="textPrimary"
@@ -522,10 +522,7 @@ const Swap = () => {
               />
             )}
             {dataFetched && !swapEnabled && !isFetching && currentNetwork.name !== "Devnet" && (
-              <NoticeBox
-                mt={3}
-                text={`Swap is not supported on ${currentNetwork.name} yet. Change to Devnet to continue.`}
-              />
+              <NoticeBox mt={3} text={`Swap is not supported on ${currentNetwork.name} yet.`} />
             )}
             {dataFetched &&
               swapEnabled &&
