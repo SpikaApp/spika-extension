@@ -63,7 +63,7 @@ const App = () => {
                             {accountRoutesEnabled === true && (
                               <Route path="import" element={<Import />} />
                             )}
-                            {devMode && <Route path="swap" element={<Swap />} />}
+                            {!devMode && <Route path="swap" element={<Swap />} />}
                             <Route path="nfts" element={<NFTs />} />
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="settings" element={<Settings />} />

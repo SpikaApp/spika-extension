@@ -335,7 +335,7 @@ const Swap = () => {
                       </Typography>
                     </Stack>
                     <Typography color="textSecondary" align="left" variant="subtitle2">
-                      Current balance:
+                      Available {baseCoin.data.symbol}:
                     </Typography>
                   </Stack>
                   <Stack direction="column">
@@ -451,7 +451,7 @@ const Swap = () => {
                       </Typography>
                     </Stack>
                     <Typography color="textSecondary" align="left" variant="subtitle2">
-                      Current balance:
+                      Available {quoteCoin.data.symbol}:
                     </Typography>
                   </Stack>
                   <Stack direction="column">
