@@ -91,13 +91,12 @@ export const Web3Provider = ({ children }) => {
     setIsLoading(false);
   };
 
-  const handleSend = async () => {
+  const handleSend = async (payload, isBcs, silent) => {
     setIsLoading(true);
-    await sendTransaction();
+    await sendTransaction(payload, isBcs, silent);
     setIsLoading(false);
     setIsValidTransaction(false);
-    setEstimatedTxnResult([]);
-    setRecipientAddress("");
+    clearPrevEstimation();
     setAmount("");
   };
 
@@ -205,22 +204,44 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const sendTransaction = async () => {
+  const sendTransaction = async (payload, isBcs, silent) => {
+    let _payload;
+    let isSilent = false;
+    let transaction;
+    if (silent) {
+      isSilent = true;
+    }
     try {
-      const payload = await transfer(
-        recipientAddress,
-        currentAsset.type,
-        valueToString(currentAsset, amount)
-      );
-      const rawTxn = await spika.client.generateRawTransaction(currentAddress, payload, {
-        maxGasAmount: maxGasAmount,
-      });
-      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
-      const transactionRes = await spika.client.submitSignedBCSTransaction(bcsTxn);
-      await spika.client.waitForTransaction(transactionRes.hash);
-      throwAlert(31, "Transaction sent", `${transactionRes.hash}`, false);
+      if (payload === undefined) {
+        _payload = await transfer(
+          recipientAddress,
+          currentAsset.type,
+          valueToString(currentAsset, amount)
+        );
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
+      } else if (isBcs === undefined || !isBcs) {
+        _payload = payload;
+        transaction = await spika.client.generateTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
+      } else {
+        _payload = payload;
+        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
+          maxGasAmount: maxGasAmount,
+        });
+      }
+      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const result = await spika.client.submitSignedBCSTransaction(bcsTxn);
+      await spika.client.waitForTransaction(result.hash);
+      if (!isSilent) {
+        throwAlert(31, "Transaction sent", `${result.hash}`, false);
+      }
     } catch (error) {
-      throwAlert(32, "Transaction failed", `${error}`, true);
+      if (!isSilent) {
+        throwAlert(32, "Transaction failed", `${error}`, true);
+      }
       console.log(error);
       setIsLoading(false);
     }
@@ -311,19 +332,33 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const getBalance = async () => {
+  const getBalance = async (asset) => {
     let resources = await spika.client.getAccountResources(account.address());
-    let resource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    if (resource === undefined || resource === null) {
-      setBalance(0);
+    let resource;
+    if (asset) {
+      resource = resources.find((r) => r.type === coinStore(asset.type));
     } else {
-      setBalance(resource.data.coin.value);
+      resource = resources.find((r) => r.type === coinStore(currentAsset.type));
+    }
+    if (resource === undefined || resource === null) {
+      if (asset) {
+        return 0;
+      } else {
+        setBalance(0);
+      }
+    } else {
+      if (asset) {
+        return resource.data.coin.value;
+      } else {
+        setBalance(resource.data.coin.value);
+      }
     }
   };
 
   const updateBalance = async (asset) => {
     let resources = await spika.client.getAccountResources(account.address());
     let _asset = resources.find((r) => r.type === asset.type);
+    console.log(resources);
     if (_asset === undefined || _asset === null) {
       setBalance(0);
     } else {
@@ -402,6 +437,7 @@ export const Web3Provider = ({ children }) => {
               balance: value.data.coin.value,
               logo: pixel_coin,
               logo_alt: pixel_coin,
+              swap: false,
             },
           });
         }
