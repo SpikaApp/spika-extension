@@ -18,6 +18,7 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { aptosCoin } from "../lib/coin";
 import copyToClipboard from "../utils/copy_clipboard";
+import debug from "../utils/debug";
 
 const AlertDialog = () => {
   const [isTransaction, setIsTransaction] = useState(false);
@@ -46,21 +47,20 @@ const AlertDialog = () => {
   } = useContext(AccountContext);
 
   useEffect(() => {
-    checkDialogType();
+    if (alertSignal === 31 || alertSignal === 61) {
+      setIsTransaction(true);
+      debug.log(`alertSignal: ${alertSignal}`);
+    }
     handleOpen();
   }, [alertSignal]);
 
-  const checkDialogType = async () => {
-    if (alertSignal === 31 || alertSignal === 61 || alertSignal === 71) {
-      setIsTransaction(true);
+  useEffect(() => {
+    if (!openAlertDialog) {
+      setIsTransaction(false);
     }
-  };
+  }, [openAlertDialog]);
 
   const navigate = useNavigate();
-
-  const handleClick = () => {
-    copyToClipboard(alertMessage);
-  };
 
   const handleOpen = () => {
     // if transaction estimated as valid => handle TransactionDialog
@@ -149,6 +149,10 @@ const AlertDialog = () => {
         break;
     }
     clearAlert();
+  };
+
+  const handleClick = () => {
+    copyToClipboard(alertMessage);
   };
 
   return (
