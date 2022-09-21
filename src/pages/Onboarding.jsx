@@ -68,11 +68,9 @@ const Onboarding = () => {
           </Typography>
         )}
       </Box>
-      <Box
-        sx={{ display: "flex", justifyContent: "start", alignItems: "center", mt: 3 }}
-        component="img"
-        src={spika_bg}
-      />
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 3 }}>
+        <Box component="img" src={spika_bg} />
+      </Box>
     </Container>
   );
 };

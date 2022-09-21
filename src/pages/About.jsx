@@ -8,7 +8,6 @@ import { EXTENSION_VERSION, APTOS_SDK_VERSION } from "../utils/constants";
 
 const About = () => {
   const { darkMode } = useContext(UIContext);
-  const { chainId } = useContext(Web3Context);
 
   return (
     <Container maxWidth="xs">

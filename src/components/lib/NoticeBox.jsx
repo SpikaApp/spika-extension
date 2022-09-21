@@ -11,6 +11,7 @@ const NoticeBox = (props) => {
           alignItems: "center",
           mt: "-12px",
           mb: "-12px",
+          width: props.width,
         }}
       >
         <WarningIcon color="warning" sx={{ fontSize: "24px", ml: "-12px", mr: "12px" }} />

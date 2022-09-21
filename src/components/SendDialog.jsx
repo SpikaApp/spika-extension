@@ -43,7 +43,7 @@ const SendDialog = () => {
         </Typography>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField
-            sx={{ mt: 4, mb: 4 }}
+            sx={{ mt: 4, mb: 4, width: "275px" }}
             id="recipientAddress"
             label="Address"
             InputLabelProps={{ shrink: true }}
@@ -56,26 +56,27 @@ const SendDialog = () => {
             onChange={(e) => setRecipientAddress(e.target.value)}
           />
           <TextField
-            sx={{ mb: 4 }}
+            sx={{ mb: 4, width: "275px" }}
             id="amount"
             label="Amount"
             InputLabelProps={{ shrink: true }}
             inputProps={{ style: { textAlign: "right" } }}
             fullWidth={true}
-            placeholder={`0.0 ${currentAsset.data.symbol}`}
+            placeholder={`0.00`}
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
           <TextField
+            sx={{ width: "275px" }}
             id="maxGasAmount"
             label="Max Gas Amount"
             InputLabelProps={{ shrink: true }}
             inputProps={{ style: { textAlign: "right" } }}
             fullWidth={true}
             type="number"
-            placeholder={`1000`}
-            value={maxGasAmount === "1000" ? "" : maxGasAmount}
+            placeholder={maxGasAmount}
+            value={maxGasAmount === "2000" ? "" : maxGasAmount}
             onChange={(e) => setMaxGasAmount(e.target.value.toString())}
           />
         </Stack>
