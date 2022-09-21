@@ -13,6 +13,7 @@ import * as apps from "../lib/apps";
 import * as network from "../lib/network";
 import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
 import { encryptPassword, decryptPassword } from "../utils/pwd";
+import debug from "../utils/debug";
 
 export const AccountContext = React.createContext();
 
@@ -380,6 +381,7 @@ export const AccountProvider = ({ children }) => {
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
         if (!isUnlocked) {
           await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+          debug.log("funding account");
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
