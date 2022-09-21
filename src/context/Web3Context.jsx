@@ -9,7 +9,8 @@ import * as token from "../lib/token";
 import { PLATFORM } from "../utils/constants";
 import { stringToValue, valueToString } from "../utils/values";
 import pixel_coin from "../assets/pixel_coin.png";
-import { setStore, getStore } from "../lib/store";
+import { setStore } from "../lib/store";
+import debug from "../utils/debug";
 
 export const Web3Context = React.createContext();
 
@@ -29,7 +30,8 @@ export const Web3Provider = ({ children }) => {
   const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [maxGasAmount, setMaxGasAmount] = useState("1000"); // todo: integrate to SendDialog
+  const [maxGasAmount, setMaxGasAmount] = useState("2000");
+  const [gasUnitPrice] = useState("100");
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
   const [txnDetails, setTxnDetails] = useState([]);
@@ -62,13 +64,13 @@ export const Web3Provider = ({ children }) => {
     ]);
 
     const rawTxn = new aptos.TxnBuilderTypes.RawTransaction(
-      aptos.TxnBuilderTypes.AccountAddress.fromHex(account.address()),
-      BigInt(sequenceNumber),
-      payload,
-      BigInt(parseInt(maxGasAmount)),
-      1n,
-      BigInt(Math.floor(Date.now() / 1000) + 20),
-      new aptos.TxnBuilderTypes.ChainId(chainId)
+      aptos.TxnBuilderTypes.AccountAddress.fromHex(account.address()), // sender
+      BigInt(sequenceNumber), // sequence_number
+      payload, // payload
+      BigInt(parseInt(maxGasAmount)), // maxGas
+      BigInt(parseInt(gasUnitPrice)), // gasUnitPrice
+      BigInt(Math.floor(Date.now() / 1000) + 20), // expiration timestamp
+      new aptos.TxnBuilderTypes.ChainId(chainId) // chainId
     );
 
     const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, rawTxn);
@@ -164,21 +166,25 @@ export const Web3Provider = ({ children }) => {
         );
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
+          gasUnitPrice: gasUnitPrice,
         });
       } else if (isBcs === undefined || !isBcs) {
         _payload = payload;
         transaction = await spika.client.generateTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
+          max_gas_amount: maxGasAmount,
+          gas_unit_price: gasUnitPrice,
         });
       } else {
         _payload = payload;
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
+          gasUnitPrice: gasUnitPrice,
         });
       }
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
       const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
       if (estimatedTxn.success === true) {
+        debug.log("estimated result:", estimatedTxn);
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn);
@@ -220,16 +226,19 @@ export const Web3Provider = ({ children }) => {
         );
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
+          gasUnitPrice: gasUnitPrice,
         });
       } else if (isBcs === undefined || !isBcs) {
         _payload = payload;
         transaction = await spika.client.generateTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
+          max_gas_amount: maxGasAmount,
+          gas_unit_price: gasUnitPrice,
         });
       } else {
         _payload = payload;
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
+          gasUnitPrice: gasUnitPrice,
         });
       }
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
@@ -280,7 +289,10 @@ export const Web3Provider = ({ children }) => {
   const registerAsset = async (coinType, name) => {
     try {
       const payload = await register(coinType);
-      const transaction = await spika.client.generateRawTransaction(account.address(), payload);
+      const transaction = await spika.client.generateRawTransaction(account.address(), payload, {
+        maxGasAmount: maxGasAmount,
+        gasUnitPrice: gasUnitPrice,
+      });
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       const submitTxn = await spika.client.submitSignedBCSTransaction(signedTxn);
       await spika.client.waitForTransaction(submitTxn.hash);
@@ -301,7 +313,10 @@ export const Web3Provider = ({ children }) => {
 
   const signTransaction = async (payload) => {
     try {
-      const transaction = await spika.client.generateTransaction(account.address(), payload);
+      const transaction = await spika.client.generateTransaction(account.address(), payload, {
+        max_gas_amount: maxGasAmount,
+        gas_unit_price: gasUnitPrice,
+      });
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       return signedTxn;
     } catch (error) {
@@ -312,7 +327,10 @@ export const Web3Provider = ({ children }) => {
 
   const signAndSubmitTransaction = async (payload) => {
     try {
-      const transaction = await spika.client.generateTransaction(account.address(), payload);
+      const transaction = await spika.client.generateTransaction(account.address(), payload, {
+        max_gas_amount: maxGasAmount,
+        gas_unit_price: gasUnitPrice,
+      });
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
       const result = await spika.client.submitSignedBCSTransaction(signedTxn);
       return result;
