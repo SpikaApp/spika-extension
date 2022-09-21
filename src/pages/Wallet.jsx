@@ -135,7 +135,7 @@ const Wallet = () => {
                     <Stack direction="row">
                       <Tooltip title="Switch active asset">
                         <Button
-                          sx={{ mr: "2px", width: "220px", display: "flex" }}
+                          sx={{ mr: "2px", width: "220px", height: "50px", display: "flex" }}
                           variant="outlined"
                           onClick={handleAccountAssetsUI}
                         >
@@ -187,7 +187,7 @@ const Wallet = () => {
                 <Tooltip title={"Faucet"}>
                   <IconButton
                     position="absolute"
-                    sx={{ mt: "-170px", ml: "270px" }}
+                    sx={{ mt: "-180px", ml: "270px" }}
                     onClick={handleMint}
                   >
                     <LocalGasStationIcon />

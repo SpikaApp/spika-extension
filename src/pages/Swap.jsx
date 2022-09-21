@@ -306,7 +306,7 @@ const Swap = () => {
                     display: "flex",
                     alignItems: "start",
                     justifyContent: "space-between",
-                    width: "275px",
+                    width: "250px",
                     mt: "-8px",
                     mb: "-8px",
                   }}
@@ -368,7 +368,7 @@ const Swap = () => {
                         }}
                         disabled={swapEnabled ? false : true}
                         disableUnderline
-                        placeholder="0.0"
+                        placeholder="0.00"
                       />
                     </Stack>
                     <Typography
@@ -422,7 +422,7 @@ const Swap = () => {
                     display: "flex",
                     alignItems: "start",
                     justifyContent: "space-between",
-                    width: "275px",
+                    width: "250px",
                     mt: "-8px",
                     mb: "-8px",
                   }}
@@ -498,9 +498,9 @@ const Swap = () => {
                 swapEnabled && !insufficientBalance && swapAmount !== "" && !badPair
                   ? {
                       background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                      width: "100%",
+                      width: "250px",
                     }
-                  : { width: "100%" }
+                  : { width: "250px" }
               }
               variant="contained"
               loading={isLocalLoading}
@@ -519,16 +519,21 @@ const Swap = () => {
               {swapAmount === "" && !insufficientBalance && !badPair && "Enter an amount"}
               {swapEnabled && !insufficientBalance && badPair && "Cannot swap same coins"}
               {swapEnabled && !insufficientBalance && swapAmount !== "" && !badPair && "Swap"}
-              {!swapEnabled && !currentNetwork.name !== "Devnet" && "Not supported"}
+              {!swapEnabled && !currentNetwork.name !== "Devnet" && "Swap disabled"}
             </LoadingButton>
             {dataFetched && !swapEnabled && currentNetwork.name === "Devnet" && (
               <NoticeBox
                 mt={3}
-                text="Account shall hold at least two eligible for swap assets in order to use this function."
+                width="250px"
+                text="Account shall hold at least two eligible for swap assets."
               />
             )}
             {dataFetched && !swapEnabled && !isFetching && currentNetwork.name !== "Devnet" && (
-              <NoticeBox mt={3} text={`Swap is not supported on ${currentNetwork.name} yet.`} />
+              <NoticeBox
+                mt={3}
+                width="250px"
+                text={`Swap is not supported on ${currentNetwork.name} yet.`}
+              />
             )}
             {dataFetched &&
               swapEnabled &&
@@ -537,6 +542,7 @@ const Swap = () => {
               badPair && (
                 <NoticeBox
                   mt={3}
+                  width="250px"
                   text={`Cannot swap ${baseCoin.data.symbol} to ${quoteCoin.data.symbol}. They are the same coin.`}
                 />
               )}
