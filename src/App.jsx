@@ -27,8 +27,7 @@ import PermissionDialog from "./components/PermissionDialog";
 import "./index.css";
 
 const App = () => {
-  const { spikaWallet, darkMode, devMode, accountRoutesEnabled, disableAllRoutes } =
-    useContext(UIContext);
+  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes } = useContext(UIContext);
 
   return (
     <Router>
@@ -63,7 +62,7 @@ const App = () => {
                             {accountRoutesEnabled === true && (
                               <Route path="import" element={<Import />} />
                             )}
-                            {!devMode && <Route path="swap" element={<Swap />} />}
+                            <Route path="swap" element={<Swap />} />
                             <Route path="nfts" element={<NFTs />} />
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="settings" element={<Settings />} />
