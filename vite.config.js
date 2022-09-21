@@ -27,7 +27,7 @@ export default defineConfig({
     },
     module: "commonjs",
     target: "es2020",
-    chunkSizeWarningLimit: 1024,
+    chunkSizeWarningLimit: 2048,
   },
   plugins: [react({ fastRefresh: true })],
 });
