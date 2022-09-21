@@ -206,6 +206,7 @@ chrome.runtime.onConnect.addListener(async (port) => {
     // console.log("[worker]: wallet connected");
     await chrome.alarms.clear("lock_trigger");
     setMem(_walletLockStatus, "idle");
+    setMem(_delayBeforeLock, 30);
   }
 
   port.onDisconnect.addListener(async () => {
