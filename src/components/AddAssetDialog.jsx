@@ -62,6 +62,7 @@ const AddAssetDialog = () => {
   assetList.sort((a, b) => a.data.name.localeCompare(b.data.name));
 
   const handleListItemClick = (event, index, asset) => {
+    setIsLocalLoading(false);
     clearPrevEstimation();
     setSelectedIndex(index);
     setSelectedAsset(asset);
