@@ -134,10 +134,7 @@ export const Web3Provider = ({ children }) => {
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
-      let _amount = "10000000";
-      if (currentNetwork.name === "Devnet") {
-        _amount = "1000000";
-      }
+      let _amount = "100000000";
       await spika.faucetClient.fundAccount(account.address(), _amount);
       throwAlert(
         21,
@@ -414,7 +411,10 @@ export const Web3Provider = ({ children }) => {
       currentAddress,
       coinStore(currentAsset.type),
       "deposit_events",
-      query
+      {
+        start: query.start < 0 ? 0 : query.start,
+        limit: query.limit,
+      }
     );
     let result = data.reverse((r) => r.type === "sequence_number");
     debug.log("depositEvents: ", result);
@@ -426,7 +426,10 @@ export const Web3Provider = ({ children }) => {
       currentAddress,
       coinStore(currentAsset.type),
       "withdraw_events",
-      query
+      {
+        start: query.start < 0 ? 0 : query.start,
+        limit: query.limit,
+      }
     );
     let result = data.reverse((r) => r.type === "sequence_number");
     debug.log("withdrawEvents: ", result);
