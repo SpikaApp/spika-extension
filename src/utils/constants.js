@@ -2,7 +2,7 @@ import { version, dependencies } from "../../package.json";
 
 // Extension version
 export const EXTENSION_VERSION = version;
-export const APTOS_SDK_VERSION = dependencies.aptos;
+export const APTOS_SDK_VERSION = dependencies.aptos.slice(1);
 
 // Nodes URL
 export const NODE_URL = "https://fullnode.devnet.aptoslabs.com/v1";
