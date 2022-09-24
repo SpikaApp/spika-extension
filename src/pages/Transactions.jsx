@@ -4,12 +4,14 @@ import {
   Typography,
   Card,
   CardContent,
+  CardActions,
   List,
   Box,
   Tab,
   IconButton,
   Stack,
   Tooltip,
+  Pagination,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Footer from "../components/Footer";
@@ -19,6 +21,7 @@ import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import debug from "../utils/debug";
 
 const style = {
   width: "100%",
@@ -28,28 +31,116 @@ const style = {
 
 const Transactions = () => {
   const { darkMode, handleAccountAssetsUI } = useContext(UIContext);
-  const { accountImported, currentAddress, currentAsset } = useContext(AccountContext);
-  const { getDepositEvents, getWithdrawEvents, withdrawEvents, depositEvents } =
-    useContext(Web3Context);
-
+  const { accountImported, currentAsset } = useContext(AccountContext);
+  const {
+    getEventsCount,
+    depositEventsCounter,
+    withdrawEventsCounter,
+    getDepositEvents,
+    getWithdrawEvents,
+    withdrawEvents,
+    setWithdrawEvents,
+    depositEvents,
+    setDepositEvents,
+  } = useContext(Web3Context);
   const [value, setValue] = useState("1");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(0);
+  const [query, setQuery] = useState({});
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const limitPerPage = 5;
 
   useEffect(() => {
     if (accountImported) {
-      getDepositEvents();
-      getWithdrawEvents();
+      getEventsCount("deposit_events");
+      getEventsCount("withdraw_events");
       const updateAccountResources = window.setInterval(() => {
-        getDepositEvents();
-        getWithdrawEvents();
+        getEventsCount("deposit_events");
+        getEventsCount("withdraw_events");
       }, 10000);
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
   }, [currentAsset]);
+
+  useEffect(() => {
+    handleCount();
+  }, [value, depositEvents, withdrawEvents]);
+
+  useEffect(() => {
+    if (value === "1") {
+      setQuery({
+        start:
+          depositEventsCounter <= limitPerPage ? 0 : depositEventsCounter - page * limitPerPage,
+        limit: depositEventsCounter > limitPerPage ? limitPerPage : depositEventsCounter,
+      });
+    }
+  }, [page, value, depositEventsCounter]);
+
+  useEffect(() => {
+    if (value === "2") {
+      setQuery({
+        start:
+          withdrawEventsCounter <= limitPerPage ? 0 : withdrawEventsCounter - page * limitPerPage,
+        limit: withdrawEventsCounter > limitPerPage ? limitPerPage : withdrawEventsCounter,
+      });
+    }
+  }, [page, value, withdrawEventsCounter]);
+
+  useEffect(() => {
+    if (accountImported) {
+      if (value === "1") {
+        if (depositEventsCounter > 0) {
+          debug.log("query", query);
+          getDepositEvents(query);
+        } else {
+          setDepositEvents([]);
+        }
+      }
+      if (value === "2") {
+        debug.log("query", query);
+        if (withdrawEventsCounter > 0) {
+          getWithdrawEvents(query);
+        } else {
+          setWithdrawEvents([]);
+        }
+      }
+    }
+  }, [query, value]);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    if (page !== 1) {
+      setPage(1);
+    }
+  };
+
+  const handlePageChange = async (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleCount = () => {
+    if (value === "1") {
+      debug.log("deposit events count: ", depositEventsCounter);
+      if (depositEventsCounter > 5) {
+        const number = Math.floor(Number(depositEventsCounter / 5));
+        debug.log("total deposit pages: ", number);
+        setPages(number);
+      } else {
+        setPages(1);
+      }
+    }
+    if (value === "2") {
+      debug.log("withdraw events count: ", withdrawEventsCounter);
+      if (withdrawEventsCounter > 5) {
+        const number = Math.floor(Number(withdrawEventsCounter / 5));
+        debug.log("total withdraw pages: ", number);
+        setPages(number);
+      } else {
+        setPages(1);
+      }
+    }
+  };
 
   return (
     <Container maxWidth="xs">
@@ -111,10 +202,10 @@ const Transactions = () => {
               </Box>
               <Box
                 sx={{
-                  height: "345px",
+                  height: "320px",
                   width: "295px",
-                  overflow: "hidden",
-                  overflowY: "scroll",
+                  // overflow: "hidden",
+                  // overflowY: "scroll",
                 }}
               >
                 <TabPanel value="1">
@@ -177,6 +268,18 @@ const Transactions = () => {
             </TabContext>
           </Box>
         </CardContent>
+        <CardActions sx={{ mt: "-25px", mb: "0px" }}>
+          <Pagination
+            count={pages}
+            page={page}
+            siblingCount={0}
+            boundaryCount={1}
+            variant="text"
+            size="medium"
+            shape="rounded"
+            onChange={handlePageChange}
+          />
+        </CardActions>
       </Card>
       <Footer />
       <AccountAssetsDialog />
