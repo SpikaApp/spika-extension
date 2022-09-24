@@ -30,7 +30,7 @@ export const Web3Provider = ({ children }) => {
   const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [maxGasAmount, setMaxGasAmount] = useState("2000");
+  const [maxGasAmount, setMaxGasAmount] = useState("10000");
   const [gasUnitPrice] = useState("100");
   const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
   const [isValidTransaction, setIsValidTransaction] = useState(false);
@@ -134,7 +134,7 @@ export const Web3Provider = ({ children }) => {
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
     try {
-      let _amount = "100000";
+      let _amount = "10000000";
       if (currentNetwork.name === "Devnet") {
         _amount = "1000000";
       }
