@@ -16,6 +16,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Loading from "../components/Loading";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
@@ -55,6 +56,7 @@ const AddAssetDialog = () => {
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [estimationRequired, setEstimationRequired] = useState(false);
   const [coinType, setCoinType] = useState("");
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
   const _currentAsset = "currentAsset";
   const assetList = coinList.filter((i) => !accountAssets.includes(i));
   assetList.sort((a, b) => a.data.name.localeCompare(b.data.name));
@@ -126,6 +128,7 @@ const AddAssetDialog = () => {
   };
 
   const handleRegisterAsset = async () => {
+    setIsLocalLoading(true);
     if (selectedIndex !== "" || isCustomToken) {
       const assetData = await findAsset(coinType);
       if (assetData) {
@@ -139,6 +142,7 @@ const AddAssetDialog = () => {
         clearDialog();
       }
     }
+    setIsLocalLoading(false);
   };
 
   const handleAddCustomToken = async () => {
@@ -354,17 +358,19 @@ const AddAssetDialog = () => {
               Cancel
             </Button>
             {isCustomToken && !isValidAsset && !isValidTransaction && (
-              <Button
+              <LoadingButton
                 sx={{
                   background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                   width: "115px",
                   ml: 4,
                 }}
                 variant="contained"
+                loading={isLocalLoading}
+                loadingIndicator={<CircularProgress sx={{ color: "white" }} size={18} />}
                 onClick={handleFindAsset}
               >
                 Find
-              </Button>
+              </LoadingButton>
             )}
             {isCustomToken && isValidAsset && !isValidTransaction && (
               <Button
@@ -379,30 +385,34 @@ const AddAssetDialog = () => {
               </Button>
             )}
             {isCustomToken && isValidAsset && isValidTransaction && (
-              <Button
+              <LoadingButton
                 sx={{
                   background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                   width: "115px",
                   ml: 4,
                 }}
                 variant="contained"
+                loading={isLocalLoading}
+                loadingIndicator={<CircularProgress sx={{ color: "white" }} size={18} />}
                 onClick={handleRegisterAsset}
               >
                 Register
-              </Button>
+              </LoadingButton>
             )}
             {!isCustomToken && isValidTransaction && (
-              <Button
+              <LoadingButton
                 sx={{
                   background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                   width: "115px",
                   ml: 4,
                 }}
                 variant="contained"
+                loading={isLocalLoading}
+                loadingIndicator={<CircularProgress sx={{ color: "white" }} size={18} />}
                 onClick={handleRegisterAsset}
               >
                 Register
-              </Button>
+              </LoadingButton>
             )}
             {!isCustomToken && !isValidTransaction && (
               <Button
