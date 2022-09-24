@@ -50,8 +50,10 @@ export const setStore = (platform, key, value) => {
     if (
       key === "currentAsset" ||
       key === "accountAssets" ||
+      key === "accountEvents" ||
       key === "accountNetworks" ||
-      key === "currentNetwork"
+      key === "currentNetwork" ||
+      key === "currentPubAccount"
     ) {
       let _value = JSON.stringify(value);
       localStorage.setItem(key, _value);
@@ -74,8 +76,10 @@ export const getStore = (platform, key) => {
       value === "null" ||
       key === "currentAsset" ||
       key === "accountAssets" ||
+      key === "accountEvents" ||
       key === "accountNetworks" ||
-      key === "currentNetwork"
+      key === "currentNetwork" ||
+      key === "currentPubAccount"
     ) {
       return JSON.parse(value);
     } else {
