@@ -5,33 +5,36 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "patch-package",
+    "build:release": "npm run build && npm run postinstall"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@manahippo/hippo-sdk": "^0.5.1",
+    "@manahippo/hippo-sdk": "^0.5.4",
     "@metamask/browser-passworder": "^3.0.0",
     "@mui/icons-material": "^5.10.6",
     "@mui/lab": "^5.0.0-alpha.98",
     "@mui/material": "^5.10.6",
     "@scure/bip39": "^1.1.0",
-    "aptos": "1.3.12",
+    "aptos": "^1.3.14",
     "buffer": "^6.0.3",
     "compare-versions": "^5.0.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-number-format": "^5.0.0-beta.5",
-    "react-router-dom": "^6.3.0",
+    "react-router-dom": "^6.4.1",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.18",
+    "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.5",
     "@vitejs/plugin-react": "^2.1.0",
+    "patch-package": "^6.4.7",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "vite": "^3.1.3"
   }
