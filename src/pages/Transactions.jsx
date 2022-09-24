@@ -67,12 +67,31 @@ const Transactions = () => {
     handleCount();
   }, [value, depositEvents, withdrawEvents]);
 
+  const countStart = (counter) => {
+    if (counter <= limitPerPage) {
+      return 0;
+    } else if (page === 1 && counter - limitPerPage > 0) {
+      return 0;
+    } else {
+      return page * limitPerPage - limitPerPage;
+    }
+  };
+
+  const countLimit = (counter) => {
+    if (counter === 0) {
+      return 1;
+    } else if (counter > limitPerPage) {
+      return limitPerPage;
+    } else {
+      return counter;
+    }
+  };
+
   useEffect(() => {
     if (value === "1") {
       setQuery({
-        start:
-          depositEventsCounter <= limitPerPage ? 0 : depositEventsCounter - page * limitPerPage,
-        limit: depositEventsCounter > limitPerPage ? limitPerPage : depositEventsCounter,
+        start: countStart(depositEventsCounter),
+        limit: countLimit(depositEventsCounter),
       });
     }
   }, [page, value, depositEventsCounter]);
@@ -80,9 +99,8 @@ const Transactions = () => {
   useEffect(() => {
     if (value === "2") {
       setQuery({
-        start:
-          withdrawEventsCounter <= limitPerPage ? 0 : withdrawEventsCounter - page * limitPerPage,
-        limit: withdrawEventsCounter > limitPerPage ? limitPerPage : withdrawEventsCounter,
+        start: countStart(withdrawEventsCounter),
+        limit: countLimit(withdrawEventsCounter),
       });
     }
   }, [page, value, withdrawEventsCounter]);
@@ -123,7 +141,10 @@ const Transactions = () => {
     if (value === "1") {
       debug.log("deposit events count: ", depositEventsCounter);
       if (depositEventsCounter > 5) {
-        const number = Math.floor(Number(depositEventsCounter / 5));
+        debug.log("more then 5");
+        const no = Number(depositEventsCounter / 5);
+        debug.log("no", no);
+        const number = Math.ceil(Number(depositEventsCounter / 5));
         debug.log("total deposit pages: ", number);
         setPages(number);
       } else {
@@ -133,7 +154,9 @@ const Transactions = () => {
     if (value === "2") {
       debug.log("withdraw events count: ", withdrawEventsCounter);
       if (withdrawEventsCounter > 5) {
-        const number = Math.floor(Number(withdrawEventsCounter / 5));
+        const no = Number(depositEventsCounter / 5);
+        debug.log("no", no);
+        const number = Math.ceil(Number(withdrawEventsCounter / 5));
         debug.log("total withdraw pages: ", number);
         setPages(number);
       } else {
@@ -204,8 +227,8 @@ const Transactions = () => {
                 sx={{
                   height: "320px",
                   width: "295px",
-                  // overflow: "hidden",
-                  // overflowY: "scroll",
+                  overflow: "hidden",
+                  overflowY: "scroll",
                 }}
               >
                 <TabPanel value="1">
