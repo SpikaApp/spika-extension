@@ -37,6 +37,8 @@ export const Web3Provider = ({ children }) => {
   const [txnDetails, setTxnDetails] = useState([]);
   const [depositEvents, setDepositEvents] = useState([]);
   const [withdrawEvents, setWithdrawEvents] = useState([]);
+  const [depositEventsCounter, setDepositEventsCounter] = useState(0);
+  const [withdrawEventsCounter, setWithdrawEventsCounter] = useState(0);
   const [accountTokens, setAccountTokens] = useState([]);
   const [isValidAsset, setIsValidAsset] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState({});
@@ -376,7 +378,6 @@ export const Web3Provider = ({ children }) => {
   const updateBalance = async (asset) => {
     let resources = await spika.client.getAccountResources(account.address());
     let _asset = resources.find((r) => r.type === asset.type);
-    console.log(resources);
     if (_asset === undefined || _asset === null) {
       setBalance(0);
     } else {
@@ -389,41 +390,46 @@ export const Web3Provider = ({ children }) => {
     return transactions;
   };
 
-  const getDepositEvents = async () => {
+  const getEventsCount = async (events) => {
     let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    if (accountResource === undefined || accountResource === null) {
-      return;
+    if (accountResource) {
+      if (events === "deposit_events") {
+        let counter = parseInt(accountResource.data.deposit_events.counter);
+        debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+        setDepositEventsCounter(counter);
+      } else if (events === "withdraw_events") {
+        let counter = parseInt(accountResource.data.withdraw_events.counter);
+        debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+        setWithdrawEventsCounter(counter);
+      }
+    } else {
+      debug.log("no resource to count");
+      return 0;
     }
-    let counter = parseInt(accountResource.data.deposit_events.counter);
+  };
+
+  const getDepositEvents = async (query) => {
     let data = await spika.client.getEventsByEventHandle(
       currentAddress,
       coinStore(currentAsset.type),
       "deposit_events",
-      {
-        limit: counter === 0 ? 1 : counter,
-      }
+      query
     );
     let result = data.reverse((r) => r.type === "sequence_number");
+    debug.log("depositEvents: ", result);
     setDepositEvents(result);
   };
 
-  const getWithdrawEvents = async () => {
-    let resources = await spika.client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    if (accountResource === undefined || accountResource === null) {
-      return;
-    }
-    let counter = parseInt(accountResource.data.withdraw_events.counter);
+  const getWithdrawEvents = async (query) => {
     let data = await spika.client.getEventsByEventHandle(
       currentAddress,
       coinStore(currentAsset.type),
       "withdraw_events",
-      {
-        limit: counter === 0 ? 1 : counter,
-      }
+      query
     );
     let result = data.reverse((r) => r.type === "sequence_number");
+    debug.log("withdrawEvents: ", result);
     setWithdrawEvents(result);
   };
 
@@ -582,10 +588,17 @@ export const Web3Provider = ({ children }) => {
         nftDetails,
         handleMint,
         handleSend,
+        getEventsCount,
+        depositEventsCounter,
+        setDepositEventsCounter,
+        withdrawEventsCounter,
+        setWithdrawEventsCounter,
         getDepositEvents,
         getWithdrawEvents,
         withdrawEvents,
+        setWithdrawEvents,
         depositEvents,
+        setDepositEvents,
         getTxnDetails,
         handleEstimate,
         accountTokens,
