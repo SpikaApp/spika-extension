@@ -1,5 +1,4 @@
 import { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   Dialog,
@@ -17,6 +16,7 @@ import {
   IconButton,
   CircularProgress,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
 import CircleIcon from "@mui/icons-material/Circle";
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
@@ -25,9 +25,8 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 import { AptosClient, FaucetClient } from "aptos";
-import useSpika from "../hooks/useSpika";
 import { getNetworks, removeNetwork } from "../lib/network";
-import { setMem, setStore } from "../lib/store";
+import { setStore } from "../lib/store";
 import { aptosCoin } from "../lib/coin";
 import { PLATFORM } from "../utils/constants";
 
@@ -41,10 +40,8 @@ const NetworkDialog = () => {
   } = useContext(UIContext);
   const {
     alertSignal,
-    accountImported,
     currentAddress,
     currentNetwork,
-    currentAsset,
     setCurrentNetwork,
     setCurrentAsset,
     throwAlert,
@@ -55,6 +52,7 @@ const NetworkDialog = () => {
   const [selectedNetwork, setSelectedNetwork] = useState({});
   const [networks, setNetworks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
   const [networkOnline, setNetworkOnline] = useState(false);
   const _currentNetwork = "currentNetwork";
   const _currentAsset = "currentAsset";
@@ -100,6 +98,7 @@ const NetworkDialog = () => {
   }, [currentNetwork]);
 
   const handleChange = async () => {
+    setIsLocalLoading(true);
     try {
       const faucetClient = new FaucetClient(
         selectedNetwork.data.node_url,
@@ -114,6 +113,7 @@ const NetworkDialog = () => {
       console.log(error);
       throwAlert(122, "Network registration failed", `${error}`, true);
     }
+    setIsLocalLoading(false);
   };
 
   const getAccountNetworks = async (silent) => {
@@ -329,17 +329,19 @@ const NetworkDialog = () => {
             </Button>
 
             {networkOnline ? (
-              <Button
+              <LoadingButton
                 sx={{
                   background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                   width: "115px",
                   ml: 4,
                 }}
                 variant="contained"
+                loading={isLocalLoading}
+                loadingIndicator={<CircularProgress sx={{ color: "white" }} size={18} />}
                 onClick={handleChange}
               >
                 Change
-              </Button>
+              </LoadingButton>
             ) : (
               <Button
                 sx={{
