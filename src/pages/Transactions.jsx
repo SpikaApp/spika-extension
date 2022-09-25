@@ -50,6 +50,8 @@ const Transactions = () => {
 
   const limitPerPage = 5;
 
+  // GET request for deposit or withdraw event counter.
+  // Interval: 10 seconds.
   useEffect(() => {
     if (accountImported) {
       getEventsCount("deposit_events");
@@ -67,26 +69,7 @@ const Transactions = () => {
     handleCount();
   }, [value, depositEvents, withdrawEvents]);
 
-  const countStart = (counter) => {
-    if (counter <= limitPerPage) {
-      return 0;
-    } else if (page === 1 && counter - limitPerPage > 0) {
-      return 0;
-    } else {
-      return page * limitPerPage - limitPerPage;
-    }
-  };
-
-  const countLimit = (counter) => {
-    if (counter === 0) {
-      return 1;
-    } else if (counter > limitPerPage) {
-      return limitPerPage;
-    } else {
-      return counter;
-    }
-  };
-
+  // Counts starting number for getEventsByEventHandle query.
   useEffect(() => {
     if (value === "1") {
       setQuery({
@@ -105,6 +88,7 @@ const Transactions = () => {
     }
   }, [page, value, withdrawEventsCounter]);
 
+  // GET request for deposit or withdraw events with calculated query.
   useEffect(() => {
     if (accountImported) {
       if (value === "1") {
@@ -126,6 +110,7 @@ const Transactions = () => {
     }
   }, [query, value]);
 
+  // Handles tab's change (Deposit / Withdraw).
   const handleChange = (event, newValue) => {
     setValue(newValue);
     if (page !== 1) {
@@ -133,6 +118,7 @@ const Transactions = () => {
     }
   };
 
+  // Handles page change.
   const handlePageChange = async (event, newPage) => {
     setPage(newPage);
   };
@@ -154,14 +140,45 @@ const Transactions = () => {
     if (value === "2") {
       debug.log("withdraw events count: ", withdrawEventsCounter);
       if (withdrawEventsCounter > 5) {
-        const no = Number(depositEventsCounter / 5);
-        debug.log("no", no);
         const number = Math.ceil(Number(withdrawEventsCounter / 5));
         debug.log("total withdraw pages: ", number);
         setPages(number);
       } else {
         setPages(1);
       }
+    }
+  };
+
+  // Counts query start.
+  const countStart = (counter) => {
+    if (counter <= limitPerPage) {
+      debug.log("case 1");
+      return 0;
+    } else if (page === 1 && counter - limitPerPage > 0) {
+      debug.log("case 2");
+      return counter - limitPerPage;
+    } else if (counter - page * limitPerPage > 0) {
+      debug.log("case 3");
+      debug.log("page", page);
+      return counter - page * limitPerPage;
+    } else if (counter - page * limitPerPage <= 0) {
+      debug.log("case 4");
+      debug.log("last page");
+      debug.log("page", page);
+      return 0;
+    }
+  };
+
+  // Counts query limit.
+  const countLimit = (counter) => {
+    if (counter === 0) {
+      return 1;
+    } else if (counter > limitPerPage) {
+      return page === pages && page !== 1
+        ? limitPerPage - (page * limitPerPage - counter)
+        : limitPerPage;
+    } else {
+      return counter;
     }
   };
 
