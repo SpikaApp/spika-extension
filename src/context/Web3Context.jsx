@@ -407,33 +407,37 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getDepositEvents = async (query) => {
-    let data = await spika.client.getEventsByEventHandle(
-      currentAddress,
-      coinStore(currentAsset.type),
-      "deposit_events",
-      {
-        start: query === undefined || query.start < 0 ? 0 : query.start,
-        limit: query.limit,
-      }
-    );
-    let result = data.reverse((r) => r.type === "sequence_number");
-    debug.log("depositEvents: ", result);
-    setDepositEvents(result);
+    if (query) {
+      let data = await spika.client.getEventsByEventHandle(
+        currentAddress,
+        coinStore(currentAsset.type),
+        "deposit_events",
+        {
+          start: query.start < 0 ? 0 : query.start,
+          limit: query.limit,
+        }
+      );
+      let result = data.reverse((r) => r.type === "sequence_number");
+      debug.log("depositEvents: ", result);
+      setDepositEvents(result);
+    }
   };
 
   const getWithdrawEvents = async (query) => {
-    let data = await spika.client.getEventsByEventHandle(
-      currentAddress,
-      coinStore(currentAsset.type),
-      "withdraw_events",
-      {
-        start: query === undefined || query.start < 0 ? 0 : query.start,
-        limit: query === undefined ? 25 : query.limit,
-      }
-    );
-    let result = data.reverse((r) => r.type === "sequence_number");
-    debug.log("withdrawEvents: ", result);
-    setWithdrawEvents(result);
+    if (query) {
+      let data = await spika.client.getEventsByEventHandle(
+        currentAddress,
+        coinStore(currentAsset.type),
+        "withdraw_events",
+        {
+          start: query.start < 0 ? 0 : query.start,
+          limit: query.limit,
+        }
+      );
+      let result = data.reverse((r) => r.type === "sequence_number");
+      debug.log("withdrawEvents: ", result);
+      setWithdrawEvents(result);
+    }
   };
 
   const getAssetData = async (type) => {
