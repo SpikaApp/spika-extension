@@ -112,6 +112,12 @@ const Transactions = () => {
 
   // Handles tab's change (Deposit / Withdraw).
   const handleChange = (event, newValue) => {
+    if (newValue === "1") {
+      setQuery({});
+    }
+    if (newValue === "2") {
+      setQuery({});
+    }
     setValue(newValue);
     if (page !== 1) {
       setPage(1);
@@ -286,7 +292,14 @@ const Transactions = () => {
                   {withdrawEvents?.length > 0 ? (
                     <List
                       sx={
-                        (style, { display: "flex", flexDirection: "column", alignItems: "start" })
+                        (style,
+                        {
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "start",
+                          ml: "12px",
+                          mt: "-24px",
+                        })
                       }
                       component="nav"
                     >
