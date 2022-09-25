@@ -35,5 +35,11 @@ export default defineConfig({
     target: "es2020",
     chunkSizeWarningLimit: 2048,
   },
+  server: {
+    port: 3000,
+  },
+  preview: {
+    port: 8080,
+  },
   plugins: [react({ fastRefresh: true })],
 });
