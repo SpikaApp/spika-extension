@@ -46,7 +46,7 @@ const Transactions = () => {
   const [value, setValue] = useState("1");
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
-  const [query, setQuery] = useState({});
+  const [query, setQuery] = useState();
 
   const limitPerPage = 5;
 
@@ -113,10 +113,10 @@ const Transactions = () => {
   // Handles tab's change (Deposit / Withdraw).
   const handleChange = (event, newValue) => {
     if (newValue === "1") {
-      setQuery({});
+      setQuery();
     }
     if (newValue === "2") {
-      setQuery({});
+      setQuery();
     }
     setValue(newValue);
     if (page !== 1) {
