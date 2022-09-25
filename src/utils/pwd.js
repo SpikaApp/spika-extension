@@ -7,8 +7,8 @@ const appRandom = import.meta.env.VITE_SPIKA_RANDOM;
 export const encryptPassword = async (pwd) => {
   const timestamp = Date.now();
   const key = (timestamp + appRandom).toString();
+  console.log(uuidv5(key, appKey));
   const secret = uuidv5(key, appKey);
-  console.log(secret);
   const encryptedPassword = await passworder.encrypt(secret, pwd);
   const result = {
     data: encryptedPassword,
