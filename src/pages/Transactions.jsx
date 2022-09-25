@@ -220,7 +220,7 @@ const Transactions = () => {
                       </IconButton>
                     </Tooltip>
                   )}
-                  <TabList onChange={handleChange} aria-label="lab API tabs example">
+                  <TabList onChange={handleChange}>
                     <Tab
                       label={
                         <Typography variant="subtitle1" color="textPrimary">
@@ -258,6 +258,8 @@ const Transactions = () => {
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "start",
+                          ml: "12px",
+                          mt: "-24px",
                         })
                       }
                       component="nav"
@@ -308,7 +310,7 @@ const Transactions = () => {
             </TabContext>
           </Box>
         </CardContent>
-        <CardActions sx={{ mt: "-25px", mb: "0px" }}>
+        <CardActions sx={{ mt: "-25px", mb: "12px" }}>
           <Pagination
             count={pages}
             page={page}
@@ -316,7 +318,7 @@ const Transactions = () => {
             boundaryCount={1}
             variant="text"
             size="medium"
-            shape="rounded"
+            shape="circular"
             onChange={handlePageChange}
           />
         </CardActions>
