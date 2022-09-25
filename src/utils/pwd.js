@@ -8,6 +8,7 @@ export const encryptPassword = async (pwd) => {
   const timestamp = Date.now();
   const key = (timestamp + appRandom).toString();
   const secret = uuidv5(key, appKey);
+  console.log(secret);
   const encryptedPassword = await passworder.encrypt(secret, pwd);
   const result = {
     data: encryptedPassword,
