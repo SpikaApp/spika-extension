@@ -412,7 +412,7 @@ export const Web3Provider = ({ children }) => {
       coinStore(currentAsset.type),
       "deposit_events",
       {
-        start: query.start < 0 ? 0 : query.start,
+        start: query === undefined || query.start < 0 ? 0 : query.start,
         limit: query.limit,
       }
     );
@@ -427,8 +427,8 @@ export const Web3Provider = ({ children }) => {
       coinStore(currentAsset.type),
       "withdraw_events",
       {
-        start: query.start < 0 ? 0 : query.start,
-        limit: query.limit,
+        start: query === undefined || query.start < 0 ? 0 : query.start,
+        limit: query === undefined ? 25 : query.limit,
       }
     );
     let result = data.reverse((r) => r.type === "sequence_number");
