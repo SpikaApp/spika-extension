@@ -349,19 +349,19 @@ const PermissionDialog = () => {
                         <Typography variant="body1">Transaction approval required</Typography>
                         <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
                               Network fee
                             </Typography>
                             <Item>~ {estimatedTxnResult.gas_used}</Item>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
                               Max gas amount
                             </Typography>
                             <Item>{estimatedTxnResult.max_gas_amount}</Item>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
                               Sender
                             </Typography>
                             <Tooltip sx={{ cursor: "pointer" }} title={estimatedTxnResult.sender}>
@@ -369,13 +369,13 @@ const PermissionDialog = () => {
                             </Tooltip>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
                               Sequence number
                             </Typography>
                             <Item>{estimatedTxnResult.sequence_number}</Item>
                           </Grid>
                           <Grid item xs={12}>
-                            <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
                               Payload
                             </Typography>
                             <Item>
