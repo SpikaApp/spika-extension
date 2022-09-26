@@ -379,9 +379,11 @@ export const AccountProvider = ({ children }) => {
       try {
         const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-        if (!isUnlocked) {
+        try {
+          await spika.client.getAccount(_account.address().hex());
+        } catch (error) {
           await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-          debug.log("funding account");
+          debug.log("Account not found on chain, calling faucet");
         }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
