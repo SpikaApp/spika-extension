@@ -29,6 +29,7 @@ import { getNetworks, removeNetwork } from "../lib/network";
 import { setStore } from "../lib/store";
 import { aptosCoin } from "../lib/coin";
 import { PLATFORM } from "../utils/constants";
+import debug from "../utils/debug";
 
 const NetworkDialog = () => {
   const {
@@ -100,18 +101,26 @@ const NetworkDialog = () => {
   const handleChange = async () => {
     setIsLocalLoading(true);
     try {
+      const client = new AptosClient(selectedNetwork.data.node_url);
       const faucetClient = new FaucetClient(
         selectedNetwork.data.node_url,
         selectedNetwork.data.faucet_url,
         null
       );
-      await faucetClient.fundAccount(currentAddress, 0);
+      // Try to GET account data onchain
+      try {
+        await client.getAccount(currentAddress);
+        // If account is not found call faucet to fund and register account
+      } catch (error) {
+        await faucetClient.fundAccount(currentAddress, 0); // Workaround during devnet
+        debug.log("Funding account");
+      }
       setStore(PLATFORM, _currentNetwork, selectedNetwork);
       setCurrentNetwork(selectedNetwork);
-      throwAlert(121, "Success", `Successfully registered in ${selectedNetwork.name}`, false);
+      throwAlert(121, "Success", `Network changed to ${selectedNetwork.name}`, false);
     } catch (error) {
       console.log(error);
-      throwAlert(122, "Network registration failed", `${error}`, true);
+      throwAlert(122, "Network change failed", `${error}`, true);
     }
     setIsLocalLoading(false);
   };
