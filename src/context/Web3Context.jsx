@@ -502,6 +502,8 @@ export const Web3Provider = ({ children }) => {
       // Get total number of Token deposit_events received by an account
       let resources = await spika.client.getAccountResources(account.address());
       let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
+      debug.log("resources : ", resources);
+      debug.log("tokenStore : ", tokenStore);
 
       const getTokens = async () => {
         if (tokenStore === undefined) {
@@ -554,18 +556,36 @@ export const Web3Provider = ({ children }) => {
         // console.log("Account doesn't hold any NFT yet");
         return setNftDetails(0);
       } else {
-        let data = await Promise.all(
-          accountTokens.map(
-            async (i) =>
-              await spika.tokenClient.getTokenData(
-                i.id.token_data_id.creator,
-                i.id.token_data_id.collection,
-                i.id.token_data_id.name
-              )
-          )
+        let result = [];
+        await Promise.all(
+          accountTokens.map(async (i) => {
+            const nft = await spika.tokenClient.getTokenData(
+              i.id.token_data_id.creator,
+              i.id.token_data_id.collection,
+              i.id.token_data_id.name
+            );
+            debug.log("nft details: ", nft);
+
+            result.push({
+              default_properties: nft.default_properties,
+              description: nft.description,
+              largest_property_version: nft.largest_property_version,
+              maximum: nft.maximum,
+              mutability_config: nft.mutability_config,
+              name: nft.name,
+              royalty: nft.royalty,
+              supply: nft.supply,
+              uri: nft.uri,
+              creator: i.id.token_data_id.creator,
+              collection: i.id.token_data_id.collection,
+            });
+          })
         );
-        let res = data.reverse();
-        return setNftDetails(res);
+
+        result.reverse();
+
+        debug.log("nft details: ", result);
+        return setNftDetails(result);
       }
     } catch (error) {
       console.log(error);
