@@ -250,8 +250,8 @@ const Transactions = () => {
                 sx={{
                   height: "320px",
                   width: "295px",
-                  overflow: "hidden",
-                  overflowY: "scroll",
+                  // overflow: "hidden",
+                  // overflowY: "scroll",
                 }}
               >
                 <TabPanel value="1">
