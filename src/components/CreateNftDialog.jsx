@@ -62,8 +62,13 @@ const CreateNftDialog = () => {
 
   const handleEstimateNft = async () => {
     setIsLoading(true);
-    const payload = await nftPayload();
-    await estimateTransaction(payload, true, true);
+    try {
+      const payload = await nftPayload();
+      await estimateTransaction(payload, true, true);
+    } catch (error) {
+      throwAlert(73, "Error", `${error}`, true);
+      console.log(error);
+    }
     setIsLoading(false);
   };
 
@@ -104,7 +109,7 @@ const CreateNftDialog = () => {
           <TextField
             sx={{ mt: 1, mb: 1.5, width: "275px" }}
             id="collectionName"
-            label="Collection Name"
+            label="Collection name"
             type="string"
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
@@ -112,7 +117,7 @@ const CreateNftDialog = () => {
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="nftName"
-            label="NFT Name"
+            label="NFT name"
             type="string"
             value={nftName}
             onChange={(e) => setNftName(e.target.value)}
@@ -120,7 +125,7 @@ const CreateNftDialog = () => {
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="nftDescription"
-            label="Description"
+            label="NFT description"
             type="string"
             multiline
             rows={2}

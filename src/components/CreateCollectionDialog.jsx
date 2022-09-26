@@ -14,11 +14,13 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
+import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { Web3Context } from "../context/Web3Context";
 
 const CreateCollectionDialog = () => {
   const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
+  const { throwAlert } = useContext(AccountContext);
   const { collection } = useContext(PayloadContext);
   const {
     estimateTransaction,
@@ -33,6 +35,7 @@ const CreateCollectionDialog = () => {
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
   const [collectionUri, setCollectionUri] = useState("");
+  const [collectionSize, setCollectionSize] = useState("");
 
   useEffect(() => {
     if (estimationRequired) {
@@ -46,14 +49,24 @@ const CreateCollectionDialog = () => {
   };
 
   const collectionPayload = async () => {
-    const payload = await collection(collectionName, collectionDescription, collectionUri, 1);
+    const payload = await collection(
+      collectionName,
+      collectionDescription,
+      collectionUri,
+      parseInt(collectionSize)
+    );
     return payload;
   };
 
   const handleEstimateCollection = async () => {
     setIsLoading(true);
-    const payload = await collectionPayload();
-    await estimateTransaction(payload, true, true);
+    try {
+      const payload = await collectionPayload();
+      await estimateTransaction(payload, true, true);
+    } catch (error) {
+      throwAlert(63, "Error", `${error}`, true);
+      console.log(error);
+    }
     setIsLoading(false);
   };
 
@@ -73,6 +86,7 @@ const CreateCollectionDialog = () => {
     setCollectionName("");
     setCollectionDescription("");
     setCollectionUri("");
+    setCollectionSize("");
   };
 
   return (
@@ -94,7 +108,7 @@ const CreateCollectionDialog = () => {
           <TextField
             sx={{ mt: 1, mb: 1.5, width: "275px" }}
             id="collectionName"
-            label="Collection Name"
+            label="Name"
             type="string"
             disabled={isValidTransaction ? true : false}
             value={collectionName}
@@ -103,7 +117,7 @@ const CreateCollectionDialog = () => {
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="collectionDescription"
-            label="Collection Description"
+            label="Description"
             type="string"
             disabled={isValidTransaction ? true : false}
             multiline
@@ -112,13 +126,22 @@ const CreateCollectionDialog = () => {
             onChange={(e) => setCollectionDescription(e.target.value)}
           />
           <TextField
-            sx={{ mt: 1.5, width: "275px" }}
+            sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="collectionUri"
             label="URL"
             type="string"
             disabled={isValidTransaction ? true : false}
             value={collectionUri}
             onChange={(e) => setCollectionUri(e.target.value)}
+          />
+          <TextField
+            sx={{ mt: 1.5, width: "275px" }}
+            id="collectionSize"
+            label="Max NFTs in collection"
+            type="number"
+            disabled={isValidTransaction ? true : false}
+            value={collectionSize}
+            onChange={(e) => setCollectionSize(e.target.value)}
           />
         </Stack>
         <Box
