@@ -46,11 +46,13 @@
 
 - 61: Collection created
 - 62: Failed create collection
+- 63: Failed estimate collection
 
 ---
 
 - 71: NFT created
 - 72: Failed create nft
+- 73: Failed estimate nft
 
 ---
 

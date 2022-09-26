@@ -10,6 +10,7 @@ import {
   Paper,
   Box,
   Tooltip,
+  Pagination,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Footer from "../components/Footer";
@@ -20,6 +21,7 @@ import CreateCollectionDialog from "../components/CreateCollectionDialog";
 import CreateNftDialog from "../components/CreateNftDialog";
 import NftDetailsDialog from "../components/NftDetailsDialog";
 import default_nft from "../assets/default_nft.jpg";
+import debug from "../utils/debug";
 
 const NftButton = styled(Button)(() => ({
   borderRadius: "8px",
@@ -32,7 +34,13 @@ const NFTs = () => {
   const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
   const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
-  const [isWaiting, setIsWaiting] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(0);
+
+  const hidden = true;
+
+  const limitPerPage = 9;
 
   useEffect(() => {
     if (accountImported === true) {
@@ -54,6 +62,10 @@ const NFTs = () => {
       setIsWaiting(false);
     }
   }, [accountTokens]);
+
+  const handlePageChange = async (event, newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <Container maxWidth="xs">
@@ -80,7 +92,7 @@ const NFTs = () => {
       {isWaiting === true && accountImported && (
         <Stack
           direction="column"
-          sx={{ display: "flex", alignItems: "center", mt: 8, mb: "257px" }}
+          sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}
         >
           <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
             Updating metadata...
@@ -100,7 +112,7 @@ const NFTs = () => {
         </Typography>
       )}
       {accountTokens !== 0 && !isWaiting && accountImported && (
-        <Box align="center" sx={{ height: "400px" }}>
+        <Box align="center" sx={{ height: "340px", mb: "28px" }}>
           <ImageList
             gap={18}
             cols={3}
@@ -109,8 +121,8 @@ const NFTs = () => {
             sx={{
               overflow: "hidden",
               overflowY: "visible",
-              width: "335px",
-              maxHeight: "385px",
+              width: "338px",
+              maxHeight: "340px",
             }}
           >
             {nftDetails.map((nft) => (
@@ -138,6 +150,23 @@ const NFTs = () => {
           </ImageList>
         </Box>
       )}
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+        {accountTokens !== 0 && !isWaiting && accountImported && hidden && (
+          <Box sx={{ mb: "32px" }} />
+        )}
+        {accountTokens !== 0 && !isWaiting && accountImported && !hidden && (
+          <Pagination
+            count={pages}
+            page={page}
+            siblingCount={0}
+            boundaryCount={1}
+            variant="text"
+            size="medium"
+            shape="circular"
+            onChange={handlePageChange}
+          />
+        )}
+      </Box>
       {accountImported && <Footer />}
       <CreateCollectionDialog />
       <CreateNftDialog />

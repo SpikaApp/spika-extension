@@ -132,7 +132,9 @@ const AlertDialog = () => {
       case 57: // Incorrect current password
       case 58: // New password shall not be the same
       case 62: // Failed create collection
+      case 63: // Failed estimate collection
       case 72: // Failed create nft
+      case 73: // Failed estimate nft
       case 92: // No mnemonic phrase found
       case 102: // New custom asset successfully added
       case 103: // Failed to add new asset
