@@ -8,7 +8,7 @@ Spika is a crypto wallet that can be used to manage digital assets and access de
 Wallet provides easy to use interface to access account balances, history of previous transactions, sending digital assets to other addresses and view collectibles in built-in NFT gallery.
 Wallet dApps API allows connecting Spika to decentralized applications, prompt for permission to access account's public information and sign transactions right from Spika user's interface.
 
-## **Main functions:**
+## **Main functions**
 - Create and import addresses
 - Send transactions between addresses
 - NFT gallery
