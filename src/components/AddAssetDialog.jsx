@@ -114,7 +114,7 @@ const AddAssetDialog = () => {
   };
 
   const handleFindAsset = async () => {
-    setIsLoading(true);
+    setIsLocalLoading(true);
     const data = await findAsset(coinType);
     if (!data) {
       throwAlert(112, "Error", "Asset doesn't exist on chain", true);
@@ -125,7 +125,7 @@ const AddAssetDialog = () => {
     } else {
       handleRegisterAsset();
     }
-    setIsLoading(false);
+    setIsLocalLoading(false);
   };
 
   const handleRegisterAsset = async () => {
