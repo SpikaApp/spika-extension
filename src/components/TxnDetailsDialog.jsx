@@ -24,6 +24,7 @@ import convertTimestamp from "../utils/convert_timestamp";
 import { stringToValue } from "../utils/values";
 import shortenAddress from "../utils/shorten_address";
 import copyToClipboard from "../utils/copy_clipboard";
+import debug from "../utils/debug";
 
 const TxnDetailsDialog = () => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, txnType, setTxnType } =
@@ -34,54 +35,52 @@ const TxnDetailsDialog = () => {
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
-      if (
-        txnDetails.payload.function === "0x1::coin::transfer" ||
-        txnDetails.payload.function === "0x1::aptos_coin::mint"
-      ) {
-        let _amount = "";
-        let recipient = "";
-        if (txnDetails.payload.arguments.length === 1) {
-          recipient = currentAddress;
-          _amount = txnDetails.payload.arguments[0];
-        } else if (txnDetails.payload.arguments.length === 2) {
-          recipient = txnDetails.payload.arguments[0];
-          _amount = txnDetails.payload.arguments[1];
-        }
-
-        setRows([
-          createData("Time", convertTimestamp(txnDetails.timestamp)),
-          createData("Txn Hash", txnDetails.hash),
-          createData("Sender", txnDetails.sender),
-          createData("Recipient", recipient),
-          createData(
-            "Amount",
-            `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`
-          ),
-          createData("Gas used", txnDetails.gas_used),
-          createData("Max gas", txnDetails.max_gas_amount),
-          createData("Gas price", txnDetails.gas_unit_price),
-        ]);
-      } else {
-        setRows([
-          createData("Time", convertTimestamp(txnDetails.timestamp)),
-          createData("Txn Hash", txnDetails.hash),
-          createData("Sender", txnDetails.sender),
-          createData(
-            "Function",
-            txnDetails.payload.function
-              .substring(txnDetails.payload.function.indexOf("0x") + 66)
-              .split("::")
-              .join(" ")
-          ),
-          createData(
-            "Amount",
-            `${stringToValue(currentAsset, amount)} ${currentAsset.data.symbol}`
-          ),
-          createData("Gas used", txnDetails.gas_used),
-          createData("Max gas", txnDetails.max_gas_amount),
-          createData("Gas price", txnDetails.gas_unit_price),
-        ]);
+      // debug.log("txn details", txnDetails);
+      // if (
+      //   txnDetails.payload.function === "0x1::coin::transfer" ||
+      //   txnDetails.payload.function === "0x1::aptos_coin::mint"
+      // ) {
+      let _amount = "";
+      let recipient = "";
+      if (txnDetails.payload.arguments.length === 1) {
+        recipient = currentAddress;
+        _amount = txnDetails.payload.arguments[0];
+      } else if (txnDetails.payload.arguments.length === 2) {
+        recipient = txnDetails.payload.arguments[0];
+        _amount = txnDetails.payload.arguments[1];
       }
+
+      //   setRows([
+      //     createData("Time", convertTimestamp(txnDetails.timestamp)),
+      //     createData("Txn Hash", txnDetails.hash),
+      //     createData("Sender", txnDetails.sender),
+      //     createData("Recipient", recipient),
+      //     createData(
+      //       "Amount",
+      //       `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`
+      //     ),
+      //     createData("Gas used", txnDetails.gas_used),
+      //     createData("Max gas", txnDetails.max_gas_amount),
+      //     createData("Gas price", txnDetails.gas_unit_price),
+      //   ]);
+      // } else {
+      setRows([
+        createData("Time", convertTimestamp(txnDetails.timestamp)),
+        createData("Txn Hash", txnDetails.hash),
+        createData("Sender", txnDetails.sender),
+        // createData(
+        //   "Function",
+        //   txnDetails.payload.function
+        //     .substring(txnDetails.payload.function.indexOf("0x") + 66)
+        //     .split("::")
+        //     .join(" ")
+        // ),
+        createData("Amount", `${stringToValue(currentAsset, amount)} ${currentAsset.data.symbol}`),
+        createData("Gas used", txnDetails.gas_used),
+        createData("Max gas", txnDetails.max_gas_amount),
+        createData("Gas price", txnDetails.gas_unit_price),
+      ]);
+      // }
     }
   }, [openTxnDetailsDialog]);
 
