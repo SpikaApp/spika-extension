@@ -1,7 +1,7 @@
 {
   "name": "spika",
   "private": true,
-  "version": "0.4.27",
+  "version": "0.4.28",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,11 +12,11 @@
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@manahippo/hippo-sdk": "^0.5.4",
+    "@manahippo/hippo-sdk": "^0.7.1",
     "@metamask/browser-passworder": "^3.0.0",
     "@mui/icons-material": "^5.10.6",
-    "@mui/lab": "^5.0.0-alpha.98",
-    "@mui/material": "^5.10.6",
+    "@mui/lab": "^5.0.0-alpha.101",
+    "@mui/material": "^5.10.7",
     "@scure/bip39": "^1.1.0",
     "aptos": "^1.3.14",
     "buffer": "^6.0.3",
@@ -24,10 +24,10 @@
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-number-format": "^5.0.0-beta.5",
+    "react-number-format": "^5.0.0",
     "react-router-dom": "^6.4.1",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.4",
+    "typescript": "^4.8.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -36,6 +36,6 @@
     "@vitejs/plugin-react": "^2.1.0",
     "patch-package": "^6.4.7",
     "rollup-plugin-node-polyfills": "^0.2.1",
-    "vite": "^3.1.3"
+    "vite": "^3.1.4"
   }
 }
