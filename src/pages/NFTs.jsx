@@ -102,7 +102,7 @@ const NFTs = () => {
       )}
       {accountTokens === 0 && isWaiting === false && (
         <Typography
-          sx={{ mt: 8, mb: "336px" }}
+          sx={{ mt: 8, mb: "320px" }}
           variant="h6"
           align="center"
           color="textPrimary"
