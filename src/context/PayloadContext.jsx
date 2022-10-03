@@ -1,14 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { BCS, TxnBuilderTypes } from "aptos";
-import { AccountContext } from "./AccountContext";
-import useSpika from "../hooks/useSpika";
+import { spikaClient } from "../lib/client";
 
 export const PayloadContext = React.createContext();
 
 export const PayloadProvider = ({ children }) => {
-  const { currentNetwork } = useContext(AccountContext);
-  const { spikaClient: spika } = useSpika(currentNetwork);
-
   const register = async (coinType) => {
     const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(coinType));
 
@@ -38,6 +34,7 @@ export const PayloadProvider = ({ children }) => {
   };
 
   const collection = async (name, description, uri, maxAmount) => {
+    const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
       "0x3::token::create_collection_script",
       [],
@@ -62,6 +59,7 @@ export const PayloadProvider = ({ children }) => {
     property_values = [],
     property_types = []
   ) => {
+    const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
       "0x3::token::create_token_script",
       [],
