@@ -27,12 +27,14 @@ import Footer from "../components/Footer";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { AptosClient } from "aptos";
 import { NumericFormat } from "react-number-format";
 import { TradeAggregator } from "@manahippo/hippo-sdk";
-import { client as devnetClient, hippoClient } from "../lib/client";
+import { hippoClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
 import { stringToValue, valueToString } from "../utils/values";
 import debug from "../utils/debug";
+import { networkList } from "../lib/network";
 
 const Swap = () => {
   const { handleAccountAssetsUI, setOpenConfirmSendDialog, darkMode } = useContext(UIContext);
@@ -67,12 +69,13 @@ const Swap = () => {
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   const [badPair, setBadPair] = useState(false);
   const [swapPayload, setSwapPayload] = useState({});
+  const [underMaintenance] = useState(true);
 
   // Checks if account holds at least 2 swappable tokens and enables swap.
   useEffect(() => {
     if (accountAssets.length !== 0 && !isFetching) {
       if (swapSupportedAssets.length > 1 && !isFetching) {
-        setSwapEnabled(true);
+        // setSwapEnabled(true);
         setBaseCoin(swapSupportedAssets[0]);
         setQuoteCoin(swapSupportedAssets[1]);
         setDataFetched(true);
@@ -89,12 +92,12 @@ const Swap = () => {
 
   // Disable swap is current network !== Devnet.
   useEffect(() => {
-    if (currentNetwork.name !== "Devnet") {
+    if (currentNetwork.name !== "Testnet") {
       setSwapEnabled(false);
       setBaseCoin(aptosCoin);
       setQuoteCoin(aptosCoin);
       setDataFetched(true);
-      debug.log("not on Devnet, swap enabled", false);
+      debug.log("not on Testnet, swap disabled");
     }
   }, [swapSupportedAssets]);
 
@@ -218,10 +221,13 @@ const Swap = () => {
 
   const hippoTradeAggregator = async () => {
     let agg;
+    let client = new AptosClient(networkList[1].data.node_url);
+    debug.log(client);
     try {
       const netConf = hippoClient();
+      debug.log(netConf);
       debug.log("netConf", netConf);
-      agg = await TradeAggregator.create(devnetClient);
+      agg = await TradeAggregator.create(client, netConf);
     } catch (error) {
       console.log(error);
     }
@@ -516,36 +522,51 @@ const Swap = () => {
               }}
             >
               {insufficientBalance && "Insufficient balance"}
-              {swapAmount === "" && !insufficientBalance && !badPair && "Enter an amount"}
+              {swapAmount === "" &&
+                !insufficientBalance &&
+                !badPair &&
+                swapEnabled &&
+                "Enter an amount"}
               {swapEnabled && !insufficientBalance && badPair && "Cannot swap same coins"}
               {swapEnabled && !insufficientBalance && swapAmount !== "" && !badPair && "Swap"}
-              {!swapEnabled && !currentNetwork.name !== "Devnet" && "Swap disabled"}
+              {!swapEnabled && !currentNetwork.name !== "Testnet" && "Swap disabled"}
             </LoadingButton>
-            {dataFetched && !swapEnabled && currentNetwork.name === "Devnet" && (
-              <NoticeBox
-                mt={3}
-                width="250px"
-                text="Account shall hold at least two eligible for swap assets."
-              />
-            )}
-            {dataFetched && !swapEnabled && !isFetching && currentNetwork.name !== "Devnet" && (
-              <NoticeBox
-                mt={3}
-                width="250px"
-                text={`Swap is not supported on ${currentNetwork.name} yet.`}
-              />
-            )}
+            {dataFetched &&
+              !swapEnabled &&
+              currentNetwork.name === "Testnet" &&
+              !underMaintenance && (
+                <NoticeBox
+                  mt={3}
+                  width="250px"
+                  text="Account shall hold at least two eligible for swap assets."
+                />
+              )}
+            {dataFetched &&
+              !swapEnabled &&
+              !isFetching &&
+              currentNetwork.name !== "Testnet" &&
+              !underMaintenance && (
+                <NoticeBox
+                  mt={3}
+                  width="250px"
+                  text={`Swap is not supported on ${currentNetwork.name} network.`}
+                />
+              )}
             {dataFetched &&
               swapEnabled &&
               !isFetching &&
-              currentNetwork.name === "Devnet" &&
-              badPair && (
+              currentNetwork.name === "Testnet" &&
+              badPair &&
+              !underMaintenance && (
                 <NoticeBox
                   mt={3}
                   width="250px"
                   text={`Cannot swap ${baseCoin.data.symbol} to ${quoteCoin.data.symbol}. They are the same coin.`}
                 />
               )}
+            {dataFetched && !swapEnabled && !isFetching && underMaintenance && (
+              <NoticeBox mt={3} width="250px" text={`Temporarily disabled due to maintenance.`} />
+            )}
           </CardContent>
         </Card>
       )}
