@@ -3,7 +3,7 @@ import * as aptos from "aptos";
 import { UIContext } from "./UIContext";
 import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
-import useSpika from "../hooks/useSpika";
+import { spikaClient } from "../lib/client";
 import { aptosCoin, coinList, coinStore, coinInfo } from "../lib/coin";
 import * as token from "../lib/token";
 import { PLATFORM } from "../utils/constants";
@@ -46,7 +46,6 @@ export const Web3Provider = ({ children }) => {
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState();
-  const { spikaClient: spika } = useSpika(currentNetwork);
 
   const _accountAssets = "accountAssets";
 
@@ -60,6 +59,7 @@ export const Web3Provider = ({ children }) => {
   }, [accountImported]);
 
   const submitTransactionHelper = async (account, payload) => {
+    const spika = await spikaClient();
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
       spika.client.getAccount(account.address()),
       spika.client.getChainId(),
@@ -105,6 +105,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getChainId = async () => {
+    const spika = await spikaClient();
     const result = await spika.client.getChainId();
     setChainId(result);
   };
@@ -125,6 +126,7 @@ export const Web3Provider = ({ children }) => {
 
   const getTxnDetails = async (version) => {
     setIsLoading(true);
+    const spika = await spikaClient();
     const data = await spika.client.getTransactionByVersion(version);
     // console.log(data);
     setTxnDetails(data);
@@ -133,6 +135,7 @@ export const Web3Provider = ({ children }) => {
 
   // Request Faucet to fund address with test coins
   const mintCoins = async () => {
+    const spika = await spikaClient();
     try {
       let _amount = "100000000";
       await spika.faucetClient.fundAccount(account.address(), _amount);
@@ -150,6 +153,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const estimateTransaction = async (payload, isBcs, silent) => {
+    const spika = await spikaClient();
     let _payload;
     let isSilent = false;
     let transaction;
@@ -210,6 +214,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const sendTransaction = async (payload, isBcs, silent) => {
+    const spika = await spikaClient();
     let _payload;
     let isSilent = false;
     let transaction;
@@ -256,6 +261,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const findAsset = async (coinType, address) => {
+    const spika = await spikaClient();
     try {
       let _address;
       if (!address) {
@@ -286,6 +292,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const registerAsset = async (coinType, name) => {
+    const spika = await spikaClient();
     try {
       const payload = await register(coinType);
       const transaction = await spika.client.generateRawTransaction(account.address(), payload, {
@@ -311,6 +318,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const signTransaction = async (payload) => {
+    const spika = await spikaClient();
     try {
       const transaction = await spika.client.generateTransaction(account.address(), payload, {
         max_gas_amount: maxGasAmount,
@@ -325,6 +333,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const signAndSubmitTransaction = async (payload) => {
+    const spika = await spikaClient();
     try {
       const transaction = await spika.client.generateTransaction(account.address(), payload, {
         max_gas_amount: maxGasAmount,
@@ -350,6 +359,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getBalance = async (asset) => {
+    const spika = await spikaClient();
     let resources = await spika.client.getAccountResources(account.address());
     let resource;
     if (asset) {
@@ -373,6 +383,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const updateBalance = async (asset) => {
+    const spika = await spikaClient();
     let resources = await spika.client.getAccountResources(account.address());
     let _asset = resources.find((r) => r.type === asset.type);
     if (_asset === undefined || _asset === null) {
@@ -383,11 +394,13 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getTransactions = async () => {
+    const spika = await spikaClient();
     let transactions = await spika.client.getAccountTransactions(account.address());
     return transactions;
   };
 
   const getEventsCount = async (events) => {
+    const spika = await spikaClient();
     let resources = await spika.client.getAccountResources(account.address());
     let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
     if (accountResource) {
@@ -407,6 +420,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getDepositEvents = async (query) => {
+    const spika = await spikaClient();
     if (query) {
       let data = await spika.client.getEventsByEventHandle(
         currentAddress,
@@ -424,6 +438,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getWithdrawEvents = async (query) => {
+    const spika = await spikaClient();
     if (query) {
       let data = await spika.client.getEventsByEventHandle(
         currentAddress,
@@ -441,11 +456,13 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getAssetData = async (type) => {
+    const spika = await spikaClient();
     const data = await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
     return data;
   };
 
   const getRegisteredAssets = async () => {
+    const spika = await spikaClient();
     const result = [];
     const resources = await spika.client.getAccountResources(account.address());
     await Promise.all(
@@ -498,6 +515,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getAccountTokens = async () => {
+    const spika = await spikaClient();
     try {
       // Get total number of Token deposit_events received by an account
       let resources = await spika.client.getAccountResources(account.address());
@@ -551,6 +569,7 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getNftDetails = async () => {
+    const spika = await spikaClient();
     try {
       if (accountTokens === 0) {
         // console.log("Account doesn't hold any NFT yet");

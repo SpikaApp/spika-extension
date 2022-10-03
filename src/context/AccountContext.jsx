@@ -5,7 +5,7 @@ import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
-import useSpika from "../hooks/useSpika";
+import { spikaClient } from "../lib/client";
 import { aptosCoin, coinStore } from "../lib/coin";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
@@ -25,7 +25,6 @@ export const AccountProvider = ({ children }) => {
     setOpenLoginDialog,
     setMnemonicRequired,
     setPrivateKeyRequired,
-    setOpenLogoutDialog,
     setAccountRoutesEnabled,
     setIsError,
   } = useContext(UIContext);
@@ -42,7 +41,7 @@ export const AccountProvider = ({ children }) => {
   const [currentAddress, setCurrentAddress] = useState("");
   const [publicAccount, setPublicAccount] = useState({});
   const [account, setAccount] = useState({}); // AptosAccount
-  const [currentNetwork, setCurrentNetwork] = useState(network.networkList[0]);
+  const [currentNetwork, setCurrentNetwork] = useState();
   const [currentAsset, setCurrentAsset] = useState({});
   const [baseCoin, setBaseCoin] = useState(aptosCoin);
   const [quoteCoin, setQuoteCoin] = useState(aptosCoin);
@@ -53,7 +52,6 @@ export const AccountProvider = ({ children }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const { spikaClient: spika } = useSpika(currentNetwork);
 
   const locker = (method) => {
     if (PLATFORM === "chrome-extension:") {
@@ -282,6 +280,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const createAccount = async () => {
+    const spika = await spikaClient();
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, newMnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
@@ -328,6 +327,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const importAccount = async () => {
+    const spika = await spikaClient();
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
@@ -373,6 +373,7 @@ export const AccountProvider = ({ children }) => {
   };
 
   const loadAccount = async () => {
+    const spika = await spikaClient();
     try {
       const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
