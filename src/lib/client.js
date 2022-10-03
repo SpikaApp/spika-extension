@@ -29,7 +29,7 @@ export const spikaClient = async () => {
 };
 
 export const hippoClient = () => {
-  const isDevnet = true;
-  const netConf = isDevnet ? CONFIGS.devnet : CONFIGS.localhost;
+  const isTestnet = true;
+  const netConf = isTestnet ? CONFIGS.testnet : CONFIGS.localhost;
   return netConf;
 };
