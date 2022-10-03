@@ -281,11 +281,15 @@ export const AccountProvider = ({ children }) => {
 
   const createAccount = async () => {
     const spika = await spikaClient();
+    debug.log(spika);
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, newMnemonic);
+      debug.log("mnemonic: ", newMnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-      let resources = await spika.client.getAccountResources(_account.address());
+      debug.log("account address", _account.address().hex());
+      await spika.faucetClient.fundAccount(_account.address().hex(), 0); // Workaround during devnet
+      let resources = await spika.client.getAccountResources(_account.address().hex());
+      debug.log(resources);
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
@@ -315,6 +319,7 @@ export const AccountProvider = ({ children }) => {
 
       setPublicAccount(_publicAccount);
       setCurrentAddress(_account.address().hex());
+      setCurrentNetwork(network.networkList[0]);
       setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
@@ -328,11 +333,21 @@ export const AccountProvider = ({ children }) => {
 
   const importAccount = async () => {
     const spika = await spikaClient();
+    debug.log(spika);
     try {
       const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
+      debug.log("mnemonic: ", mnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-      let resources = await spika.client.getAccountResources(_account.address());
+      debug.log(_privateKey);
+      debug.log("account address", _account.address().hex());
+      try {
+        await spika.client.getAccount(_account.address().hex());
+      } catch (error) {
+        await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
+        debug.log("Account not found on chain, calling faucet");
+      }
+      let resources = await spika.client.getAccountResources(_account.address().hex());
+      debug.log(resources);
       let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
@@ -361,6 +376,7 @@ export const AccountProvider = ({ children }) => {
       setAccount(_account);
       setPublicAccount(_publicAccount);
       setCurrentAddress(_account.address().hex());
+      setCurrentNetwork(network.networkList[0]);
       setCurrentAsset(aptosCoin);
       setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
