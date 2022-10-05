@@ -12,7 +12,7 @@ node_modules
 dist
 dist-ssr
 *.local
-*.env
+
 
 # Editor directories and files
 .vscode/*
@@ -29,4 +29,5 @@ tmp
 
 .aptos
 src/components/_DraftDialog.jsx
-build-ext.sh
+.env
+*.env
