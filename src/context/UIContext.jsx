@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getMem, getStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 import applyUpdate from "../utils/apply_update";
+// import { createAccountTest } from "../tests/account.test";
 
 export const UIContext = React.createContext();
 
@@ -35,7 +36,7 @@ export const UIProvider = ({ children }) => {
   const [currentRoute, setCurrentRoute] = useState();
   const [somethingChanged, setSomethingChanged] = useState(false);
   const [isPopup, setIsPopup] = useState(false);
-  const [devMode, setDevMode] = useState(PLATFORM === "http:" ? true : false);
+  const [devMode] = useState(PLATFORM === "http:" ? true : false);
   const [isTest, setIsTest] = useState(false);
   const [isError, setIsError] = useState();
   const _currentRoute = "currentRoute";
@@ -50,6 +51,12 @@ export const UIProvider = ({ children }) => {
   useEffect(() => {
     dialogProvider();
   }, [currentRoute]);
+
+  // useEffect(() => {
+  //   if (spikaWallet) {
+  //     createAccountTest();
+  //   }
+  // }, [spikaWallet]);
 
   const getWallet = async () => {
     const wallet = await getStore(PLATFORM, "ACCOUNT_IMPORTED");

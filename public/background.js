@@ -126,7 +126,6 @@ const handleLaunchPopup = (message, sender, sendResponse) => {
 
 const handleAutoConnect = async (message, sender, sendResponse) => {
   const data = await getMem(_lastConnectedApp);
-  console.log(data);
   if (data) {
     if (data.url === sender.origin) {
       sendResponse(data.publicAccount);

@@ -183,17 +183,19 @@ const Wallet = () => {
                   </Stack>
                 </div>
               )}
-              {currentAsset.data.name === "Aptos Coin" && !isLoading && (
-                <Tooltip title={"Faucet"}>
-                  <IconButton
-                    position="absolute"
-                    sx={{ mt: "-180px", ml: "270px" }}
-                    onClick={handleMint}
-                  >
-                    <LocalGasStationIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
+              {currentAsset.data.name === "Aptos Coin" &&
+                currentNetwork.name === "Devnet" &&
+                !isLoading && (
+                  <Tooltip title={"Faucet"}>
+                    <IconButton
+                      position="absolute"
+                      sx={{ mt: "-180px", ml: "270px" }}
+                      onClick={handleMint}
+                    >
+                      <LocalGasStationIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
             </CardContent>
           </Card>
           <Stack

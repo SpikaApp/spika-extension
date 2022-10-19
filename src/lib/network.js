@@ -123,11 +123,10 @@ export const removeNetwork = async (currentAddress, network) => {
 
 export const networkList = [
   {
-    name: "Devnet",
+    name: "Mainnet",
     data: {
-      node_url: "https://fullnode.devnet.aptoslabs.com/v1",
-      faucet_url: "https://faucet.devnet.aptoslabs.com",
-      testnet: true,
+      node_url: "https://mainnet.aptoslabs.com/v1",
+      testnet: false,
       custom: false,
     },
   },
@@ -136,6 +135,15 @@ export const networkList = [
     data: {
       node_url: "https://testnet.aptoslabs.com/v1",
       faucet_url: "https://faucet.testnet.aptoslabs.com",
+      testnet: true,
+      custom: false,
+    },
+  },
+  {
+    name: "Devnet",
+    data: {
+      node_url: "https://fullnode.devnet.aptoslabs.com/v1",
+      faucet_url: "https://faucet.devnet.aptoslabs.com",
       testnet: true,
       custom: false,
     },

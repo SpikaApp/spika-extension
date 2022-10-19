@@ -21,7 +21,7 @@ export const Web3Provider = ({ children }) => {
     throwAlert,
     account,
     currentAddress,
-    currentNetwork,
+    validateAccount,
     setBalance,
     currentAsset,
     setIsLoading,
@@ -59,7 +59,7 @@ export const Web3Provider = ({ children }) => {
   }, [accountImported]);
 
   const submitTransactionHelper = async (account, payload) => {
-    const spika = await spikaClient();
+    const spika = await spikaClient(currentNetwork);
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
       spika.client.getAccount(account.address()),
       spika.client.getChainId(),
@@ -360,36 +360,46 @@ export const Web3Provider = ({ children }) => {
 
   const getBalance = async (asset) => {
     const spika = await spikaClient();
-    let resources = await spika.client.getAccountResources(account.address());
-    let resource;
-    if (asset) {
-      resource = resources.find((r) => r.type === coinStore(asset.type));
-    } else {
-      resource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    }
-    if (resource === undefined || resource === null) {
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      let resources = await spika.client.getAccountResources(account.address());
+      let resource;
       if (asset) {
-        return 0;
+        resource = resources.find((r) => r.type === coinStore(asset.type));
       } else {
-        setBalance(0);
+        resource = resources.find((r) => r.type === coinStore(currentAsset.type));
+      }
+      if (resource === undefined || resource === null) {
+        if (asset) {
+          return 0;
+        } else {
+          setBalance(0);
+        }
+      } else {
+        if (asset) {
+          return resource.data.coin.value;
+        } else {
+          setBalance(resource.data.coin.value);
+        }
       }
     } else {
-      if (asset) {
-        return resource.data.coin.value;
-      } else {
-        setBalance(resource.data.coin.value);
-      }
+      setBalance(0);
     }
   };
 
   const updateBalance = async (asset) => {
     const spika = await spikaClient();
-    let resources = await spika.client.getAccountResources(account.address());
-    let _asset = resources.find((r) => r.type === asset.type);
-    if (_asset === undefined || _asset === null) {
-      setBalance(0);
+    const isAccount = validateAccount(currentAddress);
+    if (isAccount) {
+      let resources = await spika.client.getAccountResources(account.address());
+      let _asset = resources.find((r) => r.type === asset.type);
+      if (_asset === undefined || _asset === null) {
+        setBalance(0);
+      } else {
+        setBalance(_asset.data.coin.value);
+      }
     } else {
-      setBalance(_asset.data.coin.value);
+      setBalance(0);
     }
   };
 
@@ -400,214 +410,248 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getEventsCount = async (events) => {
-    const spika = await spikaClient();
-    let resources = await spika.client.getAccountResources(account.address());
-    let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
-    if (accountResource) {
-      if (events === "deposit_events") {
-        let counter = parseInt(accountResource.data.deposit_events.counter);
-        debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
-        setDepositEventsCounter(counter);
-      } else if (events === "withdraw_events") {
-        let counter = parseInt(accountResource.data.withdraw_events.counter);
-        debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
-        setWithdrawEventsCounter(counter);
+    const isAccount = validateAccount(currentAddress);
+    if (isAccount) {
+      const spika = await spikaClient();
+      let resources = await spika.client.getAccountResources(account.address());
+      let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
+      if (accountResource) {
+        if (events === "deposit_events") {
+          let counter = parseInt(accountResource.data.deposit_events.counter);
+          debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+          setDepositEventsCounter(counter);
+        } else if (events === "withdraw_events") {
+          let counter = parseInt(accountResource.data.withdraw_events.counter);
+          debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+          setWithdrawEventsCounter(counter);
+        }
+      } else {
+        debug.log("no resource to count");
+        return 0;
       }
     } else {
-      debug.log("no resource to count");
       return 0;
     }
   };
 
   const getDepositEvents = async (query) => {
     const spika = await spikaClient();
-    if (query) {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "deposit_events",
-        {
-          start: query.start < 0 ? 0 : query.start,
-          limit: query.limit,
-        }
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-      debug.log("depositEvents: ", result);
-      setDepositEvents(result);
+    const isAccount = validateAccount(currentAddress);
+    if (isAccount) {
+      if (query) {
+        let data = await spika.client.getEventsByEventHandle(
+          currentAddress,
+          coinStore(currentAsset.type),
+          "deposit_events",
+          {
+            start: query.start < 0 ? 0 : query.start,
+            limit: query.limit,
+          }
+        );
+        let result = data.reverse((r) => r.type === "sequence_number");
+        debug.log("depositEvents: ", result);
+        setDepositEvents(result);
+      }
+    } else {
+      setDepositEvents([]);
     }
   };
 
   const getWithdrawEvents = async (query) => {
-    const spika = await spikaClient();
-    if (query) {
-      let data = await spika.client.getEventsByEventHandle(
-        currentAddress,
-        coinStore(currentAsset.type),
-        "withdraw_events",
-        {
-          start: query.start < 0 ? 0 : query.start,
-          limit: query.limit,
-        }
-      );
-      let result = data.reverse((r) => r.type === "sequence_number");
-      debug.log("withdrawEvents: ", result);
-      setWithdrawEvents(result);
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const spika = await spikaClient();
+      if (query) {
+        let data = await spika.client.getEventsByEventHandle(
+          currentAddress,
+          coinStore(currentAsset.type),
+          "withdraw_events",
+          {
+            start: query.start < 0 ? 0 : query.start,
+            limit: query.limit,
+          }
+        );
+        let result = data.reverse((r) => r.type === "sequence_number");
+        debug.log("withdrawEvents: ", result);
+        setWithdrawEvents(result);
+      }
+    } else {
+      setWithdrawEvents([]);
     }
   };
 
   const getAssetData = async (type) => {
-    const spika = await spikaClient();
-    const data = await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
-    return data;
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const spika = await spikaClient();
+      const data = await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
+      return data;
+    }
   };
 
   const getRegisteredAssets = async () => {
     const spika = await spikaClient();
-    const result = [];
-    const resources = await spika.client.getAccountResources(account.address());
-    await Promise.all(
-      Object.values(resources).map(async (value) => {
-        if (
-          value.type.startsWith("0x1::coin::CoinStore") //&&
-          // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-        ) {
-          const type = value.type.substring(
-            value.type.indexOf("<") + 1,
-            value.type.lastIndexOf(">")
-          );
-          const asset = await getAssetData(type);
-          result.push({
-            type: type,
-            data: {
-              name: asset.data.name,
-              symbol: asset.data.symbol,
-              decimals: asset.data.decimals,
-              balance: value.data.coin.value,
-              logo: pixel_coin,
-              logo_alt: pixel_coin,
-              swap: false,
-            },
-          });
-        }
-      })
-    );
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const result = [];
+      const resources = await spika.client.getAccountResources(account.address());
+      await Promise.all(
+        Object.values(resources).map(async (value) => {
+          if (
+            value.type.startsWith("0x1::coin::CoinStore") //&&
+            // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
+          ) {
+            const type = value.type.substring(
+              value.type.indexOf("<") + 1,
+              value.type.lastIndexOf(">")
+            );
+            const asset = await getAssetData(type);
+            result.push({
+              type: type,
+              data: {
+                name: asset.data.name,
+                symbol: asset.data.symbol,
+                decimals: asset.data.decimals,
+                balance: value.data.coin.value,
+                logo: pixel_coin,
+                logo_alt: pixel_coin,
+                swap: false,
+              },
+            });
+          }
+        })
+      );
 
-    return result;
+      return result;
+    }
   };
 
   const updateAccountAssets = async () => {
-    const registeredAssets = await getRegisteredAssets();
-    const result = registeredAssets.reduce((acc, curr) => {
-      const stored = coinList.find(({ type }) => type === curr.type);
-      if (stored) {
-        stored.data.balance = curr.data.balance;
-        stored.data.logo = stored.data.logo;
-        stored.data.logo_alt = stored.data.logo_alt;
-        acc.push(stored);
-      } else {
-        acc.push(curr);
-      }
-      return acc;
-    }, []);
-    result.sort((a, b) => a.data.name.localeCompare(b.data.name));
-    setAccountAssets(result);
-    setStore(PLATFORM, _accountAssets, result);
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const registeredAssets = await getRegisteredAssets();
+      const result = registeredAssets.reduce((acc, curr) => {
+        const stored = coinList.find(({ type }) => type === curr.type);
+        if (stored) {
+          stored.data.balance = curr.data.balance;
+          stored.data.logo = stored.data.logo;
+          stored.data.logo_alt = stored.data.logo_alt;
+          acc.push(stored);
+        } else {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+      result.sort((a, b) => a.data.name.localeCompare(b.data.name));
+      setAccountAssets(result);
+      setStore(PLATFORM, _accountAssets, result);
+    }
   };
 
   const getAccountTokens = async () => {
-    const spika = await spikaClient();
-    try {
-      // Get total number of Token deposit_events received by an account
-      let resources = await spika.client.getAccountResources(account.address());
-      let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
-      debug.log("resources : ", resources);
-      debug.log("tokenStore : ", tokenStore);
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const spika = await spikaClient();
+      try {
+        // Get total number of Token deposit_events received by an account
+        let resources = await spika.client.getAccountResources(account.address());
+        let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
+        debug.log("resources : ", resources);
+        debug.log("tokenStore : ", tokenStore);
 
-      const getTokens = async () => {
-        if (tokenStore === undefined) {
-          // console.log("Account doesn't hold any NFT yet");
-          return setAccountTokens(0);
-        } else {
-          let counter = parseInt(tokenStore.data.deposit_events.counter);
-          // Get Token deposit_events
-          let data = await spika.client.getEventsByEventHandle(
-            currentAddress,
-            tokenStore.type,
-            "deposit_events",
-            {
-              limit: counter === 0 ? 1 : counter,
-            }
-          );
-
-          // Get TokenId for accountDepositedTokens and remove dublicates
-          let tokenIds = [...new Set(data.map((i) => i.data.id))];
-
-          // Returns an array of tokenId and value
-          const accountTokensBalances = await Promise.all(
-            tokenIds.map(async (i) => {
-              let data = await spika.tokenClient.getTokenForAccount(currentAddress, i);
-              return data;
-            })
-          );
-
-          // Returns an array of tokenId and value for all tokens with > 0 balance
-          let result = accountTokensBalances.filter((r) => {
-            return r.amount !== "0";
-          });
-
-          if (result == undefined) {
-            setAccountTokens(0);
+        const getTokens = async () => {
+          if (tokenStore === undefined) {
+            // console.log("Account doesn't hold any NFT yet");
+            return setAccountTokens(0);
           } else {
-            setAccountTokens(result);
+            let counter = parseInt(tokenStore.data.deposit_events.counter);
+            // Get Token deposit_events
+            let data = await spika.client.getEventsByEventHandle(
+              currentAddress,
+              tokenStore.type,
+              "deposit_events",
+              {
+                limit: counter === 0 ? 1 : counter,
+              }
+            );
+
+            // Get TokenId for accountDepositedTokens and remove dublicates
+            let tokenIds = [...new Set(data.map((i) => i.data.id))];
+
+            // Returns an array of tokenId and value
+            const accountTokensBalances = await Promise.all(
+              tokenIds.map(async (i) => {
+                let data = await spika.tokenClient.getTokenForAccount(currentAddress, i);
+                return data;
+              })
+            );
+
+            // Returns an array of tokenId and value for all tokens with > 0 balance
+            let result = accountTokensBalances.filter((r) => {
+              return r.amount !== "0";
+            });
+
+            if (result == undefined) {
+              setAccountTokens(0);
+            } else {
+              setAccountTokens(result);
+            }
           }
-        }
-      };
-      getTokens();
-    } catch (error) {
-      console.log(error);
+        };
+        getTokens();
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setAccountTokens(0);
     }
   };
 
   const getNftDetails = async () => {
-    const spika = await spikaClient();
-    try {
-      if (accountTokens === 0) {
-        // console.log("Account doesn't hold any NFT yet");
-        return setNftDetails(0);
-      } else {
-        let result = [];
-        await Promise.all(
-          accountTokens.map(async (i) => {
-            const nft = await spika.tokenClient.getTokenData(
-              i.id.token_data_id.creator,
-              i.id.token_data_id.collection,
-              i.id.token_data_id.name
-            );
-            debug.log("nft details: ", nft);
+    const isAccount = await validateAccount(currentAddress);
+    if (isAccount) {
+      const spika = await spikaClient();
+      try {
+        if (accountTokens === 0) {
+          // console.log("Account doesn't hold any NFT yet");
+          return setNftDetails(0);
+        } else {
+          let result = [];
+          await Promise.all(
+            accountTokens.map(async (i) => {
+              const nft = await spika.tokenClient.getTokenData(
+                i.id.token_data_id.creator,
+                i.id.token_data_id.collection,
+                i.id.token_data_id.name
+              );
+              debug.log("nft details: ", nft);
 
-            result.push({
-              default_properties: nft.default_properties,
-              description: nft.description,
-              largest_property_version: nft.largest_property_version,
-              maximum: nft.maximum,
-              mutability_config: nft.mutability_config,
-              name: nft.name,
-              royalty: nft.royalty,
-              supply: nft.supply,
-              uri: nft.uri,
-              creator: i.id.token_data_id.creator,
-              collection: i.id.token_data_id.collection,
-            });
-          })
-        );
+              result.push({
+                default_properties: nft.default_properties,
+                description: nft.description,
+                largest_property_version: nft.largest_property_version,
+                maximum: nft.maximum,
+                mutability_config: nft.mutability_config,
+                name: nft.name,
+                royalty: nft.royalty,
+                supply: nft.supply,
+                uri: nft.uri,
+                creator: i.id.token_data_id.creator,
+                collection: i.id.token_data_id.collection,
+              });
+            })
+          );
 
-        result.reverse();
+          result.reverse();
 
-        debug.log("nft details: ", result);
-        return setNftDetails(result);
+          debug.log("nft details: ", result);
+          return setNftDetails(result);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      setNftDetails(0);
     }
   };
 

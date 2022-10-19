@@ -303,7 +303,7 @@ const Swap = () => {
                 color="textPrimary"
                 sx={{ display: "flex", alignSelf: "start", ml: "12px", fontWeight: 600 }}
               >
-                Base
+                Sell
               </Typography>
               <Box component={DialogContent} sx={{ border: 2, borderColor: "#9e9e9e" }}>
                 <Stack
@@ -419,7 +419,7 @@ const Swap = () => {
                   fontWeight: 600,
                 }}
               >
-                Quote
+                Buy
               </Typography>
               <Box component={DialogContent} sx={{ mb: 3, border: 2, borderColor: "#9e9e9e" }}>
                 <Stack

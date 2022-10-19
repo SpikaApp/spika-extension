@@ -6,6 +6,8 @@ const _accountVersion = "accountVersion";
 const _currentAsset = "currentAsset";
 const _accountAssets = "accountAssets";
 const _connectedApps = "connectedApps";
+const _currentNetwork = "currentNetwork";
+const _accountNetworks = "accountNetworks";
 const _pwd = "PWD";
 
 let version;
@@ -16,6 +18,7 @@ const applyUpdate = async () => {
     await v0_4_0();
     await v0_4_5();
     await v0_4_14();
+    await v0_4_30();
   }
 };
 
@@ -62,6 +65,17 @@ const v0_4_14 = async () => {
   const required = pendingUpdate(version, currentUpdate);
   if (required) {
     removeStore(PLATFORM, _connectedApps);
+    setVersion();
+    logUpdate(currentUpdate);
+  }
+};
+
+const v0_4_30 = async () => {
+  const currentUpdate = "0.4.30";
+  const required = pendingUpdate(version, currentUpdate);
+  if (required) {
+    removeStore(PLATFORM, _currentNetwork);
+    removeStore(PLATFORM, _accountNetworks);
     setVersion();
     logUpdate(currentUpdate);
   }

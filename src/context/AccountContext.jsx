@@ -6,7 +6,7 @@ import * as english from "@scure/bip39/wordlists/english";
 import * as passworder from "@metamask/browser-passworder";
 import { UIContext } from "./UIContext";
 import { spikaClient } from "../lib/client";
-import { aptosCoin, coinStore } from "../lib/coin";
+import { aptosCoin } from "../lib/coin";
 import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
 import * as assetStore from "../lib/asset_store";
 import * as apps from "../lib/apps";
@@ -279,6 +279,16 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
+  const validateAccount = async (address) => {
+    const spika = await spikaClient();
+    try {
+      await spika.client.getAccount(address);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const createAccount = async () => {
     const spika = await spikaClient();
     debug.log(spika);
@@ -287,10 +297,6 @@ export const AccountProvider = ({ children }) => {
       debug.log("mnemonic: ", newMnemonic);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       debug.log("account address", _account.address().hex());
-      await spika.faucetClient.fundAccount(_account.address().hex(), 0); // Workaround during devnet
-      let resources = await spika.client.getAccountResources(_account.address().hex());
-      debug.log(resources);
-      let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       let _publicAccount = {
@@ -316,12 +322,11 @@ export const AccountProvider = ({ children }) => {
       setSpikaWallet(true);
       setPrivateKey(_privateKey);
       setAccount(_account);
-
       setPublicAccount(_publicAccount);
       setCurrentAddress(_account.address().hex());
       setCurrentNetwork(network.networkList[0]);
       setCurrentAsset(aptosCoin);
-      setBalance(accountResource.data.coin.value);
+      setBalance(0);
       setNewMnemonic("");
       setMnemonic("");
       throwAlert(1, "Account created", `${_account.address().hex()}`, false);
@@ -340,15 +345,6 @@ export const AccountProvider = ({ children }) => {
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
       debug.log(_privateKey);
       debug.log("account address", _account.address().hex());
-      try {
-        await spika.client.getAccount(_account.address().hex());
-      } catch (error) {
-        await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-        debug.log("Account not found on chain, calling faucet");
-      }
-      let resources = await spika.client.getAccountResources(_account.address().hex());
-      debug.log(resources);
-      let accountResource = resources.find((r) => r.type === coinStore(aptosCoin.type));
       let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
       let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
       let _publicAccount = {
@@ -378,7 +374,6 @@ export const AccountProvider = ({ children }) => {
       setCurrentAddress(_account.address().hex());
       setCurrentNetwork(network.networkList[0]);
       setCurrentAsset(aptosCoin);
-      setBalance(accountResource.data.coin.value);
       setNewMnemonic("");
       setMnemonic("");
       throwAlert(11, "Account imported", `${_account.address().hex()}`, false);
@@ -396,19 +391,13 @@ export const AccountProvider = ({ children }) => {
       try {
         const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-        try {
-          await spika.client.getAccount(_account.address().hex());
-        } catch (error) {
-          await spika.faucetClient.fundAccount(_account.address(), 0); // Workaround during devnet
-          debug.log("Account not found on chain, calling faucet");
-        }
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
           setStore(PLATFORM, "currentAsset", aptosCoin);
           _currentAsset = aptosCoin;
         }
-        let resources = await spika.client.getAccountResources(_account.address());
-        let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
+        // let resources = await spika.client.getAccountResources(_account.address());
+        // let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
         let _currentNetwork = await getStore(PLATFORM, "currentNetwork");
         if (_currentNetwork === undefined || _currentNetwork === null) {
           setStore(PLATFORM, "currentNetwork", network.networkList[0]);
@@ -433,11 +422,11 @@ export const AccountProvider = ({ children }) => {
         setCurrentAddress(_account.address().hex());
         setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
-        if (accountResource === undefined || accountResource === null) {
-          setBalance(0);
-        } else {
-          setBalance(accountResource.data.coin.value);
-        }
+        // if (accountResource === undefined || accountResource === null) {
+        //   setBalance(0);
+        // } else {
+        //   setBalance(accountResource.data.coin.value);
+        // }
       } catch (error) {
         console.log(error);
         throwAlert(42, "Failed to load account", `${error}`, true);
@@ -521,6 +510,7 @@ export const AccountProvider = ({ children }) => {
         handleLogin,
         handleRevealMnemonic,
         handleRevealPrivateKey,
+        validateAccount,
       }}
     >
       {children}
