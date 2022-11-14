@@ -19,6 +19,7 @@ const applyUpdate = async (): Promise<void> => {
     await v0_4_5();
     await v0_4_14();
     await v0_4_30();
+    await v0_4_34();
   }
 };
 
@@ -75,6 +76,16 @@ const v0_4_30 = async (): Promise<void> => {
   if (required) {
     removeStore(PLATFORM, _currentNetwork);
     removeStore(PLATFORM, _accountNetworks);
+    setVersion();
+    logUpdate(currentUpdate);
+  }
+};
+
+const v0_4_34 = async (): Promise<void> => {
+  const currentUpdate = "0.4.34";
+  const required: boolean = pendingUpdate(version, currentUpdate);
+  if (required) {
+    removeMem(PLATFORM, _pwd);
     setVersion();
     logUpdate(currentUpdate);
   }
