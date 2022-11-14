@@ -1,19 +1,18 @@
-import React, { createContext, FC, useEffect, useState } from "react";
-import { INftDetails } from "../interface";
+import React, { createContext, useEffect, useState } from "react";
+import { IContextUI, INftDetails } from "../interface";
 import { getMem, getStore } from "../lib/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
 
-type Props = {
+type UIContextProps = {
   children: React.ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const UIContext = createContext<any>(undefined);
+export const UIContext = createContext<IContextUI>({} as IContextUI);
 
-export const UIProvider: FC<Props> = ({ children }) => {
+export const UIProvider = ({ children }: UIContextProps) => {
   const [spikaWallet, setSpikaWallet] = useState<boolean | undefined>();
-  const [darkMode, setDarkMode] = useState<boolean | undefined>();
+  const [darkMode, setDarkMode] = useState<boolean>();
   const [openAlertDialog, setOpenAlertDialog] = useState<boolean>(false);
   const [openMintDialog, setOpenMintDialog] = useState<boolean>(false);
   const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState<boolean>(false);
@@ -29,7 +28,7 @@ export const UIProvider: FC<Props> = ({ children }) => {
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState<boolean>(false);
   const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState<boolean>(false);
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState<boolean>(false);
-  const [txnType, setTxnType] = useState<0 | 1 | 2>(0); // 0: undefined, 1: inbound, 2: outbound
+  const [txnType, setTxnType] = useState<number>(0); // 0: undefined, 1: inbound, 2: outbound
   const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState<boolean>(false);
   const [openNftDetailsDialog, setOpenNftDetailsDialog] = useState<boolean>(false);
   const [selectedNft, setSelectedNft] = useState<INftDetails | undefined>();
@@ -43,7 +42,7 @@ export const UIProvider: FC<Props> = ({ children }) => {
   const [isPopup, setIsPopup] = useState<boolean>(false);
   const [devMode] = useState<boolean>(PLATFORM === "http:" ? true : false);
   const [isTest, setIsTest] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean | undefined>();
+  const [isError, setIsError] = useState<boolean>(false);
   const _currentRoute = "currentRoute";
 
   useEffect(() => {

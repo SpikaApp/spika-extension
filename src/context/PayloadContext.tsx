@@ -1,15 +1,15 @@
 import { BCS, TxnBuilderTypes } from "aptos";
-import React, { createContext, FC } from "react";
+import React, { createContext } from "react";
+import { IContextPayload, IPayloadCollectionArgs, IPayloadNftArgs, IPayloadTransferArgs } from "../interface";
 import { spikaClient } from "../lib/client";
 
-type Props = {
+type PayloadContextProps = {
   children: React.ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const PayloadContext = createContext<any>(undefined);
+export const PayloadContext = createContext<IContextPayload>({} as IContextPayload);
 
-export const PayloadProvider: FC<Props> = ({ children }) => {
+export const PayloadProvider = ({ children }: PayloadContextProps) => {
   const register = async (coinType: string): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
     const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(coinType));
     return new TxnBuilderTypes.TransactionPayloadEntryFunction(
@@ -17,76 +17,53 @@ export const PayloadProvider: FC<Props> = ({ children }) => {
     );
   };
 
-  const transfer = async (
-    recipientAddress: string,
-    currentAsset: string,
-    amount: number
-  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
-    const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(currentAsset));
+  const transfer = async (args: IPayloadTransferArgs): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
+    const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(args.currentAsset));
     const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
       TxnBuilderTypes.EntryFunction.natural(
         "0x1::coin",
         "transfer",
         [token],
-        [BCS.bcsToBytes(TxnBuilderTypes.AccountAddress.fromHex(recipientAddress)), BCS.bcsSerializeUint64(amount)]
+        [
+          BCS.bcsToBytes(TxnBuilderTypes.AccountAddress.fromHex(args.recipientAddress)),
+          BCS.bcsSerializeUint64(args.amount),
+        ]
       )
     );
-
     return payload;
   };
 
-  const collection = async (
-    name: string,
-    description: string,
-    uri: string,
-    maxAmount: string
-  ): Promise<TxnBuilderTypes.TransactionPayload> => {
+  const collection = async (args: IPayloadCollectionArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
     const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
       "0x3::token::create_collection_script",
       [],
-      [name, description, uri, maxAmount, [false, false, false]]
+      [args.name, args.description, args.uri, args.maxAmount, [false, false, false]]
     );
-
     return payload;
   };
 
-  const nft = async (
-    address: string,
-    collectionName: string,
-    name: string,
-    description: string,
-    supply: string,
-    uri: string,
-    max: string,
-    royalty_payee_address = address,
-    royalty_points_denominator = 0,
-    royalty_points_numerator = 0,
-    property_keys = [],
-    property_values = [],
-    property_types = []
-  ): Promise<TxnBuilderTypes.TransactionPayload> => {
+  const nft = async (args: IPayloadNftArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
     const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
       "0x3::token::create_token_script",
       [],
       [
-        collectionName,
-        name,
-        description,
-        parseInt(supply),
-        max,
-        uri,
-        royalty_payee_address,
-        royalty_points_denominator,
-        royalty_points_numerator,
+        args.address,
+        args.name,
+        args.description,
+        parseInt(args.supply),
+        args.max,
+        args.uri,
+        args.address, // royalty_payee_address
+        0, // royalty_points_denominator
+        0, // royalty_points_numerator
         [false, false, false, false, false],
-        property_keys,
-        property_values,
-        property_types,
+        [], //property_keys
+        [], // property_values
+        [], //property_types
       ]
     );
-
     return payload;
   };
 

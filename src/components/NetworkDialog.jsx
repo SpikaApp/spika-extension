@@ -100,10 +100,15 @@ const NetworkDialog = () => {
       await spika.client.getChainId();
       setStore(PLATFORM, _currentNetwork, selectedNetwork);
       setCurrentNetwork(selectedNetwork);
-      throwAlert(121, "Success", `Network changed to ${selectedNetwork.name}`, false);
+      throwAlert({
+        signal: 121,
+        title: "Success",
+        message: `Network changed to ${selectedNetwork.name}`,
+        error: false,
+      });
     } catch (error) {
       console.log(error);
-      throwAlert(122, "Network change failed", `${error}`, true);
+      throwAlert({ signal: 122, title: "Network change failed", message: `${error}`, error: true });
     }
     setIsLocalLoading(false);
   };

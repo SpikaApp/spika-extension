@@ -53,7 +53,7 @@ const CreateNftDialog = () => {
       const payload = await nftPayload();
       await estimateTransaction(payload, true, true);
     } catch (error) {
-      throwAlert(73, "Error", `${error}`, true);
+      throwAlert({ signal: 73, title: "Error", message: `${error}`, error: true });
       console.log(error);
     }
     setIsLoading(false);

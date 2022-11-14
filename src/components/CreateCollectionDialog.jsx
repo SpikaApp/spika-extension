@@ -54,7 +54,7 @@ const CreateCollectionDialog = () => {
       const payload = await collectionPayload();
       await estimateTransaction(payload, true, true);
     } catch (error) {
-      throwAlert(63, "Error", `${error}`, true);
+      throwAlert({ signal: 63, title: "Error", message: `${error}`, error: true });
       console.log(error);
     }
     setIsLoading(false);

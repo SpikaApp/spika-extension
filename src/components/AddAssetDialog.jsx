@@ -110,7 +110,7 @@ const AddAssetDialog = () => {
     setIsLocalLoading(true);
     const data = await findAsset(coinType);
     if (!data) {
-      throwAlert(112, "Error", "Asset doesn't exist on chain", true);
+      throwAlert({ signal: 112, title: "Error", message: "Asset doesn't exist on chain", error: true });
       if (!isCustomToken) {
         clearPrevEstimation();
         clearDialog();
@@ -131,7 +131,7 @@ const AddAssetDialog = () => {
         clearPrevEstimation();
         clearDialog();
       } else {
-        throwAlert(112, "Error", "Asset doesn't exist on chain", true);
+        throwAlert({ signal: 112, title: "Error", message: "Asset doesn't exist on chain", error: true });
         clearPrevEstimation();
         clearDialog();
       }

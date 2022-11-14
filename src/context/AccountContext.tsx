@@ -2,9 +2,9 @@ import passworder from "@metamask/browser-passworder";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as aptos from "aptos";
-import React, { createContext, FC, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { ICoin, IEncryptedPwd, INetwork, IPublicAccount } from "../interface";
+import { IAlertArgs, ICoin, IContextAccount, IEncryptedPwd, INetwork, IPublicAccount } from "../interface";
 import * as network from "../lib/accountNetworks";
 import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
@@ -15,14 +15,13 @@ import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constan
 import { decryptPassword, encryptPassword } from "../utils/pwd";
 import { UIContext } from "./UIContext";
 
-type Props = {
+type AccountContextProps = {
   children: React.ReactNode;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AccountContext = createContext<any>(undefined);
+export const AccountContext = createContext<IContextAccount>({} as IContextAccount);
 
-export const AccountProvider: FC<Props> = ({ children }) => {
+export const AccountProvider = ({ children }: AccountContextProps) => {
   const {
     spikaWallet,
     setSpikaWallet,
@@ -35,8 +34,8 @@ export const AccountProvider: FC<Props> = ({ children }) => {
   } = useContext(UIContext);
 
   const [alertSignal, setAlertSignal] = useState<number>(0);
-  const [alertTitle, setAlertTitle] = useState<string | undefined>();
-  const [alertMessage, setAlertMessage] = useState<string | undefined>();
+  const [alertTitle, setAlertTitle] = useState<string>("");
+  const [alertMessage, setAlertMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [accountImported, setAccountImported] = useState<boolean>(false);
@@ -125,7 +124,7 @@ export const AccountProvider: FC<Props> = ({ children }) => {
       locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
-      throwAlert(62, "Failed load account", `${error}`, true);
+      throwAlert({ signal: 62, title: "Failed load account", message: `${error}`, error: true });
       setPassword("");
       console.log("Error occured during loading account");
       setAccountRoutesEnabled(true);
@@ -156,7 +155,12 @@ export const AccountProvider: FC<Props> = ({ children }) => {
     const oldPassword: string = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
-        throwAlert(58, "Incorrect password", "New password shall not be the same", true);
+        throwAlert({
+          signal: 58,
+          title: "Incorrect password",
+          message: "New password shall not be the same",
+          error: true,
+        });
         clearPasswords();
       } else if (newPassword === confirmPassword && newPassword.length > 5) {
         setIsLoading(true);
@@ -164,17 +168,22 @@ export const AccountProvider: FC<Props> = ({ children }) => {
         clearPasswords();
         setIsLoading(false);
       } else if (newPassword === "") {
-        throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
+        throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
         clearPasswords();
       } else if (newPassword !== confirmPassword) {
-        throwAlert(53, "Incorrect password", "Passwords do not match", true);
+        throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
         clearPasswords();
       } else if (newPassword.length > 5) {
-        throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
+        throwAlert({
+          signal: 54,
+          title: "Incorrect password",
+          message: "Password must be at least 6 characters long",
+          error: true,
+        });
         clearPasswords();
       }
     } else {
-      throwAlert(57, "Incorrect password", "Current password is wrong", true);
+      throwAlert({ signal: 57, title: "Incorrect password", message: "Current password is wrong", error: true });
       clearPasswords();
     }
   };
@@ -192,7 +201,7 @@ export const AccountProvider: FC<Props> = ({ children }) => {
       const encryptedPassword: IEncryptedPwd = await encryptPassword(newPassword);
       setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
-      throwAlert(56, "Success", "Password successfully changed", false);
+      throwAlert({ signal: 56, title: "Success", message: "Password successfully changed", error: false });
     } catch (error) {
       clearPasswords();
       console.log(error);
@@ -207,13 +216,18 @@ export const AccountProvider: FC<Props> = ({ children }) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
-      throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
+      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
-      throwAlert(53, "Incorrect password", "Passwords do not match", true);
+      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
       clearPasswords();
     } else if (password.length > 5) {
-      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
+      throwAlert({
+        signal: 54,
+        title: "Incorrect password",
+        message: "Password must be at least 6 characters long",
+        error: true,
+      });
       clearPasswords();
     }
   };
@@ -226,13 +240,18 @@ export const AccountProvider: FC<Props> = ({ children }) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
-      throwAlert(52, "Incorrect password", "Password field cannot be empty", true);
+      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
-      throwAlert(53, "Incorrect password", "Passwords do not match", true);
+      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
       clearPasswords();
     } else if (password.length > 5) {
-      throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
+      throwAlert({
+        signal: 54,
+        title: "Incorrect password",
+        message: "Password must be at least 6 characters long",
+        error: true,
+      });
       clearPasswords();
     }
   };
@@ -250,12 +269,12 @@ export const AccountProvider: FC<Props> = ({ children }) => {
     try {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
-      throwAlert(91, "Secret Recovery Phrase", decryptedMnemonic, false);
+      throwAlert({ signal: 91, title: "Secret Recovery Phrase", message: decryptedMnemonic, error: false });
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
-      throwAlert(92, "Error", "Incorrect password", true);
+      throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
@@ -266,12 +285,12 @@ export const AccountProvider: FC<Props> = ({ children }) => {
     try {
       const encryptedPrivateKey: string = await getStore(PLATFORM, "DATA1");
       const decryptedPrivateKey: string = await passworder.decrypt(password, encryptedPrivateKey);
-      throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`, false);
+      throwAlert({ signal: 81, title: "Private Key", message: `0x${decryptedPrivateKey}`, error: false });
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
-      throwAlert(92, "Error", "Incorrect password", true);
+      throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
@@ -341,9 +360,9 @@ export const AccountProvider: FC<Props> = ({ children }) => {
   const createAccount = async (): Promise<void> => {
     try {
       const result = await initAccount(newMnemonic);
-      throwAlert(1, "Account created", `${result}`, false);
+      throwAlert({ signal: 1, title: "Account created", message: `${result}`, error: false });
     } catch (error) {
-      throwAlert(2, "Failed create account", `${error}`, true);
+      throwAlert({ signal: 2, title: "Failed create account", message: `${error}`, error: true });
       console.log(error);
     }
   };
@@ -351,9 +370,9 @@ export const AccountProvider: FC<Props> = ({ children }) => {
   const importAccount = async (): Promise<void> => {
     try {
       const result = await initAccount(mnemonic);
-      throwAlert(11, "Account imported", `${result}`, false);
+      throwAlert({ signal: 11, title: "Account imported", message: `${result}`, error: false });
     } catch (error) {
-      throwAlert(12, "Failed import account", `${error}`, true);
+      throwAlert({ signal: 12, title: "Failed import account", message: `${error}`, error: true });
       console.log(error);
     }
   };
@@ -365,7 +384,7 @@ export const AccountProvider: FC<Props> = ({ children }) => {
       try {
         const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-        let _currentAsset = await getStore(PLATFORM, "currentAsset");
+        let _currentAsset: ICoin = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
           setStore(PLATFORM, "currentAsset", aptosCoin);
           _currentAsset = aptosCoin;
@@ -396,29 +415,29 @@ export const AccountProvider: FC<Props> = ({ children }) => {
         setCurrentAsset(_currentAsset);
       } catch (error) {
         console.log(error);
-        throwAlert(42, "Failed to load account", `${error}`, true);
+        throwAlert({ signal: 42, title: "Failed to load account", message: `${error}`, error: true });
         setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }
     } catch (error) {
       console.log(error);
-      throwAlert(55, "Error", "Incorrect password", true);
+      throwAlert({ signal: 55, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setOpenLoginDialog(true);
     }
   };
 
-  const throwAlert = (signal: number, title: string, message: string, error: boolean): void => {
-    setAlertSignal(signal);
-    setAlertTitle(title);
-    setAlertMessage(message);
-    setIsError(error);
+  const throwAlert = (args: IAlertArgs): void => {
+    setAlertSignal(args.signal);
+    setAlertTitle(args.title);
+    setAlertMessage(args.message);
+    setIsError(args.error);
   };
 
   const clearAlert = (): void => {
     setAlertSignal(0);
     setAlertTitle("");
     setAlertMessage("");
-    setIsError();
+    setIsError(false);
   };
 
   const clearPasswords = (): void => {
@@ -454,7 +473,6 @@ export const AccountProvider: FC<Props> = ({ children }) => {
         setConfirmPassword,
         clearPasswords,
         handleChangePassword,
-        spikaWallet,
         accountImported,
         setAccountImported,
         account,
