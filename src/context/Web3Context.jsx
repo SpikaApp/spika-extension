@@ -384,7 +384,7 @@ export const Web3Provider = ({ children }) => {
 
   const updateBalance = async (asset) => {
     const spika = await spikaClient();
-    const isAccount = validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress);
     if (isAccount) {
       let resources = await spika.client.getAccountResources(account.address());
       let _asset = resources.find((r) => r.type === asset.type);
@@ -405,8 +405,9 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getEventsCount = async (events) => {
-    const isAccount = validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress);
     if (isAccount) {
+      console.log(isAccount);
       const spika = await spikaClient();
       let resources = await spika.client.getAccountResources(account.address());
       let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
@@ -431,7 +432,7 @@ export const Web3Provider = ({ children }) => {
 
   const getDepositEvents = async (query) => {
     const spika = await spikaClient();
-    const isAccount = validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress);
     if (isAccount) {
       if (query) {
         let data = await spika.client.getEventsByEventHandle(
