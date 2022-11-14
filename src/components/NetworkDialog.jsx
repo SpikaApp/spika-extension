@@ -1,45 +1,39 @@
-import { useContext, useState, useEffect } from "react";
+import CircleIcon from "@mui/icons-material/Circle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Button,
+  CircularProgress,
   Dialog,
-  DialogContent,
   DialogActions,
+  DialogContent,
   DialogTitle,
-  Stack,
-  Paper,
+  IconButton,
   List,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListItemButton,
-  Typography,
+  Paper,
+  Stack,
   Tooltip,
-  IconButton,
-  CircularProgress,
+  Typography,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
-import CircleIcon from "@mui/icons-material/Circle";
-import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { UIContext } from "../context/UIContext";
+import { AptosClient } from "aptos";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import { AptosClient, FaucetClient } from "aptos";
-import { getNetworks, removeNetwork } from "../lib/network";
-import { setStore } from "../lib/store";
-import { aptosCoin } from "../lib/coin";
-import { PLATFORM } from "../utils/constants";
-import debug from "../utils/debug";
+import { getNetworks, removeNetwork } from "../lib/accountNetworks";
 import { spikaClient } from "../lib/client";
+import { aptosCoin } from "../lib/coin";
+import { setStore } from "../lib/store";
+import { PLATFORM } from "../utils/constants";
+import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
 
 const NetworkDialog = () => {
-  const {
-    openNetworkDialog,
-    setOpenNetworkDialog,
-    handleAddCustomNetworkUI,
-    somethingChanged,
-    setSomethingChanged,
-  } = useContext(UIContext);
+  const { openNetworkDialog, setOpenNetworkDialog, handleAddCustomNetworkUI, somethingChanged, setSomethingChanged } =
+    useContext(UIContext);
   const {
     alertSignal,
     currentAddress,
@@ -272,12 +266,7 @@ const NetworkDialog = () => {
                         </Stack>
                       }
                       secondary={
-                        <Typography
-                          noWrap
-                          variant="subtitle2"
-                          color="textSecondary"
-                          sx={{ maxWidth: "210px" }}
-                        >
+                        <Typography noWrap variant="subtitle2" color="textSecondary" sx={{ maxWidth: "210px" }}>
                           {normalizeAddress(network.data.node_url)}
                         </Typography>
                       }
@@ -287,10 +276,7 @@ const NetworkDialog = () => {
               ))}
             </List>
           ) : (
-            <CircularProgress
-              sx={{ position: "absolute", mt: "90px", ml: "110px" }}
-              color="inherit"
-            />
+            <CircularProgress sx={{ position: "absolute", mt: "90px", ml: "110px" }} color="inherit" />
           )}
           <List
             component="nav"
@@ -310,11 +296,7 @@ const NetworkDialog = () => {
             mt: 1,
           }}
         >
-          <Button
-            variant="outlined"
-            sx={{ mt: 1, mb: 2, width: "180px" }}
-            onClick={handleAddCustomNetworkUI}
-          >
+          <Button variant="outlined" sx={{ mt: 1, mb: 2, width: "180px" }} onClick={handleAddCustomNetworkUI}>
             Add Custom Network
           </Button>
         </Stack>

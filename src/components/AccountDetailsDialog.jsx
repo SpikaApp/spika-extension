@@ -1,19 +1,19 @@
-import { useContext } from "react";
+import SaveIcon from "@mui/icons-material/Save";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  IconButton,
   DialogTitle,
-  TextField,
+  IconButton,
   Stack,
+  TextField,
   Tooltip,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import { UIContext } from "../context/UIContext";
+import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
-import saveToFile from "../utils/save_to_file";
+import { UIContext } from "../context/UIContext";
+import saveToFile from "../utils/saveToFile";
 
 const AccountDetailsDialog = () => {
   const { openAccountDetailsDialog, setOpenAccountDetailsDialog } = useContext(UIContext);

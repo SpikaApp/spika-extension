@@ -1,18 +1,9 @@
+import { Button, Dialog, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
 import { useContext } from "react";
-import {
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Typography,
-  DialogTitle,
-  Stack,
-} from "@mui/material";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const MintDialog = () => {
   const { openMintDialog, setOpenMintDialog } = useContext(UIContext);

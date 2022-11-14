@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { Typography, Link } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { Link, Typography } from "@mui/material";
+import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 
 const Footer = () => {

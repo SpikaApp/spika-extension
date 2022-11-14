@@ -1,23 +1,23 @@
-import { useContext, useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
+  Stack,
   TextField,
   Typography,
-  Stack,
-  Link,
 } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { aptosCoin } from "../lib/coin";
-import copyToClipboard from "../utils/copy_clipboard";
+import copyToClipboard from "../utils/copyToClipboard";
 import debug from "../utils/debug";
 
 const AlertDialog = () => {
@@ -36,15 +36,8 @@ const AlertDialog = () => {
     setIsPopup,
     isError,
   } = useContext(UIContext);
-  const {
-    setAccountImported,
-    alertSignal,
-    alertTitle,
-    alertMessage,
-    clearAlert,
-    setCurrentAsset,
-    handleLogout,
-  } = useContext(AccountContext);
+  const { setAccountImported, alertSignal, alertTitle, alertMessage, clearAlert, setCurrentAsset, handleLogout } =
+    useContext(AccountContext);
 
   useEffect(() => {
     if (alertSignal === 31 || alertSignal === 61) {
@@ -94,6 +87,7 @@ const AlertDialog = () => {
       case 56: // Password successfully changed
         setOpenAlertDialog(false);
         setOpenChangePasswordDialog(false);
+        break;
       case 61: // Collection Created
         setOpenAlertDialog(false);
         setOpenCreateCollectionDialog(false);
@@ -103,14 +97,17 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setOpenCreateNftDialog(false);
         setIsTransaction(false);
+        break;
       case 81: // Private key required
         setOpenAlertDialog(false);
+        break;
       case 91: // Mnemonic required
         setOpenAlertDialog(false);
         break;
       case 101: // New asset successfully added
         setOpenAlertDialog(false);
         setOpenAddAssetDialog(false);
+        break;
       case 121: // Network changed successfully
         setOpenAlertDialog(false);
         setOpenNetworkDialog(false);
@@ -125,6 +122,7 @@ const AlertDialog = () => {
       case 42: // Failed load account
         setAccountImported(false);
         navigate(0);
+        break;
       case 52: // Password field cannot be empty
       case 53: // Passwords do not match
       case 54: // Password must at least 6 characters long
@@ -165,9 +163,7 @@ const AlertDialog = () => {
         <DialogTitle>
           <Stack sx={{ display: "flex", flexDirection: "row", alignItems: "start", mr: 2 }}>
             {isError && <ErrorIcon sx={{ mt: "4px", mr: "6px", color: "error.main" }} />}
-            {isError === false && (
-              <CheckCircleIcon sx={{ mt: "4px", mr: "6px", color: "success.main" }} />
-            )}
+            {isError === false && <CheckCircleIcon sx={{ mt: "4px", mr: "6px", color: "success.main" }} />}
             <Typography variant="h6" sx={{ color: isError ? "error.main" : "success.main" }}>
               {alertTitle}
             </Typography>

@@ -1,29 +1,22 @@
-import React, { useContext, useState, useEffect } from "react";
+import InfoIcon from "@mui/icons-material/Info";
 import {
-  Container,
-  Typography,
+  Button,
   Card,
   CardContent,
-  Button,
-  TextField,
-  Stack,
   Checkbox,
+  Container,
   FormControlLabel,
   Link,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 
 const Create = () => {
-  const {
-    newMnemonic,
-    handleGenerate,
-    handleCreate,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
-  } = useContext(AccountContext);
+  const { newMnemonic, handleGenerate, handleCreate, password, setPassword, confirmPassword, setConfirmPassword } =
+    useContext(AccountContext);
   const [checkedLicenseRules, setCheckedLicenseRules] = useState(false);
 
   useEffect(() => {
@@ -43,9 +36,8 @@ const Create = () => {
             <Typography variant="body1" align="center" color="textSecondary" gutterBottom>
               <InfoIcon color="primary" />
               <br />
-              First, let's generate new mnemonic phrase. Make sure to write down all words in
-              correct order and store it in a safe place. Remember, mnemonic phrase is a key to your
-              account.
+              First, let's generate new mnemonic phrase. Make sure to write down all words in correct order and store it
+              in a safe place. Remember, mnemonic phrase is a key to your account.
             </Typography>
             <Stack sx={{ display: "flex", alignItems: "center" }}>
               <FormControlLabel
@@ -64,13 +56,7 @@ const Create = () => {
                     </Link>{" "}
                   </Typography>
                 }
-                control={
-                  <Checkbox
-                    sx={{ my: -1 }}
-                    checked={checkedLicenseRules}
-                    onChange={handleChangeLicenseRules}
-                  />
-                }
+                control={<Checkbox sx={{ my: -1 }} checked={checkedLicenseRules} onChange={handleChangeLicenseRules} />}
               />
             </Stack>
           </CardContent>

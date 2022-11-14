@@ -1,34 +1,29 @@
-import { useContext, useState, useEffect } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
   Stack,
   TextField,
-  Box,
   Typography,
-  CircularProgress,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const CreateCollectionDialog = () => {
   const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
   const { throwAlert } = useContext(AccountContext);
   const { collection } = useContext(PayloadContext);
-  const {
-    estimateTransaction,
-    createToken,
-    isValidTransaction,
-    estimatedTxnResult,
-    clearPrevEstimation,
-  } = useContext(Web3Context);
+  const { estimateTransaction, createToken, isValidTransaction, estimatedTxnResult, clearPrevEstimation } =
+    useContext(Web3Context);
 
   const [estimationRequired, setEstimationRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,12 +44,7 @@ const CreateCollectionDialog = () => {
   };
 
   const collectionPayload = async () => {
-    const payload = await collection(
-      collectionName,
-      collectionDescription,
-      collectionUri,
-      parseInt(collectionSize)
-    );
+    const payload = await collection(collectionName, collectionDescription, collectionUri, parseInt(collectionSize));
     return payload;
   };
 
@@ -204,35 +194,31 @@ const CreateCollectionDialog = () => {
           <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
             Cancel
           </Button>
-          {!isValidTransaction &&
-            collectionName !== "" &&
-            collectionDescription !== "" &&
-            collectionUri !== "" && (
-              <LoadingButton
-                sx={{
-                  background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                  width: "121px",
-                }}
-                variant="contained"
-                loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
-                loading={isLoading}
-                onClick={handleEstimationRequired}
-              >
-                Estimate
-              </LoadingButton>
-            )}{" "}
-          {!isValidTransaction &&
-            (collectionName === "" || collectionDescription === "" || collectionUri === "") && (
-              <Button
-                sx={{
-                  width: "121px",
-                }}
-                variant="contained"
-                disabled
-              >
-                Estimate
-              </Button>
-            )}
+          {!isValidTransaction && collectionName !== "" && collectionDescription !== "" && collectionUri !== "" && (
+            <LoadingButton
+              sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "121px",
+              }}
+              variant="contained"
+              loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
+              loading={isLoading}
+              onClick={handleEstimationRequired}
+            >
+              Estimate
+            </LoadingButton>
+          )}{" "}
+          {!isValidTransaction && (collectionName === "" || collectionDescription === "" || collectionUri === "") && (
+            <Button
+              sx={{
+                width: "121px",
+              }}
+              variant="contained"
+              disabled
+            >
+              Estimate
+            </Button>
+          )}
           {isValidTransaction && (
             <LoadingButton
               sx={{

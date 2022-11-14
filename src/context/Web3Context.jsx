@@ -1,19 +1,21 @@
-import React, { useState, useContext, useEffect } from "react";
 import * as aptos from "aptos";
-import { UIContext } from "./UIContext";
-import { AccountContext } from "./AccountContext";
-import { PayloadContext } from "./PayloadContext";
+import { Buffer } from "buffer";
+import React, { useContext, useEffect, useState } from "react";
+import pixel_coin from "../assets/pixel_coin.png";
 import { spikaClient } from "../lib/client";
-import { aptosCoin, coinList, coinStore, coinInfo } from "../lib/coin";
+import { aptosCoin, coinInfo, coinList, coinStore } from "../lib/coin";
+import { setStore } from "../lib/store";
 import * as token from "../lib/token";
 import { PLATFORM } from "../utils/constants";
-import { stringToValue, valueToString } from "../utils/values";
-import pixel_coin from "../assets/pixel_coin.png";
-import { setStore } from "../lib/store";
 import debug from "../utils/debug";
+import { stringToValue, valueToString } from "../utils/values";
+import { AccountContext } from "./AccountContext";
+import { PayloadContext } from "./PayloadContext";
+import { UIContext } from "./UIContext";
 
 export const Web3Context = React.createContext();
 
+// eslint-disable-next-line react/prop-types
 export const Web3Provider = ({ children }) => {
   const { spikaWallet, setOpenSendDialog } = useContext(UIContext);
   const {
@@ -26,6 +28,7 @@ export const Web3Provider = ({ children }) => {
     currentAsset,
     setIsLoading,
     setAccountAssets,
+    currentNetwork,
   } = useContext(AccountContext);
   const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState("");
@@ -162,11 +165,7 @@ export const Web3Provider = ({ children }) => {
     }
     try {
       if (payload === undefined) {
-        _payload = await transfer(
-          recipientAddress,
-          currentAsset.type,
-          valueToString(currentAsset, amount)
-        );
+        _payload = await transfer(recipientAddress, currentAsset.type, valueToString(currentAsset, amount));
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
           gasUnitPrice: gasUnitPrice,
@@ -223,11 +222,7 @@ export const Web3Provider = ({ children }) => {
     }
     try {
       if (payload === undefined) {
-        _payload = await transfer(
-          recipientAddress,
-          currentAsset.type,
-          valueToString(currentAsset, amount)
-        );
+        _payload = await transfer(recipientAddress, currentAsset.type, valueToString(currentAsset, amount));
         transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
           maxGasAmount: maxGasAmount,
           gasUnitPrice: gasUnitPrice,
@@ -501,10 +496,7 @@ export const Web3Provider = ({ children }) => {
             value.type.startsWith("0x1::coin::CoinStore") //&&
             // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
           ) {
-            const type = value.type.substring(
-              value.type.indexOf("<") + 1,
-              value.type.lastIndexOf(">")
-            );
+            const type = value.type.substring(value.type.indexOf("<") + 1, value.type.lastIndexOf(">"));
             const asset = await getAssetData(type);
             result.push({
               type: type,
@@ -534,8 +526,8 @@ export const Web3Provider = ({ children }) => {
         const stored = coinList.find(({ type }) => type === curr.type);
         if (stored) {
           stored.data.balance = curr.data.balance;
-          stored.data.logo = stored.data.logo;
-          stored.data.logo_alt = stored.data.logo_alt;
+          stored.data.logo;
+          stored.data.logo_alt;
           acc.push(stored);
         } else {
           acc.push(curr);
@@ -566,14 +558,9 @@ export const Web3Provider = ({ children }) => {
           } else {
             let counter = parseInt(tokenStore.data.deposit_events.counter);
             // Get Token deposit_events
-            let data = await spika.client.getEventsByEventHandle(
-              currentAddress,
-              tokenStore.type,
-              "deposit_events",
-              {
-                limit: counter === 0 ? 1 : counter,
-              }
-            );
+            let data = await spika.client.getEventsByEventHandle(currentAddress, tokenStore.type, "deposit_events", {
+              limit: counter === 0 ? 1 : counter,
+            });
 
             // Get TokenId for accountDepositedTokens and remove dublicates
             let tokenIds = [...new Set(data.map((i) => i.data.id))];

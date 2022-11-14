@@ -1,31 +1,30 @@
-import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
+  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
-  Typography,
-  TableContainer,
+  Stack,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableRow,
   Tooltip,
-  Chip,
-  Stack,
+  Typography,
 } from "@mui/material";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import copyToClipboard from "../utils/copyToClipboard";
+import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
-import shortenAddress from "../utils/shorten_address";
-import copyToClipboard from "../utils/copy_clipboard";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const ConfirmSendDialog = (props) => {
-  const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } =
-    useContext(UIContext);
+  const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const {
     isValidTransaction,

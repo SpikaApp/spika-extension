@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
-import { ListItem, Stack, Typography, Button } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import TxnDetailsDialog from "./TxnDetailsDialog";
-import { UIContext } from "../context/UIContext";
+import { Button, ListItem, Stack, Typography } from "@mui/material";
+import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { stringToValue } from "../utils/values";
+import TxnDetailsDialog from "./TxnDetailsDialog";
 
 const SentEventCard = ({
   withdrawEvent: {
@@ -26,10 +26,7 @@ const SentEventCard = ({
 
   return (
     <ListItem>
-      <Button
-        sx={{ ml: 1.5, textTransform: "none", maxWidth: "290px" }}
-        onClick={handleOpenTxnDetailsDialog}
-      >
+      <Button sx={{ ml: 1.5, textTransform: "none", maxWidth: "290px" }} onClick={handleOpenTxnDetailsDialog}>
         <FileUploadIcon sx={{ fontSize: 24, mr: 2 }} color="primary" />
         <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "start" }}>
           <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>

@@ -1,16 +1,8 @@
-import { useContext } from "react";
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  Stack,
-  Typography,
-} from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
-import { UIContext } from "../context/UIContext";
+import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, Stack, Typography } from "@mui/material";
+import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 
 const LogoutDialog = () => {
   const { openLogoutDialog, setOpenLogoutDialog } = useContext(UIContext);
@@ -32,8 +24,8 @@ const LogoutDialog = () => {
       </DialogTitle>
       <DialogContent sx={{ maxWidth: 320 }}>
         <DialogContentText sx={{ display: "flex", flexDirection: "row", mb: 2 }}>
-          This will delete all stored data from Spika. Remember to export recovery phrase and any
-          imported keys before proceeding.
+          This will delete all stored data from Spika. Remember to export recovery phrase and any imported keys before
+          proceeding.
           <br />
         </DialogContentText>
       </DialogContent>

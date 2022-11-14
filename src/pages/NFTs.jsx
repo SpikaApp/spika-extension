@@ -1,27 +1,26 @@
-import React, { useContext, useEffect, useState } from "react";
 import {
-  Container,
-  Typography,
-  Stack,
+  Box,
   Button,
+  CircularProgress,
+  Container,
   ImageList,
   ImageListItem,
-  CircularProgress,
-  Paper,
-  Box,
-  Tooltip,
   Pagination,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import Footer from "../components/Footer";
-import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
-import { Web3Context } from "../context/Web3Context";
+import { useContext, useEffect, useState } from "react";
+import default_nft from "../assets/default_nft.jpg";
 import CreateCollectionDialog from "../components/CreateCollectionDialog";
 import CreateNftDialog from "../components/CreateNftDialog";
+import Footer from "../components/Footer";
 import NftDetailsDialog from "../components/NftDetailsDialog";
-import default_nft from "../assets/default_nft.jpg";
-import debug from "../utils/debug";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import { Web3Context } from "../context/Web3Context";
 
 const NftButton = styled(Button)(() => ({
   borderRadius: "8px",
@@ -36,11 +35,11 @@ const NFTs = () => {
   const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState(true);
   const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(0);
+  const [pages] = useState(0);
 
   const hidden = true;
 
-  const limitPerPage = 9;
+  // const limitPerPage = 9;
 
   useEffect(() => {
     if (accountImported === true) {
@@ -78,11 +77,7 @@ const NFTs = () => {
           justifyContent: "space-around",
         }}
       >
-        <Button
-          sx={{ width: "160px", mr: 2 }}
-          variant="outlined"
-          onClick={handleCreateCollectionUI}
-        >
+        <Button sx={{ width: "160px", mr: 2 }} variant="outlined" onClick={handleCreateCollectionUI}>
           <Typography align="center">Create Collection</Typography>
         </Button>
         <Button sx={{ width: "160px" }} variant="outlined" onClick={handleCreateNFTUI}>
@@ -90,10 +85,7 @@ const NFTs = () => {
         </Button>
       </Stack>
       {isWaiting === true && accountImported && (
-        <Stack
-          direction="column"
-          sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}
-        >
+        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}>
           <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
             Updating metadata...
           </Typography>
@@ -101,13 +93,7 @@ const NFTs = () => {
         </Stack>
       )}
       {accountTokens === 0 && isWaiting === false && (
-        <Typography
-          sx={{ mt: 8, mb: "320px" }}
-          variant="h6"
-          align="center"
-          color="textPrimary"
-          gutterBottom
-        >
+        <Typography sx={{ mt: 8, mb: "320px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
           No NFTs found
         </Typography>
       )}
@@ -151,9 +137,7 @@ const NFTs = () => {
         </Box>
       )}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
-        {accountTokens !== 0 && !isWaiting && accountImported && hidden && (
-          <Box sx={{ mb: "32px" }} />
-        )}
+        {accountTokens !== 0 && !isWaiting && accountImported && hidden && <Box sx={{ mb: "32px" }} />}
         {accountTokens !== 0 && !isWaiting && accountImported && !hidden && (
           <Pagination
             count={pages}

@@ -26,6 +26,7 @@ const transaction = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const testSignAndSubmitTransaction = async (transaction) => {
     try {
       const test = await signAndSubmitTransaction(transaction);

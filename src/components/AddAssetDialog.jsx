@@ -1,26 +1,26 @@
-import { useContext, useState, useEffect } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  Stack,
   Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  TextField,
   Paper,
+  Stack,
+  TextField,
   Typography,
-  CircularProgress,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { useContext, useEffect, useState } from "react";
 import Loading from "../components/Loading";
-import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
@@ -28,15 +28,8 @@ import { PLATFORM } from "../utils/constants";
 
 const AddAssetDialog = () => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
-  const {
-    setIsLoading,
-    alertSignal,
-    currentNetwork,
-    accountAssets,
-    currentAsset,
-    setCurrentAsset,
-    throwAlert,
-  } = useContext(AccountContext);
+  const { setIsLoading, alertSignal, currentNetwork, accountAssets, currentAsset, setCurrentAsset, throwAlert } =
+    useContext(AccountContext);
   const { register } = useContext(PayloadContext);
   const {
     getBalance,
@@ -267,10 +260,7 @@ const AddAssetDialog = () => {
                             sx={{ width: 24, height: 24, ml: "4px" }}
                           ></Box>
                         </ListItemIcon>
-                        <ListItemText
-                          sx={{ ml: "-16px" }}
-                          primary={`${asset.data.name} (${asset.data.symbol})`}
-                        />
+                        <ListItemText sx={{ ml: "-16px" }} primary={`${asset.data.name} (${asset.data.symbol})`} />
                       </ListItemButton>
                     </Stack>
                   ))}
@@ -288,11 +278,7 @@ const AddAssetDialog = () => {
               mt: 1,
             }}
           >
-            <Button
-              variant="outlined"
-              sx={{ mt: 1, mb: 1, width: "180px" }}
-              onClick={handleAddCustomToken}
-            >
+            <Button variant="outlined" sx={{ mt: 1, mb: 1, width: "180px" }} onClick={handleAddCustomToken}>
               Add Custom Token
             </Button>
           </Stack>

@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import {
   Button,
   Dialog,
@@ -6,11 +5,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  TextField,
   Stack,
+  TextField,
 } from "@mui/material";
-import { UIContext } from "../context/UIContext";
+import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 
 const ChangePasswordDialog = () => {
   const { openChangePasswordDialog, setOpenChangePasswordDialog } = useContext(UIContext);
@@ -35,8 +35,8 @@ const ChangePasswordDialog = () => {
       <DialogTitle>Change password</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ width: "275px" }}>
-          Set a new account password. Please note, Spika wallet is not saving user passwords, thus
-          unable to provide assistance in event of loss.
+          Set a new account password. Please note, Spika wallet is not saving user passwords, thus unable to provide
+          assistance in event of loss.
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ display: "flex", flexDirection: "column" }}>

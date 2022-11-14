@@ -1,28 +1,21 @@
-import { useContext, useState, useEffect } from "react";
 import {
-  Container,
-  Typography,
+  Button,
   Card,
   CardContent,
-  Button,
-  TextField,
-  Stack,
-  FormControlLabel,
   Checkbox,
+  Container,
+  FormControlLabel,
   Link,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 
 const Import = () => {
-  const {
-    mnemonic,
-    setMnemonic,
-    handleImport,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
-  } = useContext(AccountContext);
+  const { mnemonic, setMnemonic, handleImport, password, setPassword, confirmPassword, setConfirmPassword } =
+    useContext(AccountContext);
   const [checkedLicenseRules, setCheckedLicenseRules] = useState(false);
 
   useEffect(() => {
@@ -80,11 +73,7 @@ const Import = () => {
           label={
             <Typography>
               I accept the license{" "}
-              <Link
-                href="https://docs.spika.app/terms-and-conditions/license"
-                underline="none"
-                target="_blank"
-              >
+              <Link href="https://docs.spika.app/terms-and-conditions/license" underline="none" target="_blank">
                 {" "}
                 disclaimer
               </Link>

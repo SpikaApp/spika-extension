@@ -1,5 +1,5 @@
-import { Box, DialogContent, Typography, Stack } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
+import { Box, DialogContent, Stack, Typography } from "@mui/material";
 
 const NoticeBox = (props) => {
   return (

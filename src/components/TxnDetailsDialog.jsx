@@ -1,34 +1,32 @@
-import React, { useContext, useEffect, useState } from "react";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  Typography,
-  TableContainer,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Link,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableRow,
   Tooltip,
-  Chip,
-  Link,
+  Typography,
 } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import convertTimestamp from "../utils/convert_timestamp";
+import convertTimestamp from "../utils/convertTimestamp";
+import copyToClipboard from "../utils/copyToClipboard";
+import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
-import shortenAddress from "../utils/shorten_address";
-import copyToClipboard from "../utils/copy_clipboard";
-import debug from "../utils/debug";
+import AlertDialog from "./AlertDialog";
 
 const TxnDetailsDialog = () => {
-  const { openTxnDetailsDialog, setOpenTxnDetailsDialog, txnType, setTxnType } =
-    useContext(UIContext);
+  const { openTxnDetailsDialog, setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
   const { currentAsset, currentAddress } = useContext(AccountContext);
   const { txnDetails, setTxnDetails, amount, setAmount } = useContext(Web3Context);
   const [rows, setRows] = useState([]);
@@ -43,11 +41,13 @@ const TxnDetailsDialog = () => {
       let _amount = "";
       let recipient = "";
       if (txnDetails.payload.arguments.length === 1) {
-        recipient = currentAddress;
         _amount = txnDetails.payload.arguments[0];
+        recipient = currentAddress;
       } else if (txnDetails.payload.arguments.length === 2) {
-        recipient = txnDetails.payload.arguments[0];
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
         _amount = txnDetails.payload.arguments[1];
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        recipient = txnDetails.payload.arguments[0];
       }
 
       //   setRows([
@@ -127,9 +127,7 @@ const TxnDetailsDialog = () => {
                     <Typography variant="inherit">{row.name}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: "110px" }}>
-                    {row.name === "Sender" ||
-                    row.name === "Recipient" ||
-                    row.name === "Txn Hash" ? (
+                    {row.name === "Sender" || row.name === "Recipient" || row.name === "Txn Hash" ? (
                       <Tooltip title={row.value} sx={{ ml: -1.5 }}>
                         <Chip
                           label={shortenAddress(row.value)}

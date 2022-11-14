@@ -1,44 +1,42 @@
-import React, { useContext, useEffect, useState } from "react";
+import InfoIcon from "@mui/icons-material/Info";
 import {
   Box,
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
-  DialogActions,
-  Typography,
-  Stack,
-  Tooltip,
   Grid,
-  Paper,
+  Link,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Link,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import InfoIcon from "@mui/icons-material/Info";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
-import { Web3Context } from "../context/Web3Context";
-import { PLATFORM } from "../utils/constants";
-import { setMem, getMem } from "../lib/store";
-import { getApp, setApp } from "../lib/apps";
-import shortenAddress from "../utils/shorten_address";
-import logo from "../assets/spika_logo_200.png";
+import { useContext, useEffect, useState } from "react";
 import spika from "../assets/spika_color.svg";
+import logo from "../assets/spika_logo_200.png";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import { Web3Context } from "../context/Web3Context";
+import { getApp, setApp } from "../lib/connectedApps";
+import { getMem, setMem } from "../lib/store";
+import { PLATFORM } from "../utils/constants";
+import shortenAddress from "../utils/shortenAddress";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const PermissionDialog = () => {
   const [request, setRequest] = useState({});
   const [method, setMethod] = useState("default");
   const [requestSender, setRequestSender] = useState();
-  const { spikaWallet, openPermissionDialog, setOpenPermissionDialog, isPopup, setIsPopup } =
-    useContext(UIContext);
-  const { isLoading, setIsLoading, alertSignal, accountImported, currentAddress, publicAccount } =
-    useContext(AccountContext);
+  const { spikaWallet, openPermissionDialog, setOpenPermissionDialog, isPopup, setIsPopup } = useContext(UIContext);
+  const { setIsLoading, alertSignal, accountImported, publicAccount } = useContext(AccountContext);
   const {
     isValidTransaction,
     estimatedTxnResult,
@@ -118,9 +116,9 @@ const PermissionDialog = () => {
   };
 
   const handleApprove = async () => {
+    const data = await getApp(publicAccount, requestSender.origin);
     switch (method) {
       case "connect":
-        const data = await getApp(publicAccount, requestSender.origin);
         if (!data) {
           const set = await setApp(publicAccount, requestSender.origin);
           if (set) {
@@ -190,12 +188,7 @@ const PermissionDialog = () => {
           {accountImported && (
             <div>
               {(method === "connect" || method === "account") && (
-                <Dialog
-                  fullScreen
-                  sx={{ borderRadius: "0" }}
-                  align="center"
-                  open={openPermissionDialog}
-                >
+                <Dialog fullScreen sx={{ borderRadius: "0" }} align="center" open={openPermissionDialog}>
                   <DialogTitle> {requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
                     <Box
@@ -246,11 +239,7 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      sx={{ width: "121px", mr: 4 }}
-                      onClick={handleCancel}
-                    >
+                    <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
                       Reject
                     </Button>
                     <Button
@@ -283,9 +272,7 @@ const PermissionDialog = () => {
                       {requestSender.tab.title}
                     </Typography>
                     <div>
-                      <Typography variant="body1">
-                        This website is requesting to sign the following:
-                      </Typography>
+                      <Typography variant="body1">This website is requesting to sign the following:</Typography>
                       <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
                         <Grid item xs={12}>
                           <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
@@ -308,11 +295,7 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      sx={{ width: "121px", mr: 4 }}
-                      onClick={handleCancel}
-                    >
+                    <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
                       Reject
                     </Button>
                     <Button
@@ -396,19 +379,14 @@ const PermissionDialog = () => {
                       mb: 4,
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      sx={{ width: "121px", mr: 4 }}
-                      onClick={handleCancel}
-                    >
+                    <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
                       Reject
                     </Button>
                     {isValidTransaction ? (
                       <Button
                         variant="contained"
                         sx={{
-                          background:
-                            "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                          background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                           width: "121px",
                         }}
                         onClick={handleApprove}
@@ -454,8 +432,8 @@ const PermissionDialog = () => {
 
               <Typography align="center" sx={{ mt: 2 }} variant="subtitle2">
                 Wallet is not initialized. <br />
-                Valid address is required in order to interact with this website. Open Spika
-                extension and setup your account first.
+                Valid address is required in order to interact with this website. Open Spika extension and setup your
+                account first.
               </Typography>
 
               <Typography align="center" sx={{ mt: 2 }} variant="subtitle2">

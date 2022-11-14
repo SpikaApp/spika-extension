@@ -1,6 +1,5 @@
-import React from "react";
+import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { Container, Typography, Box, Button, Stack, Link } from "@mui/material";
 import spika_bg from "../assets/spika_bg.png";
 import { PLATFORM } from "../utils/constants";
 
@@ -28,22 +27,13 @@ const Onboarding = () => {
             Create Account
           </Button>
           <Link component={RouterLink} to="import">
-            <Typography
-              sx={{ fontWeight: 500, textDecorationLine: "underline" }}
-              variant="body"
-              color="link"
-            >
+            <Typography sx={{ fontWeight: 500, textDecorationLine: "underline" }} variant="body" color="link">
               Import Account
             </Typography>
           </Link>
         </Stack>
         {(PLATFORM === "http:" || PLATFORM === "https:") && (
-          <Typography
-            variant="caption"
-            align="center"
-            color="textPrimary"
-            sx={{ fontWeight: 400, mt: 2 }}
-          >
+          <Typography variant="caption" align="center" color="textPrimary" sx={{ fontWeight: 400, mt: 2 }}>
             For optimal experience it is advisable to install Spika as browser{" "}
             <Link
               href="https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb"
@@ -57,14 +47,9 @@ const Onboarding = () => {
           </Typography>
         )}
         {PLATFORM === "chrome-extension:" && (
-          <Typography
-            variant="caption"
-            align="center"
-            color="textPrimary"
-            sx={{ fontWeight: 400, mt: 2 }}
-          >
-            Spika is connected to Aptos Devnet. All account addresses and resources will be deleted
-            with scheduled weekly Devnet update.
+          <Typography variant="caption" align="center" color="textPrimary" sx={{ fontWeight: 400, mt: 2 }}>
+            Spika is connected to Aptos Devnet. All account addresses and resources will be deleted with scheduled
+            weekly Devnet update.
           </Typography>
         )}
       </Box>

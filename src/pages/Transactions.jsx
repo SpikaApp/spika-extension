@@ -1,25 +1,25 @@
-import React, { useContext, useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  List,
-  Box,
-  Tab,
-  IconButton,
-  Stack,
-  Tooltip,
-  Pagination,
-} from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Container,
+  IconButton,
+  List,
+  Pagination,
+  Stack,
+  Tab,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import AccountAssetsDialog from "../components/AccountAssetsDialog";
+import DepositEventCard from "../components/DepositEventCard";
 import Footer from "../components/Footer";
 import WithdrawEventCard from "../components/WithdrawEventCard";
-import DepositEventCard from "../components/DepositEventCard";
-import AccountAssetsDialog from "../components/AccountAssetsDialog";
-import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import debug from "../utils/debug";
 
@@ -180,9 +180,7 @@ const Transactions = () => {
     if (counter === 0) {
       return 1;
     } else if (counter > limitPerPage) {
-      return page === pages && page !== 1
-        ? limitPerPage - (page * limitPerPage - counter)
-        : limitPerPage;
+      return page === pages && page !== 1 ? limitPerPage - (page * limitPerPage - counter) : limitPerPage;
     } else {
       return counter;
     }
@@ -277,13 +275,7 @@ const Transactions = () => {
                       </Typography>
                     </List>
                   ) : (
-                    <Typography
-                      sx={{ mt: 4 }}
-                      align="center"
-                      variant="h6"
-                      color="textPrimary"
-                      gutterBottom
-                    >
+                    <Typography sx={{ mt: 4 }} align="center" variant="h6" color="textPrimary" gutterBottom>
                       No transactions found
                     </Typography>
                   )}
@@ -308,13 +300,7 @@ const Transactions = () => {
                       ))}
                     </List>
                   ) : (
-                    <Typography
-                      sx={{ mt: 4 }}
-                      align="center"
-                      variant="h6"
-                      color="textPrimary"
-                      gutterBottom
-                    >
+                    <Typography sx={{ mt: 4 }} align="center" variant="h6" color="textPrimary" gutterBottom>
                       No transactions found
                     </Typography>
                   )}

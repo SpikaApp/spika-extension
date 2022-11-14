@@ -1,25 +1,24 @@
-import React, { useContext } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Paper,
-  Grid,
   Box,
-  Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Paper,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
+import { useContext } from "react";
 import default_nft from "../assets/default_nft.jpg";
-import shortenAddress from "../utils/shorten_address";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import shortenAddress from "../utils/shortenAddress";
 
 const NftDetailsDialog = () => {
-  const { openNftDetailsDialog, setOpenNftDetailsDialog, selectedNft, setSelectedNft } =
-    useContext(UIContext);
+  const { openNftDetailsDialog, setOpenNftDetailsDialog, selectedNft, setSelectedNft } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
 
   const Item = styled(Paper)(({ theme }) => ({
@@ -64,10 +63,7 @@ const NftDetailsDialog = () => {
                     Editions
                   </Typography>
                   <Item>
-                    <Typography
-                      variant="body2"
-                      sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}
-                    >
+                    <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
                       {selectedNft.supply}
                     </Typography>
                   </Item>
@@ -85,10 +81,7 @@ const NftDetailsDialog = () => {
                     Collection
                   </Typography>
                   <Item>
-                    <Typography
-                      variant="body2"
-                      sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}
-                    >
+                    <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
                       {selectedNft.collection}
                     </Typography>
                   </Item>
@@ -98,10 +91,7 @@ const NftDetailsDialog = () => {
                     Description
                   </Typography>
                   <Item>
-                    <Typography
-                      variant="body2"
-                      sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}
-                    >
+                    <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
                       {selectedNft.description}
                     </Typography>
                   </Item>

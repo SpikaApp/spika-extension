@@ -1,7 +1,7 @@
-import { Container, Typography, Card, CardContent, CardActions } from "@mui/material";
 import DirectionsOffIcon from "@mui/icons-material/DirectionsOff";
-import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
+import { Card, CardActions, CardContent, Container, Typography } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {

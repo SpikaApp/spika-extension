@@ -1,11 +1,11 @@
+import { Button, Card, CardContent, Container, Stack } from "@mui/material";
 import { useContext } from "react";
-import { Container, Card, CardContent, Stack, Button } from "@mui/material";
-import Footer from "../components/Footer";
-import { AccountContext } from "../context/AccountContext";
-import { UIContext } from "../context/UIContext";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 
 const Settings = () => {
   const {

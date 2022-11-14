@@ -1,25 +1,23 @@
-import { useContext } from "react";
 import {
   Button,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Stack,
-  Typography,
   Paper,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
-import { Web3Context } from "../context/Web3Context";
 import { QRCodeCanvas } from "qrcode.react";
-import copyToClipboard from "../utils/copy_clipboard";
+import { useContext } from "react";
 import logo from "../assets/logo_bg.png";
-import spika from "../assets/spika_color.svg";
-import aptos from "../assets/aptos_light.png";
+import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
+import { Web3Context } from "../context/Web3Context";
+import copyToClipboard from "../utils/copyToClipboard";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const ReceiveDialog = () => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
@@ -60,22 +58,11 @@ const ReceiveDialog = () => {
               imageSettings={{ src: logo, excavate: true, height: 30, width: 30 }}
             />
           </Paper>
-          <TextField
-            sx={{ width: 275, mt: 2, mb: 2 }}
-            id="output-field"
-            multiline
-            maxRows={6}
-            value={currentAddress}
-          />
+          <TextField sx={{ width: 275, mt: 2, mb: 2 }} id="output-field" multiline maxRows={6} value={currentAddress} />
           <Button variant="outlined" onClick={handleClick}>
             Copy to clipboard
           </Button>
-          <Typography
-            noWrap
-            align="left"
-            variant="body1"
-            sx={{ ml: "75px", my: 3, width: "200px" }}
-          >
+          <Typography noWrap align="left" variant="body1" sx={{ ml: "75px", my: 3, width: "200px" }}>
             Network: {currentNetwork.name} <br />
             Chain id: {chainId}
           </Typography>

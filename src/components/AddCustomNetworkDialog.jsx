@@ -1,20 +1,11 @@
 import { useContext, useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { Button, Dialog, DialogContent, DialogActions, DialogTitle, Stack, TextField } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
-import { setNetwork } from "../lib/network";
+import { setNetwork } from "../lib/accountNetworks";
 
 const AddCustomNetworkDialog = () => {
-  const { openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog, setSomethingChanged } =
-    useContext(UIContext);
+  const { openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog, setSomethingChanged } = useContext(UIContext);
   const { currentAddress } = useContext(AccountContext);
   const [networkName, setNetworkName] = useState("");
   const [nodeUrl, setNodeUrl] = useState("");

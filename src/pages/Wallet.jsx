@@ -1,43 +1,26 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  Chip,
-  Tooltip,
-  Stack,
-  IconButton,
-} from "@mui/material";
-import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CircleIcon from "@mui/icons-material/Circle";
-import NetworkDialog from "../components/NetworkDialog";
-import MintDialog from "../components/MintDialog";
-import SendDialog from "../components/SendDialog";
+import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
+import { Box, Button, Card, CardContent, Chip, Container, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { AptosClient } from "aptos";
+import { useContext, useEffect, useState } from "react";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import AddAssetDialog from "../components/AddAssetDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
+import MintDialog from "../components/MintDialog";
+import NetworkDialog from "../components/NetworkDialog";
 import ReceiveDialog from "../components/ReceiveDialog";
-import { UIContext } from "../context/UIContext";
+import SendDialog from "../components/SendDialog";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import { AptosClient } from "aptos";
+import copyToClipboard from "../utils/copyToClipboard";
+import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
-import shortenAddress from "../utils/shorten_address";
-import copyToClipboard from "../utils/copy_clipboard";
 
 const Wallet = () => {
-  const {
-    darkMode,
-    handleSendUI,
-    handleReceiveUI,
-    handleAccountAssetsUI,
-    handleAddAssetUI,
-    handleChangeNetworkUI,
-  } = useContext(UIContext);
+  const { darkMode, handleSendUI, handleReceiveUI, handleAccountAssetsUI, handleAddAssetUI, handleChangeNetworkUI } =
+    useContext(UIContext);
   const { isLoading, currentAddress, accountImported, currentNetwork, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance, handleMint } = useContext(Web3Context);
@@ -156,11 +139,7 @@ const Wallet = () => {
                     </Stack>
                     <Stack>
                       <Stack direction="row" sx={{ mt: "8px", maxWidth: "300px" }}>
-                        <Tooltip
-                          title={`${stringToValue(currentAsset, balance)} ${
-                            currentAsset.data.symbol
-                          }`}
-                        >
+                        <Tooltip title={`${stringToValue(currentAsset, balance)} ${currentAsset.data.symbol}`}>
                           <Typography
                             noWrap
                             sx={{ fontSize: "24px", cursor: "default" }}
@@ -184,24 +163,17 @@ const Wallet = () => {
                 </div>
               )}
               {currentAsset.data.name === "Aptos Coin" &&
-                currentNetwork.name === "Devnet" &&
+                (currentNetwork.name === "Devnet" || currentNetwork.name === "Local") &&
                 !isLoading && (
                   <Tooltip title={"Faucet"}>
-                    <IconButton
-                      position="absolute"
-                      sx={{ mt: "-180px", ml: "270px" }}
-                      onClick={handleMint}
-                    >
+                    <IconButton position="absolute" sx={{ mt: "-180px", ml: "270px" }} onClick={handleMint}>
                       <LocalGasStationIcon />
                     </IconButton>
                   </Tooltip>
                 )}
             </CardContent>
           </Card>
-          <Stack
-            direction="row"
-            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 3 }}
-          >
+          <Stack direction="row" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 3 }}>
             <Button
               sx={{
                 background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",

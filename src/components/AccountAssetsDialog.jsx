@@ -1,21 +1,21 @@
-import { useContext, useEffect, useState } from "react";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
-  DialogTitle,
   DialogContent,
-  Stack,
-  Box,
+  DialogTitle,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Paper,
-  CircularProgress,
+  Stack,
 } from "@mui/material";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
@@ -43,10 +43,7 @@ const AccountAssetsDialog = (props) => {
     if (openAccountAssetsDialog) {
       updateAssets();
     }
-    if (
-      (openAccountAssetsDialog && props.type === "base") ||
-      (openAccountAssetsDialog && props.type === "quote")
-    ) {
+    if ((openAccountAssetsDialog && props.type === "base") || (openAccountAssetsDialog && props.type === "quote")) {
       setShowOnlySwapSupported(true);
     }
   }, [openAccountAssetsDialog]);
@@ -106,10 +103,7 @@ const AccountAssetsDialog = (props) => {
       <DialogTitle align="center">Select Asset</DialogTitle>
       <DialogContent sx={{ minHeight: "145px" }}>
         <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
-          <List
-            component="nav"
-            sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}
-          >
+          <List component="nav" sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}>
             {isLocalLoading ? (
               <CircularProgress sx={{ display: "flex", ml: "110px", color: "#9e9e9e" }} size={32} />
             ) : (

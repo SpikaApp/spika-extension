@@ -1,34 +1,29 @@
-import { useContext, useState, useEffect } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
   Stack,
   TextField,
-  Box,
   Typography,
-  CircularProgress,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
-import { Web3Context } from "../context/Web3Context";
 import { PayloadContext } from "../context/PayloadContext";
+import { UIContext } from "../context/UIContext";
+import { Web3Context } from "../context/Web3Context";
+import AlertDialog from "./AlertDialog";
+import Loading from "./Loading";
 
 const CreateNftDialog = () => {
   const { openCreateNftDialog, setOpenCreateNftDialog } = useContext(UIContext);
-  const { currentAddress } = useContext(AccountContext);
+  const { currentAddress, throwAlert } = useContext(AccountContext);
   const { nft } = useContext(PayloadContext);
-  const {
-    estimateTransaction,
-    isValidTransaction,
-    estimatedTxnResult,
-    clearPrevEstimation,
-    createToken,
-  } = useContext(Web3Context);
+  const { estimateTransaction, isValidTransaction, estimatedTxnResult, clearPrevEstimation, createToken } =
+    useContext(Web3Context);
   const [isLoading, setIsLoading] = useState(false);
   const [estimationRequired, setEstimationRequired] = useState(false);
   const [collectionName, setCollectionName] = useState("");
@@ -48,15 +43,7 @@ const CreateNftDialog = () => {
   };
 
   const nftPayload = async () => {
-    const payload = await nft(
-      currentAddress,
-      collectionName,
-      nftName,
-      nftDescription,
-      1,
-      nftUri,
-      1
-    );
+    const payload = await nft(currentAddress, collectionName, nftName, nftDescription, 1, nftUri, 1);
     return payload;
   };
 
@@ -219,18 +206,17 @@ const CreateNftDialog = () => {
                 Estimate
               </LoadingButton>
             )}{" "}
-          {!isValidTransaction &&
-            (collectionName === "" || nftName === "" || nftDescription === "" || nftUri === "") && (
-              <Button
-                sx={{
-                  width: "121px",
-                }}
-                variant="contained"
-                disabled
-              >
-                Estimate
-              </Button>
-            )}
+          {!isValidTransaction && (collectionName === "" || nftName === "" || nftDescription === "" || nftUri === "") && (
+            <Button
+              sx={{
+                width: "121px",
+              }}
+              variant="contained"
+              disabled
+            >
+              Estimate
+            </Button>
+          )}
           {isValidTransaction && (
             <LoadingButton
               sx={{

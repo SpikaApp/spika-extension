@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext } from "react";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 
 const Loading = () => {

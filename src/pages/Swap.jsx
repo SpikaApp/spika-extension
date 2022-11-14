@@ -5,36 +5,36 @@
  * - (Optional) Provide an option to review and change routes
  */
 
-import { useContext, useState, useEffect } from "react";
+import { TradeAggregator } from "@manahippo/hippo-sdk";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
+import { LoadingButton } from "@mui/lab";
 import {
-  Container,
+  Box,
   Card,
   CardContent,
-  Stack,
-  IconButton,
-  Box,
-  Input,
-  DialogContent,
-  Typography,
   CircularProgress,
+  Container,
+  DialogContent,
+  IconButton,
+  Input,
+  Stack,
+  Typography,
 } from "@mui/material";
-import { NoticeBox } from "../components/lib";
-import { LoadingButton } from "@mui/lab";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
+import { AptosClient } from "aptos";
+import { useContext, useEffect, useState } from "react";
+import { NumericFormat } from "react-number-format";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
 import Footer from "../components/Footer";
-import { UIContext } from "../context/UIContext";
+import { NoticeBox } from "../components/lib";
 import { AccountContext } from "../context/AccountContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import { AptosClient } from "aptos";
-import { NumericFormat } from "react-number-format";
-import { TradeAggregator } from "@manahippo/hippo-sdk";
+import { networkList } from "../lib/accountNetworks";
 import { hippoClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
-import { stringToValue, valueToString } from "../utils/values";
 import debug from "../utils/debug";
-import { networkList } from "../lib/network";
+import { stringToValue, valueToString } from "../utils/values";
 
 const Swap = () => {
   const { handleAccountAssetsUI, setOpenConfirmSendDialog, darkMode } = useContext(UIContext);
@@ -50,13 +50,8 @@ const Swap = () => {
     swapSupportedAssets,
     currentNetwork,
   } = useContext(AccountContext);
-  const {
-    getBalance,
-    estimateTransaction,
-    isValidTransaction,
-    estimatedTxnResult,
-    clearPrevEstimation,
-  } = useContext(Web3Context);
+  const { getBalance, estimateTransaction, isValidTransaction, estimatedTxnResult, clearPrevEstimation } =
+    useContext(Web3Context);
   const [type, setType] = useState("");
   const [baseCoinBalance, setBaseCoinBalance] = useState(0);
   const [quoteCoinBalance, setQuoteCoinBalance] = useState(0);
@@ -176,19 +171,11 @@ const Swap = () => {
           setInsufficientBalance(true);
           setQuoteAmount("");
           debug.log(
-            `insufficient balance, balance: ${baseCoinBalance}, swapAmount: ${valueToString(
-              baseCoin,
-              swapAmount
-            )}`
+            `insufficient balance, balance: ${baseCoinBalance}, swapAmount: ${valueToString(baseCoin, swapAmount)}`
           );
         } else {
           setInsufficientBalance(false);
-          debug.log(
-            `balance ok, balance: ${baseCoinBalance}, swapAmount: ${valueToString(
-              baseCoin,
-              swapAmount
-            )}`
-          );
+          debug.log(`balance ok, balance: ${baseCoinBalance}, swapAmount: ${valueToString(baseCoin, swapAmount)}`);
         }
       }
     } else {
@@ -332,11 +319,7 @@ const Swap = () => {
                           src={darkMode ? baseCoin.data.logo_alt : baseCoin.data.logo}
                         />
                       </IconButton>
-                      <Typography
-                        variant="h6"
-                        color="textPrimary"
-                        sx={{ ml: "4px", mr: "6px", mt: "4px" }}
-                      >
+                      <Typography variant="h6" color="textPrimary" sx={{ ml: "4px", mr: "6px", mt: "4px" }}>
                         {baseCoin.data.symbol}
                       </Typography>
                     </Stack>
@@ -377,12 +360,7 @@ const Swap = () => {
                         placeholder="0.00"
                       />
                     </Stack>
-                    <Typography
-                      color="textSecondary"
-                      sx={{ mt: "4px", mr: "12px" }}
-                      align="right"
-                      variant="subtitle2"
-                    >
+                    <Typography color="textSecondary" sx={{ mt: "4px", mr: "12px" }} align="right" variant="subtitle2">
                       {stringToValue(baseCoin, baseCoinBalance)}
                     </Typography>
                   </Stack>
@@ -448,11 +426,7 @@ const Swap = () => {
                           src={darkMode ? quoteCoin.data.logo_alt : quoteCoin.data.logo}
                         />
                       </IconButton>
-                      <Typography
-                        variant="h6"
-                        color="textPrimary"
-                        sx={{ ml: "4px", mr: "6px", mt: "4px" }}
-                      >
+                      <Typography variant="h6" color="textPrimary" sx={{ ml: "4px", mr: "6px", mt: "4px" }}>
                         {quoteCoin.data.symbol}
                       </Typography>
                     </Stack>
@@ -487,12 +461,7 @@ const Swap = () => {
                         type="number"
                       />
                     </Stack>
-                    <Typography
-                      color="textSecondary"
-                      sx={{ mt: "4px", mr: "12px" }}
-                      align="right"
-                      variant="subtitle2"
-                    >
+                    <Typography color="textSecondary" sx={{ mt: "4px", mr: "12px" }} align="right" variant="subtitle2">
                       {stringToValue(quoteCoin, quoteCoinBalance)}
                     </Typography>
                   </Stack>
@@ -522,36 +491,17 @@ const Swap = () => {
               }}
             >
               {insufficientBalance && "Insufficient balance"}
-              {swapAmount === "" &&
-                !insufficientBalance &&
-                !badPair &&
-                swapEnabled &&
-                "Enter an amount"}
+              {swapAmount === "" && !insufficientBalance && !badPair && swapEnabled && "Enter an amount"}
               {swapEnabled && !insufficientBalance && badPair && "Cannot swap same coins"}
               {swapEnabled && !insufficientBalance && swapAmount !== "" && !badPair && "Swap"}
               {!swapEnabled && !currentNetwork.name !== "Testnet" && "Swap disabled"}
             </LoadingButton>
-            {dataFetched &&
-              !swapEnabled &&
-              currentNetwork.name === "Testnet" &&
-              !underMaintenance && (
-                <NoticeBox
-                  mt={3}
-                  width="250px"
-                  text="Account shall hold at least two eligible for swap assets."
-                />
-              )}
-            {dataFetched &&
-              !swapEnabled &&
-              !isFetching &&
-              currentNetwork.name !== "Testnet" &&
-              !underMaintenance && (
-                <NoticeBox
-                  mt={3}
-                  width="250px"
-                  text={`Swap is not supported on ${currentNetwork.name} network.`}
-                />
-              )}
+            {dataFetched && !swapEnabled && currentNetwork.name === "Testnet" && !underMaintenance && (
+              <NoticeBox mt={3} width="250px" text="Account shall hold at least two eligible for swap assets." />
+            )}
+            {dataFetched && !swapEnabled && !isFetching && currentNetwork.name !== "Testnet" && !underMaintenance && (
+              <NoticeBox mt={3} width="250px" text={`Swap is not supported on ${currentNetwork.name} network.`} />
+            )}
             {dataFetched &&
               swapEnabled &&
               !isFetching &&

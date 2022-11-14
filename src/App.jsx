@@ -1,30 +1,18 @@
-import React, { useContext } from "react";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AlertDialog from "./components/AlertDialog";
+import Loading from "./components/Loading";
+import LoginDialog from "./components/LoginDialog";
 import Navbar from "./components/Navbar";
-import {
-  Onboarding,
-  Wallet,
-  Create,
-  Import,
-  Swap,
-  NFTs,
-  Transactions,
-  Settings,
-  About,
-} from "./pages";
-import { ThemeProvider } from "@mui/material";
-import { UIContext } from "./context/UIContext";
+import PermissionDialog from "./components/PermissionDialog";
 import { AccountProvider } from "./context/AccountContext";
 import { PayloadProvider } from "./context/PayloadContext";
+import { UIContext } from "./context/UIContext";
 import { Web3Provider } from "./context/Web3Context";
-import { CssBaseline } from "@mui/material";
-import { Box } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
-import AlertDialog from "./components/AlertDialog";
-import LoginDialog from "./components/LoginDialog";
-import Loading from "./components/Loading";
-import PermissionDialog from "./components/PermissionDialog";
 import "./index.css";
+import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Transactions, Wallet } from "./pages";
+import { darkTheme, lightTheme } from "./theme";
 
 const App = () => {
   const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes } = useContext(UIContext);
@@ -56,12 +44,8 @@ const App = () => {
                             ) : (
                               <Route path="*" exact element={<Onboarding />} />
                             )}
-                            {accountRoutesEnabled === true && (
-                              <Route path="create" element={<Create />} />
-                            )}
-                            {accountRoutesEnabled === true && (
-                              <Route path="import" element={<Import />} />
-                            )}
+                            {accountRoutesEnabled === true && <Route path="create" element={<Create />} />}
+                            {accountRoutesEnabled === true && <Route path="import" element={<Import />} />}
                             <Route path="swap" element={<Swap />} />
                             <Route path="nfts" element={<NFTs />} />
                             <Route path="transactions" element={<Transactions />} />

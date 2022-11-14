@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { NumericFormat } from "react-number-format";
-import { Input } from "@mui/icons-material";
 import { UIContext } from "../../context/UIContext";
 
 /**

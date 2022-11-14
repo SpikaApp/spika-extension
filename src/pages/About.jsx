@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import { Container, Typography, Link, Card, Box, CardContent, Stack } from "@mui/material";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import { Box, Card, CardContent, Container, Link, Stack, Typography } from "@mui/material";
+import { useContext } from "react";
 import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
-import { Web3Context } from "../context/Web3Context";
-import { EXTENSION_VERSION, APTOS_SDK_VERSION } from "../utils/constants";
+import { APTOS_SDK_VERSION, EXTENSION_VERSION } from "../utils/constants";
 
 const About = () => {
   const { darkMode } = useContext(UIContext);
@@ -52,24 +51,10 @@ const About = () => {
                 mb: 2,
               }}
             >
-              <Link
-                href="https://spika.app"
-                color={darkMode ? "white" : "black"}
-                underline="none"
-                target="_blank"
-              >
-                <Box
-                  sx={{ height: "48px", width: "48px", mr: 2 }}
-                  component="img"
-                  src={spika_logo}
-                />
+              <Link href="https://spika.app" color={darkMode ? "white" : "black"} underline="none" target="_blank">
+                <Box sx={{ height: "48px", width: "48px", mr: 2 }} component="img" src={spika_logo} />
               </Link>
-              <Link
-                href="https://www.twitter.com/SpikaApp"
-                color="#1DA1F2"
-                underline="none"
-                target="_blank"
-              >
+              <Link href="https://www.twitter.com/SpikaApp" color="#1DA1F2" underline="none" target="_blank">
                 <TwitterIcon sx={{ fontSize: 42 }} />
               </Link>
             </Stack>

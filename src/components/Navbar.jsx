@@ -1,31 +1,19 @@
-import { useState, useContext } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import {
-  AppBar,
-  Box,
-  Toolbar,
-  Menu,
-  MenuItem,
-  Divider,
-  Stack,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import logo from "../assets/spika_logo_128.png";
-import spika from "../assets/spika.svg";
-import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
-import LockIcon from "@mui/icons-material/Lock";
-import LogoutIcon from "@mui/icons-material/Logout";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { styled, alpha } from "@mui/material/styles";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LogoutIcon from "@mui/icons-material/Logout";
+import MenuIcon from "@mui/icons-material/Menu";
+import { AppBar, Box, Divider, IconButton, Menu, MenuItem, Stack, Toolbar, Tooltip, Typography } from "@mui/material";
 import Link from "@mui/material/Link";
+import { alpha, styled } from "@mui/material/styles";
+import { useContext, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import spika from "../assets/spika.svg";
+import LogoutDialog from "../components/LogoutDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import LogoutDialog from "../components/LogoutDialog";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 
@@ -72,8 +60,6 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const navigate = useNavigate();
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -112,11 +98,7 @@ const Navbar = () => {
                   <CloseIcon sx={{ color: "white", fontSize: "32px" }} />
                 )}
               </IconButton>
-              <Box
-                component="img"
-                src={spika}
-                sx={{ width: "69px", height: "26px", mt: 1.25, ml: "2px" }}
-              />
+              <Box component="img" src={spika} sx={{ width: "69px", height: "26px", mt: 1.25, ml: "2px" }} />
             </Stack>
             <StyledMenu
               id="main-menu"
