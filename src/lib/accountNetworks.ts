@@ -1,39 +1,37 @@
+import { INetwork, INetworkStore } from "../interface";
 import { PLATFORM } from "../utils/constants";
-import { setStore, getStore } from "./store";
+import { getStore, setStore } from "./store";
 
 const _networks = "accountNetworks";
 
-export const addNetworkStore = async (currentAddress) => {
-  const networks = await getStore(PLATFORM, _networks);
+export const addNetworkStore = async (currentAddress: string): Promise<void> => {
+  const networks: Array<INetworkStore> = await getStore(PLATFORM, _networks);
   if (!networks) {
-    setStore(PLATFORM, _networks, [
+    const data: Array<INetworkStore> = [
       {
         address: currentAddress,
         networks: networkList,
       },
-    ]);
+    ];
+    setStore(PLATFORM, _networks, data);
   } else {
-    let data = networks.find((i) => i.address === currentAddress);
+    const data: INetworkStore | undefined = networks.find((i: INetworkStore) => i.address === currentAddress);
     if (!data) {
       networks.push({
         address: currentAddress,
-        urls: [
-          {
-            address: currentAddress,
-            networks: networkList,
-          },
-        ],
+        networks: networkList,
       });
       setStore(PLATFORM, _networks, networks);
     }
   }
 };
 
-export const getNetworks = async (currentAddress) => {
+export const getNetworks = async (currentAddress: string): Promise<INetworkStore | undefined> => {
   try {
-    const data = await getStore(PLATFORM, _networks);
+    const data: Array<INetworkStore> = await getStore(PLATFORM, _networks);
     if (data !== undefined || data !== null) {
-      let result = data.find((i) => i.address === currentAddress);
+      const result: INetworkStore | undefined = data.find((i) => i.address === currentAddress);
+      // TODO: if statement to check for undefined
       return result;
     }
   } catch (error) {
@@ -41,16 +39,16 @@ export const getNetworks = async (currentAddress) => {
   }
 };
 
-export const setNetwork = async (currentAddress, network) => {
+export const setNetwork = async (currentAddress: string, network: INetwork): Promise<boolean | undefined> => {
   if (currentAddress && network) {
     try {
-      const data = await getStore(PLATFORM, _networks);
+      const data: Array<INetworkStore> = await getStore(PLATFORM, _networks);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        const result: INetworkStore | undefined = data.find((i: INetworkStore) => i.address === currentAddress);
         if (result === undefined) {
           return false;
         } else {
-          let _network = result.networks.find((i) => i.name === network.name);
+          const _network: INetwork | undefined = result.networks.find((i: INetwork) => i.name === network.name);
           if (_network === undefined) {
             result.networks.push(network);
             setStore(PLATFORM, _networks, data);
@@ -68,16 +66,16 @@ export const setNetwork = async (currentAddress, network) => {
   }
 };
 
-export const getNetwork = async (currentAddress, network) => {
+export const getNetwork = async (currentAddress: string, network: INetwork) => {
   if (currentAddress && network) {
     try {
-      const data = await getStore(PLATFORM, _networks);
+      const data: Array<INetworkStore> = await getStore(PLATFORM, _networks);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        const result: INetworkStore | undefined = data.find((i: INetworkStore) => i.address === currentAddress);
         if (result === undefined) {
           return false;
         } else {
-          let _network = result.networks.find((i) => i.name === network.name);
+          const _network: INetwork | undefined = result.networks.find((i: INetwork) => i.name === network.name);
           if (_network === undefined) {
             return false;
           } else {
@@ -93,20 +91,20 @@ export const getNetwork = async (currentAddress, network) => {
   }
 };
 
-export const removeNetwork = async (currentAddress, network) => {
+export const removeNetwork = async (currentAddress: string, network: INetwork): Promise<boolean | undefined> => {
   if (currentAddress && network) {
     try {
-      const data = await getStore(PLATFORM, _networks);
+      const data: Array<INetworkStore> = await getStore(PLATFORM, _networks);
       if (data !== undefined || data !== null) {
-        let result = data.find((i) => i.address === currentAddress);
+        const result: INetworkStore | undefined = data.find((i: INetworkStore) => i.address === currentAddress);
         if (result === undefined) {
           return false;
         } else {
-          let _network = result.networks.find((i) => i.name === network.name);
+          const _network: INetwork | undefined = result.networks.find((i) => i.name === network.name);
           if (_network === undefined) {
             return false;
           } else {
-            let index = result.networks.indexOf(network);
+            const index: number = result.networks.indexOf(network);
             result.networks.splice(index, 1);
             setStore(PLATFORM, _networks, data);
             return true;
@@ -121,7 +119,7 @@ export const removeNetwork = async (currentAddress, network) => {
   }
 };
 
-export const networkList = [
+export const networkList: Array<INetwork> = [
   {
     name: "Mainnet",
     data: {

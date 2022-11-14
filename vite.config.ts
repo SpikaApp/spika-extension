@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import nodePolyfills from "rollup-plugin-node-polyfills";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   resolve: {
@@ -13,11 +13,11 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: "es2020",
+      target: "esnext",
     },
   },
   build: {
-    // minify: false,
+    minify: true,
     // sourcemap: true,
     // commonjsOptions: {
     //   include: /node_modules/,
@@ -31,8 +31,7 @@ export default defineConfig({
       },
       plugins: [nodePolyfills()],
     },
-    module: "commonjs",
-    target: "es2020",
+    target: "modules",
     chunkSizeWarningLimit: 2048,
   },
   server: {
@@ -41,5 +40,5 @@ export default defineConfig({
   preview: {
     port: 8080,
   },
-  plugins: [react({ fastRefresh: true })],
+  plugins: [react({ fastRefresh: false })],
 });

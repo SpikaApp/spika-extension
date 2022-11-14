@@ -7,7 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "postinstall": "patch-package",
-    "build:release": "npm run build && npm run postinstall"
+    "build:patch": "npm run build && npm run postinstall"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -31,9 +31,19 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.200",
+    "@types/node": "^18.11.9",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.5",
+    "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-react": "^2.1.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "patch-package": "^6.4.7",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "vite": "^3.1.4"

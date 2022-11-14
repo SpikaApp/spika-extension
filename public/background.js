@@ -5,7 +5,6 @@ const _delayBeforeLock = "delayBeforeLock";
 const _currentRoute = "currentRoute";
 const _request = "currentRequest";
 const _sender = "currentSender";
-const _currentAddress = "currentAddress";
 const _currentPubAccount = "currentPubAccount";
 const _connectedApps = "connectedApps";
 const _lastConnectedApp = "lastConnectedApp";

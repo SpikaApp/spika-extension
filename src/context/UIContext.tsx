@@ -1,44 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, FC, useEffect, useState } from "react";
+import { INftDetails } from "../interface";
 import { getMem, getStore } from "../lib/store";
+import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
-import applyUpdate from "../utils/apply_update";
-// import { createAccountTest } from "../tests/account.test";
 
-export const UIContext = React.createContext();
+type Props = {
+  children: React.ReactNode;
+};
 
-export const UIProvider = ({ children }) => {
-  const [spikaWallet, setSpikaWallet] = useState();
-  const [darkMode, setDarkMode] = useState();
-  const [openAlertDialog, setOpenAlertDialog] = useState(false);
-  const [openMintDialog, setOpenMintDialog] = useState(false);
-  const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState(false);
-  const [openSendDialog, setOpenSendDialog] = useState(false);
-  const [openReceiveDialog, setOpenReceiveDialog] = useState(false);
-  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const [openLoginDialog, setOpenLoginDialog] = useState(false);
-  const [openAccountAssetsDialog, setOpenAccountAssetsDialog] = useState(false);
-  const [openAddAssetDialog, setOpenAddAssetDialog] = useState(false);
-  const [openNetworkDialog, setOpenNetworkDialog] = useState(false);
-  const [openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog] = useState(false);
-  const [openAccountDetailsDialog, setOpenAccountDetailsDialog] = useState(false);
-  const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
-  const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState(false);
-  const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
-  const [txnType, setTxnType] = useState(0); // 0: undefined, 1: inbound, 2: outbound
-  const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState(false);
-  const [openNftDetailsDialog, setOpenNftDetailsDialog] = useState(false);
-  const [selectedNft, setSelectedNft] = useState([]);
-  const [mnemonicRequired, setMnemonicRequired] = useState(false);
-  const [privateKeyRequired, setPrivateKeyRequired] = useState(false);
-  const [accountRoutesEnabled, setAccountRoutesEnabled] = useState(true);
-  const [openPermissionDialog, setOpenPermissionDialog] = useState(false);
-  const [disableAllRoutes, setDisableAllRoutes] = useState(false);
-  const [currentRoute, setCurrentRoute] = useState();
-  const [somethingChanged, setSomethingChanged] = useState(false);
-  const [isPopup, setIsPopup] = useState(false);
-  const [devMode] = useState(PLATFORM === "http:" ? true : false);
-  const [isTest, setIsTest] = useState(false);
-  const [isError, setIsError] = useState();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const UIContext = createContext<any>(undefined);
+
+export const UIProvider: FC<Props> = ({ children }) => {
+  const [spikaWallet, setSpikaWallet] = useState<boolean | undefined>();
+  const [darkMode, setDarkMode] = useState<boolean | undefined>();
+  const [openAlertDialog, setOpenAlertDialog] = useState<boolean>(false);
+  const [openMintDialog, setOpenMintDialog] = useState<boolean>(false);
+  const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState<boolean>(false);
+  const [openSendDialog, setOpenSendDialog] = useState<boolean>(false);
+  const [openReceiveDialog, setOpenReceiveDialog] = useState<boolean>(false);
+  const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
+  const [openLoginDialog, setOpenLoginDialog] = useState<boolean>(false);
+  const [openAccountAssetsDialog, setOpenAccountAssetsDialog] = useState<boolean>(false);
+  const [openAddAssetDialog, setOpenAddAssetDialog] = useState<boolean>(false);
+  const [openNetworkDialog, setOpenNetworkDialog] = useState<boolean>(false);
+  const [openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog] = useState<boolean>(false);
+  const [openAccountDetailsDialog, setOpenAccountDetailsDialog] = useState<boolean>(false);
+  const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState<boolean>(false);
+  const [openCreateCollectionDialog, setOpenCreateCollectionDialog] = useState<boolean>(false);
+  const [openCreateNftDialog, setOpenCreateNftDialog] = useState<boolean>(false);
+  const [txnType, setTxnType] = useState<0 | 1 | 2>(0); // 0: undefined, 1: inbound, 2: outbound
+  const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState<boolean>(false);
+  const [openNftDetailsDialog, setOpenNftDetailsDialog] = useState<boolean>(false);
+  const [selectedNft, setSelectedNft] = useState<INftDetails | undefined>();
+  const [mnemonicRequired, setMnemonicRequired] = useState<boolean>(false);
+  const [privateKeyRequired, setPrivateKeyRequired] = useState<boolean>(false);
+  const [accountRoutesEnabled, setAccountRoutesEnabled] = useState<boolean>(true);
+  const [openPermissionDialog, setOpenPermissionDialog] = useState<boolean>(false);
+  const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
+  const [currentRoute, setCurrentRoute] = useState<string | undefined>();
+  const [somethingChanged, setSomethingChanged] = useState<boolean>(false);
+  const [isPopup, setIsPopup] = useState<boolean>(false);
+  const [devMode] = useState<boolean>(PLATFORM === "http:" ? true : false);
+  const [isTest, setIsTest] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean | undefined>();
   const _currentRoute = "currentRoute";
 
   useEffect(() => {
@@ -52,13 +57,7 @@ export const UIProvider = ({ children }) => {
     dialogProvider();
   }, [currentRoute]);
 
-  // useEffect(() => {
-  //   if (spikaWallet) {
-  //     createAccountTest();
-  //   }
-  // }, [spikaWallet]);
-
-  const getWallet = async () => {
+  const getWallet = async (): Promise<void> => {
     const wallet = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
     if (wallet === undefined || wallet === null || wallet === false) {
       setSpikaWallet(false);
@@ -67,8 +66,8 @@ export const UIProvider = ({ children }) => {
     }
   };
 
-  const getCurrentRoute = async () => {
-    const route = await getMem(PLATFORM, _currentRoute);
+  const getCurrentRoute = async (): Promise<void> => {
+    const route: string = await getMem(PLATFORM, _currentRoute);
     if (route === undefined || route === null) {
       setCurrentRoute("/");
     } else {
@@ -76,7 +75,7 @@ export const UIProvider = ({ children }) => {
     }
   };
 
-  const dialogProvider = async () => {
+  const dialogProvider = async (): Promise<void> => {
     switch (currentRoute) {
       case "/":
         setDisableAllRoutes(false);
@@ -87,8 +86,8 @@ export const UIProvider = ({ children }) => {
     }
   };
 
-  const getSessionTheme = async () => {
-    const data = await getStore(PLATFORM, "DARK_MODE");
+  const getSessionTheme = async (): Promise<void> => {
+    const data: boolean = await getStore(PLATFORM, "DARK_MODE");
     if (data === undefined || data === null) {
       setDarkMode(false);
     } else {
@@ -96,64 +95,64 @@ export const UIProvider = ({ children }) => {
     }
   };
 
-  const handleMintUI = () => {
+  const handleMintUI = (): void => {
     setOpenMintDialog(true);
   };
 
-  const handleSendUI = () => {
+  const handleSendUI = (): void => {
     setOpenSendDialog(true);
   };
 
-  const handleReceiveUI = () => {
+  const handleReceiveUI = (): void => {
     setOpenReceiveDialog(true);
   };
 
-  const handleCreateCollectionUI = () => {
+  const handleCreateCollectionUI = (): void => {
     setOpenCreateCollectionDialog(true);
   };
 
-  const handleCreateNFTUI = () => {
+  const handleCreateNFTUI = (): void => {
     setOpenCreateNftDialog(true);
   };
 
-  const handleLoginUI = () => {
+  const handleLoginUI = (): void => {
     setOpenLoginDialog(true);
   };
-  const handleLogoutUI = () => {
+  const handleLogoutUI = (): void => {
     setOpenLogoutDialog(true);
   };
 
-  const handleMnemonicUI = () => {
+  const handleMnemonicUI = (): void => {
     setMnemonicRequired(true);
     setOpenLoginDialog(true);
   };
 
-  const handlePrivateKeyUI = () => {
+  const handlePrivateKeyUI = (): void => {
     setPrivateKeyRequired(true);
     setOpenLoginDialog(true);
   };
 
-  const handleChangePasswordUI = () => {
+  const handleChangePasswordUI = (): void => {
     setOpenChangePasswordDialog(true);
   };
 
-  const handleAccountAssetsUI = () => {
+  const handleAccountAssetsUI = (): void => {
     setOpenAccountAssetsDialog(true);
   };
 
-  const handleAddAssetUI = () => {
+  const handleAddAssetUI = (): void => {
     setOpenAddAssetDialog(true);
   };
 
-  const handleChangeNetworkUI = () => {
+  const handleChangeNetworkUI = (): void => {
     setOpenNetworkDialog(true);
   };
 
-  const handleAddCustomNetworkUI = () => {
+  const handleAddCustomNetworkUI = (): void => {
     setOpenAddCustomNetworkDialog(true);
   };
 
-  const handleNftDetailsUI = (nft) => {
+  const handleNftDetailsUI = (nft: INftDetails): void => {
     setSelectedNft(nft);
     setOpenNftDetailsDialog(true);
   };

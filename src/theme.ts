@@ -1,8 +1,8 @@
-import { createTheme } from "@mui/material";
+import { createTheme, Theme } from "@mui/material";
 
-export const lightTheme = createTheme({
+export const lightTheme: Theme = createTheme({
   shape: {
-    borderRadius: "8px",
+    borderRadius: 8,
   },
   components: {
     MuiCard: {
@@ -49,7 +49,6 @@ export const lightTheme = createTheme({
             },
           },
           borderRadius: "8px",
-          // backgroundColor: "#FFFFFF",
         },
       },
     },
@@ -64,7 +63,13 @@ export const lightTheme = createTheme({
             color: "#636363",
           },
           borderRadius: "8px",
-          // backgroundColor: "#FFFFFF",
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: "#1F2CFF",
         },
       },
     },
@@ -86,14 +91,12 @@ export const lightTheme = createTheme({
       primary: "#232323",
       secondary: "#636363",
     },
-    link: "#1F2CFF",
   },
 });
 
-// DARK MODE
-export const darkTheme = createTheme({
+export const darkTheme: Theme = createTheme({
   shape: {
-    borderRadius: "8px",
+    borderRadius: 8,
   },
   components: {
     MuiCard: {
@@ -142,7 +145,6 @@ export const darkTheme = createTheme({
             },
           },
           borderRadius: "8px",
-          // backgroundColor: "#232323",
         },
       },
     },
@@ -157,6 +159,13 @@ export const darkTheme = createTheme({
             color: "#9e9e9e",
           },
           borderRadius: "8px",
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: "#bcbcbc",
         },
       },
     },
@@ -178,6 +187,5 @@ export const darkTheme = createTheme({
       primary: "#FFFFFF",
       secondary: "#9e9e9e",
     },
-    link: "#bcbcbc",
   },
 });

@@ -2,7 +2,8 @@ import { PLATFORM } from "./constants";
 
 const debug = (() => {
   if (PLATFORM === "http:") {
-    let timestamp = () => {};
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const timestamp = () => {};
     timestamp.toString = () => {
       return `${new Date().toLocaleTimeString("en-GB")}`;
     };
@@ -12,6 +13,7 @@ const debug = (() => {
     };
   } else {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       log: () => {},
     };
   }

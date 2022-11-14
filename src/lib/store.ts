@@ -1,7 +1,8 @@
-export const setMem = (platform, key, value) => {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const setMem = (platform: string, key: string, value: any): void => {
   if (platform === "http:" || platform === "https:") {
     if (key === "PWD") {
-      let _value = JSON.stringify(value);
+      const _value: string = JSON.stringify(value);
       sessionStorage.setItem(key, _value);
     } else {
       sessionStorage.setItem(key, value);
@@ -12,15 +13,15 @@ export const setMem = (platform, key, value) => {
   }
 };
 
-export const getMem = (platform, key) => {
-  if ((platform === "http:") | (platform === "https:")) {
-    const value = sessionStorage.getItem(key);
+export const getMem = (platform: string, key: string) => {
+  if (platform === "http:" || platform === "https:") {
+    const value: string | null = sessionStorage.getItem(key);
     if (
       value === "true" ||
       value === "false" ||
       value === "undefined" ||
       value === "null" ||
-      key === "PWD"
+      (value && key === "PWD")
     ) {
       return JSON.parse(value);
     } else {
@@ -36,7 +37,7 @@ export const getMem = (platform, key) => {
   }
 };
 
-export const removeMem = (platform, key) => {
+export const removeMem = (platform: string, key: string): void => {
   if (platform === "http:" || platform === "https:") {
     sessionStorage.removeItem(key);
   }
@@ -45,7 +46,8 @@ export const removeMem = (platform, key) => {
   }
 };
 
-export const setStore = (platform, key, value) => {
+// eslint-disable-next-line
+export const setStore = (platform: string, key: string, value: any): void => {
   if (platform === "http:" || platform === "https:") {
     if (
       key === "currentAsset" ||
@@ -55,7 +57,7 @@ export const setStore = (platform, key, value) => {
       key === "currentNetwork" ||
       key === "currentPubAccount"
     ) {
-      let _value = JSON.stringify(value);
+      const _value = JSON.stringify(value);
       localStorage.setItem(key, _value);
     } else {
       localStorage.setItem(key, value);
@@ -66,9 +68,9 @@ export const setStore = (platform, key, value) => {
   }
 };
 
-export const getStore = (platform, key) => {
-  if ((platform === "http:") | (platform === "https:")) {
-    const value = localStorage.getItem(key);
+export const getStore = (platform: string, key: string): any => {
+  if (platform === "http:" || platform === "https:") {
+    const value: any = localStorage.getItem(key);
     if (
       value === "true" ||
       value === "false" ||
@@ -95,7 +97,7 @@ export const getStore = (platform, key) => {
   }
 };
 
-export const removeStore = (platform, key) => {
+export const removeStore = (platform: string, key: string): void => {
   if (platform === "http:" || platform === "https:") {
     localStorage.removeItem(key);
   }
@@ -104,7 +106,7 @@ export const removeStore = (platform, key) => {
   }
 };
 
-export const clearStore = (platform) => {
+export const clearStore = (platform: string): void => {
   if (platform === "http:" || platform === "https:") {
     localStorage.clear();
   }

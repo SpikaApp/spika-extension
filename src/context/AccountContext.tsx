@@ -1,23 +1,28 @@
-import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import * as aptos from "aptos";
+import passworder from "@metamask/browser-passworder";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
-import * as passworder from "@metamask/browser-passworder";
-import { UIContext } from "./UIContext";
+import * as aptos from "aptos";
+import React, { createContext, FC, useContext, useEffect, useState } from "react";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import { ICoin, IEncryptedPwd, INetwork, IPublicAccount } from "../interface";
+import * as network from "../lib/accountNetworks";
+import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
-import { setMem, getMem, removeMem, setStore, getStore, clearStore } from "../lib/store";
-import * as assetStore from "../lib/asset_store";
-import * as apps from "../lib/apps";
-import * as network from "../lib/network";
-import { APTOS_DERIVE_PATH, PLATFORM, EXTENSION_VERSION } from "../utils/constants";
-import { encryptPassword, decryptPassword } from "../utils/pwd";
-import debug from "../utils/debug";
+import * as apps from "../lib/connectedApps";
+import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../lib/store";
+import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constants";
+import { decryptPassword, encryptPassword } from "../utils/pwd";
+import { UIContext } from "./UIContext";
 
-export const AccountContext = React.createContext();
+type Props = {
+  children: React.ReactNode;
+};
 
-export const AccountProvider = ({ children }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const AccountContext = createContext<any>(undefined);
+
+export const AccountProvider: FC<Props> = ({ children }) => {
   const {
     spikaWallet,
     setSpikaWallet,
@@ -29,31 +34,31 @@ export const AccountProvider = ({ children }) => {
     setIsError,
   } = useContext(UIContext);
 
-  const [alertSignal, setAlertSignal] = useState(0);
-  const [alertTitle, setAlertTitle] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
-  const [accountImported, setAccountImported] = useState(false);
-  const [mnemonic, setMnemonic] = useState("");
-  const [newMnemonic, setNewMnemonic] = useState("");
-  const [privateKey, setPrivateKey] = useState([]); // Uint8Array
-  const [currentAddress, setCurrentAddress] = useState("");
-  const [publicAccount, setPublicAccount] = useState({});
-  const [account, setAccount] = useState({}); // AptosAccount
-  const [currentNetwork, setCurrentNetwork] = useState();
-  const [currentAsset, setCurrentAsset] = useState({});
-  const [baseCoin, setBaseCoin] = useState(aptosCoin);
-  const [quoteCoin, setQuoteCoin] = useState(aptosCoin);
-  const [accountAssets, setAccountAssets] = useState([]);
-  const [swapSupportedAssets, setSwapSupportedAssets] = useState([]);
-  const [balance, setBalance] = useState([]);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [alertSignal, setAlertSignal] = useState<number>(0);
+  const [alertTitle, setAlertTitle] = useState<string | undefined>();
+  const [alertMessage, setAlertMessage] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [accountImported, setAccountImported] = useState<boolean>(false);
+  const [mnemonic, setMnemonic] = useState<string>("");
+  const [newMnemonic, setNewMnemonic] = useState<string>("");
+  const [privateKey, setPrivateKey] = useState<string | undefined>();
+  const [currentAddress, setCurrentAddress] = useState<string | undefined>();
+  const [publicAccount, setPublicAccount] = useState<IPublicAccount | undefined>();
+  const [account, setAccount] = useState<aptos.AptosAccount | undefined>();
+  const [currentNetwork, setCurrentNetwork] = useState<INetwork | undefined>();
+  const [currentAsset, setCurrentAsset] = useState<ICoin | undefined>();
+  const [baseCoin, setBaseCoin] = useState<ICoin>(aptosCoin);
+  const [quoteCoin, setQuoteCoin] = useState<ICoin>(aptosCoin);
+  const [accountAssets, setAccountAssets] = useState<Array<ICoin>>([]);
+  const [swapSupportedAssets, setSwapSupportedAssets] = useState<Array<ICoin>>([]);
+  const [balance, setBalance] = useState<string | undefined>();
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
 
-  const locker = (method) => {
+  const locker = (method: string): void => {
     if (PLATFORM === "chrome-extension:") {
       chrome.runtime.sendMessage({
         method: method,
@@ -62,7 +67,7 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
     if (spikaWallet === undefined) {
@@ -83,20 +88,20 @@ export const AccountProvider = ({ children }) => {
     }
   }, [isUnlocked === true]);
 
-  const walletState = async () => {
-    const data = await getMem(PLATFORM, "PWD");
+  const walletState = async (): Promise<void> => {
+    const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
     if (data === undefined || data === null) {
       checkIfLoginRequired();
     } else {
-      const pwd = await decryptPassword(data);
+      const pwd: string = await decryptPassword(data);
       setPassword(pwd);
       setIsUnlocked(true);
     }
   };
 
-  const checkIfLoginRequired = async () => {
+  const checkIfLoginRequired = async (): Promise<void> => {
     try {
-      const data = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+      const data: boolean = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
       if (data) {
         handleLoginUI();
       } else {
@@ -109,7 +114,7 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (): Promise<void> => {
     try {
       setOpenLoginDialog(false);
       setIsLoading(true);
@@ -127,7 +132,7 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     locker("idle");
     removeMem(PLATFORM, "PWD");
     clearStore(PLATFORM);
@@ -135,20 +140,20 @@ export const AccountProvider = ({ children }) => {
     window.close();
   };
 
-  const handleLock = () => {
+  const handleLock = (): void => {
     locker("idle");
-    setPrivateKey("");
-    setCurrentAddress("");
-    setAccount([]);
+    setPrivateKey(undefined);
+    setCurrentAddress(undefined);
+    setAccount(undefined);
     clearPasswords();
     removeMem(PLATFORM, "PWD");
     setAccountImported(false);
     handleLoginUI();
   };
 
-  const handleChangePassword = async () => {
-    const data = await getMem(PLATFORM, "PWD");
-    const oldPassword = await decryptPassword(data);
+  const handleChangePassword = async (): Promise<void> => {
+    const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
+    const oldPassword: string = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
         throwAlert(58, "Incorrect password", "New password shall not be the same", true);
@@ -164,7 +169,7 @@ export const AccountProvider = ({ children }) => {
       } else if (newPassword !== confirmPassword) {
         throwAlert(53, "Incorrect password", "Passwords do not match", true);
         clearPasswords();
-      } else if ([newPassword.length > 5]) {
+      } else if (newPassword.length > 5) {
         throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
         clearPasswords();
       }
@@ -174,17 +179,17 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const changePassword = async () => {
+  const changePassword = async (): Promise<void> => {
     try {
-      let encryptedMnemonic = await getStore(PLATFORM, "DATA0");
-      let encryptedPrivateKey = await getStore(PLATFORM, "DATA1");
-      const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
-      const decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
+      let encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
+      let encryptedPrivateKey: string = await getStore(PLATFORM, "DATA1");
+      const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
+      const decryptedPrivateKey: string = await passworder.decrypt(password, encryptedPrivateKey);
       encryptedMnemonic = await passworder.encrypt(newPassword, decryptedMnemonic);
       encryptedPrivateKey = await passworder.encrypt(newPassword, decryptedPrivateKey);
       setStore(PLATFORM, "DATA0", encryptedMnemonic);
       setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      const encryptedPassword = await encryptPassword(newPassword);
+      const encryptedPassword: IEncryptedPwd = await encryptPassword(newPassword);
       setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
       throwAlert(56, "Success", "Password successfully changed", false);
@@ -194,13 +199,7 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const clearPasswords = () => {
-    setPassword("");
-    setConfirmPassword("");
-    setNewPassword("");
-  };
-
-  const handleCreate = async () => {
+  const handleCreate = async (): Promise<void> => {
     if (password === confirmPassword && password.length > 5) {
       setIsLoading(true);
       await createAccount();
@@ -213,13 +212,13 @@ export const AccountProvider = ({ children }) => {
     } else if (password !== confirmPassword) {
       throwAlert(53, "Incorrect password", "Passwords do not match", true);
       clearPasswords();
-    } else if ([password.length > 5]) {
+    } else if (password.length > 5) {
       throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
       clearPasswords();
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = async (): Promise<void> => {
     if (password === confirmPassword && password.length > 5) {
       setIsLoading(true);
       await importAccount();
@@ -232,25 +231,25 @@ export const AccountProvider = ({ children }) => {
     } else if (password !== confirmPassword) {
       throwAlert(53, "Incorrect password", "Passwords do not match", true);
       clearPasswords();
-    } else if ([password.length > 5]) {
+    } else if (password.length > 5) {
       throwAlert(54, "Incorrect password", "Password must be at least 6 characters long", true);
       clearPasswords();
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = (): void => {
     generateMnemonic();
   };
 
-  const generateMnemonic = () => {
-    const mn = bip39.generateMnemonic(english.wordlist);
+  const generateMnemonic = (): void => {
+    const mn: string = bip39.generateMnemonic(english.wordlist);
     setNewMnemonic(mn);
   };
 
-  const handleRevealMnemonic = async () => {
+  const handleRevealMnemonic = async (): Promise<void> => {
     try {
-      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
-      let decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
+      const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
       throwAlert(91, "Secret Recovery Phrase", decryptedMnemonic, false);
       setPassword("");
       setMnemonicRequired(false);
@@ -263,10 +262,10 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const handleRevealPrivateKey = async () => {
+  const handleRevealPrivateKey = async (): Promise<void> => {
     try {
-      const encryptedPrivateKey = await getStore(PLATFORM, "DATA1");
-      let decryptedPrivateKey = await passworder.decrypt(password, encryptedPrivateKey);
+      const encryptedPrivateKey: string = await getStore(PLATFORM, "DATA1");
+      const decryptedPrivateKey: string = await passworder.decrypt(password, encryptedPrivateKey);
       throwAlert(81, "Private Key", `0x${decryptedPrivateKey}`, false);
       setPassword("");
       setPrivateKeyRequired(false);
@@ -279,7 +278,7 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const validateAccount = async (address) => {
+  const validateAccount = async (address: string): Promise<boolean> => {
     const spika = await spikaClient();
     try {
       await spika.client.getAccount(address);
@@ -289,121 +288,94 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const createAccount = async () => {
-    const spika = await spikaClient();
-    debug.log(spika);
+  const initAccount = async (mnemonic: string): Promise<string> => {
+    // Initialize Aptos Account
+    const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
+    const _privateKey: string = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+    const _publicAccount: IPublicAccount = {
+      publicKey: _account.pubKey().hex(),
+      account: _account.address().hex(),
+      authKey: _account.authKey().hex(),
+    };
+
+    // Encrypt mnemonic, private key and password
+    const encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
+    const encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
+    const encryptedPassword = await encryptPassword(password);
+
+    // Initialize wallet locker
+    locker("lock");
+
+    // Local storage
+    setStore(PLATFORM, "DATA0", encryptedMnemonic);
+    setStore(PLATFORM, "DATA1", encryptedPrivateKey);
+    setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
+    setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
+    setStore(PLATFORM, "currentAddress", _account.address().hex());
+    setStore(PLATFORM, "currentPubAccount", _publicAccount);
+    setStore(PLATFORM, "currentNetwork", network.networkList[0]);
+    setStore(PLATFORM, "currentAsset", aptosCoin);
+    assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+    network.addNetworkStore(_account.address().hex());
+    apps.addAddress(_publicAccount);
+
+    // Session storage
+    setMem(PLATFORM, "PWD", encryptedPassword);
+
+    // Save state
+    setAccountImported(true);
+    setSpikaWallet(true);
+    setPrivateKey(_privateKey);
+    setAccount(_account);
+    setPublicAccount(_publicAccount);
+    setCurrentAddress(_account.address().hex());
+    setCurrentNetwork(network.networkList[0]);
+    setCurrentAsset(aptosCoin);
+    setBalance(undefined);
+    setNewMnemonic("");
+    setMnemonic("");
+
+    return _publicAccount.account;
+  };
+
+  const createAccount = async (): Promise<void> => {
     try {
-      const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, newMnemonic);
-      debug.log("mnemonic: ", newMnemonic);
-      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      debug.log("account address", _account.address().hex());
-      let encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
-      let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
-      let _publicAccount = {
-        publicKey: _account.pubKey().hex(),
-        account: _account.address().hex(),
-        authKey: _account.authKey().hex(),
-      };
-      locker("lock");
-      setStore(PLATFORM, "DATA0", encryptedMnemonic);
-      setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
-      setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
-      setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentPubAccount", _publicAccount);
-      setStore(PLATFORM, "currentNetwork", network.networkList[0]);
-      const encryptedPassword = await encryptPassword(password);
-      setMem(PLATFORM, "PWD", encryptedPassword);
-      setStore(PLATFORM, "currentAsset", aptosCoin);
-      assetStore.addAssetStore(_account.address().hex(), aptosCoin);
-      network.addNetworkStore(_account.address().hex());
-      apps.addAddress(_publicAccount);
-      setAccountImported(true);
-      setSpikaWallet(true);
-      setPrivateKey(_privateKey);
-      setAccount(_account);
-      setPublicAccount(_publicAccount);
-      setCurrentAddress(_account.address().hex());
-      setCurrentNetwork(network.networkList[0]);
-      setCurrentAsset(aptosCoin);
-      setBalance(0);
-      setNewMnemonic("");
-      setMnemonic("");
-      throwAlert(1, "Account created", `${_account.address().hex()}`, false);
+      const result = await initAccount(newMnemonic);
+      throwAlert(1, "Account created", `${result}`, false);
     } catch (error) {
       throwAlert(2, "Failed create account", `${error}`, true);
       console.log(error);
     }
   };
 
-  const importAccount = async () => {
-    const spika = await spikaClient();
-    debug.log(spika);
+  const importAccount = async (): Promise<void> => {
     try {
-      const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, mnemonic);
-      debug.log("mnemonic: ", mnemonic);
-      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      debug.log(_privateKey);
-      debug.log("account address", _account.address().hex());
-      let encryptedMnemonic = await passworder.encrypt(password, mnemonic);
-      let encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
-      let _publicAccount = {
-        publicKey: _account.pubKey().hex(),
-        account: _account.address().hex(),
-        authKey: _account.authKey().hex(),
-      };
-      locker("lock");
-      setStore(PLATFORM, "DATA0", encryptedMnemonic);
-      setStore(PLATFORM, "DATA1", encryptedPrivateKey);
-      setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
-      setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
-      setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentPubAccount", _publicAccount);
-      setStore(PLATFORM, "currentNetwork", network.networkList[0]);
-      const encryptedPassword = await encryptPassword(password);
-      setMem(PLATFORM, "PWD", encryptedPassword);
-      setStore(PLATFORM, "currentAsset", aptosCoin);
-      assetStore.addAssetStore(_account.address().hex(), aptosCoin);
-      network.addNetworkStore(_account.address().hex());
-      apps.addAddress(_publicAccount);
-      setAccountImported(true);
-      setSpikaWallet(true);
-      setPrivateKey(_privateKey);
-      setAccount(_account);
-      setPublicAccount(_publicAccount);
-      setCurrentAddress(_account.address().hex());
-      setCurrentNetwork(network.networkList[0]);
-      setCurrentAsset(aptosCoin);
-      setNewMnemonic("");
-      setMnemonic("");
-      throwAlert(11, "Account imported", `${_account.address().hex()}`, false);
+      const result = await initAccount(mnemonic);
+      throwAlert(11, "Account imported", `${result}`, false);
     } catch (error) {
       throwAlert(12, "Failed import account", `${error}`, true);
       console.log(error);
     }
   };
 
-  const loadAccount = async () => {
-    const spika = await spikaClient();
+  const loadAccount = async (): Promise<void> => {
     try {
-      const encryptedMnemonic = await getStore(PLATFORM, "DATA0");
-      const decryptedMnemonic = await passworder.decrypt(password, encryptedMnemonic);
+      const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
+      const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
       try {
-        const _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
+        const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
         let _currentAsset = await getStore(PLATFORM, "currentAsset");
         if (_currentAsset === undefined || _currentAsset === null) {
           setStore(PLATFORM, "currentAsset", aptosCoin);
           _currentAsset = aptosCoin;
         }
-        // let resources = await spika.client.getAccountResources(_account.address());
-        // let accountResource = resources.find((r) => r.type === coinStore(_currentAsset.type));
         let _currentNetwork = await getStore(PLATFORM, "currentNetwork");
         if (_currentNetwork === undefined || _currentNetwork === null) {
           setStore(PLATFORM, "currentNetwork", network.networkList[0]);
           _currentNetwork = network.networkList[0];
         }
-        let _publicAccount = {
+        const _publicAccount = {
           publicKey: _account.pubKey().hex(),
           account: _account.address().hex(),
           authKey: _account.authKey().hex(),
@@ -422,11 +394,6 @@ export const AccountProvider = ({ children }) => {
         setCurrentAddress(_account.address().hex());
         setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
-        // if (accountResource === undefined || accountResource === null) {
-        //   setBalance(0);
-        // } else {
-        //   setBalance(accountResource.data.coin.value);
-        // }
       } catch (error) {
         console.log(error);
         throwAlert(42, "Failed to load account", `${error}`, true);
@@ -440,18 +407,24 @@ export const AccountProvider = ({ children }) => {
     }
   };
 
-  const throwAlert = (signal, title, message, error) => {
+  const throwAlert = (signal: number, title: string, message: string, error: boolean): void => {
     setAlertSignal(signal);
     setAlertTitle(title);
     setAlertMessage(message);
     setIsError(error);
   };
 
-  const clearAlert = () => {
+  const clearAlert = (): void => {
     setAlertSignal(0);
     setAlertTitle("");
     setAlertMessage("");
     setIsError();
+  };
+
+  const clearPasswords = (): void => {
+    setPassword("");
+    setConfirmPassword("");
+    setNewPassword("");
   };
 
   return (

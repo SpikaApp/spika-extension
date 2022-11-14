@@ -1,4 +1,4 @@
-const copyToClipboard = (content) => {
+const copyToClipboard = (content: string): void => {
   navigator.clipboard.writeText(content);
 };
 
