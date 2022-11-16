@@ -93,6 +93,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       checkIfLoginRequired();
     } else {
       const pwd: string = await decryptPassword(data);
+      console.log(pwd);
       setPassword(pwd);
       setIsUnlocked(true);
     }
@@ -318,7 +319,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     };
 
     // Encrypt mnemonic, private key and password
-    const encryptedMnemonic = await passworder.encrypt(password, newMnemonic);
+    const encryptedMnemonic = await passworder.encrypt(password, mnemonic);
     const encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
     const encryptedPassword = await encryptPassword(password);
 
@@ -380,7 +381,10 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const loadAccount = async (): Promise<void> => {
     try {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
+      console.log(encryptedMnemonic);
+      console.log(password);
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
+      console.log(decryptedMnemonic);
       try {
         const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
