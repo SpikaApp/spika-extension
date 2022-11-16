@@ -1,7 +1,7 @@
 {
   "name": "spika",
   "private": true,
-  "version": "0.4.34",
+  "version": "0.4.35",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
