@@ -12,7 +12,7 @@ import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 
-const ChangePasswordDialog = () => {
+const ChangePasswordDialog = (): JSX.Element => {
   const { openChangePasswordDialog, setOpenChangePasswordDialog } = useContext(UIContext);
   const {
     password,
@@ -25,7 +25,7 @@ const ChangePasswordDialog = () => {
     handleChangePassword,
   } = useContext(AccountContext);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenChangePasswordDialog(false);
     clearPasswords();
   };

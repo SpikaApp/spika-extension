@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
@@ -17,70 +18,78 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
+import { TxnBuilderTypes } from "aptos";
 
-const CreateNftDialog = () => {
-  const { openCreateNftDialog, setOpenCreateNftDialog } = useContext(UIContext);
-  const { currentAddress, throwAlert } = useContext(AccountContext);
-  const { nft } = useContext(PayloadContext);
-  const { estimateTransaction, isValidTransaction, estimatedTxnResult, clearPrevEstimation, createToken } =
+const CreateCollectionDialog = (): JSX.Element => {
+  const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
+  const { throwAlert } = useContext(AccountContext);
+  const { collection } = useContext(PayloadContext);
+  const { estimateTransaction, createToken, isValidTransaction, estimatedTxnResult, clearPrevEstimation } =
     useContext(Web3Context);
-  const [isLoading, setIsLoading] = useState(false);
-  const [estimationRequired, setEstimationRequired] = useState(false);
-  const [collectionName, setCollectionName] = useState("");
-  const [nftName, setNftName] = useState("");
-  const [nftDescription, setNftDescription] = useState("");
-  const [nftUri, setNftUri] = useState("");
+
+  const [estimationRequired, setEstimationRequired] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [collectionName, setCollectionName] = useState<string>("");
+  const [collectionDescription, setCollectionDescription] = useState<string>("");
+  const [collectionUri, setCollectionUri] = useState<string>("");
+  const [collectionSize, setCollectionSize] = useState<string>("");
 
   useEffect(() => {
     if (estimationRequired) {
-      handleEstimateNft();
+      handleEstimateCollection();
       setEstimationRequired(false);
     }
   }, [estimationRequired]);
 
-  const handleEstimationRequired = async () => {
+  const handleEstimationRequired = async (): Promise<void> => {
     setEstimationRequired(true);
   };
 
-  const nftPayload = async () => {
-    const payload = await nft(currentAddress, collectionName, nftName, nftDescription, 1, nftUri, 1);
+  const collectionPayload = async (): Promise<TxnBuilderTypes.TransactionPayload> => {
+    const payload = await collection({
+      name: collectionName,
+      description: collectionDescription,
+      uri: collectionUri,
+      maxAmount: parseInt(collectionSize),
+    });
     return payload;
   };
 
-  const handleEstimateNft = async () => {
+  const handleEstimateCollection = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const payload = await nftPayload();
+      const payload: TxnBuilderTypes.TransactionPayload = await collectionPayload();
       await estimateTransaction(payload, true, true);
     } catch (error) {
-      throwAlert({ signal: 73, title: "Error", message: `${error}`, error: true });
+      throwAlert({ signal: 63, title: "Error", message: `${error}`, error: true });
       console.log(error);
     }
     setIsLoading(false);
   };
 
-  const handleCreateNft = async () => {
-    const payload = await nftPayload();
+  const handleCreateCollection = async (): Promise<void> => {
+    const payload = await collectionPayload();
     await createToken(payload);
     handleCancel();
   };
 
-  const clearNftData = () => {
-    setCollectionName("");
-    setNftName("");
-    setNftDescription("");
-    setNftUri("");
-  };
-  const handleCancel = () => {
-    setOpenCreateNftDialog(false);
+  const handleCancel = (): void => {
+    setOpenCreateCollectionDialog(false);
     clearPrevEstimation();
-    clearNftData();
+    clearCollection();
+  };
+
+  const clearCollection = (): void => {
+    setCollectionName("");
+    setCollectionDescription("");
+    setCollectionUri("");
+    setCollectionSize("");
   };
 
   return (
-    <Dialog open={openCreateNftDialog} onClose={handleCancel}>
+    <Dialog open={openCreateCollectionDialog} onClose={handleCancel}>
       <DialogTitle>
-        <Stack sx={{ display: "flex", alignItems: "center" }}>Create NFT</Stack>
+        <Stack sx={{ display: "flex", alignItems: "center" }}>Create New Collection</Stack>
       </DialogTitle>
       <DialogContent>
         <Stack
@@ -96,36 +105,40 @@ const CreateNftDialog = () => {
           <TextField
             sx={{ mt: 1, mb: 1.5, width: "275px" }}
             id="collectionName"
-            label="Collection name"
+            label="Name"
             type="string"
+            disabled={isValidTransaction ? true : false}
             value={collectionName}
             onChange={(e) => setCollectionName(e.target.value)}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
-            id="nftName"
-            label="NFT name"
+            id="collectionDescription"
+            label="Description"
             type="string"
-            value={nftName}
-            onChange={(e) => setNftName(e.target.value)}
+            disabled={isValidTransaction ? true : false}
+            multiline
+            rows={3}
+            value={collectionDescription}
+            onChange={(e) => setCollectionDescription(e.target.value)}
           />
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
-            id="nftDescription"
-            label="NFT description"
+            id="collectionUri"
+            label="URL"
             type="string"
-            multiline
-            rows={2}
-            value={nftDescription}
-            onChange={(e) => setNftDescription(e.target.value)}
+            disabled={isValidTransaction ? true : false}
+            value={collectionUri}
+            onChange={(e) => setCollectionUri(e.target.value)}
           />
           <TextField
             sx={{ mt: 1.5, width: "275px" }}
-            id="nftUri"
-            label="URL"
-            type="string"
-            value={nftUri}
-            onChange={(e) => setNftUri(e.target.value)}
+            id="collectionSize"
+            label="Max NFTs in collection"
+            type="number"
+            disabled={isValidTransaction ? true : false}
+            value={collectionSize}
+            onChange={(e) => setCollectionSize(e.target.value)}
           />
         </Stack>
         <Box
@@ -151,7 +164,7 @@ const CreateNftDialog = () => {
                 mr: "12px",
               }}
             >
-              Estimated network fee: {estimatedTxnResult.gas_used}
+              Estimated network fee: {estimatedTxnResult!.gas_used}
             </Typography>
           )}
 
@@ -185,28 +198,24 @@ const CreateNftDialog = () => {
             mb: 2,
           }}
         >
-          <Button sx={{ width: "121px", mr: 4 }} variant="outlined" onClick={handleCancel}>
+          <Button variant="outlined" sx={{ width: "121px", mr: 4 }} onClick={handleCancel}>
             Cancel
           </Button>
-          {!isValidTransaction &&
-            collectionName !== "" &&
-            nftName !== "" &&
-            nftDescription !== "" &&
-            nftUri !== "" && (
-              <LoadingButton
-                sx={{
-                  background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                  width: "121px",
-                }}
-                variant="contained"
-                loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
-                loading={isLoading}
-                onClick={handleEstimationRequired}
-              >
-                Estimate
-              </LoadingButton>
-            )}{" "}
-          {!isValidTransaction && (collectionName === "" || nftName === "" || nftDescription === "" || nftUri === "") && (
+          {!isValidTransaction && collectionName !== "" && collectionDescription !== "" && collectionUri !== "" && (
+            <LoadingButton
+              sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "121px",
+              }}
+              variant="contained"
+              loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
+              loading={isLoading}
+              onClick={handleEstimationRequired}
+            >
+              Estimate
+            </LoadingButton>
+          )}{" "}
+          {!isValidTransaction && (collectionName === "" || collectionDescription === "" || collectionUri === "") && (
             <Button
               sx={{
                 width: "121px",
@@ -226,7 +235,7 @@ const CreateNftDialog = () => {
               variant="contained"
               loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
               loading={isLoading}
-              onClick={handleCreateNft}
+              onClick={handleCreateCollection}
             >
               Create
             </LoadingButton>
@@ -239,4 +248,4 @@ const CreateNftDialog = () => {
   );
 };
 
-export default CreateNftDialog;
+export default CreateCollectionDialog;

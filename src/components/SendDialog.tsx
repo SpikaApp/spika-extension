@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext } from "react";
 import { Button, TextField, Dialog, DialogContent, DialogTitle, Typography, Stack } from "@mui/material";
 import Loading from "./Loading";
@@ -6,7 +7,7 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
 
-const SendDialog = () => {
+const SendDialog = (): JSX.Element => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
   const { currentAsset, currentNetwork } = useContext(AccountContext);
   const {
@@ -20,18 +21,18 @@ const SendDialog = () => {
     handleEstimate,
   } = useContext(Web3Context);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setRecipientAddress("");
     setAmount("");
     setOpenSendDialog(false);
   };
 
   return (
-    <Dialog align="center" open={openSendDialog} onClose={handleCancel}>
-      <DialogTitle>Send {currentAsset.data.symbol}</DialogTitle>
+    <Dialog open={openSendDialog} onClose={handleCancel}>
+      <DialogTitle sx={{ alignSelf: "center" }}>Send {currentAsset!.data.symbol}</DialogTitle>
       <DialogContent sx={{ maxWidth: 375 }}>
         <Typography variant="body1" color="textSecondary" sx={{ maxWidth: "275px" }}>
-          Sending on {currentNetwork.name} with chain id {chainId}
+          Sending on {currentNetwork!.name} with chain id {chainId}
         </Typography>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField

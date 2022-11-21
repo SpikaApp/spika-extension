@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
@@ -17,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import Loading from "../components/Loading";
+import Loading from "./Loading";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
@@ -25,8 +26,9 @@ import { Web3Context } from "../context/Web3Context";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
+import { ICoin } from "../interface";
 
-const AddAssetDialog = () => {
+const AddAssetDialog = (): JSX.Element => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
   const { setIsLoading, alertSignal, currentNetwork, accountAssets, currentAsset, setCurrentAsset, throwAlert } =
     useContext(AccountContext);
@@ -45,16 +47,16 @@ const AddAssetDialog = () => {
     updateAccountAssets,
     clearPrevEstimation,
   } = useContext(Web3Context);
-  const [selectedIndex, setSelectedIndex] = useState("");
-  const [isCustomToken, setIsCustomToken] = useState(false);
-  const [estimationRequired, setEstimationRequired] = useState(false);
-  const [coinType, setCoinType] = useState("");
-  const [isLocalLoading, setIsLocalLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<string>("");
+  const [isCustomToken, setIsCustomToken] = useState<boolean>(false);
+  const [estimationRequired, setEstimationRequired] = useState<boolean>(false);
+  const [coinType, setCoinType] = useState<string>("");
+  const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
   const _currentAsset = "currentAsset";
-  const assetList = coinList.filter((i) => !accountAssets.includes(i));
-  assetList.sort((a, b) => a.data.name.localeCompare(b.data.name));
+  const assetList = coinList.filter((i: ICoin) => !accountAssets.includes(i));
+  assetList.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
 
-  const handleListItemClick = (event, index, asset) => {
+  const handleListItemClick = (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: string, asset: ICoin) => {
     setIsLocalLoading(false);
     clearPrevEstimation();
     setSelectedIndex(index);
@@ -95,20 +97,20 @@ const AddAssetDialog = () => {
     }
   }, [currentNetwork]);
 
-  const handleGetBalance = async () => {
+  const handleGetBalance = async (): Promise<void> => {
     setIsLoading(true);
     await getBalance();
     setIsLoading(false);
   };
 
-  const handleEstimateTransaction = async (coinType) => {
+  const handleEstimateTransaction = async (coinType: string): Promise<void> => {
     const payload = await register(coinType);
     await estimateTransaction(payload, true, true);
   };
 
-  const handleFindAsset = async () => {
+  const handleFindAsset = async (): Promise<void> => {
     setIsLocalLoading(true);
-    const data = await findAsset(coinType);
+    const data: ICoin | undefined = await findAsset(coinType);
     if (!data) {
       throwAlert({ signal: 112, title: "Error", message: "Asset doesn't exist on chain", error: true });
       if (!isCustomToken) {
@@ -121,10 +123,10 @@ const AddAssetDialog = () => {
     setIsLocalLoading(false);
   };
 
-  const handleRegisterAsset = async () => {
+  const handleRegisterAsset = async (): Promise<void> => {
     setIsLocalLoading(true);
     if (selectedIndex !== "" || isCustomToken) {
-      const assetData = await findAsset(coinType);
+      const assetData: ICoin | undefined = await findAsset(coinType);
       if (assetData) {
         setEstimationRequired(true);
         await registerAssetInAccount(coinType);
@@ -139,19 +141,19 @@ const AddAssetDialog = () => {
     setIsLocalLoading(false);
   };
 
-  const handleAddCustomToken = async () => {
+  const handleAddCustomToken = async (): Promise<void> => {
     clearPrevEstimation();
     clearDialog();
     setIsCustomToken(true);
   };
 
-  const registerAssetInAccount = async (coinType) => {
+  const registerAssetInAccount = async (coinType: string): Promise<void> => {
     await registerAsset(coinType, selectedAsset.data.name);
-    setCurrentAsset(selectedAsset);
+    setCurrentAsset(selectedAsset as ICoin);
     setStore(PLATFORM, _currentAsset, selectedAsset);
   };
 
-  const clearDialog = () => {
+  const clearDialog = (): void => {
     setIsValidAsset(false);
     setSelectedIndex("");
     setSelectedAsset({});
@@ -160,7 +162,7 @@ const AddAssetDialog = () => {
     updateAccountAssets();
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenAddAssetDialog(false);
     clearPrevEstimation();
     clearDialog();
@@ -231,7 +233,7 @@ const AddAssetDialog = () => {
           </form>
         ) : (
           <div>
-            {currentNetwork.name === "Devnet" && (
+            {currentNetwork!.name === "Devnet" && (
               <Paper
                 sx={{
                   width: "260px",
@@ -308,7 +310,7 @@ const AddAssetDialog = () => {
                     mr: "12px",
                   }}
                 >
-                  Estimated network fee: {estimatedTxnResult.gas_used}
+                  Estimated network fee: {estimatedTxnResult!.gas_used}
                 </Typography>
               )}
               {estimatedTxnResult && !isValidTransaction && (

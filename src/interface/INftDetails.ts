@@ -11,8 +11,8 @@ interface INftDetails {
   royalty: any;
   supply: string;
   uri: string;
-  creator: string;
-  collection: string;
+  creator?: string;
+  collection?: string;
 }
 
 export default INftDetails;

@@ -17,11 +17,16 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { ICoin } from "../interface";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 
-const AccountAssetsDialog = (props) => {
+type AccountAssetsDialogProps = {
+  type: "base" | "quote";
+};
+
+const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
   const {
     setIsLoading,
@@ -51,7 +56,7 @@ const AccountAssetsDialog = (props) => {
   useEffect(() => {
     if (accountAssets.length > 0) {
       debug.log("account assets", accountAssets);
-      let swapSupported = [];
+      const swapSupported: ICoin[] = [];
       Object.values(accountAssets).map((value) => {
         if (value.data.swap) {
           swapSupported.push(value);
@@ -63,13 +68,13 @@ const AccountAssetsDialog = (props) => {
     }
   }, [accountAssets.length > 0]);
 
-  const updateAssets = async () => {
+  const updateAssets = async (): Promise<void> => {
     setIsLocalLoading(true);
     await updateAccountAssets();
     setIsLocalLoading(false);
   };
 
-  const handleSwitchAsset = (asset) => {
+  const handleSwitchAsset = (asset: ICoin): void => {
     if (props.type === "base") {
       setBaseCoin(asset);
       handleUpdateBalance(asset);
@@ -87,13 +92,13 @@ const AccountAssetsDialog = (props) => {
     }
   };
 
-  const handleUpdateBalance = async (asset) => {
+  const handleUpdateBalance = async (asset: ICoin): Promise<void> => {
     setIsLoading(true);
     await updateBalance(asset);
     setIsLoading(false);
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setShowOnlySwapSupported(false);
     setOpenAccountAssetsDialog(false);
   };

@@ -17,7 +17,7 @@ export interface IPayloadCollectionArgs {
   name: string;
   description: string;
   uri: string;
-  maxAmount: string;
+  maxAmount: number;
 }
 
 export interface IPayloadNftArgs {
@@ -27,13 +27,13 @@ export interface IPayloadNftArgs {
   description: string;
   supply: string;
   uri: string;
-  max: string;
-  royalty_payee_address: string;
-  royalty_points_denominator: number;
-  royalty_points_numerator: number;
-  property_keys: Array<string>;
-  property_values: Array<string>;
-  property_types: Array<string>;
+  max: number;
+  royalty_payee_address?: string;
+  royalty_points_denominator?: number;
+  royalty_points_numerator?: number;
+  property_keys?: Array<string>;
+  property_values?: Array<string>;
+  property_types?: Array<string>;
 }
 
 export default IContextPayload;

@@ -1,7 +1,13 @@
 import WarningIcon from "@mui/icons-material/Warning";
 import { Box, DialogContent, Stack, Typography } from "@mui/material";
 
-const NoticeBox = (props) => {
+interface NoticeBoxProps {
+  mt: string | number;
+  width: string | number;
+  text: string;
+}
+
+const NoticeBox = (props: NoticeBoxProps): JSX.Element => {
   return (
     <Box component={DialogContent} sx={{ mt: props.mt, border: 2, borderColor: "warning.light" }}>
       <Stack

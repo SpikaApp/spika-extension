@@ -5,19 +5,19 @@ import { Web3Context } from "../context/Web3Context";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
-const MintDialog = () => {
+const MintDialog = (): JSX.Element => {
   const { openMintDialog, setOpenMintDialog } = useContext(UIContext);
   const { amount, setAmount, handleMint } = useContext(Web3Context);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setAmount("");
     setOpenMintDialog(false);
   };
 
   return (
-    <Dialog align="center" open={openMintDialog} onClose={handleCancel}>
+    <Dialog open={openMintDialog} onClose={handleCancel}>
       <DialogTitle align="center">Mint test APT</DialogTitle>
-      <DialogContent align="center">
+      <DialogContent>
         <Stack
           sx={{
             display: "flex",

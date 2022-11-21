@@ -4,11 +4,11 @@ import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 
-const LogoutDialog = () => {
+const LogoutDialog = (): JSX.Element => {
   const { openLogoutDialog, setOpenLogoutDialog } = useContext(UIContext);
   const { handleLogout } = useContext(AccountContext);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenLogoutDialog(false);
   };
 

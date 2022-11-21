@@ -3,7 +3,7 @@ import { Link, Typography } from "@mui/material";
 import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 
-const Footer = () => {
+const Footer = (): JSX.Element => {
   const { currentAddress } = useContext(AccountContext);
   return (
     <Typography sx={{ mt: 2 }} variant="subtitle1" align="center" color="textPrimary">

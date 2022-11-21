@@ -4,14 +4,14 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 
 const Loading = () => {
-  const [open, setOpen] = useState(false);
   const { isLoading } = useContext(AccountContext);
+  const [open, setOpen] = useState<boolean>(false);
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setOpen(false);
   };
 

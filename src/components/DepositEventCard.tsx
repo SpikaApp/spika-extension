@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import DownloadIcon from "@mui/icons-material/Download";
 import { Button, ListItem, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
@@ -7,17 +8,26 @@ import { Web3Context } from "../context/Web3Context";
 import { stringToValue } from "../utils/values";
 import TxnDetailsDialog from "./TxnDetailsDialog";
 
+type DepositEventProps = {
+  depositEvent: {
+    version: number;
+    data: {
+      amount: string;
+    };
+  };
+};
+
 const DepositEventCard = ({
   depositEvent: {
     version,
     data: { amount },
   },
-}) => {
+}: DepositEventProps): JSX.Element => {
   const { setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const { getTxnDetails, setAmount } = useContext(Web3Context);
 
-  const handleOpenTxnDetailsDialog = async () => {
+  const handleOpenTxnDetailsDialog = async (): Promise<void> => {
     setTxnType(2);
     setAmount(amount);
     await getTxnDetails(version);
@@ -33,9 +43,9 @@ const DepositEventCard = ({
             <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
             <Stack direction="row">
               <Typography noWrap sx={{ mr: 0.5, maxWidth: "90px" }}>
-                {stringToValue(currentAsset, amount)}
+                {stringToValue(currentAsset!, amount)}
               </Typography>
-              <Typography sx={{ mr: 0.5, maxWidth: "40px" }}>{currentAsset.data.symbol}</Typography>
+              <Typography sx={{ mr: 0.5, maxWidth: "40px" }}>{currentAsset!.data.symbol}</Typography>
             </Stack>
           </Stack>
         </Stack>

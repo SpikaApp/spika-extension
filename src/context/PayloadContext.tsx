@@ -49,7 +49,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
       "0x3::token::create_token_script",
       [],
       [
-        args.address,
+        args.collectionName,
         args.name,
         args.description,
         parseInt(args.supply),

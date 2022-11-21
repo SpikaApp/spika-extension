@@ -57,7 +57,7 @@ const NFTs = () => {
     if (accountImported && accountTokens.length > 0) {
       getNftDetails();
       setIsWaiting(false);
-    } else if (accountTokens === 0) {
+    } else if (accountTokens.length === 0) {
       setIsWaiting(false);
     }
   }, [accountTokens]);
@@ -92,12 +92,12 @@ const NFTs = () => {
           <CircularProgress sx={{ mt: 4 }} color="info" />
         </Stack>
       )}
-      {accountTokens === 0 && isWaiting === false && (
+      {accountTokens.length === 0 && isWaiting === false && (
         <Typography sx={{ mt: 8, mb: "320px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
           No NFTs found
         </Typography>
       )}
-      {accountTokens !== 0 && !isWaiting && accountImported && (
+      {accountTokens.length > 0 && !isWaiting && accountImported && (
         <Box align="center" sx={{ height: "340px", mb: "28px" }}>
           <ImageList
             gap={18}

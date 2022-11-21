@@ -12,7 +12,7 @@ import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 
-const LoginDialog = () => {
+const LoginDialog = (): JSX.Element => {
   const { password, setPassword, handleLogin, handleRevealMnemonic, handleRevealPrivateKey } =
     useContext(AccountContext);
   const {
@@ -24,12 +24,13 @@ const LoginDialog = () => {
     setPrivateKeyRequired,
   } = useContext(UIContext);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenLoginDialog(false);
     setMnemonicRequired(false);
     setPrivateKeyRequired(false);
     setPassword("");
   };
+
   return (
     <Dialog open={openLoginDialog}>
       {mnemonicRequired || privateKeyRequired ? (

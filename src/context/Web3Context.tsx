@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as aptos from "aptos";
 import { Buffer } from "buffer";
 import React, { useContext, useEffect, useState } from "react";
 import pixel_coin from "../assets/pixel_coin.png";
+import { ICoin, IContextWeb3, INftDetails } from "../interface";
 import { spikaClient } from "../lib/client";
 import { aptosCoin, coinInfo, coinList, coinStore } from "../lib/coin";
 import { setStore } from "../lib/store";
@@ -13,10 +15,13 @@ import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
 import { UIContext } from "./UIContext";
 
-export const Web3Context = React.createContext();
+type Web3ContextProps = {
+  children: React.ReactNode;
+};
 
-// eslint-disable-next-line react/prop-types
-export const Web3Provider = ({ children }) => {
+export const Web3Context = React.createContext<IContextWeb3>({} as IContextWeb3);
+
+export const Web3Provider = ({ children }: Web3ContextProps) => {
   const { spikaWallet, setOpenSendDialog } = useContext(UIContext);
   const {
     accountImported,
@@ -31,24 +36,25 @@ export const Web3Provider = ({ children }) => {
     currentNetwork,
   } = useContext(AccountContext);
   const { register, transfer } = useContext(PayloadContext);
-  const [recipientAddress, setRecipientAddress] = useState("");
-  const [amount, setAmount] = useState("");
-  const [maxGasAmount, setMaxGasAmount] = useState("10000");
-  const [gasUnitPrice] = useState("100");
-  const [estimatedTxnResult, setEstimatedTxnResult] = useState([]);
-  const [isValidTransaction, setIsValidTransaction] = useState(false);
-  const [txnDetails, setTxnDetails] = useState([]);
-  const [depositEvents, setDepositEvents] = useState([]);
-  const [withdrawEvents, setWithdrawEvents] = useState([]);
-  const [depositEventsCounter, setDepositEventsCounter] = useState(0);
-  const [withdrawEventsCounter, setWithdrawEventsCounter] = useState(0);
-  const [accountTokens, setAccountTokens] = useState([]);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [maxGasAmount, setMaxGasAmount] = useState<string>("10000");
+  const [gasUnitPrice] = useState<string>("100");
+  const [estimatedTxnResult, setEstimatedTxnResult] = useState<aptos.Types.UserTransaction>();
+  const [isValidTransaction, setIsValidTransaction] = useState<boolean>(false);
+  const [txnDetails, setTxnDetails] = useState<aptos.Types.Transaction | Record<string, never>>({});
+  const [depositEvents, setDepositEvents] = useState<aptos.Types.Event[]>([]);
+  const [withdrawEvents, setWithdrawEvents] = useState<aptos.Types.Event[]>([]);
+  const [depositEventsCounter, setDepositEventsCounter] = useState<number>(0);
+  const [withdrawEventsCounter, setWithdrawEventsCounter] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [accountTokens, setAccountTokens] = useState<any[]>([]);
   const [isValidAsset, setIsValidAsset] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState({});
-  const [nftDetails, setNftDetails] = useState([]);
+  const [selectedAsset, setSelectedAsset] = useState<ICoin | Record<string, never>>({});
+  const [nftDetails, setNftDetails] = useState<INftDetails[]>([]);
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
-  const [chainId, setChainId] = useState();
+  const [chainId, setChainId] = useState<number>();
 
   const _accountAssets = "accountAssets";
 
@@ -61,7 +67,10 @@ export const Web3Provider = ({ children }) => {
     }
   }, [accountImported]);
 
-  const submitTransactionHelper = async (account, payload) => {
+  const submitTransactionHelper = async (
+    account: aptos.AptosAccount,
+    payload: aptos.TxnBuilderTypes.TransactionPayload
+  ): Promise<string> => {
     const spika = await spikaClient(currentNetwork);
     const [{ sequence_number: sequenceNumber }, chainId] = await Promise.all([
       spika.client.getAccount(account.address()),
@@ -84,21 +93,25 @@ export const Web3Provider = ({ children }) => {
     return transactionRes.hash;
   };
 
-  const handleMint = async () => {
+  const handleMint = async (): Promise<void> => {
     setIsLoading(true);
     await mintCoins();
     setIsLoading(false);
     setAmount("");
   };
 
-  const handleEstimate = async () => {
+  const handleEstimate = async (): Promise<void> => {
     setIsLoading(true);
     setOpenSendDialog(false);
     await estimateTransaction();
     setIsLoading(false);
   };
 
-  const handleSend = async (payload, isBcs, silent) => {
+  const handleSend = async (
+    payload: aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs: boolean,
+    silent: boolean
+  ): Promise<void> => {
     setIsLoading(true);
     await sendTransaction(payload, isBcs, silent);
     setIsLoading(false);
@@ -107,55 +120,56 @@ export const Web3Provider = ({ children }) => {
     setAmount("");
   };
 
-  const getChainId = async () => {
+  const getChainId = async (): Promise<void> => {
     const spika = await spikaClient();
     const result = await spika.client.getChainId();
     setChainId(result);
   };
 
-  const getAptosAddress = async (AptosName) => {
-    const name = AptosName;
-    const result = await fetch(`https://www.aptosnames.com/api/v1/address/${name}`);
+  const getAptosAddress = async (aptosName: string): Promise<void> => {
+    const result = await fetch(`https://www.aptosnames.com/api/v1/address/${aptosName}`);
     const { address } = await result.json();
     setAptosAddress(address);
   };
 
-  const getAptosName = async (AptosAddress) => {
-    const address = AptosAddress;
+  const getAptosName = async (address: string): Promise<void> => {
     const result = await fetch(`https://www.aptosnames.com/api/v1/name/${address}`);
     const { name } = await result.json();
     setAptosName(name);
   };
 
-  const getTxnDetails = async (version) => {
+  const getTxnDetails = async (version: number | bigint): Promise<void> => {
     setIsLoading(true);
     const spika = await spikaClient();
     const data = await spika.client.getTransactionByVersion(version);
-    // console.log(data);
     setTxnDetails(data);
     setIsLoading(false);
   };
 
   // Request Faucet to fund address with test coins
-  const mintCoins = async () => {
+  const mintCoins = async (): Promise<void> => {
     const spika = await spikaClient();
     try {
-      let _amount = "100000000";
-      await spika.faucetClient.fundAccount(account.address(), _amount);
-      throwAlert(
-        21,
-        "Success",
-        `Received ${Number(stringToValue(aptosCoin, _amount))} ${aptosCoin.data.symbol}`,
-        false
-      );
+      const _amount = "100000000";
+      await spika.faucetClient!.fundAccount(account!.address(), Number(_amount));
+      throwAlert({
+        signal: 21,
+        title: "Success",
+        message: `Received ${Number(stringToValue(aptosCoin, _amount))} ${aptosCoin.data.symbol}`,
+        error: false,
+      });
     } catch (error) {
-      throwAlert(22, "Transaction failed", `${error}`, true);
+      throwAlert({ signal: 22, title: "Transaction failed", message: `${error}`, error: true });
       setIsLoading(false);
       console.log(error);
     }
   };
 
-  const estimateTransaction = async (payload, isBcs, silent) => {
+  const estimateTransaction = async (
+    payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
+  ): Promise<void> => {
     const spika = await spikaClient();
     let _payload;
     let isSilent = false;
@@ -165,38 +179,42 @@ export const Web3Provider = ({ children }) => {
     }
     try {
       if (payload === undefined) {
-        _payload = await transfer(recipientAddress, currentAsset.type, valueToString(currentAsset, amount));
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
-          gasUnitPrice: gasUnitPrice,
+        _payload = await transfer({
+          recipientAddress: recipientAddress,
+          currentAsset: currentAsset!.type,
+          amount: Number(valueToString(currentAsset!, amount)),
+        });
+        transaction = await spika.client.generateRawTransaction(account!.address(), _payload, {
+          maxGasAmount: BigInt(maxGasAmount),
+          gasUnitPrice: BigInt(gasUnitPrice),
         });
       } else if (isBcs === undefined || !isBcs) {
-        _payload = payload;
-        transaction = await spika.client.generateTransaction(account.address(), _payload, {
+        _payload = payload as aptos.Types.EntryFunctionPayload;
+        transaction = await spika.client.generateTransaction(account!.address(), _payload, {
           max_gas_amount: maxGasAmount,
           gas_unit_price: gasUnitPrice,
         });
       } else {
-        _payload = payload;
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
-          gasUnitPrice: gasUnitPrice,
+        _payload = payload as aptos.TxnBuilderTypes.TransactionPayload;
+        transaction = await spika.client.generateRawTransaction(account!.address(), _payload, {
+          maxGasAmount: BigInt(maxGasAmount),
+          gasUnitPrice: BigInt(gasUnitPrice),
         });
       }
-      const bcsTxn = aptos.AptosClient.generateBCSSimulation(account, transaction);
+      const bcsTxn = aptos.AptosClient.generateBCSSimulation(account!, transaction);
       const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
       if (estimatedTxn.success === true) {
         debug.log("estimated result:", estimatedTxn);
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn);
-        throwAlert(30, "Transaction is valid", `${estimatedTxn.vm_status}`, false);
+        throwAlert({ signal: 30, title: "Transaction is valid", message: `${estimatedTxn.vm_status}`, error: false });
       }
       if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn);
         if (!isSilent) {
-          throwAlert(33, "Transaction invalid", `${estimatedTxn.vm_status}`, true);
+          throwAlert({ signal: 33, title: "Transaction invalid", message: `${estimatedTxn.vm_status}`, error: true });
         }
         setRecipientAddress("");
         setAmount("");
@@ -204,7 +222,7 @@ export const Web3Provider = ({ children }) => {
     } catch (error) {
       // logic if txn body doesn't looks good to be submitted to VM
       if (!isSilent) {
-        throwAlert(34, "Failed to estimate", `${error}`, true);
+        throwAlert({ signal: 34, title: "Failed to estimate", message: `${error}`, error: true });
       }
       setRecipientAddress("");
       setAmount("");
@@ -212,7 +230,11 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const sendTransaction = async (payload, isBcs, silent) => {
+  const sendTransaction = async (
+    payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
+  ): Promise<void> => {
     const spika = await spikaClient();
     let _payload;
     let isSilent = false;
@@ -222,40 +244,44 @@ export const Web3Provider = ({ children }) => {
     }
     try {
       if (payload === undefined) {
-        _payload = await transfer(recipientAddress, currentAsset.type, valueToString(currentAsset, amount));
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
-          gasUnitPrice: gasUnitPrice,
+        _payload = await transfer({
+          recipientAddress: recipientAddress,
+          currentAsset: currentAsset!.type,
+          amount: Number(valueToString(currentAsset!, amount)),
+        });
+        transaction = await spika.client.generateRawTransaction(account!.address(), _payload, {
+          maxGasAmount: BigInt(maxGasAmount),
+          gasUnitPrice: BigInt(gasUnitPrice),
         });
       } else if (isBcs === undefined || !isBcs) {
-        _payload = payload;
-        transaction = await spika.client.generateTransaction(account.address(), _payload, {
+        _payload = payload as aptos.Types.EntryFunctionPayload;
+        transaction = await spika.client.generateTransaction(account!.address(), _payload, {
           max_gas_amount: maxGasAmount,
           gas_unit_price: gasUnitPrice,
         });
       } else {
-        _payload = payload;
-        transaction = await spika.client.generateRawTransaction(account.address(), _payload, {
-          maxGasAmount: maxGasAmount,
-          gasUnitPrice: gasUnitPrice,
+        _payload = payload as aptos.TxnBuilderTypes.TransactionPayload;
+        transaction = await spika.client.generateRawTransaction(account!.address(), _payload, {
+          maxGasAmount: BigInt(maxGasAmount),
+          gasUnitPrice: BigInt(gasUnitPrice),
         });
       }
-      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const bcsTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       const result = await spika.client.submitSignedBCSTransaction(bcsTxn);
       await spika.client.waitForTransaction(result.hash);
       if (!isSilent) {
-        throwAlert(31, "Transaction sent", `${result.hash}`, false);
+        throwAlert({ signal: 31, title: "Transaction sent", message: `${result.hash}`, error: false });
       }
     } catch (error) {
       if (!isSilent) {
-        throwAlert(32, "Transaction failed", `${error}`, true);
+        throwAlert({ signal: 32, title: "Transaction failed", message: `${error}`, error: true });
       }
       console.log(error);
       setIsLoading(false);
     }
   };
 
-  const findAsset = async (coinType, address) => {
+  const findAsset = async (coinType: string, address?: string): Promise<ICoin | undefined> => {
     const spika = await spikaClient();
     try {
       let _address;
@@ -264,8 +290,9 @@ export const Web3Provider = ({ children }) => {
       } else {
         _address = address;
       }
-      const asset = await spika.client.getAccountResource(_address, coinInfo(coinType));
-      const result = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const asset: any = await spika.client.getAccountResource(_address, coinInfo(coinType));
+      const result: ICoin = {
         type: coinType,
         data: {
           name: `${asset.data.name}`,
@@ -280,46 +307,45 @@ export const Web3Provider = ({ children }) => {
       setIsValidAsset(true);
       return result;
     } catch (error) {
-      setSelectedAsset([]);
+      setSelectedAsset({});
       setIsValidAsset(false);
       console.log(error);
     }
   };
 
-  const registerAsset = async (coinType, name) => {
+  const registerAsset = async (coinType: string, name: string): Promise<void> => {
     const spika = await spikaClient();
     try {
       const payload = await register(coinType);
-      const transaction = await spika.client.generateRawTransaction(account.address(), payload, {
-        maxGasAmount: maxGasAmount,
-        gasUnitPrice: gasUnitPrice,
+      const transaction = await spika.client.generateRawTransaction(account!.address(), payload, {
+        maxGasAmount: BigInt(maxGasAmount),
+        gasUnitPrice: BigInt(gasUnitPrice),
       });
-      const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const signedTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       const submitTxn = await spika.client.submitSignedBCSTransaction(signedTxn);
       await spika.client.waitForTransaction(submitTxn.hash);
-      throwAlert(101, "Success", `${name} successfully registered`, false);
+      throwAlert({ signal: 101, title: "Success", message: `${name} successfully registered`, error: false });
     } catch (error) {
-      throwAlert(102, "Failed to register asset", `${error}`, true);
+      throwAlert({ signal: 102, title: "Failed to register asset", message: `${error}`, error: true });
       console.log(error);
       setIsLoading(false);
     }
   };
 
-  const signMessage = async (message) => {
+  const signMessage = async (message: string): Promise<string> => {
     const messageToSign = Buffer.from(message);
-    const signedMessage = await account.signBuffer(messageToSign);
-    const response = signedMessage.hexString;
-    return response;
+    const signedMessage = account!.signBuffer(messageToSign);
+    return signedMessage.hex();
   };
 
-  const signTransaction = async (payload) => {
+  const signTransaction = async (payload: aptos.Types.EntryFunctionPayload): Promise<Uint8Array | unknown> => {
     const spika = await spikaClient();
     try {
-      const transaction = await spika.client.generateTransaction(account.address(), payload, {
+      const transaction = await spika.client.generateTransaction(account!.address(), payload, {
         max_gas_amount: maxGasAmount,
         gas_unit_price: gasUnitPrice,
       });
-      const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const signedTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       return signedTxn;
     } catch (error) {
       console.log(error);
@@ -327,14 +353,16 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const signAndSubmitTransaction = async (payload) => {
+  const signAndSubmitTransaction = async (
+    payload: aptos.Types.EntryFunctionPayload
+  ): Promise<aptos.Types.PendingTransaction | unknown> => {
     const spika = await spikaClient();
     try {
-      const transaction = await spika.client.generateTransaction(account.address(), payload, {
+      const transaction = await spika.client.generateTransaction(account!.address(), payload, {
         max_gas_amount: maxGasAmount,
         gas_unit_price: gasUnitPrice,
       });
-      const signedTxn = aptos.AptosClient.generateBCSTransaction(account, transaction);
+      const signedTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       const result = await spika.client.submitSignedBCSTransaction(signedTxn);
       return result;
     } catch (error) {
@@ -342,33 +370,34 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const createToken = async (payload) => {
+  const createToken = async (payload: aptos.TxnBuilderTypes.TransactionPayload): Promise<void> => {
     try {
-      await submitTransactionHelper(account, payload);
-      throwAlert(61, "Transaction sent", `${payload}`, false);
+      await submitTransactionHelper(account!, payload);
+      throwAlert({ signal: 61, title: "Transaction sent", message: `${payload}`, error: false });
     } catch (error) {
-      throwAlert(62, "Transaction failed", `${error}`, true);
+      throwAlert({ signal: 62, title: "Transaction failed", message: `${error}`, error: true });
       setIsLoading(false);
       console.log(error);
     }
   };
 
-  const getBalance = async (asset) => {
+  const getBalance = async (asset?: ICoin): Promise<string | void> => {
     const spika = await spikaClient();
-    const isAccount = await validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
-      let resources = await spika.client.getAccountResources(account.address());
-      let resource;
+      const resources = await spika.client.getAccountResources(account!.address());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let resource: any;
       if (asset) {
         resource = resources.find((r) => r.type === coinStore(asset.type));
       } else {
-        resource = resources.find((r) => r.type === coinStore(currentAsset.type));
+        resource = resources.find((r) => r.type === coinStore(currentAsset!.type));
       }
       if (resource === undefined || resource === null) {
         if (asset) {
-          return 0;
+          return "0";
         } else {
-          setBalance(0);
+          setBalance("0");
         }
       } else {
         if (asset) {
@@ -378,47 +407,48 @@ export const Web3Provider = ({ children }) => {
         }
       }
     } else {
-      setBalance(0);
+      setBalance("0");
     }
   };
 
-  const updateBalance = async (asset) => {
+  const updateBalance = async (asset: ICoin): Promise<void> => {
     const spika = await spikaClient();
-    const isAccount = await validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
-      let resources = await spika.client.getAccountResources(account.address());
-      let _asset = resources.find((r) => r.type === asset.type);
+      const resources = await spika.client.getAccountResources(account!.address());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _asset: any = resources.find((r) => r.type === asset.type);
       if (_asset === undefined || _asset === null) {
-        setBalance(0);
+        setBalance("0");
       } else {
         setBalance(_asset.data.coin.value);
       }
     } else {
-      setBalance(0);
+      setBalance("0");
     }
   };
 
-  const getTransactions = async () => {
+  const getTransactions = async (): Promise<aptos.Types.Transaction[]> => {
     const spika = await spikaClient();
-    let transactions = await spika.client.getAccountTransactions(account.address());
-    return transactions;
+    return await spika.client.getAccountTransactions(account!.address());
   };
 
-  const getEventsCount = async (events) => {
-    const isAccount = await validateAccount(currentAddress);
+  const getEventsCount = async (events: string): Promise<void | 0> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       console.log(isAccount);
       const spika = await spikaClient();
-      let resources = await spika.client.getAccountResources(account.address());
-      let accountResource = resources.find((r) => r.type === coinStore(currentAsset.type));
+      const resources = await spika.client.getAccountResources(account!.address());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const accountResource: any = resources.find((r) => r.type === coinStore(currentAsset!.type));
       if (accountResource) {
         if (events === "deposit_events") {
-          let counter = parseInt(accountResource.data.deposit_events.counter);
-          debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+          const counter: number = parseInt(accountResource.data.deposit_events.counter);
+          debug.log(`${currentAsset!.data.symbol} ${events} counter`, counter);
           setDepositEventsCounter(counter);
         } else if (events === "withdraw_events") {
-          let counter = parseInt(accountResource.data.withdraw_events.counter);
-          debug.log(`${currentAsset.data.symbol} ${events} counter`, counter);
+          const counter: number = parseInt(accountResource.data.withdraw_events.counter);
+          debug.log(`${currentAsset!.data.symbol} ${events} counter`, counter);
           setWithdrawEventsCounter(counter);
         }
       } else {
@@ -430,21 +460,26 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const getDepositEvents = async (query) => {
+  interface IEventsQuery {
+    start: number;
+    limit: number;
+  }
+
+  const getDepositEvents = async (query: IEventsQuery): Promise<void> => {
     const spika = await spikaClient();
-    const isAccount = await validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       if (query) {
-        let data = await spika.client.getEventsByEventHandle(
-          currentAddress,
-          coinStore(currentAsset.type),
+        const result = await spika.client.getEventsByEventHandle(
+          currentAddress!,
+          coinStore(currentAsset!.type),
           "deposit_events",
           {
             start: query.start < 0 ? 0 : query.start,
             limit: query.limit,
           }
         );
-        let result = data.reverse((r) => r.type === "sequence_number");
+        result.reverse();
         debug.log("depositEvents: ", result);
         setDepositEvents(result);
       }
@@ -453,21 +488,21 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const getWithdrawEvents = async (query) => {
-    const isAccount = await validateAccount(currentAddress);
+  const getWithdrawEvents = async (query: IEventsQuery): Promise<void> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
       if (query) {
-        let data = await spika.client.getEventsByEventHandle(
-          currentAddress,
-          coinStore(currentAsset.type),
+        const result = await spika.client.getEventsByEventHandle(
+          currentAddress!,
+          coinStore(currentAsset!.type),
           "withdraw_events",
           {
             start: query.start < 0 ? 0 : query.start,
             limit: query.limit,
           }
         );
-        let result = data.reverse((r) => r.type === "sequence_number");
+        result.reverse();
         debug.log("withdrawEvents: ", result);
         setWithdrawEvents(result);
       }
@@ -476,29 +511,31 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const getAssetData = async (type) => {
-    const isAccount = await validateAccount(currentAddress);
+  const getAssetData = async (type: string): Promise<aptos.Types.MoveResource | undefined> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
-      const data = await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
-      return data;
+      return await spika.client.getAccountResource(type.split("::")[0], coinInfo(type));
     }
   };
 
-  const getRegisteredAssets = async () => {
+  const getRegisteredAssets = async (): Promise<ICoin[] | undefined> => {
     const spika = await spikaClient();
-    const isAccount = await validateAccount(currentAddress);
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
-      const result = [];
-      const resources = await spika.client.getAccountResources(account.address());
+      const result: ICoin[] = [];
+      const resources = await spika.client.getAccountResources(account!.address());
       await Promise.all(
-        Object.values(resources).map(async (value) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Object.values(resources).map(async (value: any) => {
           if (
             value.type.startsWith("0x1::coin::CoinStore") //&&
             // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
           ) {
             const type = value.type.substring(value.type.indexOf("<") + 1, value.type.lastIndexOf(">"));
-            const asset = await getAssetData(type);
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const asset: any = await getAssetData(type);
             result.push({
               type: type,
               data: {
@@ -514,16 +551,16 @@ export const Web3Provider = ({ children }) => {
           }
         })
       );
-
       return result;
     }
   };
 
-  const updateAccountAssets = async () => {
-    const isAccount = await validateAccount(currentAddress);
+  const updateAccountAssets = async (): Promise<void> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const registeredAssets = await getRegisteredAssets();
-      const result = registeredAssets.reduce((acc, curr) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = registeredAssets!.reduce((acc: ICoin[], curr: ICoin) => {
         const stored = coinList.find(({ type }) => type === curr.type);
         if (stored) {
           stored.data.balance = curr.data.balance;
@@ -535,52 +572,53 @@ export const Web3Provider = ({ children }) => {
         }
         return acc;
       }, []);
-      result.sort((a, b) => a.data.name.localeCompare(b.data.name));
+      result.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
       setAccountAssets(result);
       setStore(PLATFORM, _accountAssets, result);
     }
   };
 
-  const getAccountTokens = async () => {
-    const isAccount = await validateAccount(currentAddress);
+  const getAccountTokens = async (): Promise<void> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
       try {
         // Get total number of Token deposit_events received by an account
-        let resources = await spika.client.getAccountResources(account.address());
-        let tokenStore = resources.find((r) => r.type === token.tokenStore.type);
+        const resources = await spika.client.getAccountResources(account!.address());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tokenStore: any = resources.find((r) => r.type === token.tokenStore.type);
         debug.log("resources : ", resources);
         debug.log("tokenStore : ", tokenStore);
 
-        const getTokens = async () => {
+        const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {
-            // console.log("Account doesn't hold any NFT yet");
-            return setAccountTokens(0);
+            debug.log("account doesn't hold any NFT yet");
+            return setAccountTokens([]);
           } else {
-            let counter = parseInt(tokenStore.data.deposit_events.counter);
+            const counter = parseInt(tokenStore.data.deposit_events.counter);
             // Get Token deposit_events
-            let data = await spika.client.getEventsByEventHandle(currentAddress, tokenStore.type, "deposit_events", {
+            const data = await spika.client.getEventsByEventHandle(currentAddress!, tokenStore.type, "deposit_events", {
               limit: counter === 0 ? 1 : counter,
             });
 
             // Get TokenId for accountDepositedTokens and remove dublicates
-            let tokenIds = [...new Set(data.map((i) => i.data.id))];
+            const tokenIds = [...new Set(data.map((i) => i.data.id))];
 
             // Returns an array of tokenId and value
             const accountTokensBalances = await Promise.all(
               tokenIds.map(async (i) => {
-                let data = await spika.tokenClient.getTokenForAccount(currentAddress, i);
+                const data = await spika.tokenClient.getTokenForAccount(currentAddress!, i);
                 return data;
               })
             );
 
             // Returns an array of tokenId and value for all tokens with > 0 balance
-            let result = accountTokensBalances.filter((r) => {
+            const result = accountTokensBalances.filter((r) => {
               return r.amount !== "0";
             });
 
             if (result == undefined) {
-              setAccountTokens(0);
+              setAccountTokens([]);
             } else {
               setAccountTokens(result);
             }
@@ -591,23 +629,24 @@ export const Web3Provider = ({ children }) => {
         console.log(error);
       }
     } else {
-      setAccountTokens(0);
+      setAccountTokens([]);
     }
   };
 
-  const getNftDetails = async () => {
-    const isAccount = await validateAccount(currentAddress);
+  const getNftDetails = async (): Promise<void> => {
+    const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
       try {
-        if (accountTokens === 0) {
+        if (accountTokens.length === 0) {
           // console.log("Account doesn't hold any NFT yet");
-          return setNftDetails(0);
+          return setNftDetails([]);
         } else {
-          let result = [];
+          const result: INftDetails[] = [];
           await Promise.all(
             accountTokens.map(async (i) => {
-              const nft = await spika.tokenClient.getTokenData(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const nft: any = await spika.tokenClient.getTokenData(
                 i.id.token_data_id.creator,
                 i.id.token_data_id.collection,
                 i.id.token_data_id.name
@@ -639,19 +678,20 @@ export const Web3Provider = ({ children }) => {
         console.log(error);
       }
     } else {
-      setNftDetails(0);
+      setNftDetails([]);
     }
   };
 
   const clearPrevEstimation = () => {
     setIsValidTransaction(false);
-    setEstimatedTxnResult(false);
+    setEstimatedTxnResult(undefined);
   };
 
   return (
     <Web3Context.Provider
       value={{
         chainId,
+        recipientAddress,
         setRecipientAddress,
         amount,
         setAmount,

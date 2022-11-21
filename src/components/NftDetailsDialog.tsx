@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   Box,
   Button,
@@ -17,7 +18,7 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import shortenAddress from "../utils/shortenAddress";
 
-const NftDetailsDialog = () => {
+const NftDetailsDialog = (): JSX.Element => {
   const { openNftDetailsDialog, setOpenNftDetailsDialog, selectedNft, setSelectedNft } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
 
@@ -31,7 +32,7 @@ const NftDetailsDialog = () => {
 
   const handleClose = () => {
     setOpenNftDetailsDialog(false);
-    setSelectedNft([]);
+    setSelectedNft(undefined);
   };
 
   return (
@@ -39,14 +40,14 @@ const NftDetailsDialog = () => {
       {accountImported && openNftDetailsDialog && (
         <Dialog open={openNftDetailsDialog} onClose={handleClose}>
           <DialogTitle align="center">
-            <Box sx={{ width: "260px" }}>{selectedNft.name}</Box>
+            <Box sx={{ width: "260px" }}>{selectedNft!.name}</Box>
           </DialogTitle>
           <DialogContent sx={{ alignItems: "center", justifyContent: "center" }}>
             <Box sx={{ flexGrow: 1 }}>
-              <Box align="center">
+              <Box sx={{ alignSelf: "center" }}>
                 <Paper
                   component="img"
-                  src={selectedNft.uri}
+                  src={selectedNft!.uri}
                   onError={({ currentTarget }) => {
                     currentTarget.onerror = null; // prevents looping
                     currentTarget.src = default_nft;
@@ -64,7 +65,7 @@ const NftDetailsDialog = () => {
                   </Typography>
                   <Item>
                     <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
-                      {selectedNft.supply}
+                      {selectedNft!.supply}
                     </Typography>
                   </Item>
                 </Grid>
@@ -72,8 +73,8 @@ const NftDetailsDialog = () => {
                   <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                     Creator
                   </Typography>
-                  <Tooltip title={selectedNft.creator}>
-                    <Item sx={{ cursor: "pointer" }}>{shortenAddress(selectedNft.creator)}</Item>
+                  <Tooltip title={selectedNft!.creator}>
+                    <Item sx={{ cursor: "pointer" }}>{shortenAddress(selectedNft!.creator!)}</Item>
                   </Tooltip>
                 </Grid>
                 <Grid item xs={12}>
@@ -82,7 +83,7 @@ const NftDetailsDialog = () => {
                   </Typography>
                   <Item>
                     <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
-                      {selectedNft.collection}
+                      {selectedNft!.collection}
                     </Typography>
                   </Item>
                 </Grid>
@@ -92,7 +93,7 @@ const NftDetailsDialog = () => {
                   </Typography>
                   <Item>
                     <Typography variant="body2" sx={{ textOverflow: "ellipsis", wordWrap: "break-word" }}>
-                      {selectedNft.description}
+                      {selectedNft!.description}
                     </Typography>
                   </Item>
                 </Grid>

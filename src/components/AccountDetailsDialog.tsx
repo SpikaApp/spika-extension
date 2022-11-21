@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import SaveIcon from "@mui/icons-material/Save";
 import {
   Button,
@@ -15,21 +16,21 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import saveToFile from "../utils/saveToFile";
 
-const AccountDetailsDialog = () => {
+const AccountDetailsDialog = (): JSX.Element => {
   const { openAccountDetailsDialog, setOpenAccountDetailsDialog } = useContext(UIContext);
   const { publicAccount } = useContext(AccountContext);
 
   const title = `Spika wallet public account credentials:`;
   const breakLine = "========================================";
-  const address = `address: ${publicAccount.account}`;
-  const publicKey = `publicKey: ${publicAccount.publicKey}`;
-  const authKey = `authKey: ${publicAccount.authKey}`;
+  const address = `address: ${publicAccount!.account}`;
+  const publicKey = `publicKey: ${publicAccount!.publicKey}`;
+  const authKey = `authKey: ${publicAccount!.authKey}`;
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     saveToFile("account", `${title}\n${breakLine}\n${address}\n${publicKey}\n${authKey}`);
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenAccountDetailsDialog(false);
   };
 
@@ -67,7 +68,7 @@ const AccountDetailsDialog = () => {
               multiline
               rows={3}
               variant="outlined"
-              value={publicAccount.account}
+              value={publicAccount!.account}
             />
             <TextField
               sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
@@ -79,7 +80,7 @@ const AccountDetailsDialog = () => {
               multiline
               rows={3}
               variant="outlined"
-              value={publicAccount.publicKey}
+              value={publicAccount!.publicKey}
             />
             <TextField
               sx={{ mt: 1.5, width: "275px" }}
@@ -91,7 +92,7 @@ const AccountDetailsDialog = () => {
               multiline
               rows={3}
               variant="outlined"
-              value={publicAccount.authKey}
+              value={publicAccount!.authKey}
             />
           </Stack>
         </form>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import InfoIcon from "@mui/icons-material/Info";
 import {
   Box,
@@ -24,6 +25,7 @@ import logo from "../assets/spika_logo_200.png";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { IRequest } from "../interface";
 import { getApp, setApp } from "../lib/connectedApps";
 import { getMem, setMem } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
@@ -31,10 +33,7 @@ import shortenAddress from "../utils/shortenAddress";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
-const PermissionDialog = () => {
-  const [request, setRequest] = useState({});
-  const [method, setMethod] = useState("default");
-  const [requestSender, setRequestSender] = useState();
+const PermissionDialog = (): JSX.Element => {
   const { spikaWallet, openPermissionDialog, setOpenPermissionDialog, isPopup, setIsPopup } = useContext(UIContext);
   const { setIsLoading, alertSignal, accountImported, publicAccount } = useContext(AccountContext);
   const {
@@ -45,11 +44,16 @@ const PermissionDialog = () => {
     signTransaction,
     signAndSubmitTransaction,
   } = useContext(Web3Context);
+  const [request, setRequest] = useState<IRequest>();
+  const [method, setMethod] = useState("default");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [requestSender, setRequestSender] = useState<any>();
   const _currentRoute = "currentRoute";
   const _request = "currentRequest";
   const _sender = "currentSender";
 
-  let response;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let response: any;
 
   useEffect(() => {
     if (openPermissionDialog) {
@@ -66,8 +70,10 @@ const PermissionDialog = () => {
 
   useEffect(() => {
     if (accountImported) {
-      if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
-        estimate();
+      if (request) {
+        if (request.method === "signTransaction" || request.method === "signAndSubmitTransaction") {
+          estimate();
+        }
       }
     }
   }, [accountImported]);
@@ -88,7 +94,7 @@ const PermissionDialog = () => {
     }
   }, [isPopup]);
 
-  const getRequest = async () => {
+  const getRequest = async (): Promise<void> => {
     const data = await getMem(PLATFORM, _request);
     setRequest(data);
     if (data !== undefined || data !== null) {
@@ -96,31 +102,31 @@ const PermissionDialog = () => {
     }
   };
 
-  const getSender = async () => {
+  const getSender = async (): Promise<void> => {
     const data = await getMem(PLATFORM, _sender);
     setRequestSender(data);
   };
 
-  const sendResponse = async () => {
+  const sendResponse = async (): Promise<void> => {
     await chrome.runtime.sendMessage({
-      responseMethod: request.method,
-      id: request.id,
+      responseMethod: request!.method,
+      id: request!.id,
       response: response,
     });
   };
 
-  const estimate = async () => {
+  const estimate = async (): Promise<void> => {
     setIsLoading(true);
-    await estimateTransaction(request.args);
+    await estimateTransaction(request!.args);
     setIsLoading(false);
   };
 
-  const handleApprove = async () => {
-    const data = await getApp(publicAccount, requestSender.origin);
+  const handleApprove = async (): Promise<void> => {
+    const data = await getApp(publicAccount!, requestSender!.origin);
     switch (method) {
       case "connect":
         if (!data) {
-          const set = await setApp(publicAccount, requestSender.origin);
+          const set = await setApp(publicAccount!, requestSender!.origin);
           if (set) {
             response = publicAccount;
           } else {
@@ -135,38 +141,38 @@ const PermissionDialog = () => {
         response = publicAccount;
         break;
       case "signMessage":
-        response = await signMessage(request.args);
+        response = await signMessage(request!.args);
         break;
       case "signTransaction":
         setIsLoading(true);
-        response = await signTransaction(request.args);
+        response = await signTransaction(request!.args);
         setIsLoading(false);
         break;
       case "signAndSubmitTransaction":
         setIsLoading(true);
-        response = await signAndSubmitTransaction(request.args);
+        response = await signAndSubmitTransaction(request!.args);
         setIsLoading(false);
         break;
     }
-    sendResponse(response);
+    sendResponse();
     clearDialog();
     window.close();
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     response = false;
-    sendResponse(response);
+    sendResponse();
     clearDialog();
     window.close();
   };
 
-  const clearDialog = () => {
+  const clearDialog = (): void => {
     setOpenPermissionDialog(false);
     setMethod("default");
     setDefaultRoute();
   };
 
-  const setDefaultRoute = () => {
+  const setDefaultRoute = (): void => {
     setMem(PLATFORM, _currentRoute, "/");
   };
 
@@ -188,24 +194,26 @@ const PermissionDialog = () => {
           {accountImported && (
             <div>
               {(method === "connect" || method === "account") && (
-                <Dialog fullScreen sx={{ borderRadius: "0" }} align="center" open={openPermissionDialog}>
-                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                <Dialog fullScreen sx={{ borderRadius: "0" }} open={openPermissionDialog}>
+                  <DialogTitle sx={{ display: "flex", alignSelf: "center" }}>{requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
-                    <Box
-                      component="img"
-                      sx={{
-                        height: 48,
-                        width: 48,
-                      }}
-                      alt="favicon"
-                      src={requestSender.tab.favIconUrl}
-                    />
-                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
-                      {requestSender.tab.title}
-                    </Typography>
-                    <Typography variant="body1">
-                      Website is requesting access to the following account information:
-                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <Box
+                        component="img"
+                        sx={{
+                          height: 48,
+                          width: 48,
+                        }}
+                        alt="favicon"
+                        src={requestSender.tab.favIconUrl}
+                      />
+                      <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                        {requestSender.tab.title}
+                      </Typography>
+                      <Typography align="center" variant="body1">
+                        Website is requesting access to the following account information:
+                      </Typography>
+                    </Box>
                     <Box sx={{ width: "100%", maxWidth: 320, mt: 4 }}>
                       <List>
                         <ListItem disablePadding>
@@ -256,30 +264,34 @@ const PermissionDialog = () => {
                 </Dialog>
               )}
               {method === "signMessage" && (
-                <Dialog fullScreen align="center" open={openPermissionDialog}>
-                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                <Dialog fullScreen open={openPermissionDialog}>
+                  <DialogTitle sx={{ alignSelf: "center" }}>{requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
-                    <Box
-                      component="img"
-                      sx={{
-                        height: 48,
-                        width: 48,
-                      }}
-                      alt="favicon"
-                      src={requestSender.tab.favIconUrl}
-                    />
-                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
-                      {requestSender.tab.title}
-                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <Box
+                        component="img"
+                        sx={{
+                          height: 48,
+                          width: 48,
+                        }}
+                        alt="favicon"
+                        src={requestSender.tab.favIconUrl}
+                      />
+                      <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                        {requestSender.tab.title}
+                      </Typography>
+                      <Typography align="center" variant="body1">
+                        This website is requesting to sign the following:
+                      </Typography>
+                    </Box>
                     <div>
-                      <Typography variant="body1">This website is requesting to sign the following:</Typography>
                       <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
                         <Grid item xs={12}>
-                          <Typography align="start" variant="body1" sx={{ ml: 0.5 }}>
+                          <Typography variant="body1" sx={{ ml: 0.5 }}>
                             Message
                           </Typography>
                           <Item>
-                            <pre>{JSON.stringify(request.args, null, 2)}</pre>
+                            <pre>{JSON.stringify(request!.args, null, 2)}</pre>
                           </Item>
                         </Grid>
                       </Grid>
@@ -312,57 +324,61 @@ const PermissionDialog = () => {
                 </Dialog>
               )}
               {(method === "signTransaction" || method === "signAndSubmitTransaction") && (
-                <Dialog fullScreen align="center" open={openPermissionDialog}>
-                  <DialogTitle> {requestSender.origin}</DialogTitle>
+                <Dialog fullScreen open={openPermissionDialog}>
+                  <DialogTitle sx={{ alignSelf: "center" }}>{requestSender.origin}</DialogTitle>
                   <DialogContent sx={{ maxWidth: 375 }}>
-                    <Box
-                      component="img"
-                      sx={{
-                        height: 48,
-                        width: 48,
-                      }}
-                      alt="favicon"
-                      src={requestSender.tab.favIconUrl}
-                    />
-                    <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
-                      {requestSender.tab.title}
-                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <Box
+                        component="img"
+                        sx={{
+                          height: 48,
+                          width: 48,
+                        }}
+                        alt="favicon"
+                        src={requestSender.tab.favIconUrl}
+                      />
+                      <Typography sx={{ mt: 2, mb: 4 }} variant="h5">
+                        {requestSender.tab.title}
+                      </Typography>
+                    </Box>
                     {isValidTransaction && (
                       <div>
-                        <Typography variant="body1">Transaction approval required</Typography>
+                        <Typography align="center" variant="body1">
+                          Transaction approval required
+                        </Typography>
                         <Grid sx={{ width: "320px", mt: 2 }} container spacing={1}>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                               Network fee
                             </Typography>
-                            <Item>~ {estimatedTxnResult.gas_used}</Item>
+                            <Item>~ {estimatedTxnResult!.gas_used}</Item>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                               Max gas amount
                             </Typography>
-                            <Item>{estimatedTxnResult.max_gas_amount}</Item>
+                            <Item>{estimatedTxnResult!.max_gas_amount}</Item>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                               Sender
                             </Typography>
-                            <Tooltip sx={{ cursor: "pointer" }} title={estimatedTxnResult.sender}>
-                              <Item>{shortenAddress(estimatedTxnResult.sender)}</Item>
+                            <Tooltip sx={{ cursor: "pointer" }} title={estimatedTxnResult!.sender}>
+                              <Item>{shortenAddress(estimatedTxnResult!.sender)}</Item>
                             </Tooltip>
                           </Grid>
                           <Grid item xs={6}>
-                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                               Sequence number
                             </Typography>
-                            <Item>{estimatedTxnResult.sequence_number}</Item>
+                            <Item>{estimatedTxnResult!.sequence_number}</Item>
                           </Grid>
                           <Grid item xs={12}>
-                            <Typography align="start" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography variant="subtitle2" sx={{ ml: 0.5 }}>
                               Payload
                             </Typography>
                             <Item>
-                              <pre>{JSON.stringify(request.args, null, 2)}</pre>
+                              <pre>{JSON.stringify(request!.args, null, 2)}</pre>
                             </Item>
                           </Grid>
                         </Grid>
@@ -406,7 +422,7 @@ const PermissionDialog = () => {
           )}
         </div>
       ) : (
-        <Dialog fullScreen align="center" open={openPermissionDialog}>
+        <Dialog fullScreen open={openPermissionDialog}>
           <DialogTitle align="center"> </DialogTitle>
           <DialogContent>
             <Stack

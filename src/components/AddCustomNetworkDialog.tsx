@@ -4,14 +4,14 @@ import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { setNetwork } from "../lib/accountNetworks";
 
-const AddCustomNetworkDialog = () => {
+const AddCustomNetworkDialog = (): JSX.Element => {
   const { openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog, setSomethingChanged } = useContext(UIContext);
   const { currentAddress } = useContext(AccountContext);
-  const [networkName, setNetworkName] = useState("");
-  const [nodeUrl, setNodeUrl] = useState("");
-  const [faucetUrl, setFaucetUrl] = useState("");
+  const [networkName, setNetworkName] = useState<string>("");
+  const [nodeUrl, setNodeUrl] = useState<string>("");
+  const [faucetUrl, setFaucetUrl] = useState<string>("");
 
-  const handleAddNetwork = async () => {
+  const handleAddNetwork = async (): Promise<void> => {
     const customNetwork = {
       name: networkName,
       data: {
@@ -21,18 +21,19 @@ const AddCustomNetworkDialog = () => {
         testnet: true,
       },
     };
-    await setNetwork(currentAddress, customNetwork);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await setNetwork(currentAddress!, customNetwork);
     setSomethingChanged(true);
     setOpenAddCustomNetworkDialog(false);
     clearNetworkData();
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenAddCustomNetworkDialog(false);
     clearNetworkData();
   };
 
-  const clearNetworkData = () => {
+  const clearNetworkData = (): void => {
     setNodeUrl("");
     setFaucetUrl("");
     setNetworkName("");

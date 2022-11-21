@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   Button,
   Dialog,
@@ -19,13 +20,13 @@ import copyToClipboard from "../utils/copyToClipboard";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
-const ReceiveDialog = () => {
+const ReceiveDialog = (): JSX.Element => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
   const { currentAddress, currentNetwork } = useContext(AccountContext);
   const { chainId } = useContext(Web3Context);
 
   const handleClick = () => {
-    copyToClipboard(currentAddress);
+    copyToClipboard(currentAddress!);
   };
 
   const handleClose = () => {
@@ -51,7 +52,7 @@ const ReceiveDialog = () => {
             }}
           >
             <QRCodeCanvas
-              value={currentAddress}
+              value={currentAddress!}
               includeMargin={false}
               level="M"
               size={128}
@@ -63,7 +64,7 @@ const ReceiveDialog = () => {
             Copy to clipboard
           </Button>
           <Typography noWrap align="left" variant="body1" sx={{ ml: "75px", my: 3, width: "200px" }}>
-            Network: {currentNetwork.name} <br />
+            Network: {currentNetwork!.name} <br />
             Chain id: {chainId}
           </Typography>
         </Stack>

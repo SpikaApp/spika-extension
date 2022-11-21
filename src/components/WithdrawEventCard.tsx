@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { Button, ListItem, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
@@ -7,17 +8,26 @@ import { Web3Context } from "../context/Web3Context";
 import { stringToValue } from "../utils/values";
 import TxnDetailsDialog from "./TxnDetailsDialog";
 
+type WithdrawEventProps = {
+  withdrawEvent: {
+    version: number;
+    data: {
+      amount: string;
+    };
+  };
+};
+
 const SentEventCard = ({
   withdrawEvent: {
     version,
     data: { amount },
   },
-}) => {
+}: WithdrawEventProps): JSX.Element => {
   const { setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const { getTxnDetails, setAmount } = useContext(Web3Context);
 
-  const handleOpenTxnDetailsDialog = async () => {
+  const handleOpenTxnDetailsDialog = async (): Promise<void> => {
     setTxnType(1);
     setAmount(amount);
     await getTxnDetails(version);
@@ -32,9 +42,9 @@ const SentEventCard = ({
           <Typography sx={{ mr: 0.5 }}>Txn {version} </Typography>
           <Stack direction="row">
             <Typography noWrap sx={{ mr: 0.5, maxWidth: "100px" }}>
-              {stringToValue(currentAsset, amount)}
+              {stringToValue(currentAsset!, amount)}
             </Typography>
-            <Typography sx={{ mr: 0.5, maxWidth: "50px" }}>{currentAsset.data.symbol}</Typography>
+            <Typography sx={{ mr: 0.5, maxWidth: "50px" }}>{currentAsset!.data.symbol}</Typography>
           </Stack>
         </Stack>
       </Button>
