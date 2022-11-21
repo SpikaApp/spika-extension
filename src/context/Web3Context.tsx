@@ -332,8 +332,14 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const signMessage = async (message: string): Promise<string> => {
-    const messageToSign = Buffer.from(message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const signMessage = async (message: any): Promise<string> => {
+    let messageToSign: Uint8Array;
+    if (message instanceof String) {
+      messageToSign = Buffer.from(message);
+    } else {
+      messageToSign = Buffer.from(JSON.stringify(message));
+    }
     const signedMessage = account!.signBuffer(messageToSign);
     return signedMessage.hex();
   };
