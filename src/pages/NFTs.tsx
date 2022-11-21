@@ -29,13 +29,13 @@ const NftButton = styled(Button)(() => ({
   },
 }));
 
-const NFTs = () => {
+const NFTs = (): JSX.Element => {
   const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
   const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
-  const [isWaiting, setIsWaiting] = useState(true);
-  const [page, setPage] = useState(1);
-  const [pages] = useState(0);
+  const [isWaiting, setIsWaiting] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [pages] = useState<number>(0);
 
   const hidden = true;
 
@@ -62,7 +62,8 @@ const NFTs = () => {
     }
   }, [accountTokens]);
 
-  const handlePageChange = async (event, newPage) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handlePageChange = async (_event: any, newPage: number): Promise<void> => {
     setPage(newPage);
   };
 
@@ -85,7 +86,7 @@ const NFTs = () => {
         </Button>
       </Stack>
       {isWaiting === true && accountImported && (
-        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}>
+        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "225px" }}>
           <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
             Updating metadata...
           </Typography>
@@ -98,43 +99,45 @@ const NFTs = () => {
         </Typography>
       )}
       {accountTokens.length > 0 && !isWaiting && accountImported && (
-        <Box align="center" sx={{ height: "340px", mb: "28px" }}>
-          <ImageList
-            gap={18}
-            cols={3}
-            rowHeight={101}
-            variant="quilted"
-            sx={{
-              overflow: "hidden",
-              overflowY: "visible",
-              width: "338px",
-              maxHeight: "340px",
-            }}
-          >
-            {nftDetails.map((nft) => (
-              <ImageListItem key={nft.name + nft.description + nft.uri}>
-                <Tooltip title={nft.name}>
-                  <NftButton
-                    disableRipple
-                    sx={{ width: "100px", height: "100px" }}
-                    onClick={() => handleNftDetailsUI(nft)}
-                  >
-                    <Paper
-                      component="img"
+        <Stack sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ height: "340px", mb: "28px" }}>
+            <ImageList
+              gap={18}
+              cols={3}
+              rowHeight={101}
+              variant="quilted"
+              sx={{
+                overflow: "hidden",
+                overflowY: "visible",
+                width: "338px",
+                maxHeight: "340px",
+              }}
+            >
+              {nftDetails.map((nft) => (
+                <ImageListItem key={nft.name + nft.description + nft.uri}>
+                  <Tooltip title={nft.name}>
+                    <NftButton
+                      disableRipple
                       sx={{ width: "100px", height: "100px" }}
-                      src={`${nft.uri}`}
-                      loading="lazy"
-                      onError={({ currentTarget }) => {
-                        currentTarget.onerror = null; // prevents looping
-                        currentTarget.src = default_nft;
-                      }}
-                    />
-                  </NftButton>
-                </Tooltip>
-              </ImageListItem>
-            ))}
-          </ImageList>
-        </Box>
+                      onClick={() => handleNftDetailsUI(nft)}
+                    >
+                      <Paper
+                        component="img"
+                        sx={{ width: "100px", height: "100px" }}
+                        src={`${nft.uri}`}
+                        loading="lazy"
+                        onError={({ currentTarget }) => {
+                          currentTarget.onerror = null; // prevents looping
+                          currentTarget.src = default_nft;
+                        }}
+                      />
+                    </NftButton>
+                  </Tooltip>
+                </ImageListItem>
+              ))}
+            </ImageList>
+          </Box>
+        </Stack>
       )}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
         {accountTokens !== 0 && !isWaiting && accountImported && hidden && <Box sx={{ mb: "32px" }} />}

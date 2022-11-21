@@ -3,17 +3,17 @@ import { Link as RouterLink } from "react-router-dom";
 import spika_bg from "../assets/spika_bg.png";
 import { PLATFORM } from "../utils/constants";
 
-const Onboarding = () => {
+const Onboarding = (): JSX.Element => {
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: "100px", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Typography variant="h5" align="center" color="textPrimary" gutterBottom>
           <b>Welcome!</b>
         </Typography>
-        <Typography sx={{ mt: 1, mb: 3 }} variant="subtitle" align="center" color="textPrimary">
+        <Typography sx={{ mt: 1, mb: 3 }} variant="subtitle1" align="center" color="textPrimary">
           <b>Create or import existing account to start working with wallet.</b>
         </Typography>
-        <Stack direction="column" align="center">
+        <Stack sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Button
             variant="contained"
             component={RouterLink}
@@ -27,7 +27,7 @@ const Onboarding = () => {
             Create Account
           </Button>
           <Link component={RouterLink} to="import">
-            <Typography sx={{ fontWeight: 500, textDecorationLine: "underline" }} variant="body" color="link">
+            <Typography sx={{ fontWeight: 500, textDecorationLine: "underline" }} variant="body1" color="link">
               Import Account
             </Typography>
           </Link>

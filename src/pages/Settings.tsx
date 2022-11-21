@@ -7,7 +7,7 @@ import NetworkDialog from "../components/NetworkDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 
-const Settings = () => {
+const Settings = (): JSX.Element => {
   const {
     handleMnemonicUI,
     handlePrivateKeyUI,
@@ -20,7 +20,7 @@ const Settings = () => {
   return (
     <Container maxWidth="xs">
       <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
-        <CardContent align="center" sx={{ mt: 1 }}>
+        <CardContent sx={{ alignSelf: "center", mt: 1 }}>
           {accountImported && (
             <Stack sx={{ width: "200px" }}>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>

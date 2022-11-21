@@ -5,7 +5,7 @@ import spika_logo from "../assets/spika_logo_128.png";
 import { UIContext } from "../context/UIContext";
 import { APTOS_SDK_VERSION, EXTENSION_VERSION } from "../utils/constants";
 
-const About = () => {
+const About = (): JSX.Element => {
   const { darkMode } = useContext(UIContext);
 
   return (

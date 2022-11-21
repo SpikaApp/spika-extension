@@ -13,17 +13,18 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 
-const Import = () => {
+const Import = (): JSX.Element => {
   const { mnemonic, setMnemonic, handleImport, password, setPassword, confirmPassword, setConfirmPassword } =
     useContext(AccountContext);
-  const [checkedLicenseRules, setCheckedLicenseRules] = useState(false);
+  const [checkedLicenseRules, setCheckedLicenseRules] = useState<boolean>(false);
 
   useEffect(() => {
     setPassword("");
     setConfirmPassword("");
   }, []);
 
-  const handleChangeLicenseRules = (event) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChangeLicenseRules = (event: any): void => {
     setCheckedLicenseRules(event.target.checked);
   };
 
