@@ -25,9 +25,9 @@ There are 2 ways to install web wallet:
 
 ### **Chrome Web Store**
 
-Navigate to [Chrome Web Store](https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb) page and select **Add to Chrome**:
+Navigate to [Chrome Web Store](https://chrome.google.com/webstore/detail/spika/fadkojdgchhfkdkklllhcphknohbmjmb) page and select **Add to Chrome**
 
-Web wallet will be installed and appear in the list of active extensions:
+Web wallet will be installed and appear in the list of active extensions.
 
 _NOTE: It might not be latest version of web wallet available in Chrome Web Store as publishing updates usually takes several days. See steps below for other options to update to latest version._
 
