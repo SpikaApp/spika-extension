@@ -352,10 +352,11 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
 
   const signTransaction = async (payload: aptos.Types.EntryFunctionPayload): Promise<Uint8Array | unknown> => {
     const spika = await spikaClient();
+    const _gasUnitsPrice = (await estimateGasPrice()).gas_estimate.toString();
     try {
       const transaction = await spika.client.generateTransaction(account!.address(), payload, {
         max_gas_amount: maxGasAmount,
-        gas_unit_price: gasUnitPrice,
+        gas_unit_price: _gasUnitsPrice,
       });
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       return signedTxn;
@@ -369,10 +370,11 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     payload: aptos.Types.EntryFunctionPayload
   ): Promise<aptos.Types.PendingTransaction | unknown> => {
     const spika = await spikaClient();
+    const _gasUnitsPrice = (await estimateGasPrice()).gas_estimate.toString();
     try {
       const transaction = await spika.client.generateTransaction(account!.address(), payload, {
         max_gas_amount: maxGasAmount,
-        gas_unit_price: gasUnitPrice,
+        gas_unit_price: _gasUnitsPrice,
       });
       const signedTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
       const result = await spika.client.submitSignedBCSTransaction(signedTxn);
