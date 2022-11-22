@@ -60,7 +60,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
 
   useEffect(() => {
     if (accountAssets.length > 0) {
-      debug.log("account assets", accountAssets);
+      debug.log("Account assets updated:", accountAssets);
       const swapSupported: ICoin[] = [];
       Object.values(accountAssets).map((value) => {
         if (value.data.swap) {
@@ -68,7 +68,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
         }
       });
       setSwapSupportedAssets(swapSupported);
-      debug.log("swap supported assets updated");
+      debug.log("Swap supported assets updated:", swapSupported);
       setIsFetching(false);
     }
   }, [accountAssets.length > 0]);

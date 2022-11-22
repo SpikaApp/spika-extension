@@ -15,6 +15,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import debug from "../utils/debug";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
@@ -46,7 +47,9 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
   const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
-    if (isValidTransaction && !openAddAssetDialog && !props) {
+    if (isValidTransaction && !openAddAssetDialog) {
+      debug.log("Valid transaction:", isValidTransaction);
+      debug.log("Estimated txn result:", estimatedTxnResult);
       if (estimatedTxnResult) {
         const txn: any = estimatedTxnResult;
         const _amount = txn.payload.arguments[1];

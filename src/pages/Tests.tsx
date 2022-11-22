@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
 import { AccountContext } from "../context/AccountContext";
 import { spikaClient } from "../lib/client";
+import debug from "../utils/debug";
 
 const Tests = (): JSX.Element => {
   const { accountImported, currentAddress } = useContext(AccountContext);
@@ -20,7 +21,7 @@ const Tests = (): JSX.Element => {
   const estimateMaxGasAmount = async () => {
     const spika = await spikaClient();
     const result = await spika.client.estimateMaxGasAmount(currentAddress!);
-    console.log(result);
+    debug.log("Estimated max gas amount", result);
   };
 
   return (

@@ -14,6 +14,7 @@ import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../li
 import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constants";
 import { decryptPassword, encryptPassword } from "../utils/pwd";
 import { UIContext } from "./UIContext";
+import debug from "../utils/debug";
 
 type AccountContextProps = {
   children: React.ReactNode;
@@ -101,6 +102,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const checkIfLoginRequired = async (): Promise<void> => {
     try {
       const data: boolean = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+      debug.log("Account information saved:", data);
       if (data) {
         handleLoginUI();
       } else {
@@ -148,6 +150,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     removeMem(PLATFORM, "PWD");
     setAccountImported(false);
     handleLoginUI();
+    debug.log("Wallet locked.");
   };
 
   const handleChangePassword = async (): Promise<void> => {
@@ -155,6 +158,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     const oldPassword: string = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
+        debug.log("New password shall not be the same.");
         throwAlert({
           signal: 58,
           title: "Incorrect password",
@@ -168,12 +172,15 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         clearPasswords();
         setIsLoading(false);
       } else if (newPassword === "") {
+        debug.log("Password field cannot be empty.");
         throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
         clearPasswords();
       } else if (newPassword !== confirmPassword) {
+        debug.log("Passwords do not match.");
         throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
         clearPasswords();
       } else if (newPassword.length > 5) {
+        debug.log("Password must be at least 6 characters long.");
         throwAlert({
           signal: 54,
           title: "Incorrect password",
@@ -183,6 +190,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         clearPasswords();
       }
     } else {
+      debug.log("Current password is wrong.");
       throwAlert({ signal: 57, title: "Incorrect password", message: "Current password is wrong", error: true });
       clearPasswords();
     }
@@ -201,6 +209,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       const encryptedPassword: IEncryptedPwd = await encryptPassword(newPassword);
       setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
+      debug.log("Password successfully changed.");
       throwAlert({ signal: 56, title: "Success", message: "Password successfully changed", error: false });
     } catch (error) {
       clearPasswords();
@@ -216,12 +225,15 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
+      debug.log("Password field cannot be empty.");
       throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
+      debug.log("Passwords do not match.");
       throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
       clearPasswords();
     } else if (password.length > 5) {
+      debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,
         title: "Incorrect password",
@@ -240,12 +252,15 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       setIsLoading(false);
       navigate("/");
     } else if (password === "") {
+      debug.log("Password field cannot be empty.");
       throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
+      debug.log("Passwords do not match.");
       throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
       clearPasswords();
     } else if (password.length > 5) {
+      debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,
         title: "Incorrect password",
@@ -269,11 +284,13 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     try {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
+      debug.log("Opening recovery phrase Dialog...");
       throwAlert({ signal: 91, title: "Secret Recovery Phrase", message: decryptedMnemonic, error: false });
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
+      debug.log("Incorrect password.");
       throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setMnemonicRequired(false);
@@ -285,11 +302,13 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     try {
       const encryptedPrivateKey: string = await getStore(PLATFORM, "DATA1");
       const decryptedPrivateKey: string = await passworder.decrypt(password, encryptedPrivateKey);
+      debug.log("Opening private key Dialog...");
       throwAlert({ signal: 81, title: "Private Key", message: `0x${decryptedPrivateKey}`, error: false });
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
     } catch (error) {
+      debug.log("Incorrect password.");
       throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setPrivateKeyRequired(false);
@@ -303,6 +322,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       await spika.client.getAccount(address);
       return true;
     } catch (error) {
+      debug.log("Address not found on chain:", address);
       return false;
     }
   };
@@ -316,14 +336,17 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       account: _account.address().hex(),
       authKey: _account.authKey().hex(),
     };
+    debug.log("Account initialized:", _publicAccount.account);
 
     // Encrypt mnemonic, private key and password
     const encryptedMnemonic = await passworder.encrypt(password, mnemonic);
     const encryptedPrivateKey = await passworder.encrypt(password, _privateKey);
     const encryptedPassword = await encryptPassword(password);
+    debug.log("Data encrypted.");
 
     // Initialize wallet locker
     locker("lock");
+    debug.log("Wallet locker initialized.");
 
     // Local storage
     setStore(PLATFORM, "DATA0", encryptedMnemonic);
@@ -337,9 +360,11 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     assetStore.addAssetStore(_account.address().hex(), aptosCoin);
     network.addNetworkStore(_account.address().hex());
     apps.addAddress(_publicAccount);
+    debug.log("Data saved to local storage.");
 
     // Session storage
     setMem(PLATFORM, "PWD", encryptedPassword);
+    debug.log("Data saved to session storage.");
 
     // Save state
     setAccountImported(true);
@@ -353,6 +378,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setBalance(undefined);
     setNewMnemonic("");
     setMnemonic("");
+    debug.log("State initialized.");
 
     return _publicAccount.account;
   };
@@ -360,6 +386,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const createAccount = async (): Promise<void> => {
     try {
       const result = await initAccount(newMnemonic);
+      debug.log("Account created:", result);
       throwAlert({ signal: 1, title: "Account created", message: `${result}`, error: false });
     } catch (error) {
       throwAlert({ signal: 2, title: "Failed create account", message: `${error}`, error: true });
@@ -370,6 +397,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const importAccount = async (): Promise<void> => {
     try {
       const result = await initAccount(mnemonic);
+      debug.log("Account imported:", result);
       throwAlert({ signal: 11, title: "Account imported", message: `${result}`, error: false });
     } catch (error) {
       throwAlert({ signal: 12, title: "Failed import account", message: `${error}`, error: true });
@@ -381,6 +409,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     try {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
+      debug.log("Data encrypted.");
       try {
         const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
         const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
@@ -413,13 +442,16 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         setCurrentAddress(_account.address().hex());
         setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
+        debug.log("Local storage, session storage, state updated.");
       } catch (error) {
         console.log(error);
+        debug.log("Failed to load account.");
         throwAlert({ signal: 42, title: "Failed to load account", message: `${error}`, error: true });
         setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }
     } catch (error) {
       console.log(error);
+      debug.log("Incorrect password.");
       throwAlert({ signal: 55, title: "Error", message: "Incorrect password", error: true });
       setPassword("");
       setOpenLoginDialog(true);
@@ -431,6 +463,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setAlertTitle(args.title);
     setAlertMessage(args.message);
     setIsError(args.error);
+    debug.log(`Sending ${args.error ? "error" : "alert"} ${args.signal}:`, args.title);
   };
 
   const clearAlert = (): void => {
@@ -438,12 +471,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setAlertTitle("");
     setAlertMessage("");
     setIsError(false);
+    debug.log("Alert cleared.");
   };
 
   const clearPasswords = (): void => {
     setPassword("");
     setConfirmPassword("");
     setNewPassword("");
+    debug.log("Passwords cleared.");
   };
 
   return (

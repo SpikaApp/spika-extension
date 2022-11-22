@@ -3,6 +3,7 @@ import { IContextUI, INftDetails } from "../interface";
 import { getMem, getStore } from "../lib/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
+import debug from "../utils/debug";
 
 type UIContextProps = {
   children: React.ReactNode;
@@ -58,6 +59,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
 
   const getWallet = async (): Promise<void> => {
     const status: boolean = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+    debug.log("Account imported:", status);
     if (!status) {
       setSpikaWallet(false);
     } else {
@@ -67,6 +69,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
 
   const getCurrentRoute = async (): Promise<void> => {
     const route: string = await getMem(PLATFORM, _currentRoute);
+    debug.log("Current route:", route);
     if (route === undefined || route === null) {
       setCurrentRoute("/");
     } else {
@@ -88,6 +91,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
 
   const getSessionTheme = async (): Promise<void> => {
     const data: boolean = await getStore(PLATFORM, "DARK_MODE");
+    debug.log("Dark mode enabled:", data);
     if (!data) {
       setDarkMode(false);
     } else {

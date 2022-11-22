@@ -78,13 +78,13 @@ const Swap = () => {
         setBaseCoin(swapSupportedAssets[0]);
         setQuoteCoin(swapSupportedAssets[1]);
         setDataFetched(true);
-        debug.log("swap enabled", true);
+        debug.log("Swap enabled:", true);
       } else {
         setSwapEnabled(false);
         setBaseCoin(aptosCoin);
         setQuoteCoin(aptosCoin);
         setDataFetched(true);
-        debug.log("swap enabled", false);
+        debug.log("Swap enabled:", false);
       }
     }
   }, [swapSupportedAssets, isFetching]);
@@ -96,7 +96,7 @@ const Swap = () => {
       setBaseCoin(aptosCoin);
       setQuoteCoin(aptosCoin);
       setDataFetched(true);
-      debug.log("not on Testnet, swap disabled");
+      debug.log("Not on Testnet, swap disabled.");
     }
   }, [swapSupportedAssets]);
 
@@ -109,7 +109,7 @@ const Swap = () => {
         setBadPair(false);
       }
       getCurrentBalance("baseCoin", baseCoin);
-      debug.log("baseCoin balance fetched");
+      debug.log(`Sell coin ${baseCoin.data.symbol} balance fetched.`);
     }
   }, [baseCoin]);
 
@@ -122,7 +122,7 @@ const Swap = () => {
         setBadPair(false);
       }
       getCurrentBalance("quoteCoin", quoteCoin);
-      debug.log("quoteCoin balance fetched");
+      debug.log(`Buy coin ${quoteCoin.data.symbol} balance fetched.`);
     }
   }, [quoteCoin]);
 
@@ -134,7 +134,7 @@ const Swap = () => {
     } else if (type === "quoteCoin") {
       setQuoteCoinBalance(Number(balance));
     } else {
-      debug.log("unknown or undefined coin type");
+      debug.log("Unknown or undefined coin type.");
     }
   };
 
@@ -175,11 +175,13 @@ const Swap = () => {
           setInsufficientBalance(true);
           setQuoteAmount("");
           debug.log(
-            `insufficient balance, balance: ${baseCoinBalance}, swapAmount: ${valueToString(baseCoin, swapAmount)}`
+            `Insufficient balance: ${baseCoinBalance}, requested amount to swap: ${valueToString(baseCoin, swapAmount)}`
           );
         } else {
           setInsufficientBalance(false);
-          debug.log(`balance ok, balance: ${baseCoinBalance}, swapAmount: ${valueToString(baseCoin, swapAmount)}`);
+          debug.log(
+            `Balance in range: ${baseCoinBalance}, requested amount to swap: ${valueToString(baseCoin, swapAmount)}`
+          );
         }
       }
     } else {
@@ -190,8 +192,8 @@ const Swap = () => {
   // Opens transaction preview dialog if estimatated txn was successfull.
   useEffect(() => {
     if (isValidTransaction) {
-      debug.log("estimated txn:", estimatedTxnResult);
-      debug.log("best route quote:", quote);
+      debug.log("Estimated transaction result updated:", estimatedTxnResult);
+      debug.log("Best route quote updated:", quote);
       setOpenConfirmSendDialog(true);
     }
   }, [isValidTransaction]);
@@ -217,12 +219,12 @@ const Swap = () => {
     try {
       const netConf = hippoClient();
       debug.log(netConf);
-      debug.log("netConf", netConf);
+      debug.log("netConf:", netConf);
       agg = await TradeAggregator.create(client as any, netConf);
     } catch (error) {
       console.log(error);
     }
-    debug.log(agg);
+    debug.log("Trade Aggregator client:", agg);
     return agg;
   };
 
@@ -232,13 +234,13 @@ const Swap = () => {
     try {
       const agg = await hippoTradeAggregator();
       const xCoinInfo = agg!.registryClient.getCoinInfoBySymbol(fromSymbol);
-      debug.log("xCoinInfo", xCoinInfo);
+      debug.log("xCoinInfo:", xCoinInfo);
       const yCoinInfo = agg!.registryClient.getCoinInfoBySymbol(toSymbol);
-      debug.log("yCoinInfo", toSymbol);
+      debug.log("yCoinInfo:", toSymbol);
       const inputAmt = parseFloat(inputUiAmt);
-      debug.log("inputAmt", inputUiAmt);
+      debug.log("inputAmt:", inputUiAmt);
       const quotes = await agg!.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
-      debug.log("quotes", quotes);
+      debug.log("Quotes:", quotes);
       setQuote(quotes[0]);
       // for (const quote of quotes) {
       //   console.log("###########");
@@ -263,12 +265,12 @@ const Swap = () => {
       const inputAmt = parseFloat(inputUiAmt);
       const quotes = await agg!.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
       if (quotes.length === 0) {
-        console.log("No route available");
+        console.log("No routes available.");
         return;
       }
       const payload = quotes[0].route.makePayload(inputAmt, 0);
       setSwapPayload(payload);
-      debug.log("payload", payload);
+      debug.log("Swap payload prepared:", payload);
       await estimateTransaction(payload as any, true);
     } catch (error) {
       console.log(error);

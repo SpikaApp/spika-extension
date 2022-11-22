@@ -104,14 +104,14 @@ const Transactions = (): JSX.Element => {
     if (accountImported) {
       if (value === "1") {
         if (depositEventsCounter > 0) {
-          debug.log("query", query);
+          debug.log("Deposit events query:", query);
           getDepositEvents(query!);
         } else {
           setDepositEvents([]);
         }
       }
       if (value === "2") {
-        debug.log("query", query);
+        debug.log("Withdraw events query:", query);
         if (withdrawEventsCounter > 0) {
           getWithdrawEvents(query!);
         } else {
@@ -144,23 +144,20 @@ const Transactions = (): JSX.Element => {
 
   const handleCount = () => {
     if (value === "1") {
-      debug.log("deposit events count: ", depositEventsCounter);
       if (depositEventsCounter > 5) {
-        debug.log("more then 5");
-        const no = Number(depositEventsCounter / 5);
-        debug.log("no", no);
+        debug.log("More then 5 deposit events.");
         const number = Math.ceil(Number(depositEventsCounter / 5));
-        debug.log("total deposit pages: ", number);
+        debug.log("Deposit events total pages:", number);
         setPages(number);
       } else {
         setPages(1);
       }
     }
     if (value === "2") {
-      debug.log("withdraw events count: ", withdrawEventsCounter);
       if (withdrawEventsCounter > 5) {
+        debug.log("More then 5 withdraw events.");
         const number = Math.ceil(Number(withdrawEventsCounter / 5));
-        debug.log("total withdraw pages: ", number);
+        debug.log("Withdraw events total pages:", number);
         setPages(number);
       } else {
         setPages(1);
@@ -171,19 +168,18 @@ const Transactions = (): JSX.Element => {
   // Counts query start.
   const countStart = (counter: number): number => {
     if (counter <= limitPerPage) {
-      debug.log("case 1");
+      debug.log("Counting events query start. Case 1:", 0);
       return 0;
     } else if (page === 1 && counter - limitPerPage > 0) {
-      debug.log("case 2");
+      debug.log("Counting events query start. Case 2:", counter - limitPerPage);
       return counter - limitPerPage;
     } else if (counter - page * limitPerPage > 0) {
-      debug.log("case 3");
-      debug.log("page", page);
+      debug.log("Counting events query start. Case 3:", counter - page * limitPerPage);
+      debug.log("Transaction page:", page);
       return counter - page * limitPerPage;
     } else if (counter - page * limitPerPage <= 0) {
-      debug.log("case 4");
-      debug.log("last page");
-      debug.log("page", page);
+      debug.log("Counting events query start. Case 4: last page.");
+      debug.log("Transaction page:", page);
       return 0;
     } else {
       return 0;

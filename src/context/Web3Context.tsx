@@ -210,7 +210,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       const bcsTxn = aptos.AptosClient.generateBCSSimulation(account!, transaction);
       const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
       if (estimatedTxn.success === true) {
-        debug.log("estimated result:", estimatedTxn);
+        debug.log("Estimated transaction result received:", estimatedTxn);
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn);
@@ -448,7 +448,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const getEventsCount = async (events: string): Promise<void | 0> => {
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
-      console.log(isAccount);
       const spika = await spikaClient();
       const resources = await spika.client.getAccountResources(account!.address());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -456,15 +455,15 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       if (accountResource) {
         if (events === "deposit_events") {
           const counter: number = parseInt(accountResource.data.deposit_events.counter);
-          debug.log(`${currentAsset!.data.symbol} ${events} counter`, counter);
+          debug.log(`${currentAsset!.data.symbol} ${events} counter:`, counter);
           setDepositEventsCounter(counter);
         } else if (events === "withdraw_events") {
           const counter: number = parseInt(accountResource.data.withdraw_events.counter);
-          debug.log(`${currentAsset!.data.symbol} ${events} counter`, counter);
+          debug.log(`${currentAsset!.data.symbol} ${events} counter:`, counter);
           setWithdrawEventsCounter(counter);
         }
       } else {
-        debug.log("no resource to count");
+        debug.log("No resources to count.");
         return 0;
       }
     } else {
@@ -492,7 +491,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
           }
         );
         result.reverse();
-        debug.log("depositEvents: ", result);
+        debug.log("Deposit events:", result);
         setDepositEvents(result);
       }
     } else {
@@ -515,7 +514,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
           }
         );
         result.reverse();
-        debug.log("withdrawEvents: ", result);
+        debug.log("Withdraw events:", result);
         setWithdrawEvents(result);
       }
     } else {
@@ -599,12 +598,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         const resources = await spika.client.getAccountResources(account!.address());
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tokenStore: any = resources.find((r) => r.type === token.tokenStore.type);
-        debug.log("resources : ", resources);
-        debug.log("tokenStore : ", tokenStore);
+        debug.log("Resources updated:", resources);
+        debug.log("Token store updated: ", tokenStore);
 
         const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {
-            debug.log("account doesn't hold any NFT yet");
+            debug.log("Account doesn't hold any NFT yet.");
             return setAccountTokens([]);
           } else {
             const counter = parseInt(tokenStore.data.deposit_events.counter);
@@ -663,7 +662,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
                 i.id.token_data_id.collection,
                 i.id.token_data_id.name
               );
-              debug.log("nft details: ", nft);
+              debug.log(`NFT ${i.id.token_data_id.name} details:`, nft);
 
               result.push({
                 default_properties: nft.default_properties,
@@ -683,7 +682,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
 
           result.reverse();
 
-          debug.log("nft details: ", result);
+          debug.log("Account's NFT updated:", result);
           return setNftDetails(result);
         }
       } catch (error) {

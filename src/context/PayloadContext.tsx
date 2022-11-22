@@ -2,6 +2,7 @@ import { BCS, TxnBuilderTypes } from "aptos";
 import React, { createContext } from "react";
 import { IContextPayload, IPayloadCollectionArgs, IPayloadNftArgs, IPayloadTransferArgs } from "../interface";
 import { spikaClient } from "../lib/client";
+import debug from "../utils/debug";
 
 type PayloadContextProps = {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
         ]
       )
     );
+    debug.log("Payload prepared:", payload);
     return payload;
   };
 
@@ -40,6 +42,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
       [],
       [args.name, args.description, args.uri, args.maxAmount, [false, false, false]]
     );
+    debug.log("Payload prepared:", payload);
     return payload;
   };
 
@@ -64,6 +67,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
         [], //property_types
       ]
     );
+    debug.log("Payload prepared:", payload);
     return payload;
   };
 
