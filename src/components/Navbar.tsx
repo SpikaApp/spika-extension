@@ -147,6 +147,15 @@ const Navbar = (): JSX.Element => {
                       </Link>
                     </MenuItem>
                   )}
+                  {devMode && (
+                    <MenuItem onClick={handleClose} disableRipple>
+                      <Link underline="none" component={RouterLink} to="/tests">
+                        <Typography variant="h6" color="textPrimary">
+                          Tests
+                        </Typography>
+                      </Link>
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="nfts">
                       <Typography variant="h6" color="textPrimary">
