@@ -56,7 +56,7 @@ const StyledMenu = styled<any>((props: any): any => (
 }));
 
 const Navbar = (): JSX.Element => {
-  const { spikaWallet, darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
+  const { spikaWallet, darkMode, setDarkMode, handleLogoutUI, devMode } = useContext(UIContext);
   const { accountImported, handleLock } = useContext(AccountContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -138,13 +138,15 @@ const Navbar = (): JSX.Element => {
                       </Typography>
                     </Link>
                   </MenuItem>
-                  <MenuItem onClick={handleClose} disableRipple>
-                    <Link underline="none" component={RouterLink} to="/swap">
-                      <Typography variant="h6" color="textPrimary">
-                        Swap
-                      </Typography>
-                    </Link>
-                  </MenuItem>
+                  {devMode && (
+                    <MenuItem onClick={handleClose} disableRipple>
+                      <Link underline="none" component={RouterLink} to="/swap">
+                        <Typography variant="h6" color="textPrimary">
+                          Swap
+                        </Typography>
+                      </Link>
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="nfts">
                       <Typography variant="h6" color="textPrimary">

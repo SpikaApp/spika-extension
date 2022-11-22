@@ -15,7 +15,7 @@ import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Transactions, 
 import { darkTheme, lightTheme } from "./theme";
 
 const App = (): JSX.Element => {
-  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes } = useContext(UIContext);
+  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes, devMode } = useContext(UIContext);
 
   return (
     <Router>
@@ -46,7 +46,7 @@ const App = (): JSX.Element => {
                             )}
                             {accountRoutesEnabled === true && <Route path="create" element={<Create />} />}
                             {accountRoutesEnabled === true && <Route path="import" element={<Import />} />}
-                            <Route path="swap" element={<Swap />} />
+                            {devMode && <Route path="swap" element={<Swap />} />}
                             <Route path="nfts" element={<NFTs />} />
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="settings" element={<Settings />} />
