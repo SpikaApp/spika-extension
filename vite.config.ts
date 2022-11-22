@@ -40,5 +40,5 @@ export default defineConfig({
   preview: {
     port: 5000,
   },
-  plugins: [react({ fastRefresh: false })],
+  plugins: [react({ fastRefresh: true })],
 });
