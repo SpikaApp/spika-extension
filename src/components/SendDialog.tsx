@@ -1,11 +1,25 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext } from "react";
-import { Button, TextField, Dialog, DialogContent, DialogTitle, Typography, Stack } from "@mui/material";
+import { useContext, useState, useEffect } from "react";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  Stack,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
 import Loading from "./Loading";
 import AlertDialog from "./AlertDialog";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { Web3Context } from "../context/Web3Context";
+import { Types } from "aptos";
 
 const SendDialog = (): JSX.Element => {
   const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
@@ -16,10 +30,30 @@ const SendDialog = (): JSX.Element => {
     setRecipientAddress,
     amount,
     setAmount,
+    gasUnitPrice,
+    setGasUnitPrice,
     maxGasAmount,
     setMaxGasAmount,
     handleEstimate,
+    estimateGasPrice,
   } = useContext(Web3Context);
+  const [estimatedGasPrice, setEstimatedGasPrice] = useState<Types.GasEstimation>();
+
+  useEffect(() => {
+    if (openSendDialog) {
+      handleEstimateGasPrice();
+    }
+  }, [openSendDialog]);
+
+  const handleEstimateGasPrice = async () => {
+    const result = await estimateGasPrice();
+    setEstimatedGasPrice(result);
+    setGasUnitPrice(result.gas_estimate.toString());
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setGasUnitPrice((event.target as HTMLInputElement).value);
+  };
 
   const handleCancel = (): void => {
     setRecipientAddress("");
@@ -49,7 +83,7 @@ const SendDialog = (): JSX.Element => {
             onChange={(e) => setRecipientAddress(e.target.value)}
           />
           <TextField
-            sx={{ mb: 4, width: "275px" }}
+            sx={{ mb: 2, width: "275px" }}
             id="amount"
             label="Amount"
             InputLabelProps={{ shrink: true }}
@@ -60,10 +94,36 @@ const SendDialog = (): JSX.Element => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
+          {estimatedGasPrice && (
+            <FormControl sx={{ mb: "16px" }}>
+              <FormLabel sx={{ alignSelf: "center" }} id="gas-price-priority">
+                Gas Price Priority
+              </FormLabel>
+              <RadioGroup
+                row
+                aria-labelledby="gas-price-selection-radio"
+                name="gas-price-selection-radio"
+                value={gasUnitPrice}
+                onChange={handleChange}
+                defaultValue={estimatedGasPrice.gas_estimate}
+              >
+                <FormControlLabel
+                  value={estimatedGasPrice.gas_estimate}
+                  control={<Radio />}
+                  label={`Regular: ${estimatedGasPrice.gas_estimate}`}
+                />
+                <FormControlLabel
+                  value={estimatedGasPrice.prioritized_gas_estimate}
+                  control={<Radio />}
+                  label={`High: ${estimatedGasPrice.prioritized_gas_estimate}`}
+                />
+              </RadioGroup>
+            </FormControl>
+          )}
           <TextField
             sx={{ width: "275px" }}
             id="maxGasAmount"
-            label="Max Gas Amount"
+            label="Max Gas Amount (Gas Units)"
             InputLabelProps={{ shrink: true }}
             inputProps={{ style: { textAlign: "right" } }}
             fullWidth={true}

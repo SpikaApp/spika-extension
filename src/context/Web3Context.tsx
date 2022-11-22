@@ -39,7 +39,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [maxGasAmount, setMaxGasAmount] = useState<string>("10000");
-  const [gasUnitPrice] = useState<string>("100");
+  const [gasUnitPrice, setGasUnitPrice] = useState<string>("100");
   const [estimatedTxnResult, setEstimatedTxnResult] = useState<aptos.Types.UserTransaction>();
   const [isValidTransaction, setIsValidTransaction] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,6 +164,11 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       setIsLoading(false);
       console.log(error);
     }
+  };
+
+  const estimateGasPrice = async (): Promise<aptos.Types.GasEstimation> => {
+    const spika = await spikaClient();
+    return await spika.client.estimateGasPrice();
   };
 
   const estimateTransaction = async (
@@ -702,6 +707,8 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         setRecipientAddress,
         amount,
         setAmount,
+        gasUnitPrice,
+        setGasUnitPrice,
         maxGasAmount,
         setMaxGasAmount,
         isValidTransaction,
@@ -741,6 +748,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         aptosAddress,
         getAptosName,
         getAptosAddress,
+        estimateGasPrice,
         estimateTransaction,
         signMessage,
         signTransaction,

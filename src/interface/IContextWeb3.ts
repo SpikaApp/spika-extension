@@ -1,4 +1,4 @@
-import aptos from "aptos";
+import aptos, { Types } from "aptos";
 import ICoin from "./ICoin";
 import INftDetails from "./INftDetails";
 
@@ -8,6 +8,8 @@ interface IContextWeb3 {
   setRecipientAddress: React.Dispatch<React.SetStateAction<string>>;
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
+  gasUnitPrice: string;
+  setGasUnitPrice: React.Dispatch<React.SetStateAction<string>>;
   maxGasAmount: string;
   setMaxGasAmount: React.Dispatch<React.SetStateAction<string>>;
   isValidTransaction: boolean;
@@ -48,6 +50,7 @@ interface IContextWeb3 {
   getAptosName: (address: string) => Promise<void>;
   getAptosAddress: (aptosName: string) => Promise<void>;
   handleMint: () => Promise<void>;
+  estimateGasPrice: () => Promise<Types.GasEstimation>;
   handleSend: (payload?: aptos.TxnBuilderTypes.TransactionPayload, isBcs?: boolean, silent?: boolean) => Promise<void>;
   handleEstimate: () => Promise<void>;
   estimateTransaction: (
