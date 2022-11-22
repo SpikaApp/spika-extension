@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * SpikaSwap powered by HippoSwap
  * ======================================
@@ -30,6 +33,7 @@ import { NoticeBox } from "../components/lib";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { ICoin } from "../interface";
 import { networkList } from "../lib/accountNetworks";
 import { hippoClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
@@ -52,19 +56,19 @@ const Swap = () => {
   } = useContext(AccountContext);
   const { getBalance, estimateTransaction, isValidTransaction, estimatedTxnResult, clearPrevEstimation } =
     useContext(Web3Context);
-  const [type, setType] = useState("");
-  const [baseCoinBalance, setBaseCoinBalance] = useState(0);
-  const [quoteCoinBalance, setQuoteCoinBalance] = useState(0);
-  const [swapAmount, setSwapAmount] = useState("");
-  const [quoteAmount, setQuoteAmount] = useState("");
-  const [quote, setQuote] = useState();
-  const [isLocalLoading, setIsLocalLoading] = useState(false);
-  const [swapEnabled, setSwapEnabled] = useState(false);
-  const [dataFetched, setDataFetched] = useState(false);
-  const [insufficientBalance, setInsufficientBalance] = useState(false);
-  const [badPair, setBadPair] = useState(false);
-  const [swapPayload, setSwapPayload] = useState({});
-  const [underMaintenance] = useState(true);
+  const [type, setType] = useState<string>("");
+  const [baseCoinBalance, setBaseCoinBalance] = useState<number>(0);
+  const [quoteCoinBalance, setQuoteCoinBalance] = useState<number>(0);
+  const [swapAmount, setSwapAmount] = useState<string>("");
+  const [quoteAmount, setQuoteAmount] = useState<string>("");
+  const [quote, setQuote] = useState<any>();
+  const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
+  const [swapEnabled, setSwapEnabled] = useState<boolean>(false);
+  const [dataFetched, setDataFetched] = useState<boolean>(false);
+  const [insufficientBalance, setInsufficientBalance] = useState<boolean>(false);
+  const [badPair, setBadPair] = useState<boolean>(false);
+  const [swapPayload, setSwapPayload] = useState<any>({});
+  const [underMaintenance] = useState<boolean>(true);
 
   // Checks if account holds at least 2 swappable tokens and enables swap.
   useEffect(() => {
@@ -87,7 +91,7 @@ const Swap = () => {
 
   // Disable swap is current network !== Devnet.
   useEffect(() => {
-    if (currentNetwork.name !== "Testnet") {
+    if (currentNetwork!.name !== "Testnet") {
       setSwapEnabled(false);
       setBaseCoin(aptosCoin);
       setQuoteCoin(aptosCoin);
@@ -123,12 +127,12 @@ const Swap = () => {
   }, [quoteCoin]);
 
   // Fetch balances.
-  const getCurrentBalance = async (type, coin) => {
+  const getCurrentBalance = async (type: string, coin: ICoin): Promise<void> => {
     const balance = await getBalance(coin);
     if (type === "baseCoin") {
-      setBaseCoinBalance(balance);
+      setBaseCoinBalance(Number(balance));
     } else if (type === "quoteCoin") {
-      setQuoteCoinBalance(balance);
+      setQuoteCoinBalance(Number(balance));
     } else {
       debug.log("unknown or undefined coin type");
     }
@@ -155,7 +159,7 @@ const Swap = () => {
   useEffect(() => {
     debug.log(swapAmount);
     if (
-      Number(valueToString(baseCoin, swapAmount) < Number(baseCoinBalance)) &&
+      Number(valueToString(baseCoin, swapAmount)) < Number(baseCoinBalance) &&
       swapAmount !== "" &&
       Number(swapAmount) > 0 &&
       !badPair
@@ -196,25 +200,25 @@ const Swap = () => {
     if (alertSignal === 31 && baseCoin && quoteCoin) {
       clearSwap();
       getCurrentBalance("baseCoin", baseCoin);
-      getCurrentBalance("quoteCoin".quoteCoin);
+      getCurrentBalance("quoteCoin", quoteCoin);
     }
   }, [alertSignal]);
 
   // Function that changes baseCoin and quoteCoin coins when button is pressed.
-  const baseToQuote = () => {
+  const baseToQuote = (): void => {
     setBaseCoin(quoteCoin);
     setQuoteCoin(baseCoin);
   };
 
-  const hippoTradeAggregator = async () => {
+  const hippoTradeAggregator = async (): Promise<TradeAggregator | undefined> => {
     let agg;
-    let client = new AptosClient(networkList[1].data.node_url);
+    const client = new AptosClient(networkList[1].data.node_url);
     debug.log(client);
     try {
       const netConf = hippoClient();
       debug.log(netConf);
       debug.log("netConf", netConf);
-      agg = await TradeAggregator.create(client, netConf);
+      agg = await TradeAggregator.create(client as any, netConf);
     } catch (error) {
       console.log(error);
     }
@@ -223,17 +227,17 @@ const Swap = () => {
   };
 
   // Function that sends quote request.
-  const aggListQuotes = async (fromSymbol, toSymbol, inputUiAmt) => {
+  const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string): Promise<void> => {
     setIsLocalLoading(true);
     try {
       const agg = await hippoTradeAggregator();
-      const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+      const xCoinInfo = agg!.registryClient.getCoinInfoBySymbol(fromSymbol);
       debug.log("xCoinInfo", xCoinInfo);
-      const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
+      const yCoinInfo = agg!.registryClient.getCoinInfoBySymbol(toSymbol);
       debug.log("yCoinInfo", toSymbol);
       const inputAmt = parseFloat(inputUiAmt);
       debug.log("inputAmt", inputUiAmt);
-      const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
+      const quotes = await agg!.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
       debug.log("quotes", quotes);
       setQuote(quotes[0]);
       // for (const quote of quotes) {
@@ -249,15 +253,15 @@ const Swap = () => {
   };
 
   // Function that swaps tokens.
-  const aggSwap = async (fromSymbol, toSymbol, inputUiAmt) => {
+  const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string): Promise<void> => {
     setIsLocalLoading(true);
     clearPrevEstimation();
     try {
       const agg = await hippoTradeAggregator();
-      const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
-      const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
+      const xCoinInfo = agg!.registryClient.getCoinInfoBySymbol(fromSymbol);
+      const yCoinInfo = agg!.registryClient.getCoinInfoBySymbol(toSymbol);
       const inputAmt = parseFloat(inputUiAmt);
-      const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
+      const quotes = await agg!.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
       if (quotes.length === 0) {
         console.log("No route available");
         return;
@@ -265,7 +269,7 @@ const Swap = () => {
       const payload = quotes[0].route.makePayload(inputAmt, 0);
       setSwapPayload(payload);
       debug.log("payload", payload);
-      await estimateTransaction(payload, true);
+      await estimateTransaction(payload as any, true);
     } catch (error) {
       console.log(error);
     }
@@ -283,7 +287,7 @@ const Swap = () => {
     <Container maxWidth="xs">
       {accountImported && (
         <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
-          <CardContent align="center" sx={{ mt: 1 }}>
+          <CardContent sx={{ mt: 1 }}>
             <Stack sx={{ display: "flex", alignItems: "center", maxWidth: "295px" }}>
               <Typography
                 variant="subtitle2"
@@ -361,7 +365,7 @@ const Swap = () => {
                       />
                     </Stack>
                     <Typography color="textSecondary" sx={{ mt: "4px", mr: "12px" }} align="right" variant="subtitle2">
-                      {stringToValue(baseCoin, baseCoinBalance)}
+                      {stringToValue(baseCoin, baseCoinBalance.toString())}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -462,7 +466,7 @@ const Swap = () => {
                       />
                     </Stack>
                     <Typography color="textSecondary" sx={{ mt: "4px", mr: "12px" }} align="right" variant="subtitle2">
-                      {stringToValue(quoteCoin, quoteCoinBalance)}
+                      {stringToValue(quoteCoin, quoteCoinBalance.toString())}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -487,25 +491,25 @@ const Swap = () => {
                 (badPair ? true : false)
               }
               onClick={() => {
-                aggSwap(baseCoin.data.symbol, quoteCoin.data.symbol, swapAmount, true);
+                aggSwap(baseCoin.data.symbol, quoteCoin.data.symbol, swapAmount);
               }}
             >
               {insufficientBalance && "Insufficient balance"}
               {swapAmount === "" && !insufficientBalance && !badPair && swapEnabled && "Enter an amount"}
               {swapEnabled && !insufficientBalance && badPair && "Cannot swap same coins"}
               {swapEnabled && !insufficientBalance && swapAmount !== "" && !badPair && "Swap"}
-              {!swapEnabled && !currentNetwork.name !== "Testnet" && "Swap disabled"}
+              {!swapEnabled && "Swap disabled"}
             </LoadingButton>
-            {dataFetched && !swapEnabled && currentNetwork.name === "Testnet" && !underMaintenance && (
+            {dataFetched && !swapEnabled && currentNetwork!.name === "Testnet" && !underMaintenance && (
               <NoticeBox mt={3} width="250px" text="Account shall hold at least two eligible for swap assets." />
             )}
-            {dataFetched && !swapEnabled && !isFetching && currentNetwork.name !== "Testnet" && !underMaintenance && (
-              <NoticeBox mt={3} width="250px" text={`Swap is not supported on ${currentNetwork.name} network.`} />
+            {dataFetched && !swapEnabled && !isFetching && currentNetwork!.name !== "Testnet" && !underMaintenance && (
+              <NoticeBox mt={3} width="250px" text={`Swap is not supported on ${currentNetwork!.name} network.`} />
             )}
             {dataFetched &&
               swapEnabled &&
               !isFetching &&
-              currentNetwork.name === "Testnet" &&
+              currentNetwork!.name === "Testnet" &&
               badPair &&
               !underMaintenance && (
                 <NoticeBox
@@ -520,7 +524,7 @@ const Swap = () => {
           </CardContent>
         </Card>
       )}
-      <AccountAssetsDialog type={type} />
+      <AccountAssetsDialog type={type as any} />
       <ConfirmSendDialog
         type={"swap"}
         quote={quote}
