@@ -86,7 +86,7 @@ const NFTs = (): JSX.Element => {
         </Button>
       </Stack>
       {isWaiting === true && accountImported && (
-        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "225px" }}>
+        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}>
           <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
             Updating metadata...
           </Typography>
@@ -94,13 +94,13 @@ const NFTs = (): JSX.Element => {
         </Stack>
       )}
       {accountTokens.length === 0 && isWaiting === false && (
-        <Typography sx={{ mt: 8, mb: "320px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
+        <Typography sx={{ mt: 8, mb: "285px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
           No NFTs found
         </Typography>
       )}
       {accountTokens.length > 0 && !isWaiting && accountImported && (
         <Stack sx={{ display: "flex", alignItems: "center" }}>
-          <Box sx={{ height: "340px", mb: "28px" }}>
+          <Box sx={{ height: "340px", mb: "41px" }}>
             <ImageList
               gap={18}
               cols={3}
@@ -140,7 +140,7 @@ const NFTs = (): JSX.Element => {
         </Stack>
       )}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
-        {accountTokens !== 0 && !isWaiting && accountImported && hidden && <Box sx={{ mb: "32px" }} />}
+        {accountTokens !== 0 && !isWaiting && accountImported && hidden && <Box sx={{ mb: "35px" }} />}
         {accountTokens !== 0 && !isWaiting && accountImported && !hidden && (
           <Pagination
             count={pages}
