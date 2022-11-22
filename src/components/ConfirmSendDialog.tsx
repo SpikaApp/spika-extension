@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   Button,
   Chip,
@@ -23,7 +25,13 @@ import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
-const ConfirmSendDialog = (props) => {
+interface ConfirmSendDialogProps {
+  type?: string;
+  args?: any;
+  quote?: any;
+}
+
+const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } = useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const {
@@ -35,51 +43,56 @@ const ConfirmSendDialog = (props) => {
     setRecipientAddress,
     setAmount,
   } = useContext(Web3Context);
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
-    if (isValidTransaction && !openAddAssetDialog && props.type !== "swap") {
-      const _amount = estimatedTxnResult.payload.arguments[1];
-      setOpenConfirmSendDialog(true);
-      setRows([
-        createData("Sender", estimatedTxnResult.sender),
-        createData("Recipient", estimatedTxnResult.payload.arguments[0]),
-        createData("Amount", `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`),
-        createData("Gas fee", `~ ${estimatedTxnResult.gas_used}`),
-        createData("Max gas", estimatedTxnResult.max_gas_amount),
-        createData("Gas price", estimatedTxnResult.gas_unit_price),
-      ]);
-    } else if (isValidTransaction && props.type === "swap") {
-      setRows([
-        createData(
-          "Avg. rate",
-          `1 ${props.quote.quote.inputSymbol} ≈ ${props.quote.quote.avgPrice} ${props.quote.quote.outputSymbol}`
-        ),
-        createData("Base", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
-        createData("Quote", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
-        createData("Gas fee", `≈ ${estimatedTxnResult.gas_used}`),
-        createData("Max gas", estimatedTxnResult.max_gas_amount),
-        createData("Gas price", estimatedTxnResult.gas_unit_price),
-      ]);
+    if (isValidTransaction && !openAddAssetDialog && !props) {
+      if (estimatedTxnResult) {
+        const txn: any = estimatedTxnResult;
+        const _amount = txn.payload.arguments[1];
+        setOpenConfirmSendDialog(true);
+        setRows([
+          createData("Sender", estimatedTxnResult.sender),
+          createData("Recipient", txn.payload.arguments[0]),
+          createData("Amount", `${stringToValue(currentAsset!, _amount)} ${currentAsset!.data.symbol}`),
+          createData("Gas fee", `~ ${estimatedTxnResult.gas_used}`),
+          createData("Max gas", estimatedTxnResult.max_gas_amount),
+          createData("Gas price", estimatedTxnResult.gas_unit_price),
+        ]);
+      }
+    } else if (isValidTransaction && props && props.type === "swap") {
+      if (estimatedTxnResult) {
+        setRows([
+          createData(
+            "Avg. rate",
+            `1 ${props.quote.quote.inputSymbol} ≈ ${props.quote.quote.avgPrice} ${props.quote.quote.outputSymbol}`
+          ),
+          createData("Base", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
+          createData("Quote", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
+          createData("Gas fee", `≈ ${estimatedTxnResult.gas_used}`),
+          createData("Max gas", estimatedTxnResult.max_gas_amount),
+          createData("Gas price", estimatedTxnResult.gas_unit_price),
+        ]);
+      }
     }
   }, [isValidTransaction]);
 
-  const createData = (name, value) => {
+  const createData = (name: any, value: any): any => {
     return { name, value };
   };
 
-  const handleConfirm = () => {
-    if (props.type === "swap") {
+  const handleConfirm = (): void => {
+    if (props && props.type === "swap") {
       handleSend(props.args.payload, props.args.isBcs, props.args.silent);
     } else {
       handleSend();
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenConfirmSendDialog(false);
     setIsValidTransaction(false);
-    setEstimatedTxnResult([]);
+    setEstimatedTxnResult(undefined);
     setRecipientAddress("");
     setAmount("");
   };
@@ -97,7 +110,7 @@ const ConfirmSendDialog = (props) => {
         >
           <Table aria-label="transaction-data" sx={{ width: "260px" }}>
             <TableBody>
-              {rows.map((row) => (
+              {rows.map((row: any) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell sx={{ maxWidth: "65px" }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>

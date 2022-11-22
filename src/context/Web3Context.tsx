@@ -42,7 +42,8 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const [gasUnitPrice] = useState<string>("100");
   const [estimatedTxnResult, setEstimatedTxnResult] = useState<aptos.Types.UserTransaction>();
   const [isValidTransaction, setIsValidTransaction] = useState<boolean>(false);
-  const [txnDetails, setTxnDetails] = useState<aptos.Types.Transaction | Record<string, never>>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [txnDetails, setTxnDetails] = useState<any>({});
   const [depositEvents, setDepositEvents] = useState<aptos.Types.Event[]>([]);
   const [withdrawEvents, setWithdrawEvents] = useState<aptos.Types.Event[]>([]);
   const [depositEventsCounter, setDepositEventsCounter] = useState<number>(0);
@@ -108,9 +109,9 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   };
 
   const handleSend = async (
-    payload: aptos.TxnBuilderTypes.TransactionPayload,
-    isBcs: boolean,
-    silent: boolean
+    payload?: aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
   ): Promise<void> => {
     setIsLoading(true);
     await sendTransaction(payload, isBcs, silent);

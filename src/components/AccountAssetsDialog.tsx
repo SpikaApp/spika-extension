@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable react/jsx-no-comment-textnodes */
 import {
   Box,
   Button,
@@ -23,7 +25,7 @@ import { PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 
 type AccountAssetsDialogProps = {
-  type: "base" | "quote";
+  type?: "base" | "quote";
 };
 
 const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
@@ -48,7 +50,10 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     if (openAccountAssetsDialog) {
       updateAssets();
     }
-    if ((openAccountAssetsDialog && props.type === "base") || (openAccountAssetsDialog && props.type === "quote")) {
+    if (
+      (openAccountAssetsDialog && props && props.type === "base") ||
+      (openAccountAssetsDialog && props && props.type === "quote")
+    ) {
       setShowOnlySwapSupported(true);
     }
   }, [openAccountAssetsDialog]);
@@ -75,11 +80,11 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   };
 
   const handleSwitchAsset = (asset: ICoin): void => {
-    if (props.type === "base") {
+    if (props && props.type === "base") {
       setBaseCoin(asset);
       handleUpdateBalance(asset);
       setOpenAccountAssetsDialog(false);
-    } else if (props.type === "quote") {
+    } else if (props && props.type === "quote") {
       setQuoteCoin(asset);
       handleUpdateBalance(asset);
       setOpenAccountAssetsDialog(false);
@@ -113,9 +118,9 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
               <CircularProgress sx={{ display: "flex", ml: "110px", color: "#9e9e9e" }} size={32} />
             ) : (
               <div>
-                {!showOnlySwapSupported && props.type !== "base" && props.type !== "quote" && (
+                {!showOnlySwapSupported && props!.type !== "base" && props!.type !== "quote" && (
                   <div>
-                    {accountAssets.map((asset) => (
+                    {accountAssets.map((asset: ICoin) => (
                       <Stack key={asset.type}>
                         <ListItemButton
                           onClick={() => {

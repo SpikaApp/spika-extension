@@ -11,13 +11,14 @@ import { alpha, styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import spika from "../assets/spika.svg";
-import LogoutDialog from "../components/LogoutDialog";
+import LogoutDialog from "./LogoutDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 
-const StyledMenu = styled((props) => (
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StyledMenu = styled<any>((props: any): any => (
   <Menu
     elevation={0}
     anchorOrigin={{
@@ -54,20 +55,20 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-const Navbar = () => {
+const Navbar = (): JSX.Element => {
   const { spikaWallet, darkMode, setDarkMode, handleLogoutUI } = useContext(UIContext);
   const { accountImported, handleLock } = useContext(AccountContext);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (): void => {
     setAnchorEl(null);
   };
 
-  const handleThemeSwitch = () => {
+  const handleThemeSwitch = (): void => {
     if (darkMode) {
       setDarkMode(false);
       setStore(PLATFORM, "DARK_MODE", false);
@@ -181,7 +182,7 @@ const Navbar = () => {
           </div>
           <Stack direction="row" spacing={1}>
             <Tooltip title="Toggle theme">
-              <IconButton aria-label="theme" size="normal" onClick={handleThemeSwitch}>
+              <IconButton aria-label="theme" size="medium" onClick={handleThemeSwitch}>
                 {darkMode ? (
                   <DarkModeIcon sx={{ fontSize: "32px" }} />
                 ) : (

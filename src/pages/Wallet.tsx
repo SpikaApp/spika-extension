@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CircleIcon from "@mui/icons-material/Circle";
 import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
@@ -18,22 +19,22 @@ import copyToClipboard from "../utils/copyToClipboard";
 import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 
-const Wallet = () => {
+const Wallet = (): JSX.Element => {
   const { darkMode, handleSendUI, handleReceiveUI, handleAccountAssetsUI, handleAddAssetUI, handleChangeNetworkUI } =
     useContext(UIContext);
   const { isLoading, currentAddress, accountImported, currentNetwork, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance, handleMint } = useContext(Web3Context);
   const [isOnline, setIsOnline] = useState(false);
-  const [chainId, setChainId] = useState();
+  const [chainId, setChainId] = useState<number>();
 
   useEffect(() => {
     if (accountImported) {
-      getChainId(currentNetwork.data.node_url);
+      getChainId(currentNetwork!.data.node_url);
       getBalance();
       const updateBalance = window.setInterval(() => {
         getBalance();
-        getChainId(currentNetwork.data.node_url);
+        getChainId(currentNetwork!.data.node_url);
       }, 10000);
       return () => window.clearInterval(updateBalance);
     }
@@ -48,7 +49,7 @@ const Wallet = () => {
     }
   }, [chainId]);
 
-  const getChainId = async (nodeUrl) => {
+  const getChainId = async (nodeUrl: string): Promise<void> => {
     const client = new AptosClient(nodeUrl);
     try {
       const id = await client.getChainId();
@@ -58,8 +59,8 @@ const Wallet = () => {
     }
   };
 
-  const handleClick = () => {
-    copyToClipboard(currentAddress);
+  const handleClick = (): void => {
+    copyToClipboard(currentAddress!);
   };
 
   return (
@@ -88,7 +89,7 @@ const Wallet = () => {
                         }}
                       />
                       <Typography noWrap sx={{ ml: "5px", maxWidth: "100px" }} variant="body2">
-                        {currentNetwork.name}
+                        {currentNetwork!.name}
                       </Typography>
                     </Stack>
                   }
@@ -96,7 +97,7 @@ const Wallet = () => {
                 />
               </Tooltip>
               <Tooltip title="Copy address">
-                <Chip label={shortenAddress(currentAddress)} onClick={handleClick} />
+                <Chip label={shortenAddress(currentAddress!)} onClick={handleClick} />
               </Tooltip>
             </Stack>
             <CardContent>
@@ -128,18 +129,18 @@ const Wallet = () => {
                               height: "24px",
                             }}
                             component="img"
-                            src={darkMode ? currentAsset.data.logo_alt : currentAsset.data.logo}
+                            src={darkMode ? currentAsset!.data.logo_alt : currentAsset!.data.logo}
                           />
                           <ArrowDropDownIcon sx={{ position: "absolute", ml: "180px" }} />
                           <Typography noWrap sx={{ ml: "8px" }} variant="h6" color="textPrimary">
-                            {currentAsset.data.name}
+                            {currentAsset!.data.name}
                           </Typography>
                         </Button>
                       </Tooltip>
                     </Stack>
                     <Stack>
                       <Stack direction="row" sx={{ mt: "8px", maxWidth: "300px" }}>
-                        <Tooltip title={`${stringToValue(currentAsset, balance)} ${currentAsset.data.symbol}`}>
+                        <Tooltip title={`${stringToValue(currentAsset!, balance!)} ${currentAsset!.data.symbol}`}>
                           <Typography
                             noWrap
                             sx={{ fontSize: "24px", cursor: "default" }}
@@ -147,7 +148,7 @@ const Wallet = () => {
                             align="center"
                             color="textSecondary"
                           >
-                            {stringToValue(currentAsset, balance)}
+                            {stringToValue(currentAsset!, balance!)}
                           </Typography>
                         </Tooltip>
                         <Typography
@@ -155,18 +156,21 @@ const Wallet = () => {
                           variant="button"
                           color="textSecondary"
                         >
-                          {currentAsset.data.symbol}
+                          {currentAsset!.data.symbol}
                         </Typography>
                       </Stack>
                     </Stack>
                   </Stack>
                 </div>
               )}
-              {currentAsset.data.name === "Aptos Coin" &&
-                (currentNetwork.name === "Devnet" || currentNetwork.name === "Local") &&
+              {currentAsset!.data.name === "Aptos Coin" &&
+                (currentNetwork!.name === "Devnet" || currentNetwork!.name === "Local") &&
                 !isLoading && (
                   <Tooltip title={"Faucet"}>
-                    <IconButton position="absolute" sx={{ mt: "-180px", ml: "270px" }} onClick={handleMint}>
+                    <IconButton
+                      sx={{ display: "flex", position: "absolute", mt: "-98px", ml: "225px" }}
+                      onClick={handleMint}
+                    >
                       <LocalGasStationIcon />
                     </IconButton>
                   </Tooltip>
@@ -191,7 +195,6 @@ const Wallet = () => {
           {accountImported && (
             <Box
               sx={{
-                // backgroundColor: "#F19223",
                 width: "100%",
                 height: "145px",
                 mt: "28px",

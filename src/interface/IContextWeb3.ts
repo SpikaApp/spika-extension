@@ -14,8 +14,10 @@ interface IContextWeb3 {
   setIsValidTransaction: React.Dispatch<React.SetStateAction<boolean>>;
   estimatedTxnResult: aptos.Types.UserTransaction | undefined;
   setEstimatedTxnResult: React.Dispatch<React.SetStateAction<aptos.Types.UserTransaction | undefined>>;
-  txnDetails: aptos.Types.Transaction | Record<string, never>;
-  setTxnDetails: React.Dispatch<React.SetStateAction<aptos.Types.Transaction | Record<string, never>>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  txnDetails: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setTxnDetails: React.Dispatch<React.SetStateAction<any>>;
   nftDetails: INftDetails[];
   depositEventsCounter: number;
   setDepositEventsCounter: React.Dispatch<React.SetStateAction<number>>;
@@ -46,7 +48,7 @@ interface IContextWeb3 {
   getAptosName: (address: string) => Promise<void>;
   getAptosAddress: (aptosName: string) => Promise<void>;
   handleMint: () => Promise<void>;
-  handleSend: (payload: aptos.TxnBuilderTypes.TransactionPayload, isBcs: boolean, silent: boolean) => Promise<void>;
+  handleSend: (payload?: aptos.TxnBuilderTypes.TransactionPayload, isBcs?: boolean, silent?: boolean) => Promise<void>;
   handleEstimate: () => Promise<void>;
   estimateTransaction: (
     payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,

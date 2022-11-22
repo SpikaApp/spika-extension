@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   Button,
@@ -25,57 +29,28 @@ import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 
-const TxnDetailsDialog = () => {
+const TxnDetailsDialog = (): JSX.Element => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
   const { currentAsset, currentAddress } = useContext(AccountContext);
   const { txnDetails, setTxnDetails, amount, setAmount } = useContext(Web3Context);
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
-      // debug.log("txn details", txnDetails);
-      // if (
-      //   txnDetails.payload.function === "0x1::coin::transfer" ||
-      //   txnDetails.payload.function === "0x1::aptos_coin::mint"
-      // ) {
-      let _amount = "";
-      let recipient = "";
+      let _amount: string;
+      let recipient: string;
       if (txnDetails.payload.arguments.length === 1) {
         _amount = txnDetails.payload.arguments[0];
-        recipient = currentAddress;
+        recipient = currentAddress!;
       } else if (txnDetails.payload.arguments.length === 2) {
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
         _amount = txnDetails.payload.arguments[1];
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
         recipient = txnDetails.payload.arguments[0];
       }
-
-      //   setRows([
-      //     createData("Time", convertTimestamp(txnDetails.timestamp)),
-      //     createData("Txn Hash", txnDetails.hash),
-      //     createData("Sender", txnDetails.sender),
-      //     createData("Recipient", recipient),
-      //     createData(
-      //       "Amount",
-      //       `${stringToValue(currentAsset, _amount)} ${currentAsset.data.symbol}`
-      //     ),
-      //     createData("Gas used", txnDetails.gas_used),
-      //     createData("Max gas", txnDetails.max_gas_amount),
-      //     createData("Gas price", txnDetails.gas_unit_price),
-      //   ]);
-      // } else {
       setRows([
         createData("Time", convertTimestamp(txnDetails.timestamp)),
         createData("Txn Hash", txnDetails.hash),
         createData("Sender", txnDetails.sender),
-        // createData(
-        //   "Function",
-        //   txnDetails.payload.function
-        //     .substring(txnDetails.payload.function.indexOf("0x") + 66)
-        //     .split("::")
-        //     .join(" ")
-        // ),
-        createData("Amount", `${stringToValue(currentAsset, amount)} ${currentAsset.data.symbol}`),
+        createData("Amount", `${stringToValue(currentAsset!, amount)} ${currentAsset!.data.symbol}`),
         createData("Gas used", txnDetails.gas_used),
         createData("Max gas", txnDetails.max_gas_amount),
         createData("Gas price", txnDetails.gas_unit_price),
@@ -84,11 +59,11 @@ const TxnDetailsDialog = () => {
     }
   }, [openTxnDetailsDialog]);
 
-  const createData = (name, value) => {
+  const createData = (name: any, value: any): any => {
     return { name, value };
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setTxnDetails("");
     setAmount("");
     setTxnType(0);
@@ -121,7 +96,7 @@ const TxnDetailsDialog = () => {
         >
           <Table aria-label="transaction-data">
             <TableBody>
-              {rows.map((row) => (
+              {rows.map((row: any) => (
                 <TableRow key={row.name} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell sx={{ width: "95px" }} component="th" scope="row">
                     <Typography variant="inherit">{row.name}</Typography>

@@ -10,7 +10,7 @@ import TxnDetailsDialog from "./TxnDetailsDialog";
 
 type WithdrawEventProps = {
   withdrawEvent: {
-    version: number;
+    version: string;
     data: {
       amount: string;
     };
@@ -30,7 +30,7 @@ const SentEventCard = ({
   const handleOpenTxnDetailsDialog = async (): Promise<void> => {
     setTxnType(1);
     setAmount(amount);
-    await getTxnDetails(version);
+    await getTxnDetails(Number(version));
     setOpenTxnDetailsDialog(true);
   };
 

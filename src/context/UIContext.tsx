@@ -57,11 +57,11 @@ export const UIProvider = ({ children }: UIContextProps) => {
   }, [currentRoute]);
 
   const getWallet = async (): Promise<void> => {
-    const wallet = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
-    if (wallet === undefined || wallet === null || wallet === false) {
+    const status: boolean = await getStore(PLATFORM, "ACCOUNT_IMPORTED");
+    if (!status) {
       setSpikaWallet(false);
-    } else if (wallet) {
-      setSpikaWallet(wallet);
+    } else {
+      setSpikaWallet(status);
     }
   };
 
@@ -82,12 +82,13 @@ export const UIProvider = ({ children }: UIContextProps) => {
       case "PermissionDialog":
         setDisableAllRoutes(true);
         setOpenPermissionDialog(true);
+        break;
     }
   };
 
   const getSessionTheme = async (): Promise<void> => {
     const data: boolean = await getStore(PLATFORM, "DARK_MODE");
-    if (data === undefined || data === null) {
+    if (!data) {
       setDarkMode(false);
     } else {
       setDarkMode(data);

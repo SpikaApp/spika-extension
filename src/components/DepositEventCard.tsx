@@ -10,7 +10,7 @@ import TxnDetailsDialog from "./TxnDetailsDialog";
 
 type DepositEventProps = {
   depositEvent: {
-    version: number;
+    version: string;
     data: {
       amount: string;
     };
@@ -30,7 +30,7 @@ const DepositEventCard = ({
   const handleOpenTxnDetailsDialog = async (): Promise<void> => {
     setTxnType(2);
     setAmount(amount);
-    await getTxnDetails(version);
+    await getTxnDetails(Number(version));
     setOpenTxnDetailsDialog(true);
   };
 

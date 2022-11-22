@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
@@ -13,6 +14,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { Types } from "aptos";
 import { useContext, useEffect, useState } from "react";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import DepositEventCard from "../components/DepositEventCard";
@@ -23,13 +25,22 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import debug from "../utils/debug";
 
-const style = {
-  width: "100%",
-  maxWidth: 360,
-  bgcolor: "background.paper",
-};
+// const style = {
+//   width: "100%",
+//   maxWidth: 360,
+//   bgcolor: "background.paper",
+// };
 
-const Transactions = () => {
+interface IEvent extends Types.Event {
+  version: string;
+}
+
+interface IEventQuery {
+  start: number;
+  limit: number;
+}
+
+const Transactions = (): JSX.Element => {
   const { darkMode, handleAccountAssetsUI } = useContext(UIContext);
   const { accountImported, currentAsset } = useContext(AccountContext);
   const {
@@ -43,10 +54,10 @@ const Transactions = () => {
     depositEvents,
     setDepositEvents,
   } = useContext(Web3Context);
-  const [value, setValue] = useState("1");
-  const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(0);
-  const [query, setQuery] = useState();
+  const [value, setValue] = useState<string>("1");
+  const [page, setPage] = useState<number>(1);
+  const [pages, setPages] = useState<number>(0);
+  const [query, setQuery] = useState<IEventQuery>();
 
   const limitPerPage = 5;
 
@@ -94,7 +105,7 @@ const Transactions = () => {
       if (value === "1") {
         if (depositEventsCounter > 0) {
           debug.log("query", query);
-          getDepositEvents(query);
+          getDepositEvents(query!);
         } else {
           setDepositEvents([]);
         }
@@ -102,7 +113,7 @@ const Transactions = () => {
       if (value === "2") {
         debug.log("query", query);
         if (withdrawEventsCounter > 0) {
-          getWithdrawEvents(query);
+          getWithdrawEvents(query!);
         } else {
           setWithdrawEvents([]);
         }
@@ -111,12 +122,13 @@ const Transactions = () => {
   }, [query, value]);
 
   // Handles tab's change (Deposit / Withdraw).
-  const handleChange = (event, newValue) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (_event: any, newValue: string): void => {
     if (newValue === "1") {
-      setQuery();
+      setQuery(undefined);
     }
     if (newValue === "2") {
-      setQuery();
+      setQuery(undefined);
     }
     setValue(newValue);
     if (page !== 1) {
@@ -125,7 +137,8 @@ const Transactions = () => {
   };
 
   // Handles page change.
-  const handlePageChange = async (event, newPage) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handlePageChange = async (_event: any, newPage: number): Promise<void> => {
     setPage(newPage);
   };
 
@@ -156,7 +169,7 @@ const Transactions = () => {
   };
 
   // Counts query start.
-  const countStart = (counter) => {
+  const countStart = (counter: number): number => {
     if (counter <= limitPerPage) {
       debug.log("case 1");
       return 0;
@@ -172,11 +185,13 @@ const Transactions = () => {
       debug.log("last page");
       debug.log("page", page);
       return 0;
+    } else {
+      return 0;
     }
   };
 
   // Counts query limit.
-  const countLimit = (counter) => {
+  const countLimit = (counter: number): number => {
     if (counter === 0) {
       return 1;
     } else if (counter > limitPerPage) {
@@ -219,7 +234,7 @@ const Transactions = () => {
                         <Box
                           sx={{ width: "24px", height: "24px" }}
                           component="img"
-                          src={darkMode ? currentAsset.data.logo_alt : currentAsset.data.logo}
+                          src={darkMode ? currentAsset!.data.logo_alt : currentAsset!.data.logo}
                         />
                       </IconButton>
                     </Tooltip>
@@ -255,22 +270,18 @@ const Transactions = () => {
                 <TabPanel value="1">
                   {depositEvents?.length > 0 ? (
                     <List
-                      align="start"
-                      sx={
-                        (style,
-                        {
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "start",
-                          ml: "12px",
-                          mt: "-24px",
-                        })
-                      }
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "start",
+                        ml: "12px",
+                        mt: "-24px",
+                      }}
                       component="nav"
                     >
                       <Typography noWrap>
                         {depositEvents.map((depositEvent, sequence_number) => (
-                          <DepositEventCard depositEvent={depositEvent} key={sequence_number} />
+                          <DepositEventCard depositEvent={depositEvent as IEvent} key={sequence_number} />
                         ))}
                       </Typography>
                     </List>
@@ -283,20 +294,17 @@ const Transactions = () => {
                 <TabPanel value="2">
                   {withdrawEvents?.length > 0 ? (
                     <List
-                      sx={
-                        (style,
-                        {
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "start",
-                          ml: "12px",
-                          mt: "-24px",
-                        })
-                      }
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "start",
+                        ml: "12px",
+                        mt: "-24px",
+                      }}
                       component="nav"
                     >
                       {withdrawEvents.map((withdrawEvent, sequence_number) => (
-                        <WithdrawEventCard withdrawEvent={withdrawEvent} key={sequence_number} />
+                        <WithdrawEventCard withdrawEvent={withdrawEvent as IEvent} key={sequence_number} />
                       ))}
                     </List>
                   ) : (
