@@ -11,6 +11,19 @@ type PayloadContextProps = {
 export const PayloadContext = createContext<IContextPayload>({} as IContextPayload);
 
 export const PayloadProvider = ({ children }: PayloadContextProps) => {
+  // Create account on chain
+  const create = async (address: string): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
+    return new TxnBuilderTypes.TransactionPayloadEntryFunction(
+      TxnBuilderTypes.EntryFunction.natural(
+        "0x1::aptos_account",
+        "create_account",
+        [],
+        [BCS.bcsToBytes(TxnBuilderTypes.AccountAddress.fromHex(address))]
+      )
+    );
+  };
+
+  // Register coin in account
   const register = async (coinType: string): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
     const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(coinType));
     return new TxnBuilderTypes.TransactionPayloadEntryFunction(
@@ -18,6 +31,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
     );
   };
 
+  // Transfer coin between addresses
   const transfer = async (args: IPayloadTransferArgs): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> => {
     const token = new TxnBuilderTypes.TypeTagStruct(TxnBuilderTypes.StructTag.fromString(args.currentAsset));
     const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
@@ -35,6 +49,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
     return payload;
   };
 
+  // Create new NFT collection
   const collection = async (args: IPayloadCollectionArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
     const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
@@ -46,6 +61,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
     return payload;
   };
 
+  // Create NFT
   const nft = async (args: IPayloadNftArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
     const spika = await spikaClient();
     const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
@@ -74,6 +90,7 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
   return (
     <PayloadContext.Provider
       value={{
+        create,
         register,
         transfer,
         collection,

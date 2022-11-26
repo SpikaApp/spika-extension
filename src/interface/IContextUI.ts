@@ -36,6 +36,8 @@ type IContextUI = {
   setMnemonicRequired: React.Dispatch<React.SetStateAction<boolean>>;
   privateKeyRequired: boolean;
   setPrivateKeyRequired: React.Dispatch<React.SetStateAction<boolean>>;
+  openCreateAccountDialog: boolean;
+  setOpenCreateAccountDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openAccountAssetsDialog: boolean;
   setOpenAccountAssetsDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openAddAssetDialog: boolean;
@@ -54,6 +56,8 @@ type IContextUI = {
   setOpenPermissionDialog: React.Dispatch<React.SetStateAction<boolean>>;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
+  previewRequired: boolean;
+  setPreviewRequired: React.Dispatch<React.SetStateAction<boolean>>;
   somethingChanged: boolean;
   setSomethingChanged: React.Dispatch<React.SetStateAction<boolean>>;
   devMode: boolean;
@@ -73,6 +77,7 @@ type IContextUI = {
   handleLogoutUI: () => void;
   handleMnemonicUI: () => void;
   handlePrivateKeyUI: () => void;
+  handleCreateAccountDialog: () => void;
   handleChangePasswordUI: () => void;
   handleAccountAssetsUI: () => void;
   handleAddAssetUI: () => void;

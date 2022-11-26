@@ -1,29 +1,35 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useState, useEffect } from "react";
 import {
   Button,
-  TextField,
   Dialog,
   DialogContent,
   DialogTitle,
-  Typography,
-  Stack,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Radio,
   RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import Loading from "./Loading";
-import AlertDialog from "./AlertDialog";
-import { UIContext } from "../context/UIContext";
-import { AccountContext } from "../context/AccountContext";
-import { Web3Context } from "../context/Web3Context";
 import { Types } from "aptos";
+import { useContext, useEffect, useState } from "react";
+import { AccountContext } from "../context/AccountContext";
+import { PayloadContext } from "../context/PayloadContext";
+import { UIContext } from "../context/UIContext";
+import { Web3Context } from "../context/Web3Context";
+import { DEFAULT_MAX_GAS } from "../utils/constants";
+import debug from "../utils/debug";
+import { stringToValue } from "../utils/values";
+import AlertDialog from "./AlertDialog";
+import CreateAccountDialog from "./CreateAccountDialog";
+import Loading from "./Loading";
 
 const SendDialog = (): JSX.Element => {
-  const { openSendDialog, setOpenSendDialog } = useContext(UIContext);
-  const { currentAsset, currentNetwork } = useContext(AccountContext);
+  const { openSendDialog, setOpenSendDialog, handleCreateAccountDialog, setPreviewRequired } = useContext(UIContext);
+  const { currentAsset, currentNetwork, validateAccount, throwAlert, balance } = useContext(AccountContext);
+  const { create } = useContext(PayloadContext);
   const {
     chainId,
     recipientAddress,
@@ -35,9 +41,13 @@ const SendDialog = (): JSX.Element => {
     maxGasAmount,
     setMaxGasAmount,
     handleEstimate,
+    estimateTransaction,
     estimateGasPrice,
+    clearTxnInput,
+    updateBalance,
   } = useContext(Web3Context);
   const [estimatedGasPrice, setEstimatedGasPrice] = useState<Types.GasEstimation>();
+  const [createAccountFee, setCreateAccountFee] = useState<string>("");
 
   useEffect(() => {
     if (openSendDialog) {
@@ -58,13 +68,106 @@ const SendDialog = (): JSX.Element => {
   const handleCancel = (): void => {
     setRecipientAddress("");
     setAmount("");
+    setMaxGasAmount(DEFAULT_MAX_GAS);
     setOpenSendDialog(false);
+  };
+
+  const validateAddressInput = (): boolean => {
+    switch (recipientAddress.length) {
+      case 64:
+      case 66:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const validateAmountInput = (): boolean => {
+    switch (amount) {
+      case "":
+        return false;
+      case "0":
+        return false;
+      default:
+        return true;
+    }
+  };
+
+  const validateBalance = async (): Promise<boolean> => {
+    const balance = await updateBalance(currentAsset!);
+    const _amount = Number(amount);
+    const _balance = Number(stringToValue(currentAsset!, balance));
+    debug.log("Amount:", _amount);
+    debug.log("Balance:", _balance);
+
+    if (_amount >= _balance) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const validateAddressAndEstimateTransaction = async (): Promise<void> => {
+    const validAddress = validateAddressInput();
+    const validAmount = validateAmountInput();
+    const validBalance = await validateBalance();
+    if (!validAddress) {
+      throwAlert({
+        signal: 132,
+        title: "Invalid address",
+        message: `Invalid address format. Please double check address field and try again.`,
+        error: true,
+      });
+      return;
+    }
+    if (!validAmount) {
+      throwAlert({
+        signal: 133,
+        title: "Invalid amount",
+        message: `Invalid value ${amount} ${
+          currentAsset!.data.symbol
+        }. Please double check amount field and try again.`,
+        error: true,
+      });
+      return;
+    }
+    if (!validBalance) {
+      throwAlert({
+        signal: 134,
+        title: `Not enough ${currentAsset!.data.symbol}`,
+        message: `Account doesn't have enough ${
+          currentAsset!.data.symbol
+        } to execute transaction. Please adjust amount field and try again.`,
+        error: true,
+      });
+      return;
+    }
+
+    const validated = await validateAccount(recipientAddress);
+    if (validated) {
+      debug.log("Address registered on chain:", recipientAddress ? recipientAddress : undefined);
+      handleEstimate();
+    } else {
+      debug.log("Address not found on chain:", recipientAddress ? recipientAddress : undefined);
+      const payload = await create(recipientAddress);
+      const result = await estimateTransaction(payload, true, true);
+      if (result && result.success) {
+        setPreviewRequired(false);
+        setCreateAccountFee(result.gas_used);
+        handleCreateAccountDialog();
+      } else {
+        debug.log("Address cannot be created:", recipientAddress ? recipientAddress : undefined);
+        // Throw new error?
+        clearTxnInput();
+        return;
+      }
+    }
   };
 
   return (
     <Dialog open={openSendDialog} onClose={handleCancel}>
       <DialogTitle sx={{ alignSelf: "center", mb: "-12px" }}>Send {currentAsset!.data.symbol}</DialogTitle>
-      <DialogContent sx={{ maxWidth: 375 }}>
+      <DialogContent sx={{ maxWidth: 375, mb: "-12px" }}>
         <Typography align="center" variant="body1" color="textSecondary" sx={{ maxWidth: "275px" }}>
           {currentNetwork!.name} {`network (chain id: ${chainId})`}
         </Typography>
@@ -94,9 +197,12 @@ const SendDialog = (): JSX.Element => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
+          <Typography variant="body1" color="textSecondary" sx={{ mt: "-15px", mb: "10px" }}>
+            Available: {stringToValue(currentAsset!, balance!)} {currentAsset?.data.symbol}
+          </Typography>
           {estimatedGasPrice && (
             <FormControl sx={{ mb: "15px" }}>
-              <FormLabel sx={{ alignSelf: "center", fontSize: 12, mb: "4px" }} id="gas-price-priority">
+              <FormLabel sx={{ alignSelf: "center", fontSize: 12, mb: "-4px" }} id="gas-price-priority">
                 {"Gas Price (Gas Units)"}
               </FormLabel>
               <RadioGroup
@@ -144,8 +250,8 @@ const SendDialog = (): JSX.Element => {
             inputProps={{ style: { textAlign: "right" } }}
             fullWidth={true}
             type="number"
-            placeholder={maxGasAmount}
-            value={maxGasAmount === "10000" ? "" : maxGasAmount}
+            placeholder={`Default: ${maxGasAmount}`}
+            value={maxGasAmount === DEFAULT_MAX_GAS ? "" : maxGasAmount}
             onChange={(e) => setMaxGasAmount(e.target.value.toString())}
           />
         </Stack>
@@ -169,11 +275,17 @@ const SendDialog = (): JSX.Element => {
             width: "121px",
           }}
           variant="contained"
-          onClick={handleEstimate}
+          onClick={validateAddressAndEstimateTransaction}
         >
           Estimate
         </Button>
       </Stack>
+      <CreateAccountDialog
+        address={recipientAddress}
+        network={currentNetwork!.name}
+        chainId={3}
+        fee={createAccountFee}
+      />
       <Loading />
       <AlertDialog />
     </Dialog>

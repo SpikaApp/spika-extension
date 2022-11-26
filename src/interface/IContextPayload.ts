@@ -1,6 +1,7 @@
 import { TxnBuilderTypes } from "aptos";
 
 interface IContextPayload {
+  create: (address: string) => Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
   register: (coinType: string) => Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
   transfer: (args: IPayloadTransferArgs) => Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
   collection: (args: IPayloadCollectionArgs) => Promise<TxnBuilderTypes.TransactionPayload>;

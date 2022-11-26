@@ -385,6 +385,17 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
   const createAccount = async (): Promise<void> => {
     try {
+      const validatedMnemonic = bip39.validateMnemonic(newMnemonic, english.wordlist);
+
+      if (!validatedMnemonic) {
+        throwAlert({
+          signal: 3,
+          title: "Invalid mnemonic",
+          message: "Recovery phrase provided is not valid.",
+          error: true,
+        });
+        return;
+      }
       const result = await initAccount(newMnemonic);
       debug.log("Account created:", result);
       throwAlert({ signal: 1, title: "Account created", message: `${result}`, error: false });
@@ -396,6 +407,17 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
   const importAccount = async (): Promise<void> => {
     try {
+      const validatedMnemonic = bip39.validateMnemonic(mnemonic, english.wordlist);
+
+      if (!validatedMnemonic) {
+        throwAlert({
+          signal: 3,
+          title: "Invalid mnemonic",
+          message: "Recovery phrase provided is not valid.",
+          error: true,
+        });
+        return;
+      }
       const result = await initAccount(mnemonic);
       debug.log("Account imported:", result);
       throwAlert({ signal: 11, title: "Account imported", message: `${result}`, error: false });

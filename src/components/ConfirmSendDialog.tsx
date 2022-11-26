@@ -15,12 +15,12 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import debug from "../utils/debug";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import copyToClipboard from "../utils/copyToClipboard";
+import debug from "../utils/debug";
 import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
@@ -33,7 +33,8 @@ interface ConfirmSendDialogProps {
 }
 
 const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
-  const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog } = useContext(UIContext);
+  const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog, previewRequired } =
+    useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
   const {
     isValidTransaction,
@@ -47,7 +48,7 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
   const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
-    if (isValidTransaction && !openAddAssetDialog) {
+    if (isValidTransaction && !openAddAssetDialog && previewRequired) {
       debug.log("Valid transaction:", isValidTransaction);
       debug.log("Estimated txn result:", estimatedTxnResult);
       if (estimatedTxnResult) {

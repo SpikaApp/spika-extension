@@ -35,10 +35,12 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [selectedNft, setSelectedNft] = useState<INftDetails | undefined>();
   const [mnemonicRequired, setMnemonicRequired] = useState<boolean>(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState<boolean>(false);
+  const [openCreateAccountDialog, setOpenCreateAccountDialog] = useState<boolean>(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState<boolean>(true);
   const [openPermissionDialog, setOpenPermissionDialog] = useState<boolean>(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
+  const [previewRequired, setPreviewRequired] = useState<boolean>(true);
   const [somethingChanged, setSomethingChanged] = useState<boolean>(false);
   const [isPopup, setIsPopup] = useState<boolean>(false);
   const [devMode] = useState<boolean>(PLATFORM === "http:" ? true : false);
@@ -161,6 +163,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
     setOpenNftDetailsDialog(true);
   };
 
+  const handleCreateAccountDialog = () => {
+    setOpenCreateAccountDialog(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -208,6 +214,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
         handlePrivateKeyUI,
         privateKeyRequired,
         setPrivateKeyRequired,
+        handleCreateAccountDialog,
+        openCreateAccountDialog,
+        setOpenCreateAccountDialog,
         handleChangePasswordUI,
         openAccountAssetsDialog,
         setOpenAccountAssetsDialog,
@@ -231,6 +240,8 @@ export const UIProvider = ({ children }: UIContextProps) => {
         setOpenPermissionDialog,
         disableAllRoutes,
         setDisableAllRoutes,
+        previewRequired,
+        setPreviewRequired,
         somethingChanged,
         setSomethingChanged,
         devMode,

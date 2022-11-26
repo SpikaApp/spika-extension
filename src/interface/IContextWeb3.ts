@@ -39,7 +39,7 @@ interface IContextWeb3 {
   getTxnDetails: (version: number | bigint) => Promise<void>;
   getAccountTokens: () => Promise<void>;
   getBalance: (asset?: ICoin) => Promise<void | string>;
-  updateBalance: (asset: ICoin) => Promise<void>;
+  updateBalance: (asset: ICoin) => Promise<string>;
   getTransactions: () => Promise<aptos.Types.Transaction[]>;
   getNftDetails: () => Promise<void>;
   createToken: (payload: aptos.TxnBuilderTypes.TransactionPayload) => Promise<void>;
@@ -52,8 +52,17 @@ interface IContextWeb3 {
   handleMint: () => Promise<void>;
   estimateGasPrice: () => Promise<Types.GasEstimation>;
   handleSend: (payload?: aptos.TxnBuilderTypes.TransactionPayload, isBcs?: boolean, silent?: boolean) => Promise<void>;
-  handleEstimate: () => Promise<void>;
+  handleEstimate: (
+    payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
+  ) => Promise<aptos.Types.UserTransaction | void>;
   estimateTransaction: (
+    payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
+  ) => Promise<aptos.Types.UserTransaction | void>;
+  sendTransaction: (
     payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
     isBcs?: boolean,
     silent?: boolean
@@ -67,6 +76,7 @@ interface IContextWeb3 {
   findAsset: (coinType: string, address?: string) => Promise<ICoin | undefined>;
   registerAsset: (coinType: string, name: string) => Promise<void>;
   clearPrevEstimation: () => void;
+  clearTxnInput: () => void;
 }
 
 interface IEventsQuery {

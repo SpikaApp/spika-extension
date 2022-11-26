@@ -8,7 +8,7 @@ import { spikaClient } from "../lib/client";
 import { aptosCoin, coinInfo, coinList, coinStore } from "../lib/coin";
 import { setStore } from "../lib/store";
 import * as token from "../lib/token";
-import { PLATFORM } from "../utils/constants";
+import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 import { stringToValue, valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
@@ -22,7 +22,7 @@ type Web3ContextProps = {
 export const Web3Context = React.createContext<IContextWeb3>({} as IContextWeb3);
 
 export const Web3Provider = ({ children }: Web3ContextProps) => {
-  const { spikaWallet, setOpenSendDialog } = useContext(UIContext);
+  const { spikaWallet, setOpenSendDialog, previewRequired } = useContext(UIContext);
   const {
     accountImported,
     throwAlert,
@@ -38,7 +38,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const { register, transfer } = useContext(PayloadContext);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [maxGasAmount, setMaxGasAmount] = useState<string>("10000");
+  const [maxGasAmount, setMaxGasAmount] = useState<string>(DEFAULT_MAX_GAS);
   const [gasUnitPrice, setGasUnitPrice] = useState<string>("100");
   const [estimatedTxnResult, setEstimatedTxnResult] = useState<aptos.Types.UserTransaction>();
   const [isValidTransaction, setIsValidTransaction] = useState<boolean>(false);
@@ -101,11 +101,16 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     setAmount("");
   };
 
-  const handleEstimate = async (): Promise<void> => {
+  const handleEstimate = async (
+    payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
+    isBcs?: boolean,
+    silent?: boolean
+  ): Promise<aptos.Types.UserTransaction | void> => {
     setIsLoading(true);
     setOpenSendDialog(false);
-    await estimateTransaction();
+    const result = await estimateTransaction(payload, isBcs, silent);
     setIsLoading(false);
+    return result;
   };
 
   const handleSend = async (
@@ -119,6 +124,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     setIsValidTransaction(false);
     clearPrevEstimation();
     setAmount("");
+    setRecipientAddress("");
   };
 
   const getChainId = async (): Promise<void> => {
@@ -171,11 +177,17 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     return await spika.client.estimateGasPrice();
   };
 
+  const clearTxnInput = (): void => {
+    setRecipientAddress("");
+    setAmount("");
+    setMaxGasAmount(DEFAULT_MAX_GAS);
+  };
+
   const estimateTransaction = async (
     payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
     isBcs?: boolean,
     silent?: boolean
-  ): Promise<void> => {
+  ): Promise<aptos.Types.UserTransaction | void> => {
     const spika = await spikaClient();
     let _payload;
     let isSilent = false;
@@ -211,16 +223,19 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       const estimatedTxn = (await spika.client.submitBCSSimulation(bcsTxn))[0];
       if (estimatedTxn.success === true) {
         debug.log("Estimated transaction result received:", estimatedTxn);
+        debug.log("Preview required set to:", previewRequired);
         // logic if Move says wagmi
         setIsValidTransaction(true);
         setEstimatedTxnResult(estimatedTxn);
         throwAlert({ signal: 30, title: "Transaction is valid", message: `${estimatedTxn.vm_status}`, error: false });
+        return estimatedTxn;
       }
       if (estimatedTxn.success === false) {
         // logic if txn aborted by Move
         setEstimatedTxnResult(estimatedTxn);
         if (!isSilent) {
           throwAlert({ signal: 33, title: "Transaction invalid", message: `${estimatedTxn.vm_status}`, error: true });
+          return estimatedTxn;
         }
         setRecipientAddress("");
         setAmount("");
@@ -425,20 +440,20 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const updateBalance = async (asset: ICoin): Promise<void> => {
+  const updateBalance = async (asset: ICoin): Promise<string> => {
     const spika = await spikaClient();
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const resources = await spika.client.getAccountResources(account!.address());
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const _asset: any = resources.find((r) => r.type === asset.type);
+      const _asset: any = resources.find((r) => r.type === coinStore(asset.type));
       if (_asset === undefined || _asset === null) {
-        setBalance("0");
+        return "0";
       } else {
-        setBalance(_asset.data.coin.value);
+        return _asset.data.coin.value;
       }
     } else {
-      setBalance("0");
+      return "0";
     }
   };
 
@@ -751,6 +766,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         getAptosAddress,
         estimateGasPrice,
         estimateTransaction,
+        sendTransaction,
         signMessage,
         signTransaction,
         signAndSubmitTransaction,
@@ -758,6 +774,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         findAsset,
         registerAsset,
         clearPrevEstimation,
+        clearTxnInput,
       }}
     >
       {children}

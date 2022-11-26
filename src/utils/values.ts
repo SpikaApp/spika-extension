@@ -1,4 +1,5 @@
 import { ICoin } from "../interface";
+import { aptosCoin } from "../lib/coin";
 
 export const stringToValue = (asset: ICoin, value: string): string => {
   const decimal: number = asset.data.decimals;
@@ -11,5 +12,11 @@ export const stringToValue = (asset: ICoin, value: string): string => {
 export const valueToString = (asset: ICoin, value: string): string => {
   const decimal: number = asset.data.decimals;
   const setDecimal = `${value}e${decimal}`;
+  return Number(setDecimal).toString();
+};
+
+export const gasToValue = (gasAmount: string): string => {
+  const decimal: number = aptosCoin.data.decimals;
+  const setDecimal = `${gasAmount}e-${decimal}`;
   return Number(setDecimal).toString();
 };

@@ -47,9 +47,17 @@ const Onboarding = (): JSX.Element => {
           </Typography>
         )}
         {PLATFORM === "chrome-extension:" && (
-          <Typography variant="caption" align="center" color="textPrimary" sx={{ fontWeight: 400, mt: 2 }}>
-            Spika is connected to Aptos Devnet. All account addresses and resources will be deleted with scheduled
-            weekly Devnet update.
+          <Typography align="center" sx={{ fontWeight: 400, mt: 2 }} variant="subtitle2">
+            Need help setting up your account? <br />
+            Check{" "}
+            <Link href="https://docs.spika.app" underline="none" target="_blank" color="link">
+              guidelines
+            </Link>{" "}
+            or contact{" "}
+            <Link href="mailto:support@spika.app" underline="none" target="_blank" color="link">
+              support
+            </Link>{" "}
+            for assistance.
           </Typography>
         )}
       </Box>

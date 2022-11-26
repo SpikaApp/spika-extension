@@ -1,4 +1,4 @@
-import { version, dependencies } from "../../package.json";
+import { dependencies, version } from "../../package.json";
 
 // Extension version
 export const EXTENSION_VERSION: string = version;
@@ -13,3 +13,6 @@ export const APTOS_DERIVE_PATH = "m/44'/637'/0'/0'/0'";
 
 // Extension type
 export const PLATFORM: string = window.location.protocol;
+
+// Default Max Gas in Gas Units
+export const DEFAULT_MAX_GAS: string = import.meta.env.VITE_SPIKA_DEFAULT_MAX_GAS;
