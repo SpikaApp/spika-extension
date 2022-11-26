@@ -8,6 +8,7 @@
 
 - 1: Account created
 - 2: Failed create account
+- 3: Mnemonic phrase invalid
 
 ---
 
@@ -80,3 +81,9 @@
 
 - 121: Successfully registered in new network
 - 122: Network registration failed
+
+---
+
+- 132: Invalid address field
+- 133: Invalid amount field
+- 134: Not enough balance to execute transaction

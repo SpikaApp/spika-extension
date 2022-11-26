@@ -36,8 +36,17 @@ const AlertDialog = () => {
     setIsPopup,
     isError,
   } = useContext(UIContext);
-  const { setAccountImported, alertSignal, alertTitle, alertMessage, clearAlert, setCurrentAsset, handleLogout } =
-    useContext(AccountContext);
+  const {
+    setAccountImported,
+    alertSignal,
+    alertTitle,
+    alertMessage,
+    clearAlert,
+    setCurrentAsset,
+    handleLogout,
+    setMnemonic,
+    setNewMnemonic,
+  } = useContext(AccountContext);
 
   useEffect(() => {
     if (alertSignal === 31 || alertSignal === 61) {
@@ -115,14 +124,21 @@ const AlertDialog = () => {
         setCurrentAsset(aptosCoin);
         break;
       case 2: // Failed create account
+      case 3: // Invalid mnemonic
       case 12: // Failed import account
-      case 22: // Failed mint coins
-      case 32: // Transaction failed
+        setAccountImported(false);
+        setMnemonic("");
+        setNewMnemonic("");
+        setOpenAlertDialog(false);
+        break;
       case 41: // Account loaded from localStorage
       case 42: // Failed load account
         setAccountImported(false);
+        // This will cause extension to throw 404 and needs to be fixed.
         navigate(0);
         break;
+      case 22: // Failed mint coins
+      case 32: // Transaction failed
       case 52: // Password field cannot be empty
       case 53: // Passwords do not match
       case 54: // Password must at least 6 characters long
@@ -139,6 +155,9 @@ const AlertDialog = () => {
       case 104: // Error, Select asset from the list or add custom token to continue.
       case 112: // Failed to find asset on chain
       case 122: // Network registration failed
+      case 132: // Invalid address field
+      case 133: // Ivalid amount field
+      case 134: // Not enough balance to execute transaction
         setOpenAlertDialog(false);
         setIsPopup(false);
         break;
