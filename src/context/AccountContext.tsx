@@ -494,8 +494,11 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
   const switchAccount = async (index: number): Promise<void> => {
     try {
+      const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
+      const pwd: string = await decryptPassword(data);
       const _account: aptos.AptosAccount = await getAptosAccount(index);
       const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+      const _encryptedPrivateKey = await passworder.encrypt(pwd, _privateKey);
       const _currentAsset = aptosCoin;
       setStore(PLATFORM, "currentAsset", aptosCoin);
       const _publicAccount = {
@@ -504,6 +507,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         authKey: _account.authKey().hex(),
       };
       const _currentAddressName: string = await getAccountName(_account.address().hex());
+      setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
       setStore(PLATFORM, "currentAddress", _account.address().hex());
       setStore(PLATFORM, "currentAddressName", _currentAddressName);
       setStore(PLATFORM, "currentPubAccount", _publicAccount);
