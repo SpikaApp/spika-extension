@@ -17,11 +17,11 @@ export default defineConfig({
     },
   },
   build: {
-    minify: true,
-    sourcemap: true,
-    commonjsOptions: {
-      include: /node_modules/,
-      transformMixedEsModules: true,
+    // minify: true,
+    // sourcemap: true,
+    // commonjsOptions: {
+    //   include: /node_modules/,
+    //   transformMixedEsModules: true,
     },
     rollupOptions: {
       output: {
