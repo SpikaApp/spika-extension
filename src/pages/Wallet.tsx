@@ -16,7 +16,6 @@ import SendDialog from "../components/SendDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 
 const Wallet = (): JSX.Element => {
@@ -29,7 +28,7 @@ const Wallet = (): JSX.Element => {
     handleChangeNetworkUI,
     handleAccountManagerUI,
   } = useContext(UIContext);
-  const { isLoading, currentAddress, currentAddressName, accountImported, currentNetwork, currentAsset, balance } =
+  const { isLoading, currentAddressName, accountImported, currentNetwork, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance, handleMint } = useContext(Web3Context);
   const [isOnline, setIsOnline] = useState(false);
@@ -71,15 +70,8 @@ const Wallet = (): JSX.Element => {
       {accountImported && (
         <Container maxWidth="xs">
           <Card sx={{ mb: 2, height: "185px", mt: "100px" }}>
-            <Stack
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                mt: "18px",
-                mb: "-18px",
-              }}
-            >
-              <Tooltip sx={{ mr: "85px" }} title="Change network">
+            <Stack sx={{ display: "flex", flexDirection: "row", mt: "18px", mb: "-12px", alignItems: "center" }}>
+              <Tooltip sx={{ mr: "75px" }} title="Change network">
                 <Chip
                   label={
                     <Stack sx={{ display: "flex", flexDirection: "row" }}>
@@ -99,11 +91,23 @@ const Wallet = (): JSX.Element => {
                   onClick={handleChangeNetworkUI}
                 />
               </Tooltip>
-              <Chip
-                label={`${currentAddressName} (${shortenAddress(currentAddress!)})`}
-                onClick={handleAccountManagerUI}
-              />
+              <Tooltip title="Change account">
+                <Chip
+                  label={
+                    <Typography
+                      align="center"
+                      noWrap
+                      sx={{ ml: "5px", mr: "5px", minWidth: "50px", maxWidth: "100px" }}
+                      variant="body2"
+                    >
+                      {currentAddressName}
+                    </Typography>
+                  }
+                  onClick={handleAccountManagerUI}
+                />
+              </Tooltip>
             </Stack>
+
             <CardContent>
               {isLoading ? (
                 <Typography sx={{ mt: "-90px" }} align="center" variant="h6">

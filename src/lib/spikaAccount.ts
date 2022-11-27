@@ -54,6 +54,12 @@ export const getSpikaAccountIndex = async (): Promise<number> => {
   return result;
 };
 
+export const getSpikaAccountCurrentIndex = async (currentAddress: string): Promise<number> => {
+  const data: Array<ISpikaAccount> = await getStore(PLATFORM, _spikaMasterAccount).master;
+  const current = data.find((account: ISpikaAccount) => account.data.account === currentAddress);
+  return current!.index;
+};
+
 export const getSpikaMasterAccount = async (): Promise<ISpikaMasterAccount> => {
   return await getStore(PLATFORM, _spikaMasterAccount);
 };
@@ -94,7 +100,7 @@ export const getAptosAccount = async (index: number): Promise<AptosAccount> => {
 };
 
 export const renameAccount = async (accountName: string, accountIndex: number): Promise<ISpikaMasterAccount> => {
-  const spikaMasterAccount: ISpikaMasterAccount = getStore(PLATFORM, _spikaMasterAccount);
+  const spikaMasterAccount: ISpikaMasterAccount = await getStore(PLATFORM, _spikaMasterAccount);
   const data: Array<ISpikaAccount> = spikaMasterAccount.master;
   const account = data.find((i: ISpikaAccount) => i.index === accountIndex);
   const renamedAccount: ISpikaAccount = {
@@ -113,7 +119,7 @@ export const renameAccount = async (accountName: string, accountIndex: number): 
 };
 
 export const getAccountName = async (currentAddress: string): Promise<string> => {
-  const spikaMasterAccount: ISpikaMasterAccount = getStore(PLATFORM, _spikaMasterAccount);
+  const spikaMasterAccount: ISpikaMasterAccount = await getStore(PLATFORM, _spikaMasterAccount);
   const data: Array<ISpikaAccount> = spikaMasterAccount.master;
   const account = data.find((i: ISpikaAccount) => i.data.account === currentAddress);
   return account!.name;
