@@ -27,7 +27,10 @@ dist-ssr
 
 tmp
 
+# Enviroment variables
 .aptos
-src/components/_DraftDialog.jsx
 .env
 *.env
+
+# Local Netlify folder
+.netlify
