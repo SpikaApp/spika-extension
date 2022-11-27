@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, NavigateFunction, useNavigate } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { aptosCoin } from "../lib/coin";
@@ -21,7 +21,7 @@ import copyToClipboard from "../utils/copyToClipboard";
 import debug from "../utils/debug";
 
 const AlertDialog = () => {
-  const [isTransaction, setIsTransaction] = useState(false);
+  const [isTransaction, setIsTransaction] = useState<boolean>(false);
   const {
     openAlertDialog,
     setOpenAlertDialog,
@@ -62,7 +62,7 @@ const AlertDialog = () => {
     }
   }, [openAlertDialog]);
 
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   const handleOpen = () => {
     // if transaction estimated as valid => handle TransactionDialog
@@ -132,7 +132,8 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         break;
       case 41: // Account loaded from localStorage
-      case 42: // Failed load account
+      case 42: // Failed to load account
+      case 43: // Failed to switch account
         setAccountImported(false);
         // This will cause extension to throw 404 and needs to be fixed.
         navigate(0);

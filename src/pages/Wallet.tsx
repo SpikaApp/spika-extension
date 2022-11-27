@@ -6,6 +6,7 @@ import { Box, Button, Card, CardContent, Chip, Container, IconButton, Stack, Too
 import { AptosClient } from "aptos";
 import { useContext, useEffect, useState } from "react";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
+import AccountManagerDialog from "../components/AccountManagerDialog";
 import AddAssetDialog from "../components/AddAssetDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
 import MintDialog from "../components/MintDialog";
@@ -15,14 +16,20 @@ import SendDialog from "../components/SendDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import copyToClipboard from "../utils/copyToClipboard";
 import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 
 const Wallet = (): JSX.Element => {
-  const { darkMode, handleSendUI, handleReceiveUI, handleAccountAssetsUI, handleAddAssetUI, handleChangeNetworkUI } =
-    useContext(UIContext);
-  const { isLoading, currentAddress, accountImported, currentNetwork, currentAsset, balance } =
+  const {
+    darkMode,
+    handleSendUI,
+    handleReceiveUI,
+    handleAccountAssetsUI,
+    handleAddAssetUI,
+    handleChangeNetworkUI,
+    handleAccountManagerUI,
+  } = useContext(UIContext);
+  const { isLoading, currentAddress, currentAddressName, accountImported, currentNetwork, currentAsset, balance } =
     useContext(AccountContext);
   const { getBalance, handleMint } = useContext(Web3Context);
   const [isOnline, setIsOnline] = useState(false);
@@ -59,10 +66,6 @@ const Wallet = (): JSX.Element => {
     }
   };
 
-  const handleClick = (): void => {
-    copyToClipboard(currentAddress!);
-  };
-
   return (
     <Box>
       {accountImported && (
@@ -96,9 +99,10 @@ const Wallet = (): JSX.Element => {
                   onClick={handleChangeNetworkUI}
                 />
               </Tooltip>
-              <Tooltip title="Copy address">
-                <Chip label={shortenAddress(currentAddress!)} onClick={handleClick} />
-              </Tooltip>
+              <Chip
+                label={`${currentAddressName} (${shortenAddress(currentAddress!)})`}
+                onClick={handleAccountManagerUI}
+              />
             </Stack>
             <CardContent>
               {isLoading ? (
@@ -224,6 +228,7 @@ const Wallet = (): JSX.Element => {
           <SendDialog />
           <ConfirmSendDialog />
           <ReceiveDialog />
+          <AccountManagerDialog />
         </Container>
       )}
     </Box>

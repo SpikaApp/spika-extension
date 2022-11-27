@@ -31,7 +31,8 @@
 ---
 
 - 41: Account loaded
-- 42: Failed load account
+- 42: Failed to load account
+- 43: Failed to switch account
 
 ---
 

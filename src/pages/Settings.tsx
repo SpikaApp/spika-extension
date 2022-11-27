@@ -1,6 +1,7 @@
 import { Button, Card, CardContent, Container, Stack } from "@mui/material";
 import { useContext } from "react";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
+import AccountManagerDialog from "../components/AccountManagerDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
@@ -13,6 +14,7 @@ const Settings = (): JSX.Element => {
     handlePrivateKeyUI,
     handleChangePasswordUI,
     handleChangeNetworkUI,
+    handleAccountManagerUI,
     setOpenAccountDetailsDialog,
   } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
@@ -44,6 +46,9 @@ const Settings = (): JSX.Element => {
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleChangeNetworkUI}>
                 Change Network
               </Button>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleAccountManagerUI}>
+                Account Manager
+              </Button>
             </Stack>
           )}
         </CardContent>
@@ -52,6 +57,7 @@ const Settings = (): JSX.Element => {
       <AccountDetailsDialog />
       <ChangePasswordDialog />
       <NetworkDialog />
+      <AccountManagerDialog />
     </Container>
   );
 };

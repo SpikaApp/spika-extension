@@ -36,8 +36,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [mnemonicRequired, setMnemonicRequired] = useState<boolean>(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState<boolean>(false);
   const [openCreateAccountDialog, setOpenCreateAccountDialog] = useState<boolean>(false);
+  const [openRenameAccountDialog, setOpenRenameAccountDialog] = useState<boolean>(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState<boolean>(true);
   const [openPermissionDialog, setOpenPermissionDialog] = useState<boolean>(false);
+  const [openAccountManagerDialog, setOpenAccountManagerDialog] = useState<boolean>(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
   const [previewRequired, setPreviewRequired] = useState<boolean>(true);
@@ -163,8 +165,16 @@ export const UIProvider = ({ children }: UIContextProps) => {
     setOpenNftDetailsDialog(true);
   };
 
-  const handleCreateAccountDialog = () => {
+  const handleCreateAccountDialog = (): void => {
     setOpenCreateAccountDialog(true);
+  };
+
+  const handleAccountManagerUI = (): void => {
+    setOpenAccountManagerDialog(true);
+  };
+
+  const handleRenameAccountUI = (): void => {
+    setOpenRenameAccountDialog(true);
   };
 
   return (
@@ -238,6 +248,12 @@ export const UIProvider = ({ children }: UIContextProps) => {
         setAccountRoutesEnabled,
         openPermissionDialog,
         setOpenPermissionDialog,
+        openAccountManagerDialog,
+        handleRenameAccountUI,
+        setOpenAccountManagerDialog,
+        openRenameAccountDialog,
+        setOpenRenameAccountDialog,
+        handleAccountManagerUI,
         disableAllRoutes,
         setDisableAllRoutes,
         previewRequired,

@@ -11,5 +11,6 @@ export type { default as IContextAccount } from "./IContextAccount";
 export type { IAlertArgs } from "./IContextAccount";
 export type { default as IContextWeb3 } from "./IContextWeb3";
 export type { default as IContextPayload } from "./IContextPayload";
+export type { ISpikaMasterAccount, ISpikaAccount } from "./ISpikaMasterAccount";
 export type { IPayloadTransferArgs, IPayloadCollectionArgs, IPayloadNftArgs } from "./IContextPayload";
 export * from "./IWallet";

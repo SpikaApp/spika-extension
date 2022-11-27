@@ -6,18 +6,22 @@ import * as aptos from "aptos";
 import { Types } from "aptos";
 import { useContext } from "react";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
+import AccountManagerDialog from "../components/AccountManagerDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
 import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
+import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { spikaClient } from "../lib/client";
+import { addSpikaAccount, initSpikaMasterAccount } from "../lib/spikaAccount";
 import { APTOS_DERIVE_PATH } from "../utils/constants";
 import debug from "../utils/debug";
 
 const Tests = (): JSX.Element => {
-  const { accountImported, currentAddress, validateAccount } = useContext(AccountContext);
+  const { handleAccountManagerUI } = useContext(UIContext);
+  const { accountImported, currentAddress, validateAccount, publicAccount } = useContext(AccountContext);
   const { estimateTransaction, handleSend } = useContext(Web3Context);
   const { create } = useContext(PayloadContext);
 
@@ -72,6 +76,15 @@ const Tests = (): JSX.Element => {
               <Button sx={{ mb: 2 }} variant="outlined" onClick={createAccount}>
                 Create Account
               </Button>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={handleAccountManagerUI}>
+                Account Manager
+              </Button>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={() => initSpikaMasterAccount(publicAccount!)}>
+                Init Account
+              </Button>
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={addSpikaAccount}>
+                Add Account
+              </Button>
             </Stack>
           )}
         </CardContent>
@@ -80,6 +93,7 @@ const Tests = (): JSX.Element => {
       <AccountDetailsDialog />
       <ChangePasswordDialog />
       <NetworkDialog />
+      <AccountManagerDialog />
     </Container>
   );
 };

@@ -10,11 +10,12 @@ import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
 import * as apps from "../lib/connectedApps";
+import { getAccountName, getAptosAccount, initSpikaMasterAccount } from "../lib/spikaAccount";
 import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../lib/store";
 import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constants";
+import debug from "../utils/debug";
 import { decryptPassword, encryptPassword } from "../utils/pwd";
 import { UIContext } from "./UIContext";
-import debug from "../utils/debug";
 
 type AccountContextProps = {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const [newMnemonic, setNewMnemonic] = useState<string>("");
   const [privateKey, setPrivateKey] = useState<string | undefined>();
   const [currentAddress, setCurrentAddress] = useState<string | undefined>();
+  const [currentAddressName, setCurrentAddressName] = useState<string | undefined>();
   const [publicAccount, setPublicAccount] = useState<IPublicAccount | undefined>();
   const [account, setAccount] = useState<aptos.AptosAccount | undefined>();
   const [currentNetwork, setCurrentNetwork] = useState<INetwork | undefined>();
@@ -184,14 +186,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         throwAlert({
           signal: 54,
           title: "Incorrect password",
-          message: "Password must be at least 6 characters long",
+          message: "Password must be at least 6 characters long.",
           error: true,
         });
         clearPasswords();
       }
     } else {
       debug.log("Current password is wrong.");
-      throwAlert({ signal: 57, title: "Incorrect password", message: "Current password is wrong", error: true });
+      throwAlert({ signal: 57, title: "Incorrect password", message: "Current password is wrong.", error: true });
       clearPasswords();
     }
   };
@@ -210,7 +212,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       setMem(PLATFORM, "PWD", encryptedPassword);
       clearPasswords();
       debug.log("Password successfully changed.");
-      throwAlert({ signal: 56, title: "Success", message: "Password successfully changed", error: false });
+      throwAlert({ signal: 56, title: "Success", message: "Password successfully changed.", error: false });
     } catch (error) {
       clearPasswords();
       console.log(error);
@@ -226,18 +228,18 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       navigate("/");
     } else if (password === "") {
       debug.log("Password field cannot be empty.");
-      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
+      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty.", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
       debug.log("Passwords do not match.");
-      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
+      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match.", error: true });
       clearPasswords();
     } else if (password.length > 5) {
       debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,
         title: "Incorrect password",
-        message: "Password must be at least 6 characters long",
+        message: "Password must be at least 6 characters long.",
         error: true,
       });
       clearPasswords();
@@ -253,18 +255,18 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       navigate("/");
     } else if (password === "") {
       debug.log("Password field cannot be empty.");
-      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty", error: true });
+      throwAlert({ signal: 52, title: "Incorrect password", message: "Password field cannot be empty.", error: true });
       clearPasswords();
     } else if (password !== confirmPassword) {
       debug.log("Passwords do not match.");
-      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
+      throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match.", error: true });
       clearPasswords();
     } else if (password.length > 5) {
       debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,
         title: "Incorrect password",
-        message: "Password must be at least 6 characters long",
+        message: "Password must be at least 6 characters long.",
         error: true,
       });
       clearPasswords();
@@ -291,7 +293,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       setOpenLoginDialog(false);
     } catch (error) {
       debug.log("Incorrect password.");
-      throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
+      throwAlert({ signal: 92, title: "Error", message: "Incorrect password.", error: true });
       setPassword("");
       setMnemonicRequired(false);
       setOpenLoginDialog(false);
@@ -309,7 +311,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       setOpenLoginDialog(false);
     } catch (error) {
       debug.log("Incorrect password.");
-      throwAlert({ signal: 92, title: "Error", message: "Incorrect password", error: true });
+      throwAlert({ signal: 92, title: "Error", message: "Incorrect password.", error: true });
       setPassword("");
       setPrivateKeyRequired(false);
       setOpenLoginDialog(false);
@@ -348,12 +350,17 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     locker("lock");
     debug.log("Wallet locker initialized.");
 
+    // Initialize Master Account
+    await initSpikaMasterAccount(_publicAccount);
+    const _currentAddressName: string = await getAccountName(_account.address().hex());
+
     // Local storage
     setStore(PLATFORM, "DATA0", encryptedMnemonic);
     setStore(PLATFORM, "DATA1", encryptedPrivateKey);
     setStore(PLATFORM, "ACCOUNT_IMPORTED", true);
     setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
     setStore(PLATFORM, "currentAddress", _account.address().hex());
+    setStore(PLATFORM, "currentAddressName", _currentAddressName);
     setStore(PLATFORM, "currentPubAccount", _publicAccount);
     setStore(PLATFORM, "currentNetwork", network.networkList[0]);
     setStore(PLATFORM, "currentAsset", aptosCoin);
@@ -373,6 +380,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setAccount(_account);
     setPublicAccount(_publicAccount);
     setCurrentAddress(_account.address().hex());
+    setCurrentAddressName(_currentAddressName);
     setCurrentNetwork(network.networkList[0]);
     setCurrentAsset(aptosCoin);
     setBalance(undefined);
@@ -450,10 +458,13 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
           account: _account.address().hex(),
           authKey: _account.authKey().hex(),
         };
+        await initSpikaMasterAccount(_publicAccount);
+        const _currentAddressName: string = await getAccountName(_account.address().hex());
         assetStore.addAssetStore(_account.address().hex(), aptosCoin);
         network.addNetworkStore(_account.address().hex());
         apps.addAddress(_publicAccount);
         setStore(PLATFORM, "currentAddress", _account.address().hex());
+        setStore(PLATFORM, "currentAddressName", _currentAddressName);
         setStore(PLATFORM, "currentPubAccount", _publicAccount);
         const encryptedPassword = await encryptPassword(password);
         setMem(PLATFORM, "PWD", encryptedPassword);
@@ -462,21 +473,51 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         setAccount(_account);
         setPublicAccount(_publicAccount);
         setCurrentAddress(_account.address().hex());
+        setCurrentAddressName(_currentAddressName);
         setCurrentNetwork(_currentNetwork);
         setCurrentAsset(_currentAsset);
         debug.log("Local storage, session storage, state updated.");
       } catch (error) {
         console.log(error);
         debug.log("Failed to load account.");
-        throwAlert({ signal: 42, title: "Failed to load account", message: `${error}`, error: true });
+        throwAlert({ signal: 42, title: "Failed to load account.", message: `${error}`, error: true });
         setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }
     } catch (error) {
       console.log(error);
       debug.log("Incorrect password.");
-      throwAlert({ signal: 55, title: "Error", message: "Incorrect password", error: true });
+      throwAlert({ signal: 55, title: "Error", message: "Incorrect password.", error: true });
       setPassword("");
       setOpenLoginDialog(true);
+    }
+  };
+
+  const switchAccount = async (index: number): Promise<void> => {
+    try {
+      const _account: aptos.AptosAccount = await getAptosAccount(index);
+      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+      const _currentAsset = aptosCoin;
+      setStore(PLATFORM, "currentAsset", aptosCoin);
+      const _publicAccount = {
+        publicKey: _account.pubKey().hex(),
+        account: _account.address().hex(),
+        authKey: _account.authKey().hex(),
+      };
+      const _currentAddressName: string = await getAccountName(_account.address().hex());
+      setStore(PLATFORM, "currentAddress", _account.address().hex());
+      setStore(PLATFORM, "currentAddressName", _currentAddressName);
+      setStore(PLATFORM, "currentPubAccount", _publicAccount);
+      setPrivateKey(_privateKey);
+      setAccount(_account);
+      setPublicAccount(_publicAccount);
+      setCurrentAddress(_account.address().hex());
+      setCurrentAddressName(_currentAddressName);
+      setCurrentAsset(_currentAsset);
+      debug.log("Local storage, session storage, state updated.");
+    } catch (error) {
+      console.log(error);
+      debug.log("Failed to switch account.");
+      throwAlert({ signal: 43, title: "Failed to switch account.", message: `${error}`, error: true });
     }
   };
 
@@ -538,6 +579,8 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         publicAccount,
         privateKey,
         currentAddress,
+        currentAddressName,
+        setCurrentAddressName,
         currentAsset,
         baseCoin,
         setBaseCoin,
@@ -559,6 +602,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         handleRevealMnemonic,
         handleRevealPrivateKey,
         validateAccount,
+        switchAccount,
       }}
     >
       {children}

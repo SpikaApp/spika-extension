@@ -55,7 +55,8 @@ export const setStore = (platform: string, key: string, value: any): void => {
       key === "accountEvents" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
-      key === "currentPubAccount"
+      key === "currentPubAccount" ||
+      key === "spikaMasterAccount"
     ) {
       const _value = JSON.stringify(value);
       localStorage.setItem(key, _value);
@@ -81,7 +82,8 @@ export const getStore = (platform: string, key: string): any => {
       key === "accountEvents" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
-      key === "currentPubAccount"
+      key === "currentPubAccount" ||
+      key === "spikaMasterAccount"
     ) {
       return JSON.parse(value);
     } else {

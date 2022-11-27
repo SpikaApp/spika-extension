@@ -29,6 +29,8 @@ interface IContextAccount {
   account: AptosAccount | undefined;
   privateKey: string | undefined;
   currentAddress: string | undefined;
+  currentAddressName: string | undefined;
+  setCurrentAddressName: React.Dispatch<React.SetStateAction<string | undefined>>;
   publicAccount: IPublicAccount | undefined;
   currentNetwork: INetwork | undefined;
   setCurrentNetwork: React.Dispatch<React.SetStateAction<INetwork | undefined>>;
@@ -56,6 +58,7 @@ interface IContextAccount {
   validateAccount: (address: string) => Promise<boolean>;
   throwAlert: (args: IAlertArgs) => void;
   clearAlert: () => void;
+  switchAccount: (index: number) => Promise<void>;
 }
 
 export interface IAlertArgs {

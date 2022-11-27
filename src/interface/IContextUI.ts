@@ -54,6 +54,10 @@ type IContextUI = {
   setAccountRoutesEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   openPermissionDialog: boolean;
   setOpenPermissionDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openAccountManagerDialog: boolean;
+  setOpenAccountManagerDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openRenameAccountDialog: boolean;
+  setOpenRenameAccountDialog: React.Dispatch<React.SetStateAction<boolean>>;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
   previewRequired: boolean;
@@ -83,6 +87,8 @@ type IContextUI = {
   handleAddAssetUI: () => void;
   handleChangeNetworkUI: () => void;
   handleAddCustomNetworkUI: () => void;
+  handleAccountManagerUI: () => void;
+  handleRenameAccountUI: () => void;
 };
 
 export default IContextUI;
