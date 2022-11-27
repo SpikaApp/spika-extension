@@ -17,12 +17,12 @@ export default defineConfig({
     },
   },
   build: {
-    // minify: true,
+    minify: true,
     // sourcemap: true,
     // commonjsOptions: {
     //   include: /node_modules/,
     //   transformMixedEsModules: true,
-    },
+    // },
     rollupOptions: {
       output: {
         entryFileNames: "app/[name].js",
