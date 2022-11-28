@@ -36,7 +36,7 @@ const RenameAccountDialog = (props: RenameAccountDialogProps): JSX.Element => {
       <DialogContent sx={{ maxWidth: 375 }}>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField
-            sx={{ mb: "20px", width: "275px" }}
+            sx={{ mb: "-10px", width: "275px" }}
             InputLabelProps={{ shrink: true }}
             inputProps={{ style: { textAlign: "left" } }}
             fullWidth={true}
