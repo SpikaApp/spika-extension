@@ -37,6 +37,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [privateKeyRequired, setPrivateKeyRequired] = useState<boolean>(false);
   const [openCreateAccountDialog, setOpenCreateAccountDialog] = useState<boolean>(false);
   const [openRenameAccountDialog, setOpenRenameAccountDialog] = useState<boolean>(false);
+  const [openResetWalletDialog, setOpenResetWalletDialog] = useState<boolean>(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState<boolean>(true);
   const [openPermissionDialog, setOpenPermissionDialog] = useState<boolean>(false);
   const [openAccountManagerDialog, setOpenAccountManagerDialog] = useState<boolean>(false);
@@ -177,6 +178,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
     setOpenRenameAccountDialog(true);
   };
 
+  const handleResetWalletUI = (): void => {
+    setOpenResetWalletDialog(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -254,6 +259,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
         openRenameAccountDialog,
         setOpenRenameAccountDialog,
         handleAccountManagerUI,
+        openResetWalletDialog,
+        setOpenResetWalletDialog,
+        handleResetWalletUI,
         disableAllRoutes,
         setDisableAllRoutes,
         previewRequired,

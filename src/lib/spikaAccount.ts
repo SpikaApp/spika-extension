@@ -24,24 +24,24 @@ const getMnemonic = async (): Promise<string> => {
 
 export const initSpikaMasterAccount = async (publicAccount: IPublicAccount): Promise<void> => {
   const spikaAccount: ISpikaMasterAccount = await getStore(PLATFORM, _spikaMasterAccount);
+  const data = [];
+  const index = 0;
+  const account: ISpikaAccount = {
+    index: index,
+    name: `Account${index + 1}`,
+    data: publicAccount,
+  };
+  data.push(account);
+  const result: ISpikaMasterAccount = {
+    master: data,
+    latest: index + 1,
+  };
   if (!spikaAccount) {
-    const data = [];
-    const index = 0;
-    const account: ISpikaAccount = {
-      index: index,
-      name: `Account${index + 1}`,
-      data: publicAccount,
-    };
-    data.push(account);
-    debug.log("Data:", data);
-
-    const result: ISpikaMasterAccount = {
-      master: data,
-      latest: index + 1,
-    };
-    debug.log("Result:", result);
     setStore(PLATFORM, _spikaMasterAccount, result);
     debug.log("Master account successfully initialized.");
+  } else if (spikaAccount.master[0].data.account !== publicAccount.account) {
+    setStore(PLATFORM, _spikaMasterAccount, result);
+    debug.log("Address missmatch. Master account recreated.");
   } else {
     debug.log("Master account found in storage.");
   }

@@ -11,6 +11,7 @@ import {
 import { useContext } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
+import ResetWalletDialog from "./ResetWalletDialog";
 
 const LoginDialog = (): JSX.Element => {
   const { password, setPassword, handleLogin, handleRevealMnemonic, handleRevealPrivateKey } =
@@ -22,6 +23,7 @@ const LoginDialog = (): JSX.Element => {
     setMnemonicRequired,
     privateKeyRequired,
     setPrivateKeyRequired,
+    handleResetWalletUI,
   } = useContext(UIContext);
 
   const handleCancel = (): void => {
@@ -92,19 +94,26 @@ const LoginDialog = (): JSX.Element => {
           </Stack>
         )}
         {!mnemonicRequired && !privateKeyRequired && (
-          <Button
-            variant="contained"
-            onClick={handleLogin}
-            sx={{
-              mb: 2,
-              background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-              width: "115px",
-            }}
-          >
-            Login
-          </Button>
+          <Stack sx={{ display: "flex", alignItems: "center" }}>
+            <Button
+              variant="contained"
+              onClick={handleLogin}
+              sx={{
+                mt: "8px",
+                mb: "8px",
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
+                width: "150px",
+              }}
+            >
+              Login
+            </Button>
+            <Button sx={{ width: "150px" }} onClick={handleResetWalletUI}>
+              Forgot password?
+            </Button>
+          </Stack>
         )}
       </DialogActions>
+      <ResetWalletDialog />
     </Dialog>
   );
 };

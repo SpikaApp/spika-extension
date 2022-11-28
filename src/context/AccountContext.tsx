@@ -160,7 +160,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     const oldPassword: string = await decryptPassword(data);
     if (oldPassword === password) {
       if (newPassword === password) {
-        debug.log("New password shall not be the same.");
+        debug.log("New password shall not be the same as old.");
         throwAlert({
           signal: 58,
           title: "Incorrect password",
@@ -181,7 +181,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         debug.log("Passwords do not match.");
         throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match", error: true });
         clearPasswords();
-      } else if (newPassword.length > 5) {
+      } else if (newPassword.length < 6) {
         debug.log("Password must be at least 6 characters long.");
         throwAlert({
           signal: 54,
@@ -234,7 +234,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       debug.log("Passwords do not match.");
       throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match.", error: true });
       clearPasswords();
-    } else if (password.length > 5) {
+    } else if (password.length < 6) {
       debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,
@@ -261,7 +261,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       debug.log("Passwords do not match.");
       throwAlert({ signal: 53, title: "Incorrect password", message: "Passwords do not match.", error: true });
       clearPasswords();
-    } else if (password.length > 5) {
+    } else if (password.length < 6) {
       debug.log("Password must be at least 6 characters long.");
       throwAlert({
         signal: 54,

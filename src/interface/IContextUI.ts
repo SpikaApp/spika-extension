@@ -58,6 +58,8 @@ type IContextUI = {
   setOpenAccountManagerDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openRenameAccountDialog: boolean;
   setOpenRenameAccountDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openResetWalletDialog: boolean;
+  setOpenResetWalletDialog: React.Dispatch<React.SetStateAction<boolean>>;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
   previewRequired: boolean;
@@ -89,6 +91,7 @@ type IContextUI = {
   handleAddCustomNetworkUI: () => void;
   handleAccountManagerUI: () => void;
   handleRenameAccountUI: () => void;
+  handleResetWalletUI: () => void;
 };
 
 export default IContextUI;
