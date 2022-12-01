@@ -11,7 +11,7 @@ import { PayloadProvider } from "./context/PayloadContext";
 import { UIContext } from "./context/UIContext";
 import { Web3Provider } from "./context/Web3Context";
 import "./index.css";
-import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Transactions, Wallet, Tests } from "./pages";
+import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Tests, Transactions, Wallet } from "./pages";
 import { darkTheme, lightTheme } from "./theme";
 
 const App = (): JSX.Element => {
