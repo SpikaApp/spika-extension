@@ -8,7 +8,6 @@ import { useContext } from "react";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import AccountManagerDialog from "../components/AccountManagerDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
-import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
@@ -89,7 +88,6 @@ const Tests = (): JSX.Element => {
           )}
         </CardContent>
       </Card>
-      <Footer />
       {accountImported && (
         <div>
           <AccountDetailsDialog />
