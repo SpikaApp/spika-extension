@@ -90,10 +90,14 @@ const Tests = (): JSX.Element => {
         </CardContent>
       </Card>
       <Footer />
-      <AccountDetailsDialog />
-      <ChangePasswordDialog />
-      <NetworkDialog />
-      <AccountManagerDialog />
+      {accountImported && (
+        <div>
+          <AccountDetailsDialog />
+          <ChangePasswordDialog />
+          <NetworkDialog />
+          <AccountManagerDialog />
+        </div>
+      )}
     </Container>
   );
 };

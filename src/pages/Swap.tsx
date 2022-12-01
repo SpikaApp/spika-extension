@@ -91,7 +91,7 @@ const Swap = () => {
 
   // Disable swap is current network !== Devnet.
   useEffect(() => {
-    if (currentNetwork!.name !== "Testnet") {
+    if (accountImported && currentNetwork!.name !== "Testnet") {
       setSwapEnabled(false);
       setBaseCoin(aptosCoin);
       setQuoteCoin(aptosCoin);
@@ -526,16 +526,20 @@ const Swap = () => {
           </CardContent>
         </Card>
       )}
-      <AccountAssetsDialog type={type as any} />
-      <ConfirmSendDialog
-        type={"swap"}
-        quote={quote}
-        args={{
-          payload: swapPayload,
-          isBcs: true,
-          silent: false,
-        }}
-      />
+      {accountImported && (
+        <div>
+          <AccountAssetsDialog type={type as any} />
+          <ConfirmSendDialog
+            type={"swap"}
+            quote={quote}
+            args={{
+              payload: swapPayload,
+              isBcs: true,
+              silent: false,
+            }}
+          />
+        </div>
+      )}
       <Footer />
     </Container>
   );

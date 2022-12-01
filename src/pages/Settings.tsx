@@ -23,7 +23,7 @@ const Settings = (): JSX.Element => {
     <Container maxWidth="xs">
       <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
         <CardContent sx={{ alignSelf: "center", mt: 1 }}>
-          {accountImported && (
+          {accountImported === true && (
             <Stack sx={{ width: "200px" }}>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
                 Show Recovery Phrase
@@ -54,10 +54,14 @@ const Settings = (): JSX.Element => {
         </CardContent>
       </Card>
       <Footer />
-      <AccountDetailsDialog />
-      <ChangePasswordDialog />
-      <NetworkDialog />
-      <AccountManagerDialog />
+      {accountImported && (
+        <div>
+          <AccountDetailsDialog />
+          <ChangePasswordDialog />
+          <NetworkDialog />
+          <AccountManagerDialog />
+        </div>
+      )}
     </Container>
   );
 };
