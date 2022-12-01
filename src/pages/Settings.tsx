@@ -3,6 +3,7 @@ import { useContext } from "react";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import AccountManagerDialog from "../components/AccountManagerDialog";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
+import ConnectedSitesDialog from "../components/ConnectedSitesDialog";
 import Footer from "../components/Footer";
 import NetworkDialog from "../components/NetworkDialog";
 import { AccountContext } from "../context/AccountContext";
@@ -15,6 +16,7 @@ const Settings = (): JSX.Element => {
     handleChangePasswordUI,
     handleChangeNetworkUI,
     handleAccountManagerUI,
+    handleConnectedSitesUI,
     setOpenAccountDetailsDialog,
   } = useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
@@ -22,7 +24,7 @@ const Settings = (): JSX.Element => {
   return (
     <Container maxWidth="xs">
       <Card sx={{ mb: 2, mt: "100px", minHeight: "450px" }}>
-        <CardContent sx={{ alignSelf: "center", mt: 1 }}>
+        <CardContent sx={{ alignSelf: "center", mt: 0.5 }}>
           {accountImported === true && (
             <Stack sx={{ width: "200px" }}>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleMnemonicUI}>
@@ -49,6 +51,9 @@ const Settings = (): JSX.Element => {
               <Button sx={{ mb: 2 }} variant="outlined" onClick={handleAccountManagerUI}>
                 Account Manager
               </Button>
+              <Button variant="outlined" onClick={handleConnectedSitesUI}>
+                Manage Connected Sites
+              </Button>
             </Stack>
           )}
         </CardContent>
@@ -60,6 +65,7 @@ const Settings = (): JSX.Element => {
           <ChangePasswordDialog />
           <NetworkDialog />
           <AccountManagerDialog />
+          <ConnectedSitesDialog />
         </div>
       )}
     </Container>

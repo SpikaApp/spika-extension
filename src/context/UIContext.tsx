@@ -40,7 +40,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [openResetWalletDialog, setOpenResetWalletDialog] = useState<boolean>(false);
   const [accountRoutesEnabled, setAccountRoutesEnabled] = useState<boolean>(true);
   const [openPermissionDialog, setOpenPermissionDialog] = useState<boolean>(false);
+  const [openConnectedSitesDialog, setOpenConnectedSitesDialog] = useState<boolean>(false);
   const [openAccountManagerDialog, setOpenAccountManagerDialog] = useState<boolean>(false);
+  const [openConnectWalletDialog, setOpenConnectWalletDialog] = useState<boolean>(false);
+  const [openKeystoneDialog, setOpenKeystoneDialog] = useState<boolean>(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
   const [previewRequired, setPreviewRequired] = useState<boolean>(true);
@@ -74,7 +77,6 @@ export const UIProvider = ({ children }: UIContextProps) => {
 
   const getCurrentRoute = async (): Promise<void> => {
     const route: string = await getMem(PLATFORM, _currentRoute);
-    debug.log("Current route:", route);
     if (route === undefined || route === null) {
       setCurrentRoute("/");
     } else {
@@ -106,80 +108,115 @@ export const UIProvider = ({ children }: UIContextProps) => {
 
   const handleMintUI = (): void => {
     setOpenMintDialog(true);
+    debug.log("Opening Mint Dialog...");
   };
 
   const handleSendUI = (): void => {
     setOpenSendDialog(true);
+    debug.log("Opening Send Dialog...");
   };
 
   const handleReceiveUI = (): void => {
     setOpenReceiveDialog(true);
+    debug.log("Opening Receive Dialog...");
   };
 
   const handleCreateCollectionUI = (): void => {
     setOpenCreateCollectionDialog(true);
+    debug.log("Opening Create Collection Dialog...");
   };
 
   const handleCreateNFTUI = (): void => {
     setOpenCreateNftDialog(true);
+    debug.log("Opening Create NFT Dialog...");
   };
 
   const handleLoginUI = (): void => {
     setOpenLoginDialog(true);
+    debug.log("Opening Login Dialog...");
   };
   const handleLogoutUI = (): void => {
     setOpenLogoutDialog(true);
+    debug.log("Opening Logout Dialog...");
   };
 
   const handleMnemonicUI = (): void => {
     setMnemonicRequired(true);
     setOpenLoginDialog(true);
+    debug.log("Opening Mnemonics Dialog...");
   };
 
   const handlePrivateKeyUI = (): void => {
     setPrivateKeyRequired(true);
     setOpenLoginDialog(true);
+    debug.log("Opening Private Key Dialog...");
   };
 
   const handleChangePasswordUI = (): void => {
     setOpenChangePasswordDialog(true);
+    debug.log("Opening Change Password Dialog...");
   };
 
   const handleAccountAssetsUI = (): void => {
     setOpenAccountAssetsDialog(true);
+    debug.log("Opening Account Assets Dialog...");
   };
 
   const handleAddAssetUI = (): void => {
     setOpenAddAssetDialog(true);
+    debug.log("Opening Add Asset Dialog...");
   };
 
   const handleChangeNetworkUI = (): void => {
     setOpenNetworkDialog(true);
+    debug.log("Opening Change Network Dialog...");
   };
 
   const handleAddCustomNetworkUI = (): void => {
     setOpenAddCustomNetworkDialog(true);
+    debug.log("Opening Add Custom Network Dialog...");
   };
 
   const handleNftDetailsUI = (nft: INftDetails): void => {
     setSelectedNft(nft);
     setOpenNftDetailsDialog(true);
+    debug.log("Opening NFT Details Dialog...");
+  };
+
+  const handleConnectedSitesUI = (): void => {
+    setOpenConnectedSitesDialog(true);
+    debug.log("Opening Connected Sites Dialog...");
   };
 
   const handleCreateAccountDialog = (): void => {
     setOpenCreateAccountDialog(true);
+    debug.log("Opening Create Account Dialog...");
   };
 
   const handleAccountManagerUI = (): void => {
     setOpenAccountManagerDialog(true);
+    debug.log("Opening Account Manager Dialog...");
   };
 
   const handleRenameAccountUI = (): void => {
     setOpenRenameAccountDialog(true);
+    debug.log("Opening Rename Account Dialog...");
   };
 
   const handleResetWalletUI = (): void => {
     setOpenResetWalletDialog(true);
+    debug.log("Opening Reset Wallet Dialog...");
+  };
+
+  const handleConnectWalletUI = (): void => {
+    setOpenConnectWalletDialog(true);
+    debug.log("Opening Connect Wallet Dialog...");
+  };
+
+  const handleKeystoneUI = (): void => {
+    setOpenConnectWalletDialog(false);
+    setOpenKeystoneDialog(true);
+    debug.log("Opening Keystone Dialog...");
   };
 
   return (
@@ -253,12 +290,21 @@ export const UIProvider = ({ children }: UIContextProps) => {
         setAccountRoutesEnabled,
         openPermissionDialog,
         setOpenPermissionDialog,
+        openConnectedSitesDialog,
+        setOpenConnectedSitesDialog,
+        handleConnectedSitesUI,
         openAccountManagerDialog,
         handleRenameAccountUI,
         setOpenAccountManagerDialog,
         openRenameAccountDialog,
         setOpenRenameAccountDialog,
         handleAccountManagerUI,
+        openConnectWalletDialog,
+        setOpenConnectWalletDialog,
+        handleConnectWalletUI,
+        openKeystoneDialog,
+        setOpenKeystoneDialog,
+        handleKeystoneUI,
         openResetWalletDialog,
         setOpenResetWalletDialog,
         handleResetWalletUI,
