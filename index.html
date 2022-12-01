@@ -18,6 +18,10 @@
     import { Buffer } from "safe-buffer";
     window.Buffer = Buffer;
   </script>
+  <script type="module">
+    import process from 'process';
+    window.process = process;
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
