@@ -11,7 +11,7 @@ interface ICoinData {
   logo: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logo_alt: any;
-  swap?: false;
+  swap?: boolean;
   balance?: string;
 }
 
