@@ -9,6 +9,7 @@ export default defineConfig({
       stream: "rollup-plugin-node-polyfills/polyfills/stream",
       events: "rollup-plugin-node-polyfills/polyfills/events",
       util: "rollup-plugin-node-polyfills/polyfills/util",
+      assert: "rollup-plugin-node-polyfills/polyfills/assert",
     },
   },
   optimizeDeps: {
@@ -32,7 +33,7 @@ export default defineConfig({
       plugins: [nodePolyfills()],
     },
     target: "modules",
-    chunkSizeWarningLimit: 2048,
+    chunkSizeWarningLimit: 4096,
   },
   server: {
     port: 3000,
