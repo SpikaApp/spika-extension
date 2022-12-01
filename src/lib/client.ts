@@ -13,7 +13,7 @@ class SpikaClient {
   faucetClient?: FaucetClient;
 
   constructor(network: INetwork) {
-    this.client = new AptosClient(network.data.node_url);
+    this.client = new AptosClient(network.data.node_url, { CREDENTIALS: "same-origin", WITH_CREDENTIALS: false });
     this.tokenClient = new TokenClient(new AptosClient(network.data.node_url));
     if (network.data.faucet_url) {
       this.faucetClient = new FaucetClient(network.data.node_url, network.data.faucet_url, undefined);
@@ -35,7 +35,15 @@ export const spikaClient = async (network?: INetwork): Promise<SpikaClient> => {
   return new SpikaClient(_network ? _network : networkList[0]);
 };
 
-export const hippoClient = (): NetworkConfiguration => {
-  const isTestnet = true;
-  return isTestnet ? CONFIGS.testnet : CONFIGS.localhost;
+export type IHippoClientNetwork = "Mainnet" | "Testnet" | "Local";
+
+export const hippoClient = (network: IHippoClientNetwork): NetworkConfiguration => {
+  switch (network) {
+    case "Mainnet":
+      return CONFIGS.mainnet;
+    case "Testnet":
+      return CONFIGS.testnet;
+    case "Local":
+      return CONFIGS.localhost;
+  }
 };
