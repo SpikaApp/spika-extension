@@ -22,13 +22,14 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { IConnectedApps } from "../interface";
 import { getConnectedApps, removeApp } from "../lib/connectedApps";
+import { PLATFORM } from "../utils/constants";
 import copyToClipboard from "../utils/copyToClipboard";
 import shortenAddress from "../utils/shortenAddress";
 
 const ConnectedSitesDialog = (): JSX.Element => {
   const { openConnectedSitesDialog, setOpenConnectedSitesDialog } = useContext(UIContext);
   const { publicAccount } = useContext(AccountContext);
-  const [connectedSites, setConnectedSites] = useState<IConnectedApps | undefined>();
+  const [connectedSites, setConnectedSites] = useState<IConnectedApps | undefined>(undefined);
 
   useEffect(() => {
     if (openConnectedSitesDialog) {
@@ -37,19 +38,21 @@ const ConnectedSitesDialog = (): JSX.Element => {
   }, [openConnectedSitesDialog]);
 
   const getConnectedSites = async (): Promise<void> => {
-    const data = await getConnectedApps(publicAccount!);
-    if (data) {
-      if (data.urls.length > 0) {
-        setConnectedSites(data);
+    if (PLATFORM === "chrome-extension:") {
+      const data = await getConnectedApps(publicAccount!);
+      if (data) {
+        if (data.urls.length > 0) {
+          setConnectedSites(data);
+        } else {
+          setConnectedSites(undefined);
+        }
       } else {
         setConnectedSites(undefined);
       }
-    } else {
-      setConnectedSites(undefined);
     }
   };
 
-  const normalizeUrl = (url: string) => {
+  const normalizeUrl = (url: string): string => {
     return url.replace("https://", "");
   };
 
