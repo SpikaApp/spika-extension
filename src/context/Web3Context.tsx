@@ -615,8 +615,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         const resources = await spika.client.getAccountResources(account!.address());
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tokenStore: any = resources.find((r) => r.type === token.tokenStore.type);
-        debug.log("Resources updated:", resources);
-        debug.log("Token store updated: ", tokenStore);
 
         const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {

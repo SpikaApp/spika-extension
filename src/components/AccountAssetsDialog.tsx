@@ -22,7 +22,6 @@ import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
-import debug from "../utils/debug";
 
 type AccountAssetsDialogProps = {
   type?: "base" | "quote";
@@ -60,7 +59,6 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
 
   useEffect(() => {
     if (accountAssets.length > 0) {
-      debug.log("Account assets updated:", accountAssets);
       const swapSupported: ICoin[] = [];
       Object.values(accountAssets).map((value) => {
         if (value.data.swap) {
@@ -68,7 +66,6 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
         }
       });
       setSwapSupportedAssets(swapSupported);
-      debug.log("Swap supported assets updated:", swapSupported);
       setIsFetching(false);
     }
   }, [accountAssets.length > 0]);
