@@ -1,7 +1,7 @@
 {
   "name": "spika",
   "private": true,
-  "version": "0.5.11",
+  "version": "0.5.12",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,13 +12,17 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@manahippo/hippo-sdk": "^0.8.14",
+    "@keystonehq/animated-qr": "^0.3.1-alpha.0",
+    "@keystonehq/aptos-keyring": "^0.1.1-alpha.1",
+    "@manahippo/hippo-sdk": "^3.1.2",
     "@metamask/browser-passworder": "^3.0.0",
+    "@metamask/obs-store": "^7.0.0",
     "@mui/icons-material": "^5.10.9",
     "@mui/lab": "^5.0.0-alpha.101",
     "@mui/material": "^5.10.13",
+    "@ngraveio/bc-ur": "^1.1.6",
     "@scure/bip39": "^1.1.0",
-    "aptos": "^1.3.17",
+    "aptos": "^1.3.15",
     "buffer": "^6.0.3",
     "compare-versions": "^5.0.1",
     "qrcode.react": "^3.1.0",
@@ -47,5 +51,17 @@
     "patch-package": "^6.5.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "vite": "^3.2.3"
+  },
+  "overrides": {
+    "@keystonehq/sdk": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "qrcode.react": "3.1.0"
+    },
+    "@keystonehq/animated-qr": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "qrcode.react": "3.1.0"
+    }
   }
 }
