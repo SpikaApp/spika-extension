@@ -159,6 +159,7 @@ const AlertDialog = () => {
       case 132: // Invalid address field
       case 133: // Ivalid amount field
       case 134: // Not enough balance to execute transaction
+      case 142: // QRScanner Error
         setOpenAlertDialog(false);
         setIsPopup(false);
         break;

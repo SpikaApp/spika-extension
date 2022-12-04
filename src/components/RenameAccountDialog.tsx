@@ -3,18 +3,20 @@ import { Button, Dialog, DialogContent, DialogTitle, Stack, TextField } from "@m
 import { useContext, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import { renameAccount } from "../lib/spikaAccount";
+import { renameAccount, renameKeystoneAccount } from "../lib/spikaAccount";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 
 interface RenameAccountDialogProps {
   accountName: string;
   accountIndex: number;
+  accountAddress: string;
+  wallet: string;
 }
 
 const RenameAccountDialog = (props: RenameAccountDialogProps): JSX.Element => {
   const { openRenameAccountDialog, setOpenRenameAccountDialog } = useContext(UIContext);
-  const { setCurrentAddressName } = useContext(AccountContext);
+  const { setCurrentAddressName, currentAddress } = useContext(AccountContext);
   const [accountName, setAccountName] = useState<string>("");
 
   const handleCancel = (): void => {
@@ -23,9 +25,18 @@ const RenameAccountDialog = (props: RenameAccountDialogProps): JSX.Element => {
   };
 
   const handleRename = async (): Promise<void> => {
-    await renameAccount(accountName, props.accountIndex);
-    setCurrentAddressName(accountName);
-    setStore(PLATFORM, "currentAddressName", accountName);
+    switch (props.wallet) {
+      case "spika":
+        await renameAccount(accountName, props.accountIndex);
+        break;
+      case "keystone":
+        await renameKeystoneAccount(accountName, props.accountIndex);
+        break;
+    }
+    if (currentAddress === props.accountAddress) {
+      setCurrentAddressName(accountName);
+      setStore(PLATFORM, "currentAddressName", accountName);
+    }
     setAccountName("");
     setOpenRenameAccountDialog(false);
   };

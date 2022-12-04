@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { IContextUI, INftDetails } from "../interface";
+import { IContextUI, INftDetails, IUR } from "../interface";
 import { getMem, getStore } from "../lib/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
@@ -43,7 +43,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [openConnectedSitesDialog, setOpenConnectedSitesDialog] = useState<boolean>(false);
   const [openAccountManagerDialog, setOpenAccountManagerDialog] = useState<boolean>(false);
   const [openConnectWalletDialog, setOpenConnectWalletDialog] = useState<boolean>(false);
-  const [openKeystoneDialog, setOpenKeystoneDialog] = useState<boolean>(false);
+  const [openKeystoneQRScannerDialog, setOpenKeystoneQRScannerDialog] = useState<boolean>(false);
+  const [openKeystoneImportDialog, setOpenKeystoneImportDialog] = useState<boolean>(false);
+  const [keystoneScanResult, setKeystoneScanResult] = useState<IUR | undefined>(undefined);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
   const [previewRequired, setPreviewRequired] = useState<boolean>(true);
@@ -213,10 +215,15 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening Connect Wallet Dialog...");
   };
 
-  const handleKeystoneUI = (): void => {
+  const handleKeystoneQRScannerUI = (): void => {
     setOpenConnectWalletDialog(false);
-    setOpenKeystoneDialog(true);
-    debug.log("Opening Keystone Dialog...");
+    setOpenKeystoneQRScannerDialog(true);
+    debug.log("Opening Keystone QR Scanner Dialog...");
+  };
+
+  const handleKeystoneImportUI = (): void => {
+    setOpenKeystoneImportDialog(true);
+    debug.log("Opening Keystone Import Dialog...");
   };
 
   return (
@@ -302,12 +309,17 @@ export const UIProvider = ({ children }: UIContextProps) => {
         openConnectWalletDialog,
         setOpenConnectWalletDialog,
         handleConnectWalletUI,
-        openKeystoneDialog,
-        setOpenKeystoneDialog,
-        handleKeystoneUI,
+        openKeystoneQRScannerDialog,
+        setOpenKeystoneQRScannerDialog,
+        handleKeystoneQRScannerUI,
         openResetWalletDialog,
         setOpenResetWalletDialog,
         handleResetWalletUI,
+        openKeystoneImportDialog,
+        setOpenKeystoneImportDialog,
+        handleKeystoneImportUI,
+        keystoneScanResult,
+        setKeystoneScanResult,
         disableAllRoutes,
         setDisableAllRoutes,
         previewRequired,

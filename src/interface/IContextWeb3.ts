@@ -47,6 +47,7 @@ interface IContextWeb3 {
   setSelectedAsset: React.Dispatch<React.SetStateAction<ICoin | Record<string, never>>>;
   aptosName: string;
   aptosAddress: string;
+  mainnet: boolean;
   getAptosName: (address: string) => Promise<void>;
   getAptosAddress: (aptosName: string) => Promise<void>;
   handleMint: () => Promise<void>;

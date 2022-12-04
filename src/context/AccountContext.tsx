@@ -1,16 +1,30 @@
+/* eslint-disable no-case-declarations */
 import passworder from "@metamask/browser-passworder";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as aptos from "aptos";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { IAlertArgs, ICoin, IContextAccount, IEncryptedPwd, INetwork, IPublicAccount } from "../interface";
+import {
+  IAccountType,
+  IAlertArgs,
+  ICoin,
+  IContextAccount,
+  IEncryptedPwd,
+  INetwork,
+  IPublicAccount,
+} from "../interface";
 import * as network from "../lib/accountNetworks";
 import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
 import * as apps from "../lib/connectedApps";
-import { getAccountName, getAptosAccount, initSpikaMasterAccount } from "../lib/spikaAccount";
+import {
+  getAccountName,
+  getAptosAccount,
+  getKeystoneAccountByIndex,
+  initSpikaMasterAccount,
+} from "../lib/spikaAccount";
 import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../lib/store";
 import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
@@ -46,6 +60,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const [privateKey, setPrivateKey] = useState<string | undefined>();
   const [currentAddress, setCurrentAddress] = useState<string | undefined>();
   const [currentAddressName, setCurrentAddressName] = useState<string | undefined>();
+  const [currentAccountType, setCurrentAccountType] = useState<IAccountType | undefined>();
   const [publicAccount, setPublicAccount] = useState<IPublicAccount | undefined>();
   const [account, setAccount] = useState<aptos.AptosAccount | undefined>();
   const [currentNetwork, setCurrentNetwork] = useState<INetwork | undefined>();
@@ -361,6 +376,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setStore(PLATFORM, "accountVersion", EXTENSION_VERSION);
     setStore(PLATFORM, "currentAddress", _account.address().hex());
     setStore(PLATFORM, "currentAddressName", _currentAddressName);
+    setStore(PLATFORM, "currentAccountType", "master");
     setStore(PLATFORM, "currentPubAccount", _publicAccount);
     setStore(PLATFORM, "currentNetwork", network.networkList[0]);
     setStore(PLATFORM, "currentAsset", aptosCoin);
@@ -381,6 +397,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setPublicAccount(_publicAccount);
     setCurrentAddress(_account.address().hex());
     setCurrentAddressName(_currentAddressName);
+    setCurrentAccountType("master");
     setCurrentNetwork(network.networkList[0]);
     setCurrentAsset(aptosCoin);
     setBalance(undefined);
@@ -440,42 +457,85 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
       debug.log("Data encrypted.");
+
       try {
-        const _account: aptos.AptosAccount = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
-        const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-        let _currentAsset: ICoin = await getStore(PLATFORM, "currentAsset");
-        if (_currentAsset === undefined || _currentAsset === null) {
-          setStore(PLATFORM, "currentAsset", aptosCoin);
-          _currentAsset = aptosCoin;
+        const _accountType: IAccountType = await getStore(PLATFORM, "currentAccountType");
+
+        let _account: aptos.AptosAccount | undefined;
+        let _privateKey: string;
+        let _currentAddress: string;
+        let _currentAddressName: string;
+        let _publicAccount: IPublicAccount;
+        let _currentAsset: ICoin;
+        let _currentNetwork: INetwork;
+
+        switch (_accountType) {
+          case "master":
+            _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
+            _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+            _currentAddress = _account.address().hex();
+            _currentAsset = await getStore(PLATFORM, "currentAsset");
+            if (_currentAsset === undefined || _currentAsset === null) {
+              _currentAsset = aptosCoin;
+            }
+            _currentNetwork = await getStore(PLATFORM, "currentNetwork");
+            if (_currentNetwork === undefined || _currentNetwork === null) {
+              _currentNetwork = network.networkList[0];
+            }
+            _publicAccount = {
+              publicKey: _account.pubKey().hex(),
+              account: _account.address().hex(),
+              authKey: _account.authKey().hex(),
+            };
+            await initSpikaMasterAccount(_publicAccount);
+            _currentAddressName = await getAccountName(_currentAddress);
+            break;
+
+          case "hardware":
+            _privateKey = "NOT_AVAILABLE";
+            _currentAddress = await getStore(PLATFORM, "currentAddress");
+            _account = undefined;
+            _currentAddressName = await getStore(PLATFORM, "currentAddressName");
+            _publicAccount = {
+              publicKey: "NOT_AVAILABLE",
+              account: _currentAddress,
+              authKey: _currentAddress,
+            };
+            _currentAsset = await getStore(PLATFORM, "currentAsset");
+            if (_currentAsset === undefined || _currentAsset === null) {
+              _currentAsset = aptosCoin;
+            }
+            _currentNetwork = await getStore(PLATFORM, "currentNetwork");
+            if (_currentNetwork === undefined || _currentNetwork === null) {
+              _currentNetwork = network.networkList[0];
+            }
+            break;
         }
-        let _currentNetwork = await getStore(PLATFORM, "currentNetwork");
-        if (_currentNetwork === undefined || _currentNetwork === null) {
-          setStore(PLATFORM, "currentNetwork", network.networkList[0]);
-          _currentNetwork = network.networkList[0];
-        }
-        const _publicAccount = {
-          publicKey: _account.pubKey().hex(),
-          account: _account.address().hex(),
-          authKey: _account.authKey().hex(),
-        };
-        await initSpikaMasterAccount(_publicAccount);
-        const _currentAddressName: string = await getAccountName(_account.address().hex());
-        assetStore.addAssetStore(_account.address().hex(), aptosCoin);
-        network.addNetworkStore(_account.address().hex());
+
+        // Storage.
+        assetStore.addAssetStore(_currentAddress, aptosCoin);
+        network.addNetworkStore(_currentAddress);
         apps.addAddress(_publicAccount);
-        setStore(PLATFORM, "currentAddress", _account.address().hex());
+        setStore(PLATFORM, "currentAddress", _currentAddress);
         setStore(PLATFORM, "currentAddressName", _currentAddressName);
+        setStore(PLATFORM, "currentAccountType", _accountType);
         setStore(PLATFORM, "currentPubAccount", _publicAccount);
+        setStore(PLATFORM, "currentAsset", _currentAsset);
+        setStore(PLATFORM, "currentNetwork", _currentNetwork);
         const encryptedPassword = await encryptPassword(password);
         setMem(PLATFORM, "PWD", encryptedPassword);
+
+        // State.
         setAccountImported(true);
         setPrivateKey(_privateKey);
         setAccount(_account);
         setPublicAccount(_publicAccount);
-        setCurrentAddress(_account.address().hex());
+        setCurrentAddress(_currentAddress);
         setCurrentAddressName(_currentAddressName);
-        setCurrentNetwork(_currentNetwork);
+        setCurrentAccountType(_accountType);
         setCurrentAsset(_currentAsset);
+        setCurrentNetwork(_currentNetwork);
+
         debug.log("Local storage, session storage, state updated.");
       } catch (error) {
         console.log(error);
@@ -492,32 +552,72 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     }
   };
 
-  const switchAccount = async (index: number): Promise<void> => {
+  const switchAccount = async (index: number, type?: IAccountType): Promise<void> => {
     try {
-      const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
-      const pwd: string = await decryptPassword(data);
-      const _account: aptos.AptosAccount = await getAptosAccount(index);
-      const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
-      const _encryptedPrivateKey = await passworder.encrypt(pwd, _privateKey);
-      const _currentAsset = aptosCoin;
-      setStore(PLATFORM, "currentAsset", aptosCoin);
-      const _publicAccount = {
-        publicKey: _account.pubKey().hex(),
-        account: _account.address().hex(),
-        authKey: _account.authKey().hex(),
-      };
-      const _currentAddressName: string = await getAccountName(_account.address().hex());
-      setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
-      setStore(PLATFORM, "currentAddress", _account.address().hex());
-      setStore(PLATFORM, "currentAddressName", _currentAddressName);
-      setStore(PLATFORM, "currentPubAccount", _publicAccount);
-      setPrivateKey(_privateKey);
-      setAccount(_account);
-      setPublicAccount(_publicAccount);
-      setCurrentAddress(_account.address().hex());
-      setCurrentAddressName(_currentAddressName);
-      setCurrentAsset(_currentAsset);
-      debug.log("Local storage, session storage, state updated.");
+      if (type) {
+        const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
+        const pwd: string = await decryptPassword(data);
+        switch (type) {
+          case "hardware":
+            const _privateKey = "NOT_AVAILABLE";
+            const _encryptedPrivateKey = await passworder.encrypt(pwd, _privateKey);
+            const _exAccount = await getKeystoneAccountByIndex(index);
+            const _account = undefined;
+            const _currentAddress = _exAccount.account;
+            const _currentAddressName = _exAccount.name;
+            const _publicAccount = {
+              publicKey: "NOT_AVAILABLE",
+              account: _exAccount.account,
+              authKey: _exAccount.account,
+            };
+            const _currentAsset = aptosCoin;
+
+            // Storage.
+            setStore(PLATFORM, "currentAsset", _currentAsset);
+            setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
+            setStore(PLATFORM, "currentAddress", _currentAddress);
+            setStore(PLATFORM, "currentAddressName", _currentAddressName);
+            setStore(PLATFORM, "currentAccountType", type);
+            setStore(PLATFORM, "currentPubAccount", _publicAccount);
+
+            // State.
+            setPrivateKey(_privateKey);
+            setAccount(_account);
+            setPublicAccount(_publicAccount);
+            setCurrentAddress(_currentAddress);
+            setCurrentAddressName(_currentAddressName);
+            setCurrentAccountType(type);
+            setCurrentAsset(_currentAsset);
+            debug.log("Local storage, session storage, state updated.");
+        }
+      } else {
+        const data: IEncryptedPwd = await getMem(PLATFORM, "PWD");
+        const pwd: string = await decryptPassword(data);
+        const _account: aptos.AptosAccount = await getAptosAccount(index);
+        const _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
+        const _encryptedPrivateKey = await passworder.encrypt(pwd, _privateKey);
+        const _currentAsset = aptosCoin;
+        setStore(PLATFORM, "currentAsset", aptosCoin);
+        const _publicAccount = {
+          publicKey: _account.pubKey().hex(),
+          account: _account.address().hex(),
+          authKey: _account.authKey().hex(),
+        };
+        const _currentAddressName: string = await getAccountName(_account.address().hex());
+        setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
+        setStore(PLATFORM, "currentAddress", _account.address().hex());
+        setStore(PLATFORM, "currentAddressName", _currentAddressName);
+        setStore(PLATFORM, "currentAccountType", "master");
+        setStore(PLATFORM, "currentPubAccount", _publicAccount);
+        setPrivateKey(_privateKey);
+        setAccount(_account);
+        setPublicAccount(_publicAccount);
+        setCurrentAddress(_account.address().hex());
+        setCurrentAddressName(_currentAddressName);
+        setCurrentAccountType("master");
+        setCurrentAsset(_currentAsset);
+        debug.log("Local storage, session storage, state updated.");
+      }
     } catch (error) {
       console.log(error);
       debug.log("Failed to switch account.");
@@ -585,6 +685,8 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         currentAddress,
         currentAddressName,
         setCurrentAddressName,
+        currentAccountType,
+        setCurrentAccountType,
         currentAsset,
         baseCoin,
         setBaseCoin,

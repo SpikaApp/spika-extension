@@ -88,3 +88,7 @@
 - 132: Invalid address field
 - 133: Invalid amount field
 - 134: Not enough balance to execute transaction
+
+---
+
+- 142: QRScannerError

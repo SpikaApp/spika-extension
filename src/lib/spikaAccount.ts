@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { CryptoMultiAccounts } from "@keystonehq/bc-ur-registry-aptos";
 import passworder from "@metamask/browser-passworder";
 import { AptosAccount } from "aptos";
-import { IEncryptedPwd, IPublicAccount, ISpikaAccount, ISpikaMasterAccount } from "../interface";
+import { IEncryptedPwd, IKeystoneAccount, IPublicAccount, ISpikaAccount, ISpikaMasterAccount, IUR } from "../interface";
 import { PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 import { decryptPassword } from "../utils/pwd";
@@ -110,10 +111,19 @@ export const renameAccount = async (accountName: string, accountIndex: number): 
   };
   const findAndReplace = data.findIndex((account) => account.index == renamedAccount.index);
   data[findAndReplace] = renamedAccount;
-  const result: ISpikaMasterAccount = {
-    master: data,
-    latest: spikaMasterAccount.latest,
-  };
+  let result: ISpikaMasterAccount;
+  if (spikaMasterAccount.keystone !== undefined) {
+    result = {
+      master: data,
+      keystone: spikaMasterAccount.keystone,
+      latest: spikaMasterAccount.latest,
+    };
+  } else {
+    result = {
+      master: data,
+      latest: spikaMasterAccount.latest,
+    };
+  }
   setStore(PLATFORM, _spikaMasterAccount, result);
   return result;
 };
@@ -123,4 +133,92 @@ export const getAccountName = async (currentAddress: string): Promise<string> =>
   const data: Array<ISpikaAccount> = spikaMasterAccount.master;
   const account = data.find((i: ISpikaAccount) => i.data.account === currentAddress);
   return account!.name;
+};
+
+// Decodes crypto-multi-accounts cbor and reads accounts from Keystone device.
+export const getKeystoneAccounts = async (ur: IUR): Promise<IKeystoneAccount[]> => {
+  const data = CryptoMultiAccounts.fromCBOR(Buffer.from(ur.cbor, "hex"));
+  const keyring = data.getKeys();
+  const result = keyring.map((account, index) => ({
+    hdPath: account.getOrigin().getPath(),
+    name: `Keystone${index + 1}`,
+    account: `0x${account.getKey().toString("hex")}`,
+    index,
+    device: "keystone",
+  }));
+  return result;
+};
+
+// Compare accounts stored in local storage against accounts stored in Keystone device.
+// Returns array of addresses that are not yet imported.
+export const getNotImportedKeystoneAccounts = async (ur: IUR): Promise<IKeystoneAccount[] | undefined> => {
+  const spikaMasterAccount = await getSpikaMasterAccount();
+  const keystoneAccounts = await getKeystoneAccounts(ur);
+  let importedAccounts: IKeystoneAccount[];
+  if (spikaMasterAccount.keystone !== undefined) {
+    importedAccounts = spikaMasterAccount.keystone;
+    const result = keystoneAccounts.filter((x: IKeystoneAccount) => {
+      return !importedAccounts.find((y: IKeystoneAccount) => {
+        return x.account == y.account;
+      });
+    });
+    return result;
+  } else {
+    return keystoneAccounts;
+  }
+};
+
+// Saves single Keystone account object from Keystone device to spikaMasterAccount.
+export const importKeystoneAccount = async (account: IKeystoneAccount): Promise<void> => {
+  const spikaMasterAccount = await getSpikaMasterAccount();
+  if (spikaMasterAccount.keystone !== undefined) {
+    spikaMasterAccount.keystone.push(account);
+    setStore(PLATFORM, _spikaMasterAccount, spikaMasterAccount);
+  } else {
+    const result: ISpikaMasterAccount = {
+      master: spikaMasterAccount.master,
+      keystone: [account],
+      latest: spikaMasterAccount.latest,
+    };
+    setStore(PLATFORM, _spikaMasterAccount, result);
+  }
+};
+
+export const getKeystoneAccountsFromMasterAccount = async (): Promise<IKeystoneAccount[] | undefined> => {
+  const spikaMasterAccount = await getSpikaMasterAccount();
+  if (spikaMasterAccount.keystone !== undefined) {
+    return spikaMasterAccount.keystone;
+  } else {
+    return undefined;
+  }
+};
+
+export const renameKeystoneAccount = async (
+  accountName: string,
+  accountIndex: number
+): Promise<ISpikaMasterAccount> => {
+  const spikaMasterAccount: ISpikaMasterAccount = await getStore(PLATFORM, _spikaMasterAccount);
+  const data: Array<IKeystoneAccount> = spikaMasterAccount.keystone!;
+  const account = data.find((i: IKeystoneAccount) => i.index === accountIndex);
+  const renamedAccount: IKeystoneAccount = {
+    hdPath: account!.hdPath,
+    account: account!.account,
+    index: account!.index,
+    name: accountName,
+    device: "keystone",
+  };
+  const findAndReplace = data.findIndex((account) => account.index == renamedAccount.index);
+  data[findAndReplace] = renamedAccount;
+  const result: ISpikaMasterAccount = {
+    master: spikaMasterAccount.master,
+    keystone: data,
+    latest: spikaMasterAccount.latest,
+  };
+  setStore(PLATFORM, _spikaMasterAccount, result);
+  return result;
+};
+
+export const getKeystoneAccountByIndex = async (index: number): Promise<IKeystoneAccount> => {
+  const data = await getKeystoneAccountsFromMasterAccount();
+  return data!.find((i: IKeystoneAccount) => i.index === index)!;
 };

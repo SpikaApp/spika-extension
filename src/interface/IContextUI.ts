@@ -1,5 +1,5 @@
 import React from "react";
-import { INftDetails } from ".";
+import { INftDetails, IUR } from ".";
 
 type IContextUI = {
   spikaWallet: boolean | undefined;
@@ -64,9 +64,12 @@ type IContextUI = {
   setOpenRenameAccountDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openResetWalletDialog: boolean;
   setOpenResetWalletDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  openKeystoneDialog: boolean;
-  setOpenKeystoneDialog: React.Dispatch<React.SetStateAction<boolean>>;
-
+  openKeystoneQRScannerDialog: boolean;
+  setOpenKeystoneQRScannerDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openKeystoneImportDialog: boolean;
+  setOpenKeystoneImportDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  keystoneScanResult: IUR | undefined;
+  setKeystoneScanResult: React.Dispatch<React.SetStateAction<IUR | undefined>>;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
   previewRequired: boolean;
@@ -80,6 +83,7 @@ type IContextUI = {
   setIsPopup: React.Dispatch<React.SetStateAction<boolean>>;
   isError?: boolean;
   setIsError: React.Dispatch<React.SetStateAction<boolean>>;
+
   handleMintUI: () => void;
   handleSendUI: () => void;
   handleReceiveUI: () => void;
@@ -101,7 +105,8 @@ type IContextUI = {
   handleRenameAccountUI: () => void;
   handleResetWalletUI: () => void;
   handleConnectWalletUI: () => void;
-  handleKeystoneUI: () => void;
+  handleKeystoneQRScannerUI: () => void;
+  handleKeystoneImportUI: () => void;
 };
 
 export default IContextUI;

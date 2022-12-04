@@ -31,6 +31,8 @@ interface IContextAccount {
   currentAddress: string | undefined;
   currentAddressName: string | undefined;
   setCurrentAddressName: React.Dispatch<React.SetStateAction<string | undefined>>;
+  currentAccountType: IAccountType | undefined;
+  setCurrentAccountType: React.Dispatch<React.SetStateAction<IAccountType | undefined>>;
   publicAccount: IPublicAccount | undefined;
   currentNetwork: INetwork | undefined;
   setCurrentNetwork: React.Dispatch<React.SetStateAction<INetwork | undefined>>;
@@ -58,8 +60,10 @@ interface IContextAccount {
   validateAccount: (address: string) => Promise<boolean>;
   throwAlert: (args: IAlertArgs) => void;
   clearAlert: () => void;
-  switchAccount: (index: number) => Promise<void>;
+  switchAccount: (index: number, type?: IAccountType) => Promise<void>;
 }
+
+export type IAccountType = "master" | "hardware";
 
 export interface IAlertArgs {
   signal: number;

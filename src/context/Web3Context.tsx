@@ -56,6 +56,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState<number>();
+  const [mainnet, setMainnet] = useState<boolean>(false);
 
   const _accountAssets = "accountAssets";
 
@@ -67,6 +68,17 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       updateAccountAssets();
     }
   }, [accountImported]);
+
+  // Checks if current network is Mainnet.
+  useEffect(() => {
+    if (accountImported) {
+      (async () => {
+        const result = await isMainnet();
+        debug.log(result);
+        setMainnet(result);
+      })();
+    }
+  }, [currentNetwork]);
 
   const submitTransactionHelper = async (
     account: aptos.AptosAccount,
@@ -131,6 +143,16 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     const spika = await spikaClient();
     const result = await spika.client.getChainId();
     setChainId(result);
+  };
+
+  const isMainnet = async (): Promise<boolean> => {
+    const spika = await spikaClient();
+    const result = await spika.client.getChainId();
+    if (result === 1) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const getAptosAddress = async (aptosName: string): Promise<void> => {
@@ -457,9 +479,9 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const getTransactions = async (): Promise<aptos.Types.Transaction[]> => {
+  const getTransactions = async (query?: IEventsQuery): Promise<aptos.Types.Transaction[]> => {
     const spika = await spikaClient();
-    return await spika.client.getAccountTransactions(account!.address());
+    return await spika.client.getAccountTransactions(account!.address(), query);
   };
 
   const getEventsCount = async (events: string): Promise<void | 0> => {
@@ -553,29 +575,32 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     if (isAccount) {
       const result: ICoin[] = [];
       const resources = await spika.client.getAccountResources(account!.address());
+      debug.log("Account resources:", resources);
       await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(resources).map(async (value: any) => {
-          if (
-            value.type.startsWith("0x1::coin::CoinStore") //&&
-            // value.type !== "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-          ) {
+          if (value.type.startsWith("0x1::coin::CoinStore")) {
             const type = value.type.substring(value.type.indexOf("<") + 1, value.type.lastIndexOf(">"));
+            debug.log("Found new CoinStore resource:", type);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const asset: any = await getAssetData(type);
-            result.push({
-              type: type,
-              data: {
-                name: asset.data.name,
-                symbol: asset.data.symbol,
-                decimals: asset.data.decimals,
-                balance: value.data.coin.value,
-                logo: pixel_coin,
-                logo_alt: pixel_coin,
-                swap: false,
-              },
-            });
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const asset: any = await getAssetData(type);
+              result.push({
+                type: type,
+                data: {
+                  name: asset.data.name,
+                  symbol: asset.data.symbol,
+                  decimals: asset.data.decimals,
+                  balance: value.data.coin.value,
+                  logo: pixel_coin,
+                  logo_alt: pixel_coin,
+                  swap: false,
+                },
+              });
+            } catch (error) {
+              console.log(error);
+            }
           }
         })
       );
@@ -773,6 +798,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         registerAsset,
         clearPrevEstimation,
         clearTxnInput,
+        mainnet,
       }}
     >
       {children}
