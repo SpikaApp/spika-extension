@@ -1,7 +1,7 @@
 import { AptosClient, TokenClient, FaucetClient } from "aptos";
 import { getStore } from "./store";
 import { NODE_URL, FAUCET_URL, PLATFORM } from "../utils/constants";
-import { CONFIGS, NetworkConfiguration } from "@manahippo/hippo-sdk";
+import { CONFIGS, NetworkConfiguration, TradeAggregator } from "@manahippo/hippo-sdk";
 import { networkList } from "./accountNetworks";
 import { INetwork } from "../interface";
 
@@ -46,4 +46,12 @@ export const hippoClient = (network: IHippoClientNetwork): NetworkConfiguration 
     case "Local":
       return CONFIGS.localhost;
   }
+};
+
+type IHippoClientConf = "Mainnet" | "Testnet" | "Local";
+
+export const hippoTradeAggregator = (nodeUrl: string, network: IHippoClientConf): TradeAggregator => {
+  const client = new AptosClient(nodeUrl, { CREDENTIALS: "same-origin", WITH_CREDENTIALS: false });
+  const netConf = hippoClient(network);
+  return new TradeAggregator(client, netConf);
 };

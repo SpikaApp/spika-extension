@@ -3,6 +3,7 @@ import { PLATFORM } from "../utils/constants";
 import { getStore, setStore } from "./store";
 
 const _networks = "accountNetworks";
+const noderealApiKey: string = import.meta.env.VITE_SPIKA_NODEREAL_API_KEY;
 
 export const addNetworkStore = async (currentAddress: string): Promise<void> => {
   const networks: Array<INetworkStore> = await getStore(PLATFORM, _networks);
@@ -124,6 +125,14 @@ export const networkList: Array<INetwork> = [
     name: "Mainnet",
     data: {
       node_url: "https://mainnet.aptoslabs.com/v1",
+      testnet: false,
+      custom: false,
+    },
+  },
+  {
+    name: "Mainnet (Nodereal)",
+    data: {
+      node_url: `https://aptos-mainnet.nodereal.io/v1/${noderealApiKey}/v1`,
       testnet: false,
       custom: false,
     },

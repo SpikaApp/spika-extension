@@ -50,7 +50,7 @@ export const coinList: Array<ICoin> = [
     },
   },
   {
-    type: "0xe9c192ff55cffab3963c695cff6dbf9dad6aff2bb5ac19a6415cad26a81860d9::mee_coin::MeeCoin",
+    type: "0x16fe2df00ea7dde4a63409201f7f4e536bde7bb7335526a35d05111e68aa322c::AnimeCoin::ANI",
     data: {
       name: "AnimeSwap Coin",
       symbol: "ANI",

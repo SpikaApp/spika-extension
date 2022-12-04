@@ -28,7 +28,8 @@ import Loading from "./Loading";
 
 const SendDialog = (): JSX.Element => {
   const { openSendDialog, setOpenSendDialog, handleCreateAccountDialog, setPreviewRequired } = useContext(UIContext);
-  const { currentAsset, currentNetwork, validateAccount, throwAlert, balance } = useContext(AccountContext);
+  const { currentAccountType, currentAsset, currentNetwork, validateAccount, throwAlert, balance } =
+    useContext(AccountContext);
   const { create } = useContext(PayloadContext);
   const {
     chainId,
@@ -277,7 +278,7 @@ const SendDialog = (): JSX.Element => {
           variant="contained"
           onClick={validateAddressAndEstimateTransaction}
         >
-          Estimate
+          {currentAccountType === "hardware" ? "Sign" : "Estimate"}
         </Button>
       </Stack>
       <CreateAccountDialog

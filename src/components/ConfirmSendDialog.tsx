@@ -25,6 +25,7 @@ import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
+import { gasToValue } from "../utils/values";
 
 interface ConfirmSendDialogProps {
   type?: string;
@@ -49,9 +50,8 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
 
   useEffect(() => {
     if (isValidTransaction && !openAddAssetDialog && previewRequired) {
-      debug.log("Valid transaction:", isValidTransaction);
-      debug.log("Estimated txn result:", estimatedTxnResult);
-      if (estimatedTxnResult) {
+      if (estimatedTxnResult && !props) {
+        debug.log("Case 1: No preview transaction props provided.");
         const txn: any = estimatedTxnResult;
         const _amount = txn.payload.arguments[1];
         setOpenConfirmSendDialog(true);
@@ -59,29 +59,27 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
           createData("Sender", estimatedTxnResult.sender),
           createData("Recipient", txn.payload.arguments[0]),
           createData("Amount", `${stringToValue(currentAsset!, _amount)} ${currentAsset!.data.symbol}`),
-          createData("Gas fee", `~ ${estimatedTxnResult.gas_used}`),
-          createData("Max gas", estimatedTxnResult.max_gas_amount),
-          createData("Gas price", estimatedTxnResult.gas_unit_price),
+          createData("Gas cost", `${gasToValue(estimatedTxnResult.gas_used)} APT`),
+          createData("Max gas", `${estimatedTxnResult.max_gas_amount} (Gas Units)`),
+          createData("Gas price", `${estimatedTxnResult.gas_unit_price} (Gas Units)`),
         ]);
-      }
-    } else if (isValidTransaction && props && props.type === "swap") {
-      if (estimatedTxnResult) {
+      } else if (estimatedTxnResult && props && props.type === "swap") {
         setRows([
           createData(
             "Avg. rate",
             `1 ${props.quote.quote.inputSymbol} ≈ ${props.quote.quote.avgPrice} ${props.quote.quote.outputSymbol}`
           ),
-          createData("Base", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
-          createData("Quote", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
-          createData("Gas fee", `≈ ${estimatedTxnResult.gas_used}`),
-          createData("Max gas", estimatedTxnResult.max_gas_amount),
-          createData("Gas price", estimatedTxnResult.gas_unit_price),
+          createData("Sell", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
+          createData("Buy", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
+          createData("Gas cost", `${gasToValue(estimatedTxnResult.gas_used)} APT`),
+          createData("Max gas", `${estimatedTxnResult.max_gas_amount} (Gas Units)`),
+          createData("Gas price", `${estimatedTxnResult.gas_unit_price} (Gas Units)`),
         ]);
       }
     }
   }, [isValidTransaction]);
 
-  const createData = (name: any, value: any): any => {
+  const createData = (name: string, value: any): any => {
     return { name, value };
   };
 

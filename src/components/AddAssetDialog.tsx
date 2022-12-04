@@ -18,15 +18,15 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import Loading from "./Loading";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { ICoin } from "../interface";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
-import { ICoin } from "../interface";
+import Loading from "./Loading";
 
 const AddAssetDialog = (): JSX.Element => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
@@ -46,6 +46,7 @@ const AddAssetDialog = (): JSX.Element => {
     registerAsset,
     updateAccountAssets,
     clearPrevEstimation,
+    mainnet,
   } = useContext(Web3Context);
   const [selectedIndex, setSelectedIndex] = useState<string>("");
   const [isCustomToken, setIsCustomToken] = useState<boolean>(false);
@@ -56,7 +57,11 @@ const AddAssetDialog = (): JSX.Element => {
   const assetList = coinList.filter((i: ICoin) => !accountAssets.includes(i));
   assetList.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
 
-  const handleListItemClick = (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: string, asset: ICoin) => {
+  const handleListItemClick = (
+    _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: string,
+    asset: ICoin
+  ): void => {
     setIsLocalLoading(false);
     clearPrevEstimation();
     setSelectedIndex(index);
@@ -175,7 +180,7 @@ const AddAssetDialog = (): JSX.Element => {
       ) : (
         <DialogTitle align="center">Register Asset</DialogTitle>
       )}
-      <DialogContent sx={{ display: "flex", flexDirection: "column" }}>
+      <DialogContent sx={{ display: "flex", flexDirection: "column", width: "305px" }}>
         {isCustomToken ? (
           <form>
             <input hidden type="text" autoComplete="username" value={undefined}></input>
@@ -233,7 +238,7 @@ const AddAssetDialog = (): JSX.Element => {
           </form>
         ) : (
           <div>
-            {currentNetwork!.name === "Devnet" && (
+            {mainnet && (
               <Paper
                 sx={{
                   width: "260px",
