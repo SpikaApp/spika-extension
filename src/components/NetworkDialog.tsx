@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import CircleIcon from "@mui/icons-material/Circle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
@@ -24,6 +25,7 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { INetwork } from "../interface";
 import { getNetworks, removeNetwork } from "../lib/accountNetworks";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
@@ -31,7 +33,7 @@ import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
 
-const NetworkDialog = () => {
+const NetworkDialog = (): JSX.Element => {
   const { openNetworkDialog, setOpenNetworkDialog, handleAddCustomNetworkUI, somethingChanged, setSomethingChanged } =
     useContext(UIContext);
   const {
@@ -44,16 +46,21 @@ const NetworkDialog = () => {
     setAccountImported,
   } = useContext(AccountContext);
   const { updateAccountAssets, getAccountTokens } = useContext(Web3Context);
-  const [selectedIndex, setSelectedIndex] = useState("");
-  const [selectedNetwork, setSelectedNetwork] = useState({});
-  const [networks, setNetworks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLocalLoading, setIsLocalLoading] = useState(false);
-  const [networkOnline, setNetworkOnline] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<string>("");
+  const [selectedNetwork, setSelectedNetwork] = useState<INetwork>();
+  const [networks, setNetworks] = useState<INetwork[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
+  const [networkOnline, setNetworkOnline] = useState<boolean>(false);
+
   const _currentNetwork = "currentNetwork";
   const _currentAsset = "currentAsset";
 
-  const handleListItemClick = async (event, index, network) => {
+  const handleListItemClick = async (
+    _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: string,
+    network: INetwork
+  ): Promise<void> => {
     await getAccountNetworks(true);
     setSelectedIndex(index);
     setSelectedNetwork(network);
@@ -88,12 +95,12 @@ const NetworkDialog = () => {
       updateAccountAssets();
       getAccountTokens();
       setAccountImported(false);
-      setCurrentAsset({}); // reset to initial state and set to aptosCoin in AlertDialog
+      setCurrentAsset(undefined); // reset to initial state and set to aptosCoin in AlertDialog
       setStore(PLATFORM, _currentAsset, aptosCoin);
     }
   }, [currentNetwork]);
 
-  const handleChange = async () => {
+  const handleChange = async (): Promise<void> => {
     setIsLocalLoading(true);
     try {
       const spika = await spikaClient(selectedNetwork);
@@ -103,7 +110,7 @@ const NetworkDialog = () => {
       throwAlert({
         signal: 121,
         title: "Success",
-        message: `Network changed to ${selectedNetwork.name}`,
+        message: `Network changed to ${selectedNetwork!.name}`,
         error: false,
       });
     } catch (error) {
@@ -113,12 +120,12 @@ const NetworkDialog = () => {
     setIsLocalLoading(false);
   };
 
-  const getAccountNetworks = async (silent) => {
+  const getAccountNetworks = async (silent?: boolean): Promise<INetwork[]> => {
     if (!silent) {
       setIsLoading(true);
     }
-    const data = await getNetworks(currentAddress);
-    const list = data.networks.map(async (network) => {
+    const data = await getNetworks(currentAddress!);
+    const list = data!.networks.map(async (network) => {
       const chain_id = await getChainId(network.data.node_url);
       return {
         chain_id,
@@ -133,7 +140,7 @@ const NetworkDialog = () => {
     return result;
   };
 
-  const getChainId = async (nodeUrl) => {
+  const getChainId = async (nodeUrl: string): Promise<number | undefined> => {
     const client = new AptosClient(nodeUrl);
     try {
       const id = await client.getChainId();
@@ -143,24 +150,26 @@ const NetworkDialog = () => {
     }
   };
 
-  const handleRemove = async (network) => {
-    await removeNetwork(currentAddress, network);
+  const handleRemove = async (network: INetwork): Promise<void> => {
+    await removeNetwork(currentAddress!, network);
     setSomethingChanged(true);
   };
 
-  const normalizeAddress = (url) => {
-    let address = url.replace("https://", "").replace("/v1", "");
-    return address;
+  const normalizeAddress = (url: string): string => {
+    const _prefix = url.includes("https://") ? "https://" : "http://";
+    const address = url.replace(_prefix, "").replace("/v1", "");
+    const result = address.split("/");
+    return result[0];
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpenNetworkDialog(false);
     clearDialog();
   };
 
-  const clearDialog = () => {
+  const clearDialog = (): void => {
     setSelectedIndex("");
-    setSelectedNetwork({});
+    setSelectedNetwork(undefined);
     setNetworks([]);
   };
 

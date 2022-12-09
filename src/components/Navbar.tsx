@@ -138,15 +138,13 @@ const Navbar = (): JSX.Element => {
                       </Typography>
                     </Link>
                   </MenuItem>
-                  {devMode && (
-                    <MenuItem onClick={handleClose} disableRipple>
-                      <Link underline="none" component={RouterLink} to="/swap">
-                        <Typography variant="h6" color="textPrimary">
-                          Swap
-                        </Typography>
-                      </Link>
-                    </MenuItem>
-                  )}
+                  <MenuItem onClick={handleClose} disableRipple>
+                    <Link underline="none" component={RouterLink} to="/swap">
+                      <Typography variant="h6" color="textPrimary">
+                        Swap
+                      </Typography>
+                    </Link>
+                  </MenuItem>
                   {devMode && (
                     <MenuItem onClick={handleClose} disableRipple>
                       <Link underline="none" component={RouterLink} to="/tests">

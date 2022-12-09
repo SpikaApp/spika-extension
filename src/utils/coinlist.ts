@@ -1,8 +1,11 @@
 import { ICoin } from "../interface";
-import { hippoTradeAggregator } from "../lib/client";
+import { dexClient } from "../lib/client";
 
-export const fetchCoinlist = async (nodeUrl: string) => {
-  const client = hippoTradeAggregator(nodeUrl, "Mainnet");
+import aptos_light from "../assets/aptos_light.png";
+import aptos_dark from "../assets/aptos_dark.png";
+
+export const fetchCoinlist = (nodeUrl: string): ICoin[] => {
+  const client = dexClient(nodeUrl, "Mainnet");
   const data = client.coinListClient.coinList;
   const coinlist: ICoin[] = [];
   data.map((coin) => {
@@ -12,12 +15,12 @@ export const fetchCoinlist = async (nodeUrl: string) => {
         name: coin.name,
         symbol: coin.symbol,
         decimals: coin.decimals,
-        logo: coin.logo_url,
-        logo_alt: coin.logo_url,
+        logo: coin.name === "Aptos Coin" ? aptos_light : coin.logo_url,
+        logo_alt: coin.name === "Aptos Coin" ? aptos_dark : coin.logo_url,
         swap: true,
       },
     };
     coinlist.push(result);
-    return coinlist;
   });
+  return coinlist;
 };

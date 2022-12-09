@@ -1,6 +1,7 @@
 interface INetwork {
   name: string;
   data: INetworkData;
+  chain_id?: number;
 }
 
 interface INetworkData {

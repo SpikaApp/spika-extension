@@ -53,7 +53,6 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const [alertTitle, setAlertTitle] = useState<string>("");
   const [alertMessage, setAlertMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
   const [accountImported, setAccountImported] = useState<boolean>(false);
   const [mnemonic, setMnemonic] = useState<string>("");
   const [newMnemonic, setNewMnemonic] = useState<string>("");
@@ -65,10 +64,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const [account, setAccount] = useState<aptos.AptosAccount | undefined>();
   const [currentNetwork, setCurrentNetwork] = useState<INetwork | undefined>();
   const [currentAsset, setCurrentAsset] = useState<ICoin | undefined>();
-  const [baseCoin, setBaseCoin] = useState<ICoin>(aptosCoin);
-  const [quoteCoin, setQuoteCoin] = useState<ICoin>(aptosCoin);
   const [accountAssets, setAccountAssets] = useState<Array<ICoin>>([]);
-  const [swapSupportedAssets, setSwapSupportedAssets] = useState<Array<ICoin>>([]);
   const [balance, setBalance] = useState<string | undefined>();
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -661,8 +657,6 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         clearAlert,
         isLoading,
         setIsLoading,
-        isFetching,
-        setIsFetching,
         mnemonic,
         newMnemonic,
         setNewMnemonic,
@@ -688,14 +682,8 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         currentAccountType,
         setCurrentAccountType,
         currentAsset,
-        baseCoin,
-        setBaseCoin,
-        quoteCoin,
-        setQuoteCoin,
         accountAssets,
         setAccountAssets,
-        swapSupportedAssets,
-        setSwapSupportedAssets,
         setCurrentAsset,
         balance,
         setBalance,

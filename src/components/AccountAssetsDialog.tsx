@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable react/jsx-no-comment-textnodes */
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
@@ -15,83 +14,146 @@ import {
   Paper,
   Stack,
 } from "@mui/material";
+import InputBase from "@mui/material/InputBase";
+import { alpha, styled } from "@mui/material/styles";
+import debug from "../utils/debug";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { DexContext } from "../context/DexContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { setStore } from "../lib/store";
+import { fetchCoinlist } from "../utils/coinlist";
 import { PLATFORM } from "../utils/constants";
+import { stringToValue } from "../utils/values";
 
 type AccountAssetsDialogProps = {
-  type?: "base" | "quote";
+  type?: "xCoin" | "yCoin";
 };
+
+type ICoinListType = "account" | "all";
 
 const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const {
-    setIsLoading,
-    setIsFetching,
-    setCurrentAsset,
-    accountAssets,
-    setBaseCoin,
-    setQuoteCoin,
-    swapSupportedAssets,
-    setSwapSupportedAssets,
-  } = useContext(AccountContext);
+  const { setIsLoading, setCurrentAsset, accountAssets, currentNetwork } = useContext(AccountContext);
   const { updateAccountAssets, updateBalance } = useContext(Web3Context);
-  const [showOnlySwapSupported, setShowOnlySwapSupported] = useState(false);
-  const [isLocalLoading, setIsLocalLoading] = useState(false);
+  const { setIsFetching, setXCoin, setYCoin } = useContext(DexContext);
+  const [isLocalLoading, setIsLocalLoading] = useState(true);
+  const [selectedList, setSelectedList] = useState<ICoin[]>([]);
+  const [coinlist, setCoinlist] = useState<ICoin[]>([]);
+  const [searchString, setSearchString] = useState<string>("");
+  const [listType, setListType] = useState<ICoinListType | undefined>(undefined);
+  const [hasList, setHasList] = useState<boolean>(false);
 
   const _currentAsset = "currentAsset";
 
   useEffect(() => {
     if (openAccountAssetsDialog) {
-      updateAssets();
-    }
-    if (
-      (openAccountAssetsDialog && props && props.type === "base") ||
-      (openAccountAssetsDialog && props && props.type === "quote")
-    ) {
-      setShowOnlySwapSupported(true);
+      if (props && props.type === "yCoin") {
+        setListType("all");
+        debug.log("Setting coin list type to 'all'");
+      } else {
+        if (listType === "all") {
+          setSelectedList(accountAssets);
+          setCoinlist(accountAssets);
+        }
+        setListType("account");
+        debug.log("Setting coin list type to 'account'");
+      }
     }
   }, [openAccountAssetsDialog]);
 
   useEffect(() => {
-    if (accountAssets.length > 0) {
-      const swapSupported: ICoin[] = [];
-      Object.values(accountAssets).map((value) => {
-        if (value.data.swap) {
-          swapSupported.push(value);
-        }
-      });
-      setSwapSupportedAssets(swapSupported);
-      setIsFetching(false);
+    if (openAccountAssetsDialog) {
+      let result: ICoin[] = [];
+      switch (listType) {
+        case "account":
+          getAccountAsets();
+          break;
+        case "all":
+          result = getCoinlist();
+          setSelectedList(result);
+          break;
+      }
+      debug.log(`Selected coinlist set to: ${listType === "account" ? "account" : "dex coins"}`);
     }
-  }, [accountAssets.length > 0]);
+  }, [listType]);
 
-  const updateAssets = async (): Promise<void> => {
+  useEffect(() => {
+    if (!isLocalLoading) {
+      setCoinlist(search(selectedList, searchString));
+      debug.log("Coinlist to render updated:", selectedList);
+    }
+  }, [!isLocalLoading]);
+
+  useEffect(() => {
+    if (coinlist.length !== 0) {
+      setHasList(true);
+      debug.log("Coinlist to render found, coinlist length:", coinlist.length);
+    } else {
+      setHasList(false);
+      debug.log("No coinlist to render found, coinlist length:", coinlist.length);
+    }
+  }, [coinlist]);
+
+  useEffect(() => {
+    if (selectedList.length > 0) {
+      let result: ICoin[];
+      if (searchString === "") {
+        result = selectedList;
+      } else {
+        result = search(selectedList, searchString);
+      }
+      debug.log(`Search string '${searchString}' matches the following coinlist:`, result);
+      setCoinlist(result);
+    }
+  }, [searchString]);
+
+  const search = (list: ICoin[], searchStr: string): ICoin[] => {
+    const result: ICoin[] = [];
+    list.filter((asset) => {
+      const matchByName = asset.data.name.toLowerCase().includes(searchStr.toLowerCase());
+      const matchBySymbol = asset.data.symbol.toLowerCase().includes(searchStr.toLowerCase());
+      if (matchByName || matchBySymbol) {
+        result.push(asset);
+      }
+    });
+    return result;
+  };
+
+  const getAccountAsets = async (): Promise<void> => {
     setIsLocalLoading(true);
-    await updateAccountAssets();
+    const data = await updateAccountAssets();
+    if (data) {
+      setSelectedList(data);
+    } else {
+      setSelectedList([]);
+    }
     setIsLocalLoading(false);
   };
 
-  const handleSwitchAsset = (asset: ICoin): void => {
-    if (props && props.type === "base") {
-      setBaseCoin(asset);
-      handleUpdateBalance(asset);
-      setOpenAccountAssetsDialog(false);
-    } else if (props && props.type === "quote") {
-      setQuoteCoin(asset);
-      handleUpdateBalance(asset);
-      setOpenAccountAssetsDialog(false);
+  const getCoinlist = (): ICoin[] => {
+    setIsFetching(false);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const result = fetchCoinlist(currentNetwork!.data.node_url);
+    result.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
+    setIsLocalLoading(false);
+    return result;
+  };
+
+  const handleSwitchAsset = async (asset: ICoin): Promise<void> => {
+    if (props && props.type === "xCoin") {
+      setXCoin(asset);
+    } else if (props && props.type === "yCoin") {
+      setYCoin(asset);
     } else {
       setStore(PLATFORM, _currentAsset, asset);
       setCurrentAsset(asset);
-      handleUpdateBalance(asset);
-      setShowOnlySwapSupported(false);
-      setOpenAccountAssetsDialog(false);
     }
+    await handleUpdateBalance(asset);
+    setOpenAccountAssetsDialog(false);
+    handleCancel();
   };
 
   const handleUpdateBalance = async (asset: ICoin): Promise<void> => {
@@ -101,65 +163,121 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   };
 
   const handleCancel = (): void => {
-    setShowOnlySwapSupported(false);
     setOpenAccountAssetsDialog(false);
+    setIsLocalLoading(true);
+    // setListType(undefined);
+    // setSelectedList([]);
+    // setCoinlist([]);
+    setSearchString("");
   };
+
+  const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto",
+    },
+  }));
+
+  const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
+
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: "inherit",
+    "& .MuiInputBase-input": {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create("width"),
+      width: "100%",
+      [theme.breakpoints.up("sm")]: {
+        width: "12ch",
+        "&:focus": {
+          width: "20ch",
+        },
+      },
+    },
+  }));
 
   return (
     <Dialog open={openAccountAssetsDialog}>
-      <DialogTitle align="center">Select Asset</DialogTitle>
-      <DialogContent sx={{ minHeight: "145px" }}>
-        <Paper sx={{ width: "260px", bgcolor: "background.paper" }}>
+      <DialogTitle align="center" sx={{ mb: "-12px" }}>
+        Select Asset
+      </DialogTitle>
+      <DialogContent sx={{ minHeight: "330px" }}>
+        <Box sx={{ alignItems: "center", mb: "15px", ml: "-5px", mr: "1px" }}>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+              autoFocus={true}
+              value={searchString}
+              onChange={(e) => setSearchString(e.target.value)}
+            />
+          </Search>
+        </Box>
+        <Paper sx={{ width: "260px", minHeight: "65px", bgcolor: "background.paper" }}>
           <List component="nav" sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}>
-            {isLocalLoading ? (
-              <CircularProgress sx={{ display: "flex", ml: "110px", color: "#9e9e9e" }} size={32} />
-            ) : (
-              <div>
-                {!showOnlySwapSupported && props!.type !== "base" && props!.type !== "quote" && (
-                  <div>
-                    {accountAssets.map((asset: ICoin) => (
-                      <Stack key={asset.type}>
-                        <ListItemButton
-                          onClick={() => {
-                            handleSwitchAsset(asset);
-                          }}
-                        >
-                          <ListItemIcon sx={{ ml: 8 }}>
-                            <Box
-                              component="img"
-                              src={darkMode ? asset.data.logo_alt : asset.data.logo}
-                              sx={{ width: 32, height: 32 }}
-                            ></Box>
-                          </ListItemIcon>
-                          <ListItemText primary={`${asset.data.symbol}`} />
-                        </ListItemButton>
-                      </Stack>
-                    ))}
-                  </div>
-                )}{" "}
-                {showOnlySwapSupported && (
-                  <div>
-                    {swapSupportedAssets.map((asset) => (
-                      <Stack key={asset.type}>
-                        <ListItemButton
-                          onClick={() => {
-                            handleSwitchAsset(asset);
-                          }}
-                        >
-                          <ListItemIcon sx={{ ml: 8 }}>
-                            <Box
-                              component="img"
-                              src={darkMode ? asset.data.logo_alt : asset.data.logo}
-                              sx={{ width: 32, height: 32 }}
-                            ></Box>
-                          </ListItemIcon>
-                          <ListItemText primary={`${asset.data.symbol}`} />
-                        </ListItemButton>
-                      </Stack>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {isLocalLoading && coinlist.length === 0 && (
+              <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={32} />
+            )}
+            {isLocalLoading && coinlist.length !== 0 && (
+              <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={18} />
+            )}
+            {hasList &&
+              coinlist.map((asset) => (
+                <Stack key={asset.type}>
+                  <ListItemButton
+                    onClick={() => {
+                      handleSwitchAsset(asset);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Box
+                        component="img"
+                        src={darkMode ? asset.data.logo_alt : asset.data.logo}
+                        sx={{ width: 32, height: 32 }}
+                      ></Box>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${asset.data.name}`}
+                      secondary={
+                        asset.data.balance &&
+                        Number(asset.data.balance) > 0 &&
+                        `${stringToValue(asset, asset.data.balance)} ${asset.data.symbol}`
+                      }
+                    />
+                  </ListItemButton>
+                </Stack>
+              ))}
+            {coinlist.length === 0 && !isLocalLoading && (
+              <ListItemText
+                primary="No assets found"
+                primaryTypographyProps={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18px",
+                  mt: "10px",
+                }}
+              />
             )}
           </List>
         </Paper>

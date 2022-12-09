@@ -73,7 +73,7 @@ interface IContextWeb3 {
   signAndSubmitTransaction: (
     payload: aptos.Types.EntryFunctionPayload
   ) => Promise<aptos.Types.PendingTransaction | unknown>;
-  updateAccountAssets: () => Promise<void>;
+  updateAccountAssets: () => Promise<ICoin[] | undefined>;
   findAsset: (coinType: string, address?: string) => Promise<ICoin | undefined>;
   registerAsset: (coinType: string, name: string) => Promise<void>;
   clearPrevEstimation: () => void;

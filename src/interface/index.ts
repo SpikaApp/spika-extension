@@ -2,6 +2,7 @@ export type { default as IAssetStore } from "./IAssetStore";
 export type { default as ICoin } from "./ICoin";
 export type { default as IConnectedApps } from "./IConnectedApps";
 export type { default as IContextAccount, IAccountType, IAlertArgs } from "./IContextAccount";
+export type { default as IContextDex } from "./IContextDex";
 export type {
   default as IContextPayload,
   IPayloadCollectionArgs,
@@ -15,6 +16,7 @@ export type { IUR } from "./IKeystone";
 export type { default as INetwork } from "./INetwork";
 export type { default as INetworkStore } from "./INetworkStore";
 export type { default as INftDetails } from "./INftDetails";
+export type { default as INotification } from "./INotification";
 export type { default as IPublicAccount } from "./IPublicAccount";
 export type { IKeystoneAccount, ISpikaAccount, ISpikaMasterAccount } from "./ISpikaMasterAccount";
 export * from "./IWallet";

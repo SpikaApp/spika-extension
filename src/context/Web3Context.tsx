@@ -608,7 +608,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const updateAccountAssets = async (): Promise<void> => {
+  const updateAccountAssets = async (): Promise<ICoin[] | undefined> => {
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const registeredAssets = await getRegisteredAssets();
@@ -626,8 +626,10 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         return acc;
       }, []);
       result.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
+      result.sort((a: ICoin, b: ICoin) => Number(b.data.balance) - Number(a.data.balance));
       setAccountAssets(result);
       setStore(PLATFORM, _accountAssets, result);
+      return result;
     }
   };
 
@@ -640,6 +642,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         const resources = await spika.client.getAccountResources(account!.address());
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tokenStore: any = resources.find((r) => r.type === token.tokenStore.type);
+        debug.log(tokenStore);
 
         const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {
@@ -654,19 +657,26 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
 
             // Get TokenId for accountDepositedTokens and remove dublicates
             const tokenIds = [...new Set(data.map((i) => i.data.id))];
+            debug.log(tokenIds);
+
+            const tokens: aptos.TokenTypes.Token[] = [];
 
             // Returns an array of tokenId and value
-            const accountTokensBalances = await Promise.all(
-              tokenIds.map(async (i) => {
-                const data = await spika.tokenClient.getTokenForAccount(currentAddress!, i);
-                return data;
+            await Promise.all(
+              tokenIds.map(async (token) => {
+                const data = await spika.tokenClient.getTokenForAccount(currentAddress!, token);
+                debug.log(data);
+                if (data) {
+                  tokens.push(data);
+                }
               })
             );
 
             // Returns an array of tokenId and value for all tokens with > 0 balance
-            const result = accountTokensBalances.filter((r) => {
-              return r.amount !== "0";
+            const result = tokens.filter((token) => {
+              return token.amount !== "0";
             });
+            debug.log(result);
 
             if (result == undefined) {
               setAccountTokens([]);

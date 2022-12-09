@@ -51,7 +51,7 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
   useEffect(() => {
     if (isValidTransaction && !openAddAssetDialog && previewRequired) {
       if (estimatedTxnResult && !props) {
-        debug.log("Case 1: No preview transaction props provided.");
+        debug.log("Case 1: No transaction props provided.");
         const txn: any = estimatedTxnResult;
         const _amount = txn.payload.arguments[1];
         setOpenConfirmSendDialog(true);

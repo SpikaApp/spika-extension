@@ -50,7 +50,7 @@ export const hippoClient = (network: IHippoClientNetwork): NetworkConfiguration 
 
 type IHippoClientConf = "Mainnet" | "Testnet" | "Local";
 
-export const hippoTradeAggregator = (nodeUrl: string, network: IHippoClientConf): TradeAggregator => {
+export const dexClient = (nodeUrl: string, network: IHippoClientConf): TradeAggregator => {
   const client = new AptosClient(nodeUrl, { CREDENTIALS: "same-origin", WITH_CREDENTIALS: false });
   const netConf = hippoClient(network);
   return new TradeAggregator(client, netConf);

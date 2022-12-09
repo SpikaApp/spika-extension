@@ -11,8 +11,6 @@ interface IContextAccount {
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  isFetching: boolean;
-  setIsFetching: React.Dispatch<React.SetStateAction<boolean>>;
   accountImported: boolean;
   setAccountImported: React.Dispatch<React.SetStateAction<boolean>>;
   mnemonic: string;
@@ -38,14 +36,8 @@ interface IContextAccount {
   setCurrentNetwork: React.Dispatch<React.SetStateAction<INetwork | undefined>>;
   currentAsset: ICoin | undefined;
   setCurrentAsset: React.Dispatch<React.SetStateAction<ICoin | undefined>>;
-  baseCoin: ICoin;
-  setBaseCoin: React.Dispatch<React.SetStateAction<ICoin>>;
-  quoteCoin: ICoin;
-  setQuoteCoin: React.Dispatch<React.SetStateAction<ICoin>>;
   accountAssets: Array<ICoin>;
   setAccountAssets: React.Dispatch<React.SetStateAction<Array<ICoin>>>;
-  swapSupportedAssets: Array<ICoin>;
-  setSwapSupportedAssets: React.Dispatch<React.SetStateAction<Array<ICoin>>>;
   balance: string | undefined;
   setBalance: React.Dispatch<React.SetStateAction<string | undefined>>;
   handleChangePassword: () => void;

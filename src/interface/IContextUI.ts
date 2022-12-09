@@ -1,5 +1,5 @@
 import React from "react";
-import { INftDetails, IUR } from ".";
+import { INftDetails, INotification, IUR } from ".";
 
 type IContextUI = {
   spikaWallet: boolean | undefined;
@@ -70,6 +70,15 @@ type IContextUI = {
   setOpenKeystoneImportDialog: React.Dispatch<React.SetStateAction<boolean>>;
   keystoneScanResult: IUR | undefined;
   setKeystoneScanResult: React.Dispatch<React.SetStateAction<IUR | undefined>>;
+  openSwapSettingsDialog: boolean;
+  setOpenSwapSettingsDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openNotification: boolean;
+  setOpenNotification: React.Dispatch<React.SetStateAction<boolean>>;
+  notification: INotification | undefined;
+  setNotification: React.Dispatch<React.SetStateAction<INotification | undefined>>;
+  notificationExpired: boolean;
+  setNotificationExpired: React.Dispatch<React.SetStateAction<boolean>>;
+  sendNotification: (args: INotification) => void;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
   previewRequired: boolean;
@@ -107,6 +116,7 @@ type IContextUI = {
   handleConnectWalletUI: () => void;
   handleKeystoneQRScannerUI: () => void;
   handleKeystoneImportUI: () => void;
+  handleSwapSettingsUI: () => void;
 };
 
 export default IContextUI;

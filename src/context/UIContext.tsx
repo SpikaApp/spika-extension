@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { IContextUI, INftDetails, IUR } from "../interface";
+import { IContextUI, INftDetails, INotification, IUR } from "../interface";
 import { getMem, getStore } from "../lib/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
@@ -46,6 +46,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [openKeystoneQRScannerDialog, setOpenKeystoneQRScannerDialog] = useState<boolean>(false);
   const [openKeystoneImportDialog, setOpenKeystoneImportDialog] = useState<boolean>(false);
   const [keystoneScanResult, setKeystoneScanResult] = useState<IUR | undefined>(undefined);
+  const [openSwapSettingsDialog, setOpenSwapSettingsDialog] = useState<boolean>(false);
+  const [openNotification, setOpenNotification] = useState<boolean>(true);
+  const [notification, setNotification] = useState<INotification | undefined>(undefined);
+  const [notificationExpired, setNotificationExpired] = useState<boolean>(true);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
   const [previewRequired, setPreviewRequired] = useState<boolean>(true);
@@ -226,6 +230,27 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening Keystone Import Dialog...");
   };
 
+  const handleSwapSettingsUI = (): void => {
+    setOpenSwapSettingsDialog(true);
+    debug.log("Opening Settings Dialog...");
+  };
+
+  const sendNotification = (args: INotification): void => {
+    const _notification: INotification = {
+      message: args.message,
+      title: args.title,
+      type: args.type,
+      autoHide: args.autoHide,
+      untilExpired: args.untilExpired,
+    };
+
+    if (args.untilExpired) {
+      setNotificationExpired(false);
+    }
+    setNotification(_notification);
+    setOpenNotification(true);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -320,6 +345,16 @@ export const UIProvider = ({ children }: UIContextProps) => {
         handleKeystoneImportUI,
         keystoneScanResult,
         setKeystoneScanResult,
+        openSwapSettingsDialog,
+        setOpenSwapSettingsDialog,
+        openNotification,
+        setOpenNotification,
+        notification,
+        setNotification,
+        notificationExpired,
+        setNotificationExpired,
+        sendNotification,
+        handleSwapSettingsUI,
         disableAllRoutes,
         setDisableAllRoutes,
         previewRequired,
