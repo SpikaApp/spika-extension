@@ -45,8 +45,11 @@ const Swap = () => {
     setNotificationExpired,
     darkMode,
   } = useContext(UIContext);
+
   const { accountImported, accountAssets, currentNetwork } = useContext(AccountContext);
+
   const { getBalance, isValidTransaction, estimatedTxnResult, clearPrevEstimation, mainnet } = useContext(Web3Context);
+
   const { xCoin, setXCoin, yCoin, setYCoin, slippage, maxGasAmount, simulateSwapTransaction, submitSwapTransaction } =
     useContext(DexContext);
 
@@ -73,9 +76,7 @@ const Swap = () => {
   // Initial setup.
   useEffect(() => {
     if (accountImported) {
-      debug.log("[Swap]: Account imported, looking for avaialble coins...");
       if (accountAssets) {
-        debug.log("[Swap]: Found CoinStore records for account...");
         setXCoin(accountAssets[0]);
         if (accountAssets.length > 0) {
           setYCoin(accountAssets[1]);
