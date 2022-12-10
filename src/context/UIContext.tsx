@@ -15,7 +15,6 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [spikaWallet, setSpikaWallet] = useState<boolean | undefined>();
   const [darkMode, setDarkMode] = useState<boolean>();
   const [openAlertDialog, setOpenAlertDialog] = useState<boolean>(false);
-  const [openMintDialog, setOpenMintDialog] = useState<boolean>(false);
   const [openConfirmSendDialog, setOpenConfirmSendDialog] = useState<boolean>(false);
   const [openSendDialog, setOpenSendDialog] = useState<boolean>(false);
   const [openReceiveDialog, setOpenReceiveDialog] = useState<boolean>(false);
@@ -110,11 +109,6 @@ export const UIProvider = ({ children }: UIContextProps) => {
     } else {
       setDarkMode(data);
     }
-  };
-
-  const handleMintUI = (): void => {
-    setOpenMintDialog(true);
-    debug.log("Opening Mint Dialog...");
   };
 
   const handleSendUI = (): void => {
@@ -260,13 +254,10 @@ export const UIProvider = ({ children }: UIContextProps) => {
         setDarkMode,
         openAlertDialog,
         setOpenAlertDialog,
-        openMintDialog,
-        setOpenMintDialog,
         openSendDialog,
         setOpenSendDialog,
         openConfirmSendDialog,
         setOpenConfirmSendDialog,
-        handleMintUI,
         handleSendUI,
         handleReceiveUI,
         openReceiveDialog,

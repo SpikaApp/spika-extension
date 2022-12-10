@@ -10,13 +10,13 @@ import AccountAssetsDialog from "../components/AccountAssetsDialog";
 import AccountManagerDialog from "../components/AccountManagerDialog";
 import AddAssetDialog from "../components/AddAssetDialog";
 import ConfirmSendDialog from "../components/ConfirmSendDialog";
-import MintDialog from "../components/MintDialog";
 import NetworkDialog from "../components/NetworkDialog";
 import ReceiveDialog from "../components/ReceiveDialog";
 import SendDialog from "../components/SendDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { aptosCoin } from "../lib/coin";
 import { stringToValue } from "../utils/values";
 
 const Wallet = (): JSX.Element => {
@@ -28,10 +28,11 @@ const Wallet = (): JSX.Element => {
     handleAddAssetUI,
     handleChangeNetworkUI,
     handleAccountManagerUI,
+    sendNotification,
   } = useContext(UIContext);
-  const { isLoading, currentAddressName, accountImported, currentNetwork, currentAsset, balance } =
+  const { isLoading, currentAddressName, accountImported, currentNetwork, currentAsset, balance, setIsLoading } =
     useContext(AccountContext);
-  const { getBalance, handleMint } = useContext(Web3Context);
+  const { getBalance, mintCoins } = useContext(Web3Context);
   const [isOnline, setIsOnline] = useState(false);
   const [chainId, setChainId] = useState<number>();
 
@@ -64,6 +65,23 @@ const Wallet = (): JSX.Element => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleMint = async (): Promise<void> => {
+    setIsLoading(true);
+    const amount = "100000000";
+    try {
+      await mintCoins(amount);
+      sendNotification({
+        message: `Successfully received ${stringToValue(aptosCoin, amount)} test APT`,
+        type: "success",
+        autoHide: true,
+      });
+    } catch (error) {
+      sendNotification({ message: "Failed to mint test APT", type: "error", autoHide: true });
+      console.log(error);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -229,7 +247,6 @@ const Wallet = (): JSX.Element => {
           <NetworkDialog />
           <AccountAssetsDialog />
           <AddAssetDialog />
-          <MintDialog />
           <SendDialog />
           <ConfirmSendDialog />
           <ReceiveDialog />

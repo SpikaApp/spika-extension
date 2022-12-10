@@ -17,7 +17,8 @@ import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Tests, Transac
 import { darkTheme, lightTheme } from "./theme";
 
 const App = (): JSX.Element => {
-  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes, devMode } = useContext(UIContext);
+  const { spikaWallet, darkMode, accountRoutesEnabled, disableAllRoutes, notification, devMode } =
+    useContext(UIContext);
 
   return (
     <Router>
@@ -64,7 +65,7 @@ const App = (): JSX.Element => {
                 </div>
                 <LoginDialog />
                 <AlertDialog />
-                <Notification />
+                {notification && <Notification />}
                 <Loading />
                 <PermissionDialog />
               </DexProvider>

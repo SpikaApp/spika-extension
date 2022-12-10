@@ -20,20 +20,12 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import copyToClipboard from "../utils/copyToClipboard";
-import debug from "../utils/debug";
 import shortenAddress from "../utils/shortenAddress";
-import { stringToValue } from "../utils/values";
+import { gasToValue, stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
-import { gasToValue } from "../utils/values";
 
-interface ConfirmSendDialogProps {
-  type?: string;
-  args?: any;
-  quote?: any;
-}
-
-const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
+const ConfirmSendDialog = (): JSX.Element => {
   const { openConfirmSendDialog, setOpenConfirmSendDialog, openAddAssetDialog, previewRequired } =
     useContext(UIContext);
   const { currentAsset } = useContext(AccountContext);
@@ -50,8 +42,7 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
 
   useEffect(() => {
     if (isValidTransaction && !openAddAssetDialog && previewRequired) {
-      if (estimatedTxnResult && !props) {
-        debug.log("Case 1: No transaction props provided.");
+      if (estimatedTxnResult) {
         const txn: any = estimatedTxnResult;
         const _amount = txn.payload.arguments[1];
         setOpenConfirmSendDialog(true);
@@ -59,18 +50,6 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
           createData("Sender", estimatedTxnResult.sender),
           createData("Recipient", txn.payload.arguments[0]),
           createData("Amount", `${stringToValue(currentAsset!, _amount)} ${currentAsset!.data.symbol}`),
-          createData("Gas cost", `${gasToValue(estimatedTxnResult.gas_used)} APT`),
-          createData("Max gas", `${estimatedTxnResult.max_gas_amount} (Gas Units)`),
-          createData("Gas price", `${estimatedTxnResult.gas_unit_price} (Gas Units)`),
-        ]);
-      } else if (estimatedTxnResult && props && props.type === "swap") {
-        setRows([
-          createData(
-            "Avg. rate",
-            `1 ${props.quote.quote.inputSymbol} ≈ ${props.quote.quote.avgPrice} ${props.quote.quote.outputSymbol}`
-          ),
-          createData("Sell", `${props.quote.quote.inputUiAmt} ${props.quote.quote.inputSymbol}`),
-          createData("Buy", `${props.quote.quote.outputUiAmt} ${props.quote.quote.outputSymbol}`),
           createData("Gas cost", `${gasToValue(estimatedTxnResult.gas_used)} APT`),
           createData("Max gas", `${estimatedTxnResult.max_gas_amount} (Gas Units)`),
           createData("Gas price", `${estimatedTxnResult.gas_unit_price} (Gas Units)`),
@@ -84,11 +63,7 @@ const ConfirmSendDialog = (props: ConfirmSendDialogProps): JSX.Element => {
   };
 
   const handleConfirm = (): void => {
-    if (props && props.type === "swap") {
-      handleSend(props.args.payload, props.args.isBcs, props.args.silent);
-    } else {
-      handleSend();
-    }
+    handleSend();
   };
 
   const handleCancel = (): void => {

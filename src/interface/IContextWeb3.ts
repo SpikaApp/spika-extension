@@ -50,7 +50,7 @@ interface IContextWeb3 {
   mainnet: boolean;
   getAptosName: (address: string) => Promise<void>;
   getAptosAddress: (aptosName: string) => Promise<void>;
-  handleMint: () => Promise<void>;
+  mintCoins: (amount: string) => Promise<void>;
   estimateGasPrice: () => Promise<Types.GasEstimation>;
   handleSend: (payload?: aptos.TxnBuilderTypes.TransactionPayload, isBcs?: boolean, silent?: boolean) => Promise<void>;
   handleEstimate: (

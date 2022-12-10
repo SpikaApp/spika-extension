@@ -16,7 +16,6 @@ import { useContext, useEffect, useState } from "react";
 import { Link as RouterLink, NavigateFunction, useNavigate } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import { aptosCoin } from "../lib/coin";
 import copyToClipboard from "../utils/copyToClipboard";
 import debug from "../utils/debug";
 
@@ -25,14 +24,12 @@ const AlertDialog = () => {
   const {
     openAlertDialog,
     setOpenAlertDialog,
-    setOpenMintDialog,
     setOpenSendDialog,
     setOpenConfirmSendDialog,
     setOpenCreateCollectionDialog,
     setOpenCreateNftDialog,
     setOpenChangePasswordDialog,
     setOpenAddAssetDialog,
-    setOpenNetworkDialog,
     setIsPopup,
     isError,
   } = useContext(UIContext);
@@ -42,7 +39,6 @@ const AlertDialog = () => {
     alertTitle,
     alertMessage,
     clearAlert,
-    setCurrentAsset,
     handleLogout,
     setMnemonic,
     setNewMnemonic,
@@ -79,11 +75,6 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         navigate("/");
         break;
-      case 21: // Coins minted
-        setOpenAlertDialog(false);
-        setOpenMintDialog(false);
-        navigate("/");
-        break;
       case 31: // Transaction sent
       case 33: // Transaction estimated as invalid
       case 34: // Failed estimate transaction
@@ -117,12 +108,6 @@ const AlertDialog = () => {
         setOpenAlertDialog(false);
         setOpenAddAssetDialog(false);
         break;
-      case 121: // Network changed successfully
-        setOpenAlertDialog(false);
-        setOpenNetworkDialog(false);
-        setAccountImported(true);
-        setCurrentAsset(aptosCoin);
-        break;
       case 2: // Failed create account
       case 3: // Invalid mnemonic
       case 12: // Failed import account
@@ -155,7 +140,6 @@ const AlertDialog = () => {
       case 103: // Failed to add new asset
       case 104: // Error, Select asset from the list or add custom token to continue.
       case 112: // Failed to find asset on chain
-      case 122: // Network registration failed
       case 132: // Invalid address field
       case 133: // Ivalid amount field
       case 134: // Not enough balance to execute transaction

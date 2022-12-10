@@ -8,8 +8,6 @@ type IContextUI = {
   setDarkMode: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   openAlertDialog: boolean;
   setOpenAlertDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  openMintDialog: boolean;
-  setOpenMintDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openSendDialog: boolean;
   setOpenSendDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openConfirmSendDialog: boolean;

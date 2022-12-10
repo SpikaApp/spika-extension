@@ -5,12 +5,12 @@ import React, { useContext, useEffect, useState } from "react";
 import pixel_coin from "../assets/pixel_coin.png";
 import { ICoin, IContextWeb3, INftDetails } from "../interface";
 import { spikaClient } from "../lib/client";
-import { aptosCoin, coinInfo, coinList, coinStore } from "../lib/coin";
+import { coinInfo, coinList, coinStore } from "../lib/coin";
 import { setStore } from "../lib/store";
 import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
-import { stringToValue, valueToString } from "../utils/values";
+import { valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
 import { UIContext } from "./UIContext";
@@ -69,7 +69,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   }, [accountImported]);
 
-  // Checks if current network is Mainnet.
+  // Checks if current is Mainnet.
   useEffect(() => {
     if (accountImported) {
       (async () => {
@@ -104,13 +104,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     const transactionRes = await spika.client.submitSignedBCSTransaction(bcsTxn);
 
     return transactionRes.hash;
-  };
-
-  const handleMint = async (): Promise<void> => {
-    setIsLoading(true);
-    await mintCoins();
-    setIsLoading(false);
-    setAmount("");
   };
 
   const handleEstimate = async (
@@ -176,22 +169,9 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   };
 
   // Request Faucet to fund address with test coins
-  const mintCoins = async (): Promise<void> => {
+  const mintCoins = async (amount: string): Promise<void> => {
     const spika = await spikaClient();
-    try {
-      const _amount = "100000000";
-      await spika.faucetClient!.fundAccount(account!.address(), Number(_amount));
-      throwAlert({
-        signal: 21,
-        title: "Success",
-        message: `Received ${Number(stringToValue(aptosCoin, _amount))} ${aptosCoin.data.symbol}`,
-        error: false,
-      });
-    } catch (error) {
-      throwAlert({ signal: 22, title: "Transaction failed", message: `${error}`, error: true });
-      setIsLoading(false);
-      console.log(error);
-    }
+    await spika.faucetClient!.fundAccount(account!.address(), Number(amount));
   };
 
   const estimateGasPrice = async (): Promise<aptos.Types.GasEstimation> => {
@@ -767,7 +747,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         txnDetails,
         setTxnDetails,
         nftDetails,
-        handleMint,
+        mintCoins,
         handleSend,
         getEventsCount,
         depositEventsCounter,

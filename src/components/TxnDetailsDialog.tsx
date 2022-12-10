@@ -25,31 +25,32 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import convertTimestamp from "../utils/convertTimestamp";
 import copyToClipboard from "../utils/copyToClipboard";
+import debug from "../utils/debug";
+import getTxnFunction from "../utils/getTxnFunction";
 import shortenAddress from "../utils/shortenAddress";
 import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 
 const TxnDetailsDialog = (): JSX.Element => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
-  const { currentAsset, currentAddress } = useContext(AccountContext);
+  const { currentAsset } = useContext(AccountContext);
   const { txnDetails, setTxnDetails, amount, setAmount } = useContext(Web3Context);
   const [rows, setRows] = useState<any>([]);
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
+      debug.log(txnDetails);
       let _amount: string;
-      let recipient: string;
       if (txnDetails.payload.arguments.length === 1) {
         _amount = txnDetails.payload.arguments[0];
-        recipient = currentAddress!;
       } else if (txnDetails.payload.arguments.length === 2) {
         _amount = txnDetails.payload.arguments[1];
-        recipient = txnDetails.payload.arguments[0];
       }
       setRows([
         createData("Time", convertTimestamp(txnDetails.timestamp)),
         createData("Txn Hash", txnDetails.hash),
         createData("Sender", txnDetails.sender),
+        createData("Function", `${getTxnFunction(txnDetails.payload.function)}`),
         createData("Amount", `${stringToValue(currentAsset!, amount)} ${currentAsset!.data.symbol}`),
         createData("Gas used", txnDetails.gas_used),
         createData("Max gas", txnDetails.max_gas_amount),

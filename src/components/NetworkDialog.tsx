@@ -34,8 +34,14 @@ import { PLATFORM } from "../utils/constants";
 import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
 
 const NetworkDialog = (): JSX.Element => {
-  const { openNetworkDialog, setOpenNetworkDialog, handleAddCustomNetworkUI, somethingChanged, setSomethingChanged } =
-    useContext(UIContext);
+  const {
+    openNetworkDialog,
+    setOpenNetworkDialog,
+    handleAddCustomNetworkUI,
+    somethingChanged,
+    setSomethingChanged,
+    sendNotification,
+  } = useContext(UIContext);
   const {
     alertSignal,
     currentAddress,
@@ -107,12 +113,10 @@ const NetworkDialog = (): JSX.Element => {
       await spika.client.getChainId();
       setStore(PLATFORM, _currentNetwork, selectedNetwork);
       setCurrentNetwork(selectedNetwork);
-      throwAlert({
-        signal: 121,
-        title: "Success",
-        message: `Network changed to ${selectedNetwork!.name}`,
-        error: false,
-      });
+      setOpenNetworkDialog(false);
+      setAccountImported(true);
+      setCurrentAsset(aptosCoin);
+      sendNotification({ message: `Network changed to ${selectedNetwork!.name}`, type: "info", autoHide: true });
     } catch (error) {
       console.log(error);
       throwAlert({ signal: 122, title: "Network change failed", message: `${error}`, error: true });

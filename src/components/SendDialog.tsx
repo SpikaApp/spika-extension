@@ -251,7 +251,7 @@ const SendDialog = (): JSX.Element => {
             inputProps={{ style: { textAlign: "right" } }}
             fullWidth={true}
             type="number"
-            placeholder={`Default: ${maxGasAmount}`}
+            placeholder={`${maxGasAmount} (default)`}
             value={maxGasAmount === DEFAULT_MAX_GAS ? "" : maxGasAmount}
             onChange={(e) => setMaxGasAmount(e.target.value.toString())}
           />

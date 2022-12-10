@@ -94,7 +94,7 @@ const SwapSettingsDialog = (): JSX.Element => {
               Max Gas Amount
             </Typography>
             <TextField
-              sx={{ mt: 1.5, mb: 1.5, width: "230px" }}
+              sx={{ mt: 1.5, mb: "-12px", width: "230px" }}
               type="string"
               label="Gas Units"
               fullWidth={false}
