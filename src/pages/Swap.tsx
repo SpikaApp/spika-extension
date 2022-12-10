@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Container,
   DialogContent,
+  Divider,
   IconButton,
   Input,
   Stack,
@@ -20,9 +21,7 @@ import { TxnBuilderTypes } from "aptos";
 import { useContext, useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
-import ConfirmSendDialog from "../components/ConfirmSendDialog";
 import Footer from "../components/Footer";
-import { NoticeBox, Notification } from "../components/lib";
 import SwapSettingsDialog from "../components/SwapSettingsDialog";
 import { AccountContext } from "../context/AccountContext";
 import { DexContext } from "../context/DexContext";
@@ -46,10 +45,12 @@ const Swap = () => {
     setNotificationExpired,
     darkMode,
   } = useContext(UIContext);
-  const { alertSignal, accountImported, accountAssets, currentNetwork } = useContext(AccountContext);
+  const { accountImported, accountAssets, currentNetwork } = useContext(AccountContext);
   const { getBalance, isValidTransaction, estimatedTxnResult, clearPrevEstimation, mainnet } = useContext(Web3Context);
-  const { isFetching, xCoin, setXCoin, yCoin, setYCoin, slippage, simulateSwapTransaction, submitSwapTransaction } =
+  const { xCoin, setXCoin, yCoin, setYCoin, slippage, maxGasAmount, simulateSwapTransaction, submitSwapTransaction } =
     useContext(DexContext);
+
+  // Swap variables.
   const [type, setType] = useState<string>("");
   const [xCoinBalance, setXCoinBalance] = useState<number>(0);
   const [yCoinBalance, setYCoinBalance] = useState<number>(0);
@@ -57,13 +58,17 @@ const Swap = () => {
   const [outputAmount, setOutputAmount] = useState<string>("");
   const [minOutputAmount, setMinOutputAmount] = useState<string>("");
   const [quotation, setQuotation] = useState<DetailedRouteAndQuote | undefined>();
-  const [swapPayload, setSwapPayload] = useState<TxnBuilderTypes.TransactionPayloadEntryFunction | undefined>();
+  const [summary, setSummary] = useState<any[]>([]);
+
+  // Swap state conditions.
   const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
   const [swapEnabled, setSwapEnabled] = useState<boolean>(false);
-  const [insufficientBalance, setInsufficientBalance] = useState<boolean>(false);
-  const [badPair, setBadPair] = useState<boolean>(false);
   const [isChangeXtoY, setIsChangeXtoY] = useState<boolean>(false);
-  const [noUpdates, setNoUpdates] = useState<boolean>(false);
+
+  // Swap errors.
+  const [E_INSUFFICIENT_BALANCE, setE_INSUFFICIENT_BALANCE] = useState<boolean>(false);
+  const [E_BAD_PAIR, setE_BAD_PAIR] = useState<boolean>(false);
+  const [E_NO_ROUTE, setE_NO_ROUTE] = useState<boolean>(false);
 
   // Initial setup.
   useEffect(() => {
@@ -95,32 +100,32 @@ const Swap = () => {
   // On xCoin change => update balance.
   // Skip balance update if changing X to Y.
   useEffect(() => {
-    if (xCoin && yCoin && !isChangeXtoY) {
+    if (xCoin && yCoin && !isChangeXtoY && swapEnabled) {
       if (xCoin.data.symbol === yCoin.data.symbol) {
-        setBadPair(true);
+        setE_BAD_PAIR(true);
       } else {
-        setBadPair(false);
+        setE_BAD_PAIR(false);
       }
       getCurrentBalance("xCoin", xCoin);
       debug.log(`[Swap]: xCoin ${xCoin.data.symbol} balance fetched.`);
     }
-  }, [xCoin]);
+  }, [xCoin, swapEnabled === true]);
 
   // On yCoin change => update balance.
   // Skip balance update if changing Y to X.
   useEffect(() => {
-    if (yCoin && xCoin && !isChangeXtoY) {
+    if (yCoin && xCoin && !isChangeXtoY && swapEnabled) {
       if (xCoin.data.symbol === yCoin.data.symbol) {
-        setBadPair(true);
+        setE_BAD_PAIR(true);
       } else {
-        setBadPair(false);
+        setE_BAD_PAIR(false);
       }
       getCurrentBalance("yCoin", yCoin);
       debug.log(`[Swap]: yCoin ${yCoin.data.symbol} balance fetched.`);
     }
-  }, [yCoin]);
+  }, [yCoin, swapEnabled === true]);
 
-  // Fetch balances.
+  // Fetch balance.
   const getCurrentBalance = async (type: string, coin: ICoin): Promise<void> => {
     const balance = await getBalance(coin);
     if (type === "xCoin") {
@@ -132,43 +137,32 @@ const Swap = () => {
     }
   };
 
-  // If base currency is changed => clear values and clear previous estimation.
+  // If xCoin changed => clearSwap().
   useEffect(() => {
     if (xCoin) {
-      setInputAmount("");
-      setOutputAmount("");
-      clearPrevEstimation();
+      clearSwap();
+      setE_NO_ROUTE(false);
     }
   }, [xCoin]);
 
-  // Continiously send quote requests while typing swapAmount.
-  // todo: this might result blocking from node's API and needs to be improved.
+  // If yCoin changed => clearSwap().
   useEffect(() => {
-    if (
-      Number(valueToString(xCoin, inputAmount)) < Number(xCoinBalance) &&
-      inputAmount !== "" &&
-      Number(inputAmount) > 0 &&
-      !badPair
-    ) {
-      getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
+    if (yCoin) {
+      clearSwap();
+      setE_NO_ROUTE(false);
     }
-    if (inputAmount === "") {
-      setOutputAmount("");
-    }
-    if (inputAmount !== "") {
-      if (xCoin) {
-        if (Number(xCoinBalance) <= Number(valueToString(xCoin, inputAmount))) {
-          setInsufficientBalance(true);
-          setOutputAmount("");
-          debug.log(`[Swap]: Low balance: ${xCoinBalance}, input amount: ${valueToString(xCoin, inputAmount)}`);
-        } else {
-          setInsufficientBalance(false);
-          debug.log(`[Swap]: Balance ok: ${xCoinBalance}, input amount: ${valueToString(xCoin, inputAmount)}`);
-        }
+  }, [yCoin]);
+
+  // Request quotation after input amount is entered.
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (inputAmount) {
+        setSummary([]);
+        callApi();
       }
-    } else {
-      setInsufficientBalance(false);
-    }
+    }, 1000);
+
+    return () => clearTimeout(delay);
   }, [inputAmount]);
 
   // Opens transaction preview dialog if estimatated txn was successfull.
@@ -180,32 +174,63 @@ const Swap = () => {
     }
   }, [isValidTransaction]);
 
-  useEffect(() => {
-    if (alertSignal === 31 && xCoin && yCoin) {
-      clearSwap();
-      getCurrentBalance("xCoin", xCoin);
-      getCurrentBalance("yCoin", yCoin);
-    }
-  }, [alertSignal]);
-
   // Periodically refresh quotation.
   useEffect(() => {
-    if (quotation && !noUpdates) {
+    if (quotation) {
       const updateQuotation = window.setInterval(() => {
         getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
         debug.log("[Swap]: Thick");
-      }, 20000);
+      }, 30000);
       return () => window.clearInterval(updateQuotation);
     }
     return undefined;
-  }, [inputAmount, noUpdates]);
+  }, [quotation]);
 
+  // Once output amount received => calculate minimum output based on slippage tolerance.
   useEffect(() => {
     if (Number(outputAmount) > 0) {
       calculateMinOutputAmount(outputAmount, slippage);
       debug.log("[Swap]: Min Output Amount:", calculateMinOutputAmount(outputAmount, slippage));
     }
   }, [slippage]);
+
+  // Clear results if no input amount.
+  useEffect(() => {
+    if (inputAmount === "") {
+      clearSwap();
+    }
+  }, [inputAmount]);
+
+  // Clear E_NO_ROUTE if quotation received.
+  useEffect(() => {
+    if (quotation) {
+      setE_NO_ROUTE(false);
+    }
+  }, [quotation]);
+
+  // Request new quotation if slippage is changed.
+  useEffect(() => {
+    if (inputAmount !== "" && xCoin && yCoin && slippage) {
+      const delay = setTimeout(() => {
+        if (inputAmount) {
+          getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
+        }
+      }, 1000);
+      return () => clearTimeout(delay);
+    }
+  }, [slippage]);
+
+  // Request new quotation if maxGasAmount is changed.
+  useEffect(() => {
+    if (inputAmount !== "" && xCoin && yCoin && maxGasAmount) {
+      const delay = setTimeout(() => {
+        if (inputAmount) {
+          getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
+        }
+      }, 1000);
+      return () => clearTimeout(delay);
+    }
+  }, [maxGasAmount]);
 
   // Function that changes X and Y coins when button is pressed.
   const baseToQuote = async (): Promise<void> => {
@@ -223,6 +248,34 @@ const Swap = () => {
     return (Number(outputAmount) * slippage).toString();
   };
 
+  const callApi = async (): Promise<void> => {
+    if (
+      Number(valueToString(xCoin, inputAmount)) <= Number(xCoinBalance) &&
+      inputAmount !== "" &&
+      Number(inputAmount) > 0 &&
+      !E_BAD_PAIR
+    ) {
+      await getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
+    }
+    if (inputAmount === "") {
+      setOutputAmount("");
+    }
+    if (inputAmount !== "") {
+      if (xCoin) {
+        if (Number(xCoinBalance) < Number(valueToString(xCoin, inputAmount))) {
+          setE_INSUFFICIENT_BALANCE(true);
+          setOutputAmount("");
+          debug.log(`[Swap]: Low balance: ${xCoinBalance}, input amount: ${valueToString(xCoin, inputAmount)}`);
+        } else {
+          setE_INSUFFICIENT_BALANCE(false);
+          debug.log(`[Swap]: Balance ok: ${xCoinBalance}, input amount: ${valueToString(xCoin, inputAmount)}`);
+        }
+      }
+    } else {
+      setE_INSUFFICIENT_BALANCE(false);
+    }
+  };
+
   // Function that sends quote request.
   const getQuote = async (fromSymbol: string, toSymbol: string, inputUiAmt: string): Promise<void> => {
     setIsLocalLoading(true);
@@ -233,12 +286,13 @@ const Swap = () => {
       const result = await client.getBestQuote(Number(inputUiAmt), xCoinInfo, yCoinInfo);
       if (!result) {
         console.log(`[Swap]: No route from ${fromSymbol} to ${toSymbol}`);
-        return;
+        setE_NO_ROUTE(true);
       } else {
         const _minOutputAmount = calculateMinOutputAmount(result.quote.outputUiAmt.toString(), slippage);
         setQuotation(result);
         setOutputAmount(result.quote.outputUiAmt.toString());
         setMinOutputAmount(_minOutputAmount);
+        makeSummary(result);
         debug.log("[Swap]: Minumum received amount after slippage:", _minOutputAmount);
         await sleep(1000);
       }
@@ -251,29 +305,29 @@ const Swap = () => {
   // Function that swaps tokens.
   const executeSwap = async (_quote: DetailedRouteAndQuote, inputUiAmt: string): Promise<void> => {
     setIsLocalLoading(true);
-    setNoUpdates(true);
     clearPrevEstimation();
+    setQuotation(undefined);
     try {
       const inputAmt = parseFloat(inputUiAmt);
       const payload = _quote.route.makeSwapPayload(inputAmt, Number(minOutputAmount));
-      setSwapPayload(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
       sendNotification({
-        message: "Submitting transaction, please wait...",
+        message: "Submitting transaction...",
         untilExpired: true,
         type: "info",
       });
       const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
       if (simulated.success) {
-        await sleep(1000);
         setNotificationExpired(true);
         const result: any = await submitSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
         if (result.success) {
+          await sleep(1000);
           sendNotification({
             message: `Successfully exchanged ${xCoin.data.symbol} to ${yCoin.data.symbol}`,
             autoHide: true,
           });
           await getCurrentBalance("xCoin", xCoin);
           await getCurrentBalance("yCoin", yCoin);
+          clearSwap();
         } else {
           await sleep(1000);
           setNotificationExpired(true);
@@ -288,12 +342,37 @@ const Swap = () => {
       console.log(error);
     }
     setIsLocalLoading(false);
-    setNoUpdates(false);
+  };
+
+  const makeSummary = async (quotation: DetailedRouteAndQuote): Promise<void> => {
+    const _minOutput = calculateMinOutputAmount(quotation.quote.outputUiAmt.toString(), slippage);
+    const _priceImpact = quotation.quote.priceImpact ? quotation.quote.priceImpact.toFixed(4) : "-";
+    const payload = quotation.route.makeSwapPayload(Number(inputAmount), Number(minOutputAmount));
+    const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+    let networkFee = "";
+
+    if (simulated) {
+      networkFee = `${simulated.gas_used} (Gas Units)`;
+    } else {
+      networkFee = "N/A";
+    }
+    setSummary([
+      createData("Output amount", `${quotation.quote.outputUiAmt} ${yCoin.data.symbol}`),
+      createData("Minimum receive", `${Number(_minOutput).toFixed(yCoin.data.decimals)} ${yCoin.data.symbol}`),
+      createData("Price impact", `${_priceImpact}`),
+      createData("Network fee", `${networkFee}`),
+    ]);
+  };
+
+  const createData = (name: string, value: string): any => {
+    return { name, value };
   };
 
   const clearSwap = () => {
     setInputAmount("");
     setOutputAmount("");
+    setQuotation(undefined);
+    setSummary([]);
     clearPrevEstimation();
   };
 
@@ -311,8 +390,8 @@ const Swap = () => {
                 >
                   Sell
                 </Typography>
-                <IconButton sx={{ position: "absolute", ml: "230px", mt: "-18px" }} onClick={handleSwapSettingsUI}>
-                  <SettingsIcon />
+                <IconButton sx={{ position: "absolute", ml: "335px", mt: "-12px" }} onClick={handleSwapSettingsUI}>
+                  <SettingsIcon sx={{ fontSize: "22px" }} />
                 </IconButton>
                 <Box component={DialogContent} sx={{ border: 2, borderColor: "#9e9e9e" }}>
                   <Stack
@@ -427,7 +506,7 @@ const Swap = () => {
                 >
                   Buy
                 </Typography>
-                <Box component={DialogContent} sx={{ mb: 3, border: 2, borderColor: "#9e9e9e" }}>
+                <Box component={DialogContent} sx={{ mb: "12px", border: 2, borderColor: "#9e9e9e" }}>
                   <Stack
                     direction="row"
                     sx={{
@@ -514,7 +593,7 @@ const Swap = () => {
               <Stack sx={{ display: "flex", alignItems: "center" }}>
                 <LoadingButton
                   sx={
-                    swapEnabled && !insufficientBalance && inputAmount !== "" && !badPair
+                    swapEnabled && !E_INSUFFICIENT_BALANCE && inputAmount !== "" && outputAmount !== "" && !E_BAD_PAIR
                       ? {
                           background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                           width: "250px",
@@ -526,31 +605,75 @@ const Swap = () => {
                   loadingIndicator={<CircularProgress sx={{ color: "#FFFFFF" }} size={18} />}
                   disabled={
                     (swapEnabled ? false : true) ||
-                    (insufficientBalance ? true : false) ||
                     (inputAmount == "" ? true : false) ||
-                    (badPair ? true : false)
+                    (outputAmount == "" ? true : false) ||
+                    (E_INSUFFICIENT_BALANCE ? true : false) ||
+                    (E_BAD_PAIR ? true : false) ||
+                    (E_NO_ROUTE ? true : false)
                   }
                   onClick={() => {
                     executeSwap(quotation!, inputAmount);
                   }}
                 >
-                  {insufficientBalance && "Insufficient balance"}
-                  {inputAmount === "" && !insufficientBalance && !badPair && swapEnabled && "Enter an amount"}
-                  {swapEnabled && !insufficientBalance && badPair && "Cannot swap same coins"}
-                  {swapEnabled && !insufficientBalance && inputAmount !== "" && !badPair && "Swap"}
+                  {E_INSUFFICIENT_BALANCE && "Insufficient balance"}
+                  {swapEnabled &&
+                    inputAmount === "" &&
+                    !E_INSUFFICIENT_BALANCE &&
+                    !E_BAD_PAIR &&
+                    !E_NO_ROUTE &&
+                    "Enter an amount"}
+                  {swapEnabled && !E_INSUFFICIENT_BALANCE && !E_NO_ROUTE && E_BAD_PAIR && "Select coin"}
+                  {swapEnabled &&
+                    !E_INSUFFICIENT_BALANCE &&
+                    !E_BAD_PAIR &&
+                    E_NO_ROUTE &&
+                    `No route ${xCoin.data.symbol}/${yCoin.data.symbol}`}
+                  {swapEnabled &&
+                    inputAmount !== "" &&
+                    outputAmount !== "" &&
+                    !E_INSUFFICIENT_BALANCE &&
+                    !E_BAD_PAIR &&
+                    "Swap"}
                   {!swapEnabled && "Swap disabled"}
                 </LoadingButton>
+                {summary.length > 0 && (
+                  <Stack
+                    sx={{
+                      border: 1,
+                      borderRadius: "8px",
+                      width: "100%",
+                      height: "95px",
+                      mt: "12px",
+                      py: "8px",
+                      px: "10px",
+                    }}
+                  >
+                    {summary.map((data, index) => (
+                      <Stack key={data.name}>
+                        <Stack
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "start",
+                            justifyContent: "space-between",
+                            border: 0,
+                            borderRadius: "8px",
+                            width: "100%",
+                          }}
+                        >
+                          <Typography color="textSecondary" variant="body2" align="left" sx={{ fontWeight: "450" }}>
+                            {data.name}
+                          </Typography>
+                          <Typography color="textSecondary" variant="body2" align="right" sx={{ fontWeight: "450" }}>
+                            {data.value}
+                          </Typography>
+                        </Stack>
+                        {index + 1 !== summary.length && <Divider />}
+                      </Stack>
+                    ))}
+                  </Stack>
+                )}
               </Stack>
-            )}
-            {swapEnabled && !isFetching && !mainnet && (
-              <NoticeBox mt={3} width="250px" text={`Switch to Mainnet to continue.`} />
-            )}
-            {swapEnabled && !isFetching && mainnet && badPair && (
-              <NoticeBox
-                mt={3}
-                width="250px"
-                text={`Cannot swap ${xCoin.data.symbol} to ${yCoin.data.symbol}. They are the same coin.`}
-              />
             )}
           </CardContent>
         </Card>
@@ -558,19 +681,9 @@ const Swap = () => {
       {accountImported && (
         <div>
           <AccountAssetsDialog type={type as IAssetsDialogType} />
-          <ConfirmSendDialog
-            type={"swap"}
-            quote={quotation}
-            args={{
-              payload: swapPayload,
-              isBcs: true,
-              silent: false,
-            }}
-          />
         </div>
       )}
       <SwapSettingsDialog />
-      <Notification />
       <Footer />
     </Container>
   );
