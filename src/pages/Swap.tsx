@@ -15,6 +15,7 @@ import {
   IconButton,
   Input,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { TxnBuilderTypes } from "aptos";
@@ -30,6 +31,7 @@ import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { dexClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
+import errorParser from "../lib/errorParser";
 import debug from "../utils/debug";
 import sleep from "../utils/sleep";
 import { stringToValue, valueToString } from "../utils/values";
@@ -50,8 +52,17 @@ const Swap = () => {
 
   const { getBalance, isValidTransaction, estimatedTxnResult, clearPrevEstimation, mainnet } = useContext(Web3Context);
 
-  const { xCoin, setXCoin, yCoin, setYCoin, slippage, maxGasAmount, simulateSwapTransaction, submitSwapTransaction } =
-    useContext(DexContext);
+  const {
+    xCoin,
+    setXCoin,
+    yCoin,
+    setYCoin,
+    slippage,
+    maxGasAmount,
+    transactionTimeout,
+    simulateSwapTransaction,
+    submitSwapTransaction,
+  } = useContext(DexContext);
 
   // Swap variables.
   const [type, setType] = useState<string>("");
@@ -72,6 +83,7 @@ const Swap = () => {
   const [E_INSUFFICIENT_BALANCE, setE_INSUFFICIENT_BALANCE] = useState<boolean>(false);
   const [E_BAD_PAIR, setE_BAD_PAIR] = useState<boolean>(false);
   const [E_NO_ROUTE, setE_NO_ROUTE] = useState<boolean>(false);
+  const [E_SIMULATION_ERROR, setE_SIMULATION_ERROR] = useState<boolean>(false);
 
   // Initial setup.
   useEffect(() => {
@@ -180,7 +192,7 @@ const Swap = () => {
     if (quotation) {
       const updateQuotation = window.setInterval(() => {
         getQuote(xCoin.data.symbol, yCoin.data.symbol, inputAmount);
-        debug.log("[Swap]: Thick");
+        debug.log("[Swap]: Routes reloaded.");
       }, 30000);
       return () => window.clearInterval(updateQuotation);
     }
@@ -232,6 +244,13 @@ const Swap = () => {
       return () => clearTimeout(delay);
     }
   }, [maxGasAmount]);
+
+  useEffect(() => {
+    if (E_SIMULATION_ERROR) {
+      clearSwap();
+      setE_SIMULATION_ERROR(false);
+    }
+  }, [E_SIMULATION_ERROR === true]);
 
   // Function that changes X and Y coins when button is pressed.
   const baseToQuote = async (): Promise<void> => {
@@ -298,6 +317,10 @@ const Swap = () => {
         await sleep(1000);
       }
     } catch (error) {
+      sendNotification({
+        message: errorParser(error, `Faild to get get ${xCoin.data.symbol}/${yCoin.data.symbol} quote`),
+        type: "error",
+      });
       console.log(error);
     }
     setIsLocalLoading(false);
@@ -340,29 +363,49 @@ const Swap = () => {
         sendNotification({ message: "Simulation failed", type: "error", autoHide: true });
       }
     } catch (error) {
+      sendNotification({
+        message: errorParser(error, `Failed to swap ${xCoin.data.symbol} to ${yCoin.data.symbol}`),
+        type: "error",
+      });
       console.log(error);
     }
     setIsLocalLoading(false);
   };
 
   const makeSummary = async (quotation: DetailedRouteAndQuote): Promise<void> => {
-    const _minOutput = calculateMinOutputAmount(quotation.quote.outputUiAmt.toString(), slippage);
-    const _priceImpact = quotation.quote.priceImpact ? quotation.quote.priceImpact.toFixed(4) : "-";
-    const payload = quotation.route.makeSwapPayload(Number(inputAmount), Number(minOutputAmount));
-    const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
-    let networkFee = "";
+    try {
+      const _minOutput = calculateMinOutputAmount(quotation.quote.outputUiAmt.toString(), slippage);
+      const _priceImpact = quotation.quote.priceImpact ? quotation.quote.priceImpact.toFixed(4) : "-";
+      const payload = quotation.route.makeSwapPayload(Number(inputAmount), Number(minOutputAmount));
+      let networkFee = "";
+      const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
 
-    if (simulated) {
-      networkFee = `${simulated.gas_used} (Gas Units)`;
-    } else {
-      networkFee = "N/A";
+      if (simulated && simulated.success) {
+        networkFee = `${simulated.gas_used} (Gas Units)`;
+        setE_SIMULATION_ERROR(false);
+        setSummary([
+          createData("Output amount", `${quotation.quote.outputUiAmt} ${yCoin.data.symbol}`),
+          createData("Minimum receive", `${Number(_minOutput).toFixed(yCoin.data.decimals)} ${yCoin.data.symbol}`),
+          createData("Price impact", `${_priceImpact}`),
+          createData("Network fee", `${networkFee}`),
+        ]);
+      } else {
+        networkFee = "N/A";
+        setE_SIMULATION_ERROR(true);
+        sendNotification({
+          message: `Simulation ${xCoin.data.symbol} to ${yCoin.data.symbol} failed`,
+          type: "error",
+          autoHide: true,
+        });
+      }
+    } catch (error) {
+      setE_SIMULATION_ERROR(true);
+      sendNotification({
+        message: errorParser(error, `Simulation ${xCoin.data.symbol}/${yCoin.data.symbol} failed`),
+        type: "error",
+        autoHide: true,
+      });
     }
-    setSummary([
-      createData("Output amount", `${quotation.quote.outputUiAmt} ${yCoin.data.symbol}`),
-      createData("Minimum receive", `${Number(_minOutput).toFixed(yCoin.data.decimals)} ${yCoin.data.symbol}`),
-      createData("Price impact", `${_priceImpact}`),
-      createData("Network fee", `${networkFee}`),
-    ]);
   };
 
   const createData = (name: string, value: string): any => {
@@ -389,11 +432,20 @@ const Swap = () => {
                   color="textPrimary"
                   sx={{ display: "flex", alignSelf: "start", ml: "12px", fontWeight: 600 }}
                 >
-                  Sell
+                  Pay
                 </Typography>
-                <IconButton sx={{ position: "absolute", ml: "285px", mt: "-18px" }} onClick={handleSwapSettingsUI}>
-                  <SettingsIcon sx={{ fontSize: "22px" }} />
-                </IconButton>
+                <Tooltip
+                  title={
+                    <span
+                      style={{ whiteSpace: "pre-line" }}
+                    >{`Slippage: ${slippage}%\nMax Gas: ${maxGasAmount}\nTimeout: ${transactionTimeout}s`}</span>
+                  }
+                  placement="left"
+                >
+                  <IconButton sx={{ position: "absolute", ml: "285px", mt: "-18px" }} onClick={handleSwapSettingsUI}>
+                    <SettingsIcon sx={{ fontSize: "22px" }} />
+                  </IconButton>
+                </Tooltip>
                 <Box component={DialogContent} sx={{ border: 2, borderColor: "#9e9e9e" }}>
                   <Stack
                     direction="row"
@@ -505,7 +557,7 @@ const Swap = () => {
                     fontWeight: 600,
                   }}
                 >
-                  Buy
+                  Receive
                 </Typography>
                 <Box component={DialogContent} sx={{ mb: "12px", border: 2, borderColor: "#9e9e9e" }}>
                   <Stack
@@ -640,13 +692,14 @@ const Swap = () => {
                 {summary.length > 0 && (
                   <Stack
                     sx={{
-                      border: 1,
-                      borderRadius: "8px",
+                      border: 2,
+                      borderRadius: "12px",
+                      borderColor: "#9e9e9e",
                       width: "100%",
-                      height: "95px",
+                      height: "100  px",
                       mt: "12px",
                       py: "8px",
-                      px: "10px",
+                      px: "12px",
                     }}
                   >
                     {summary.map((data, index) => (
