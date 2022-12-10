@@ -1,5 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Alert, AlertTitle, Box, CircularProgress, Collapse, IconButton } from "@mui/material";
+import { Alert, AlertTitle, CircularProgress, Collapse, IconButton, Stack } from "@mui/material";
 import { useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { UIContext } from "../../context/UIContext";
@@ -13,6 +13,13 @@ const Notification = (): JSX.Element => {
     notificationExpired,
     setNotificationExpired,
   } = useContext(UIContext);
+
+  // const notification = {
+  //   type: "info",
+  //   message: "Test notification message",
+  //   autoHide: false,
+  //   untilExpired: false,
+  // };
 
   const timeout = 5000;
 
@@ -57,45 +64,62 @@ const Notification = (): JSX.Element => {
   };
 
   return (
-    <Box
+    <Stack
       sx={{
+        display: "flex",
         width: "100%",
-        position: "absolute",
+        flexDirection: "row",
+        height: "54px",
+        py: "2px",
         marginY: "-105px",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        zIndex: 100,
       }}
     >
       {notification && (
-        <Collapse in={openNotification} sx={{ width: "100%" }}>
-          <Alert
-            severity={notification.type ? notification.type : "success"}
-            action={
-              <IconButton
-                color="inherit"
-                size="small"
-                onClick={() => {
-                  handleClose();
-                }}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-            }
-            sx={{ fontWeight: "600", mt: "-1px", position: "absolute", maxWidth: "396px" }}
+        <Collapse in={true} sx={{ width: "375px", height: "50px" }}>
+          <Stack
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignSelf: "center",
+              justifyContent: "center",
+              position: "relative",
+            }}
           >
-            {notification.title && <AlertTitle>{notification.title}</AlertTitle>}
-            <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Alert
+              severity={notification.type ? notification.type : "success"}
+              action={
+                notification.untilExpired ? (
+                  <CircularProgress
+                    color={notification.type ? notification.type : "success"}
+                    sx={{ display: "flex", mt: "3.5px", mr: "5px" }}
+                    size={18}
+                    thickness={7}
+                  />
+                ) : (
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      handleClose();
+                    }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                )
+              }
+              sx={{ fontWeight: "600", mt: "-1px", position: "absolute", maxWidth: "396px" }}
+            >
+              {notification.title && <AlertTitle>{notification.title}</AlertTitle>}
               {notification.message}
-              {notification.untilExpired && (
-                <CircularProgress
-                  color={notification.type ? notification.type : "success"}
-                  sx={{ display: "flex", ml: "10px" }}
-                  size={18}
-                />
-              )}
-            </Box>
-          </Alert>
+            </Alert>
+          </Stack>
         </Collapse>
       )}
-    </Box>
+    </Stack>
   );
 };
 
