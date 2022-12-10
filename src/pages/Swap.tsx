@@ -391,7 +391,7 @@ const Swap = () => {
                 >
                   Sell
                 </Typography>
-                <IconButton sx={{ position: "absolute", ml: "335px", mt: "-12px" }} onClick={handleSwapSettingsUI}>
+                <IconButton sx={{ position: "absolute", ml: "285px", mt: "-18px" }} onClick={handleSwapSettingsUI}>
                   <SettingsIcon sx={{ fontSize: "22px" }} />
                 </IconButton>
                 <Box component={DialogContent} sx={{ border: 2, borderColor: "#9e9e9e" }}>
