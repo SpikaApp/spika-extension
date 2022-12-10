@@ -34,7 +34,7 @@ const Footer = (): JSX.Element => {
     <Typography sx={{ mt: 2 }} variant="subtitle1" align="center" color="textPrimary">
       View account in{" "}
       <Link
-        href={`https://explorer.devnet.aptos.dev/account/${currentAddress}?network=${network}`}
+        href={`https://explorer.aptoslabs.com/account/${currentAddress}?network=${network}`}
         underline="none"
         target="_blank"
         color="link"
