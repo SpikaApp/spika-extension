@@ -1,6 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Alert, AlertTitle, Box, Collapse, IconButton } from "@mui/material";
+import { Alert, AlertTitle, Box, CircularProgress, Collapse, IconButton } from "@mui/material";
 import { useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { UIContext } from "../../context/UIContext";
 
 const Notification = (): JSX.Element => {
@@ -16,6 +17,12 @@ const Notification = (): JSX.Element => {
   const timeout = 5000;
 
   const expiryTimeout = 2000;
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpenNotification(false);
+  }, [location]);
 
   useEffect(() => {
     if (notification && notification.autoHide) {
@@ -75,7 +82,16 @@ const Notification = (): JSX.Element => {
             sx={{ fontWeight: "600", mt: "-1px", position: "absolute", maxWidth: "396px" }}
           >
             {notification.title && <AlertTitle>{notification.title}</AlertTitle>}
-            {notification.message}
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              {notification.message}
+              {notification.untilExpired && (
+                <CircularProgress
+                  color={notification.type ? notification.type : "success"}
+                  sx={{ display: "flex", ml: "10px" }}
+                  size={18}
+                />
+              )}
+            </Box>
           </Alert>
         </Collapse>
       )}
