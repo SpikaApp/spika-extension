@@ -2,15 +2,16 @@ import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AlertDialog from "./components/AlertDialog";
+import { Notification } from "./components/lib";
 import Loading from "./components/Loading";
 import LoginDialog from "./components/LoginDialog";
 import Navbar from "./components/Navbar";
 import PermissionDialog from "./components/PermissionDialog";
 import { AccountProvider } from "./context/AccountContext";
+import { DexProvider } from "./context/DexContext";
 import { PayloadProvider } from "./context/PayloadContext";
 import { UIContext } from "./context/UIContext";
 import { Web3Provider } from "./context/Web3Context";
-import { DexProvider } from "./context/DexContext";
 import "./index.css";
 import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Tests, Transactions, Wallet } from "./pages";
 import { darkTheme, lightTheme } from "./theme";
@@ -63,6 +64,7 @@ const App = (): JSX.Element => {
                 </div>
                 <LoginDialog />
                 <AlertDialog />
+                <Notification />
                 <Loading />
                 <PermissionDialog />
               </DexProvider>
