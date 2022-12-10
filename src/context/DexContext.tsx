@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as aptos from "aptos";
 import React, { createContext, useContext, useState } from "react";
-import { IContextDex, ICoin } from "../interface";
+import { ICoin, IContextDex } from "../interface";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
 import { AccountContext } from "./AccountContext";
@@ -20,7 +20,7 @@ export const DexProvider = ({ children }: DexContextProps) => {
   const [xCoin, setXCoin] = useState<ICoin>(aptosCoin);
   const [yCoin, setYCoin] = useState<ICoin>(aptosCoin);
   const [slippage, setSlippage] = useState<string>("1");
-  const [transactionTimeout, setTransactionTimeout] = useState<string>("60");
+  const [transactionTimeout, setTransactionTimeout] = useState<string>("10");
   const [maxGasAmount, setMaxGasAmount] = useState<string>("20000");
 
   const simulateSwapTransaction = async (
@@ -43,6 +43,7 @@ export const DexProvider = ({ children }: DexContextProps) => {
     const result = await spika.client.generateSignSubmitWaitForTransaction(account!, payload, {
       gasUnitPrice: BigInt(gasUnitPrice),
       maxGasAmount: BigInt(maxGasAmount),
+      timeoutSecs: Number(transactionTimeout),
       checkSuccess: true,
     });
     return result;
