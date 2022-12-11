@@ -305,22 +305,27 @@ const Swap = () => {
       const xCoinInfo = client.coinListClient.getCoinInfoBySymbol(fromSymbol)[0];
       const yCoinInfo = client.coinListClient.getCoinInfoBySymbol(toSymbol)[0];
       const result = await client.requestQuotesViaAPI(Number(inputUiAmt), xCoinInfo, yCoinInfo);
-      if (!result) {
+      if (result.allRoutesCount === 0) {
+        sendNotification({
+          message: `No route from ${fromSymbol} to ${toSymbol}`,
+          type: "warning",
+          autoHide: true,
+        });
         console.log(`[Swap]: No route from ${fromSymbol} to ${toSymbol}`);
         setE_NO_ROUTE(true);
       } else {
-        const _result = result.routes[0];
-        const _minOutputAmount = calculateMinOutputAmount(_result.quote.outputUiAmt.toString(), slippage);
-        setQuotation(_result);
-        setOutputAmount(_result.quote.outputUiAmt.toString());
+        const _quotation = result.routes[0];
+        const _minOutputAmount = calculateMinOutputAmount(_quotation.quote.outputUiAmt.toString(), slippage);
+        setQuotation(_quotation);
+        setOutputAmount(_quotation.quote.outputUiAmt.toString());
         setMinOutputAmount(_minOutputAmount);
-        makeSummary(_result);
+        makeSummary(_quotation);
         debug.log("[Swap]: Minumum received amount after slippage:", _minOutputAmount);
         await sleep(1000);
       }
     } catch (error) {
       sendNotification({
-        message: errorParser(error, `Faild to get get ${xCoin.data.symbol}/${yCoin.data.symbol} quote`),
+        message: errorParser(error, `Failed to get ${xCoin.data.symbol}/${yCoin.data.symbol} quote`),
         type: "error",
       });
       console.log(error);
