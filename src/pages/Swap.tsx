@@ -48,7 +48,8 @@ const Swap = () => {
     darkMode,
   } = useContext(UIContext);
 
-  const { accountImported, accountAssets, currentNetwork } = useContext(AccountContext);
+  const { accountImported, currentAddress, accountAssets, currentNetwork, validateAccount } =
+    useContext(AccountContext);
 
   const { getBalance, isValidTransaction, estimatedTxnResult, clearPrevEstimation, mainnet } = useContext(Web3Context);
 
@@ -84,6 +85,7 @@ const Swap = () => {
   const [E_BAD_PAIR, setE_BAD_PAIR] = useState<boolean>(false);
   const [E_NO_ROUTE, setE_NO_ROUTE] = useState<boolean>(false);
   const [E_SIMULATION_ERROR, setE_SIMULATION_ERROR] = useState<boolean>(false);
+  const [E_ACCOUNT_NOT_REGISTERED, setE_ACCOUNT_NOT_REGISTERED] = useState<boolean>(false);
 
   // Initial setup.
   useEffect(() => {
@@ -252,6 +254,22 @@ const Swap = () => {
     }
   }, [E_SIMULATION_ERROR === true]);
 
+  useEffect(() => {
+    if (accountImported) {
+      validateCurrentAccount();
+    }
+  }, [currentAddress]);
+
+  useEffect(() => {
+    if (E_ACCOUNT_NOT_REGISTERED) {
+      sendNotification({
+        message: `Address is not yet registered`,
+        type: "error",
+        autoHide: true,
+      });
+    }
+  }, [E_ACCOUNT_NOT_REGISTERED]);
+
   // Function that changes X and Y coins when button is pressed.
   const baseToQuote = async (): Promise<void> => {
     setIsChangeXtoY(true);
@@ -261,6 +279,17 @@ const Swap = () => {
     setYCoinBalance(xCoinBalance);
     await sleep(1000);
     setIsChangeXtoY(false);
+  };
+
+  const validateCurrentAccount = async () => {
+    const validated = await validateAccount(currentAddress!);
+    if (validated) {
+      setE_ACCOUNT_NOT_REGISTERED(false);
+      setSwapEnabled(true);
+    } else {
+      setE_ACCOUNT_NOT_REGISTERED(true);
+      setSwapEnabled(false);
+    }
   };
 
   const getPrecision = (input: string): number | undefined => {
@@ -543,7 +572,7 @@ const Swap = () => {
                         align="right"
                         variant="subtitle2"
                       >
-                        {stringToValue(xCoin, xCoinBalance.toString())}
+                        {isNaN(xCoinBalance) ? "0" : stringToValue(xCoin, xCoinBalance.toString())}
                       </Typography>
                     </Stack>
                   </Stack>
@@ -650,7 +679,7 @@ const Swap = () => {
                         align="right"
                         variant="subtitle2"
                       >
-                        {stringToValue(yCoin, yCoinBalance.toString())}
+                        {isNaN(yCoinBalance) ? "0" : stringToValue(yCoin, yCoinBalance.toString())}
                       </Typography>
                     </Stack>
                   </Stack>
