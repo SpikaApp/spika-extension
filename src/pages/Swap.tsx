@@ -263,6 +263,17 @@ const Swap = () => {
     setIsChangeXtoY(false);
   };
 
+  const getPrecision = (input: string): number | undefined => {
+    debug.log(input);
+    const data = input.split(".");
+    debug.log(data);
+    if (data && data.length > 1) {
+      return data[1].length;
+    } else {
+      return undefined;
+    }
+  };
+
   const calculateMinOutputAmount = (outputAmount: string, slippageTolerance: string): string => {
     const slippage = 1 - Number(slippageTolerance) / 100;
     return (Number(outputAmount) * slippage).toString();
@@ -386,13 +397,17 @@ const Swap = () => {
       const payload = quotation.route.makeSwapPayload(Number(inputAmount), Number(minOutputAmount));
       let networkFee = "";
       const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+      const precision = getPrecision(quotation.quote.outputUiAmt.toString());
 
       if (simulated && simulated.success) {
         networkFee = `${simulated.gas_used} (Gas Units)`;
         setE_SIMULATION_ERROR(false);
         setSummary([
           createData("Output amount", `${quotation.quote.outputUiAmt} ${yCoin.data.symbol}`),
-          createData("Minimum receive", `${Number(_minOutput).toFixed(yCoin.data.decimals)} ${yCoin.data.symbol}`),
+          createData(
+            "Minimum receive",
+            `${Number(_minOutput).toFixed(precision ? precision : yCoin.data.decimals)} ${yCoin.data.symbol}`
+          ),
           createData("Price impact", `${_priceImpact}`),
           createData("Network fee", `${networkFee}`),
         ]);
