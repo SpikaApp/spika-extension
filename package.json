@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.5.12",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --cors",
     "build": "vite build",
     "preview": "vite preview",
     "postinstall": "patch-package",

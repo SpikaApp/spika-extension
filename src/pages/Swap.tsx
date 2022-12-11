@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { DetailedRouteAndQuote } from "@manahippo/hippo-sdk/dist/aggregator/types";
+import { IApiRouteAndQuote } from "@manahippo/hippo-sdk/dist/aggregator/types";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { LoadingButton } from "@mui/lab";
@@ -71,7 +71,7 @@ const Swap = () => {
   const [inputAmount, setInputAmount] = useState<string>("");
   const [outputAmount, setOutputAmount] = useState<string>("");
   const [minOutputAmount, setMinOutputAmount] = useState<string>("");
-  const [quotation, setQuotation] = useState<DetailedRouteAndQuote | undefined>();
+  const [quotation, setQuotation] = useState<IApiRouteAndQuote | undefined>();
   const [summary, setSummary] = useState<any[]>([]);
 
   // Swap state conditions.
@@ -263,11 +263,12 @@ const Swap = () => {
     setIsChangeXtoY(false);
   };
 
-  const calculateMinOutputAmount = (outputAmount: string, slippageTolerance: string) => {
+  const calculateMinOutputAmount = (outputAmount: string, slippageTolerance: string): string => {
     const slippage = 1 - Number(slippageTolerance) / 100;
     return (Number(outputAmount) * slippage).toString();
   };
 
+  // Request quotation.
   const callApi = async (): Promise<void> => {
     if (
       Number(valueToString(xCoin, inputAmount)) <= Number(xCoinBalance) &&
@@ -303,16 +304,17 @@ const Swap = () => {
       const client = dexClient(currentNetwork!.data.node_url, "Mainnet");
       const xCoinInfo = client.coinListClient.getCoinInfoBySymbol(fromSymbol)[0];
       const yCoinInfo = client.coinListClient.getCoinInfoBySymbol(toSymbol)[0];
-      const result = await client.getBestQuote(Number(inputUiAmt), xCoinInfo, yCoinInfo);
+      const result = await client.requestQuotesViaAPI(Number(inputUiAmt), xCoinInfo, yCoinInfo);
       if (!result) {
         console.log(`[Swap]: No route from ${fromSymbol} to ${toSymbol}`);
         setE_NO_ROUTE(true);
       } else {
-        const _minOutputAmount = calculateMinOutputAmount(result.quote.outputUiAmt.toString(), slippage);
-        setQuotation(result);
-        setOutputAmount(result.quote.outputUiAmt.toString());
+        const _result = result.routes[0];
+        const _minOutputAmount = calculateMinOutputAmount(_result.quote.outputUiAmt.toString(), slippage);
+        setQuotation(_result);
+        setOutputAmount(_result.quote.outputUiAmt.toString());
         setMinOutputAmount(_minOutputAmount);
-        makeSummary(result);
+        makeSummary(_result);
         debug.log("[Swap]: Minumum received amount after slippage:", _minOutputAmount);
         await sleep(1000);
       }
@@ -327,7 +329,7 @@ const Swap = () => {
   };
 
   // Function that swaps tokens.
-  const executeSwap = async (_quote: DetailedRouteAndQuote, inputUiAmt: string): Promise<void> => {
+  const executeSwap = async (_quote: IApiRouteAndQuote, inputUiAmt: string): Promise<void> => {
     setIsLocalLoading(true);
     clearPrevEstimation();
     setQuotation(undefined);
@@ -372,7 +374,7 @@ const Swap = () => {
     setIsLocalLoading(false);
   };
 
-  const makeSummary = async (quotation: DetailedRouteAndQuote): Promise<void> => {
+  const makeSummary = async (quotation: IApiRouteAndQuote): Promise<void> => {
     try {
       const _minOutput = calculateMinOutputAmount(quotation.quote.outputUiAmt.toString(), slippage);
       const _priceImpact = quotation.quote.priceImpact ? quotation.quote.priceImpact.toFixed(4) : "-";
@@ -655,7 +657,7 @@ const Swap = () => {
                   }
                   variant="contained"
                   loading={isLocalLoading}
-                  loadingIndicator={<CircularProgress sx={{ color: "#FFFFFF" }} size={18} />}
+                  loadingIndicator={<CircularProgress sx={{ color: "#FFFFFF" }} size={20} thickness={6.5} />}
                   disabled={
                     (swapEnabled ? false : true) ||
                     (inputAmount == "" ? true : false) ||
