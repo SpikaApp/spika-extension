@@ -90,10 +90,10 @@ const Swap = () => {
     if (accountImported) {
       if (accountAssets) {
         setXCoin(accountAssets[0]);
-        if (accountAssets.length > 0) {
-          setYCoin(accountAssets[1]);
-        } else {
+        if (accountAssets.length === 1) {
           setYCoin(accountAssets[0]);
+        } else {
+          setYCoin(accountAssets[1]);
         }
         setSwapEnabled(true);
       }
