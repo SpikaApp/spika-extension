@@ -20,7 +20,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { TxnBuilderTypes } from "aptos";
+import { HexString, TxnBuilderTypes } from "aptos";
 import { useContext, useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import AccountAssetsDialog from "../components/AccountAssetsDialog";
@@ -39,6 +39,9 @@ import sleep from "../utils/sleep";
 import { stringToValue, valueToString } from "../utils/values";
 
 type IAssetsDialogType = "xCoin" | "yCoin";
+
+const feesAddress = new HexString(import.meta.env.VITE_SPIKA_FEES_ADDRESS);
+const feesBip: string = import.meta.env.VITE_SPIKA_FEES_BIP;
 
 const Swap = () => {
   const {
@@ -421,7 +424,12 @@ const Swap = () => {
     setQuotation(undefined);
     try {
       const inputAmt = parseFloat(inputUiAmt);
-      const payload = _quote.route.makeSwapPayload(inputAmt, Number(minOutputAmount));
+      const payload = _quote.route.makeSwapWithFeesPayload(
+        inputAmt,
+        Number(minOutputAmount),
+        feesAddress,
+        Number(feesBip)
+      );
       sendNotification({
         message: "Submitting transaction...",
         untilExpired: true,
@@ -526,18 +534,26 @@ const Swap = () => {
                 >
                   Pay
                 </Typography>
-                <Tooltip
-                  title={
-                    <span
-                      style={{ whiteSpace: "pre-line" }}
-                    >{`Slippage: ${slippage}%\nMax Gas: ${maxGasAmount}\nTimeout: ${transactionTimeout}s`}</span>
-                  }
-                  placement="left"
-                >
-                  <IconButton sx={{ position: "absolute", ml: "285px", mt: "-18px" }} onClick={handleSwapSettingsUI}>
-                    <SettingsIcon sx={{ fontSize: "22px" }} />
-                  </IconButton>
-                </Tooltip>
+                <Stack>
+                  <Tooltip
+                    title={
+                      <span
+                        style={{ whiteSpace: "pre-line" }}
+                      >{`Slippage: ${slippage}%\nMax Gas: ${maxGasAmount}\nTimeout: ${transactionTimeout}s`}</span>
+                    }
+                    placement="bottom-start"
+                  >
+                    <span>
+                      <IconButton
+                        sx={{ position: "absolute", ml: "105px", mt: "-40px" }}
+                        disabled={swapEnabled ? false : true}
+                        onClick={handleSwapSettingsUI}
+                      >
+                        <SettingsIcon sx={{ fontSize: "22px" }} />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </Stack>
                 <Box
                   component={DialogContent}
                   sx={{
