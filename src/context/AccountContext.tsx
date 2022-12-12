@@ -458,8 +458,10 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       debug.log("Data encrypted.");
 
       try {
-        const _accountType: IAccountType = await getStore(PLATFORM, "currentAccountType");
-
+        let _accountType: IAccountType = await getStore(PLATFORM, "currentAccountType");
+        if (!_accountType) {
+          _accountType = "master";
+        }
         let _account: aptos.AptosAccount | undefined;
         let _privateKey: string;
         let _currentAddress: string;
