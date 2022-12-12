@@ -22,7 +22,10 @@ import * as apps from "../lib/connectedApps";
 import {
   getAccountName,
   getAptosAccount,
+  getAptosDerivativePath,
   getKeystoneAccountByIndex,
+  getSpikaAccountCurrentIndex,
+  getSpikaMasterAccount,
   initSpikaMasterAccount,
 } from "../lib/spikaAccount";
 import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../lib/store";
@@ -130,12 +133,12 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
   const handleLogin = async (): Promise<void> => {
     try {
-      setOpenLoginDialog(false);
       setIsLoading(true);
       setAccountRoutesEnabled(false);
       await loadAccount();
       setIsLoading(false);
       setPassword("");
+      setOpenLoginDialog(false);
       locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
@@ -467,7 +470,15 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
         switch (_accountType) {
           case "master":
-            _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
+            const spikaMasterAccount = await getSpikaMasterAccount();
+            if (!spikaMasterAccount) {
+              _account = aptos.AptosAccount.fromDerivePath(APTOS_DERIVE_PATH, decryptedMnemonic);
+            } else {
+              const _accountFromStorage = await getStore(PLATFORM, "currentAddress");
+              const index = await getSpikaAccountCurrentIndex(_accountFromStorage);
+              const derivativePath = getAptosDerivativePath(index);
+              _account = aptos.AptosAccount.fromDerivePath(derivativePath, decryptedMnemonic);
+            }
             _privateKey = Buffer.from(_account.signingKey.secretKey).toString("hex").slice(0, 64);
             _currentAddress = _account.address().hex();
             _currentAsset = await getStore(PLATFORM, "currentAsset");
@@ -483,7 +494,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
               account: _account.address().hex(),
               authKey: _account.authKey().hex(),
             };
-            await initSpikaMasterAccount(_publicAccount);
+            if (!spikaMasterAccount) await initSpikaMasterAccount(_publicAccount);
             _currentAddressName = await getAccountName(_currentAddress);
             break;
 

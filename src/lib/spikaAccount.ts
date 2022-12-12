@@ -12,15 +12,15 @@ const _spikaMasterAccount = "spikaMasterAccount";
 const _encryptedMnemonic = "DATA0";
 const _PWD = "PWD";
 
-const aptosDerivativePath = (i: number): string => {
-  return `m/44'/637'/${i}'/0'/0'`;
-};
-
 const getMnemonic = async (): Promise<string> => {
   const encryptedPassword: IEncryptedPwd = await getMem(PLATFORM, _PWD);
   const pwd: string = await decryptPassword(encryptedPassword);
   const encryptedMnemonic: string = await getStore(PLATFORM, _encryptedMnemonic);
   return await passworder.decrypt(pwd, encryptedMnemonic);
+};
+
+export const getAptosDerivativePath = (i: number): string => {
+  return `m/44'/637'/${i}'/0'/0'`;
 };
 
 export const initSpikaMasterAccount = async (publicAccount: IPublicAccount): Promise<void> => {
@@ -56,9 +56,10 @@ export const getSpikaAccountIndex = async (): Promise<number> => {
 };
 
 export const getSpikaAccountCurrentIndex = async (currentAddress: string): Promise<number> => {
-  const data: Array<ISpikaAccount> = await getStore(PLATFORM, _spikaMasterAccount).master;
-  const current = data.find((account: ISpikaAccount) => account.data.account === currentAddress);
-  return current!.index;
+  const spikaMasterAccount: ISpikaMasterAccount = await getStore(PLATFORM, _spikaMasterAccount);
+  const data: Array<ISpikaAccount> = spikaMasterAccount.master;
+  const result = data.find((account: ISpikaAccount) => account.data.account === currentAddress);
+  return result!.index;
 };
 
 export const getSpikaMasterAccount = async (): Promise<ISpikaMasterAccount> => {
@@ -69,7 +70,7 @@ export const addSpikaAccount = async (): Promise<ISpikaMasterAccount> => {
   const index = await getSpikaAccountIndex();
   const latest = index + 1;
   const mnemonic = await getMnemonic();
-  const derivativePath: string = aptosDerivativePath(index);
+  const derivativePath: string = getAptosDerivativePath(index);
   const account = AptosAccount.fromDerivePath(derivativePath, mnemonic);
   const publicAccount: IPublicAccount = {
     publicKey: account.pubKey().hex(),
@@ -95,7 +96,7 @@ export const addSpikaAccount = async (): Promise<ISpikaMasterAccount> => {
 // Returns full AptosAccount object
 export const getAptosAccount = async (index: number): Promise<AptosAccount> => {
   const mnemonic = await getMnemonic();
-  const derivativePath: string = aptosDerivativePath(index);
+  const derivativePath: string = getAptosDerivativePath(index);
   const result = AptosAccount.fromDerivePath(derivativePath, mnemonic);
   return result;
 };
