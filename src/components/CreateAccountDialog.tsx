@@ -75,7 +75,7 @@ const CreateAccountDialog = (props: CreateAccountDialogProps): JSX.Element => {
               mb: "12px",
             }}
           >
-            Recipient's address was not found on {props.network} network with chain id {props.chainId}.
+            Recipient's address not found.
           </Typography>
           <Typography align="center" sx={{ mb: "12px" }}>
             Create address first?

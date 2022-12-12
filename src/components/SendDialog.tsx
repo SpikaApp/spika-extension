@@ -32,7 +32,6 @@ const SendDialog = (): JSX.Element => {
     useContext(AccountContext);
   const { create } = useContext(PayloadContext);
   const {
-    chainId,
     recipientAddress,
     setRecipientAddress,
     amount,
@@ -169,9 +168,6 @@ const SendDialog = (): JSX.Element => {
     <Dialog open={openSendDialog} onClose={handleCancel}>
       <DialogTitle sx={{ alignSelf: "center", mb: "-12px" }}>Send {currentAsset!.data.symbol}</DialogTitle>
       <DialogContent sx={{ maxWidth: 375, mb: "-12px" }}>
-        <Typography align="center" variant="body1" color="textSecondary" sx={{ maxWidth: "275px" }}>
-          {currentNetwork!.name} {`network (chain id: ${chainId})`}
-        </Typography>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField
             sx={{ mt: "20px", mb: "20px", width: "275px" }}
@@ -198,13 +194,13 @@ const SendDialog = (): JSX.Element => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
-          <Typography variant="body1" color="textSecondary" sx={{ mt: "-15px", mb: "10px" }}>
-            Available: {stringToValue(currentAsset!, balance!)} {currentAsset?.data.symbol}
+          <Typography color="textSecondary" sx={{ mt: "-15px", mb: "16px", fontWeight: "450", fontSize: "16px" }}>
+            Balance: {stringToValue(currentAsset!, balance!)} {currentAsset?.data.symbol}
           </Typography>
           {estimatedGasPrice && (
             <FormControl sx={{ mb: "15px" }}>
               <FormLabel sx={{ alignSelf: "center", fontSize: 12, mb: "-4px" }} id="gas-price-priority">
-                {"Gas Price (Gas Units)"}
+                <Typography sx={{ fontWeight: "550", fontSize: "14px", mb: "4px" }}>Gas Price (Gas Units)</Typography>
               </FormLabel>
               <RadioGroup
                 row
@@ -221,11 +217,17 @@ const SendDialog = (): JSX.Element => {
                       sx={{
                         "& .MuiSvgIcon-root": {
                           fontSize: 16,
+                          color: "#434343",
+                          mt: "-2px",
                         },
                       }}
                     />
                   }
-                  label={`Normal: ${estimatedGasPrice.gas_estimate}`}
+                  label={
+                    <Typography color="textSecondary" sx={{ fontWeight: "450", fontSize: "14px" }}>
+                      Normal: {estimatedGasPrice.gas_estimate}
+                    </Typography>
+                  }
                 />
                 <FormControlLabel
                   value={estimatedGasPrice.prioritized_gas_estimate}
@@ -234,11 +236,17 @@ const SendDialog = (): JSX.Element => {
                       sx={{
                         "& .MuiSvgIcon-root": {
                           fontSize: 16,
+                          color: "#434343",
+                          mt: "-2px",
                         },
                       }}
                     />
                   }
-                  label={`Priority: ${estimatedGasPrice.prioritized_gas_estimate}`}
+                  label={
+                    <Typography color="textSecondary" sx={{ fontWeight: "450", fontSize: "14px" }}>
+                      Priority: {estimatedGasPrice.prioritized_gas_estimate}
+                    </Typography>
+                  }
                 />
               </RadioGroup>
             </FormControl>
