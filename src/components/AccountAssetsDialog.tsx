@@ -83,17 +83,15 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   useEffect(() => {
     if (!isLocalLoading) {
       setCoinlist(search(selectedList, searchString));
-      debug.log("Coinlist to render updated:", selectedList);
+      debug.log("Coinlist updated:", selectedList);
     }
   }, [!isLocalLoading]);
 
   useEffect(() => {
     if (coinlist.length !== 0) {
       setHasList(true);
-      debug.log("Coinlist to render found, coinlist length:", coinlist.length);
     } else {
       setHasList(false);
-      debug.log("No coinlist to render found, coinlist length:", coinlist.length);
     }
   }, [coinlist]);
 
