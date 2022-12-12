@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { IApiRouteAndQuote } from "@manahippo/hippo-sdk/dist/aggregator/types";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -30,7 +32,7 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { dexClient } from "../lib/client";
-import { aptosCoin } from "../lib/coin";
+import { aptosCoin, coinList } from "../lib/coin";
 import errorParser from "../lib/errorParser";
 import debug from "../utils/debug";
 import sleep from "../utils/sleep";
@@ -93,14 +95,20 @@ const Swap = () => {
       if (accountAssets) {
         setXCoin(accountAssets[0]);
         if (accountAssets.length === 1) {
-          setYCoin(accountAssets[0]);
+          const defaultYCoin = coinList.find((coin) => coin.data.name === "USD Coin (Wormhole)");
+          setYCoin(defaultYCoin ? defaultYCoin : accountAssets[0]);
         } else {
           setYCoin(accountAssets[1]);
         }
         setSwapEnabled(true);
       }
+      if (E_ACCOUNT_NOT_REGISTERED) {
+        setXCoin(aptosCoin);
+        setYCoin(aptosCoin);
+        setSwapEnabled(false);
+      }
     }
-  }, [accountAssets.length, accountImported]);
+  }, [accountImported, accountAssets.length, E_ACCOUNT_NOT_REGISTERED]);
 
   // Disable swap if not on Mainnet.
   useEffect(() => {
@@ -263,7 +271,7 @@ const Swap = () => {
   useEffect(() => {
     if (E_ACCOUNT_NOT_REGISTERED) {
       sendNotification({
-        message: `Address is not yet registered`,
+        message: `Address is not registered on chain`,
         type: "error",
         autoHide: true,
       });
@@ -300,6 +308,39 @@ const Swap = () => {
       return data[1].length;
     } else {
       return undefined;
+    }
+  };
+
+  const roundOutput = (output: string): string => {
+    let data = Number(output);
+    if (data > 1000) {
+      data = Math.floor(data * 100) / 100;
+    } else if (data > 100) {
+      data = Math.floor(data * 1000) / 1000;
+    } else if (data > 10) {
+      data = Math.floor(data * 10000) / 10000;
+    }
+    return data.toString();
+  };
+
+  const priceImpactColor = (input: string): string => {
+    const data = Number(input.replace("%", "").replace("-", ""));
+    console.log(data);
+    let color: string;
+    if (isNaN(data)) {
+      color = "info";
+      return color;
+    } else {
+      if (data > 2) {
+        color = "error.main";
+      } else if (data > 1) {
+        color = "warning.main";
+      } else if (data <= 1 && data > 0.3) {
+        color = "success.main";
+      } else {
+        color = "info.main";
+      }
+      return color;
     }
   };
 
@@ -357,7 +398,7 @@ const Swap = () => {
         const _quotation = result.routes[0];
         const _minOutputAmount = calculateMinOutputAmount(_quotation.quote.outputUiAmt.toString(), slippage);
         setQuotation(_quotation);
-        setOutputAmount(_quotation.quote.outputUiAmt.toString());
+        setOutputAmount(roundOutput(_quotation.quote.outputUiAmt.toString()));
         setMinOutputAmount(_minOutputAmount);
         makeSummary(_quotation);
         debug.log("[Swap]: Minumum received amount after slippage:", _minOutputAmount);
@@ -422,7 +463,7 @@ const Swap = () => {
   const makeSummary = async (quotation: IApiRouteAndQuote): Promise<void> => {
     try {
       const _minOutput = calculateMinOutputAmount(quotation.quote.outputUiAmt.toString(), slippage);
-      const _priceImpact = quotation.quote.priceImpact ? quotation.quote.priceImpact.toFixed(4) : "-";
+      const _priceImpact = quotation.quote.priceImpact ? `${(quotation.quote.priceImpact * 100).toFixed(2)}` : "-";
       const payload = quotation.route.makeSwapPayload(Number(inputAmount), Number(minOutputAmount));
       let networkFee = "";
       const simulated = await simulateSwapTransaction(payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
@@ -437,7 +478,7 @@ const Swap = () => {
             "Minimum receive",
             `${Number(_minOutput).toFixed(precision ? precision : yCoin.data.decimals)} ${yCoin.data.symbol}`
           ),
-          createData("Price impact", `${_priceImpact}`),
+          createData("Price impact", `${_priceImpact}%`),
           createData("Network fee", `${networkFee}`),
         ]);
       } else {
@@ -497,7 +538,13 @@ const Swap = () => {
                     <SettingsIcon sx={{ fontSize: "22px" }} />
                   </IconButton>
                 </Tooltip>
-                <Box component={DialogContent} sx={{ border: 2, borderColor: "#9e9e9e" }}>
+                <Box
+                  component={DialogContent}
+                  sx={{
+                    border: 2,
+                    borderColor: "#9e9e9e",
+                  }}
+                >
                   <Stack
                     direction="row"
                     sx={{
@@ -511,29 +558,58 @@ const Swap = () => {
                   >
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
-                        <IconButton
-                          sx={{ ml: "-10px" }}
-                          disabled={swapEnabled ? false : true}
-                          onClick={() => {
-                            setType("xCoin");
-                            handleAccountAssetsUI();
-                          }}
-                        >
-                          <Box
-                            sx={{ width: "24px", height: "24px" }}
-                            component="img"
-                            src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
-                          />
-                        </IconButton>
-                        <Typography variant="h6" color="textPrimary" sx={{ ml: "4px", mr: "6px", mt: "4px" }}>
-                          {xCoin.data.symbol}
-                        </Typography>
+                        <Tooltip title={xCoin.data.name}>
+                          <Button
+                            variant="outlined"
+                            sx={{
+                              ml: "-4px",
+                              mt: "4px",
+                              mr: "-12px",
+                              alignItems: "left",
+                              justifyContent: "start",
+                              height: "31.5px",
+                              width: "300px",
+                              borderRadius: "8px",
+                              border: 1.3,
+                              borderColor: "#9e9e9e",
+                            }}
+                            disabled={swapEnabled ? false : true}
+                            onClick={() => {
+                              setType("xCoin");
+                              handleAccountAssetsUI();
+                            }}
+                          >
+                            <Box
+                              sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                              component="img"
+                              src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
+                            />
+
+                            <Typography
+                              noWrap
+                              color="textPrimary"
+                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                            >
+                              {xCoin.data.symbol}
+                            </Typography>
+                            <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                          </Button>
+                        </Tooltip>
                       </Stack>
-                      <Typography color="textSecondary" align="left" variant="subtitle2" sx={{ minWidth: "120px" }}>
-                        Available {xCoin.data.symbol}:
+                      <Typography
+                        color="textSecondary"
+                        align="left"
+                        sx={{ minWidth: "120px", mt: "4.5px", fontWeight: "550", fontSize: "14px" }}
+                      >
+                        Balance
                       </Typography>
                     </Stack>
-                    <Stack direction="column">
+                    <Stack
+                      direction="column"
+                      sx={{
+                        mr: "-12px",
+                      }}
+                    >
                       <Stack direction="row">
                         <NumericFormat
                           thousandSeparator=" "
@@ -547,7 +623,7 @@ const Swap = () => {
                           }}
                           sx={{
                             mt: "4px",
-                            ml: "6px",
+                            ml: "14px",
                             "& ::placeholder": {
                               color: "primary.main",
                             },
@@ -568,9 +644,8 @@ const Swap = () => {
                       </Stack>
                       <Typography
                         color="textSecondary"
-                        sx={{ mt: "4px", mr: "12px" }}
+                        sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
                         align="right"
-                        variant="subtitle2"
                       >
                         {isNaN(xCoinBalance) ? "0" : stringToValue(xCoin, xCoinBalance.toString())}
                       </Typography>
@@ -610,7 +685,14 @@ const Swap = () => {
                 >
                   Receive
                 </Typography>
-                <Box component={DialogContent} sx={{ mb: "12px", border: 2, borderColor: "#9e9e9e" }}>
+                <Box
+                  component={DialogContent}
+                  sx={{
+                    border: 2,
+                    borderColor: "#9e9e9e",
+                    mb: "12px",
+                  }}
+                >
                   <Stack
                     direction="row"
                     sx={{
@@ -624,29 +706,58 @@ const Swap = () => {
                   >
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
-                        <IconButton
-                          sx={{ ml: "-10px" }}
-                          disabled={swapEnabled ? false : true}
-                          onClick={() => {
-                            setType("yCoin");
-                            handleAccountAssetsUI();
-                          }}
-                        >
-                          <Box
-                            sx={{ width: "24px", height: "24px" }}
-                            component="img"
-                            src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
-                          />
-                        </IconButton>
-                        <Typography variant="h6" color="textPrimary" sx={{ ml: "4px", mr: "6px", mt: "4px" }}>
-                          {yCoin.data.symbol}
-                        </Typography>
+                        <Tooltip title={yCoin.data.name}>
+                          <Button
+                            variant="outlined"
+                            sx={{
+                              ml: "-4px",
+                              mt: "4px",
+                              mr: "-12px",
+                              alignItems: "left",
+                              justifyContent: "start",
+                              height: "31.5px",
+                              width: "300px",
+                              borderRadius: "8px",
+                              border: 1.3,
+                              borderColor: "#9e9e9e",
+                            }}
+                            disabled={swapEnabled ? false : true}
+                            onClick={() => {
+                              setType("yCoin");
+                              handleAccountAssetsUI();
+                            }}
+                          >
+                            <Box
+                              sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                              component="img"
+                              src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
+                            />
+
+                            <Typography
+                              noWrap
+                              color="textPrimary"
+                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                            >
+                              {yCoin.data.symbol}
+                            </Typography>
+                            <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                          </Button>
+                        </Tooltip>
                       </Stack>
-                      <Typography color="textSecondary" align="left" variant="subtitle2" sx={{ minWidth: "120px" }}>
-                        Available {yCoin.data.symbol}:
+                      <Typography
+                        color="textSecondary"
+                        align="left"
+                        sx={{ minWidth: "120px", mt: "5px", fontWeight: "550", fontSize: "14px" }}
+                      >
+                        Balance
                       </Typography>
                     </Stack>
-                    <Stack direction="column">
+                    <Stack
+                      direction="column"
+                      sx={{
+                        mr: "-12px",
+                      }}
+                    >
                       <Stack direction="row">
                         <Input
                           sx={{
@@ -675,9 +786,8 @@ const Swap = () => {
                       </Stack>
                       <Typography
                         color="textSecondary"
-                        sx={{ mt: "4px", mr: "12px" }}
+                        sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
                         align="right"
-                        variant="subtitle2"
                       >
                         {isNaN(yCoinBalance) ? "0" : stringToValue(yCoin, yCoinBalance.toString())}
                       </Typography>
@@ -769,7 +879,12 @@ const Swap = () => {
                           <Typography color="textSecondary" variant="body2" align="left" sx={{ fontWeight: "450" }}>
                             {data.name}
                           </Typography>
-                          <Typography color="textSecondary" variant="body2" align="right" sx={{ fontWeight: "450" }}>
+                          <Typography
+                            color={data.name === "Price impact" ? priceImpactColor(data.value) : "textSecondary"}
+                            variant="body2"
+                            align="right"
+                            sx={{ fontWeight: "450" }}
+                          >
                             {data.value}
                           </Typography>
                         </Stack>
