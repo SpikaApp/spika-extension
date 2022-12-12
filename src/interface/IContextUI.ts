@@ -84,14 +84,11 @@ type IContextUI = {
   somethingChanged: boolean;
   setSomethingChanged: React.Dispatch<React.SetStateAction<boolean>>;
   devMode: boolean;
-  isTest: boolean;
-  setIsTest: React.Dispatch<React.SetStateAction<boolean>>;
   isPopup: boolean;
   setIsPopup: React.Dispatch<React.SetStateAction<boolean>>;
   isError?: boolean;
   setIsError: React.Dispatch<React.SetStateAction<boolean>>;
 
-  handleMintUI: () => void;
   handleSendUI: () => void;
   handleReceiveUI: () => void;
   handleCreateCollectionUI: () => void;

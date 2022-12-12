@@ -55,7 +55,6 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [somethingChanged, setSomethingChanged] = useState<boolean>(false);
   const [isPopup, setIsPopup] = useState<boolean>(false);
   const [devMode] = useState<boolean>(PLATFORM === "http:" ? true : false);
-  const [isTest, setIsTest] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const _currentRoute = "currentRoute";
 
@@ -353,8 +352,6 @@ export const UIProvider = ({ children }: UIContextProps) => {
         somethingChanged,
         setSomethingChanged,
         devMode,
-        isTest,
-        setIsTest,
         isPopup,
         setIsPopup,
         isError,
