@@ -41,6 +41,7 @@ const AccountManagerDialog = (): JSX.Element => {
     openKeystoneImportDialog,
     handleConnectWalletUI,
     darkMode,
+    devMode,
   } = useContext(UIContext);
   const { switchAccount, setAccountImported } = useContext(AccountContext);
   const [accounts, setAccounts] = useState<ISpikaAccount[]>();
@@ -244,9 +245,11 @@ const AccountManagerDialog = (): JSX.Element => {
           <Button variant="outlined" sx={{ width: "165px", mb: "12px" }} onClick={handleAddAccount}>
             Add Account
           </Button>
-          <Button variant="outlined" sx={{ width: "165px" }} onClick={handleConnectHW}>
-            Connect HW
-          </Button>
+          {devMode && (
+            <Button variant="outlined" sx={{ width: "165px" }} onClick={handleConnectHW}>
+              Connect HW
+            </Button>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
