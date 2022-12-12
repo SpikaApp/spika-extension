@@ -50,6 +50,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setPrivateKeyRequired,
     setAccountRoutesEnabled,
     setIsError,
+    sendNotification,
   } = useContext(UIContext);
 
   const [alertSignal, setAlertSignal] = useState<number>(0);
@@ -138,7 +139,6 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       await loadAccount();
       setIsLoading(false);
       setPassword("");
-      setOpenLoginDialog(false);
       locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
@@ -545,10 +545,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         setCurrentAsset(_currentAsset);
         setCurrentNetwork(_currentNetwork);
 
+        // Close loging dialog on successfull login.
+        setOpenLoginDialog(false);
+
         debug.log("Local storage, session storage, state updated.");
       } catch (error) {
         console.log(error);
         debug.log("Failed to load account.");
+        sendNotification({ message: "Test" });
         throwAlert({ signal: 42, title: "Failed to load account.", message: `${error}`, error: true });
         setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }

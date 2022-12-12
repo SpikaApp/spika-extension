@@ -68,6 +68,12 @@ const AlertDialog = () => {
     }
   };
 
+  const handleEnter = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === "Enter") {
+      handleClose();
+    }
+  };
+
   const handleClose = () => {
     switch (alertSignal) {
       case 1: // Account created
@@ -161,7 +167,7 @@ const AlertDialog = () => {
   };
 
   return (
-    <Dialog open={openAlertDialog} onClose={handleClose}>
+    <Dialog open={openAlertDialog} onClose={handleClose} onKeyDown={(e) => handleEnter(e)}>
       {alertSignal === 81 || alertSignal === 91 ? (
         <DialogTitle align="center">{alertTitle}</DialogTitle>
       ) : (
