@@ -74,7 +74,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     if (accountImported) {
       (async () => {
         const result = await isMainnet();
-        debug.log(result);
         setMainnet(result);
       })();
     }
@@ -555,13 +554,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     if (isAccount) {
       const result: ICoin[] = [];
       const resources = await spika.client.getAccountResources(account!.address());
-      debug.log("Account resources:", resources);
       await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(resources).map(async (value: any) => {
           if (value.type.startsWith("0x1::coin::CoinStore")) {
             const type = value.type.substring(value.type.indexOf("<") + 1, value.type.lastIndexOf(">"));
-            debug.log("Found new CoinStore resource:", type);
+            // debug.log("Found new CoinStore resource:", type);
 
             try {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -656,7 +654,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
             const result = tokens.filter((token) => {
               return token.amount !== "0";
             });
-            debug.log(result);
 
             if (result == undefined) {
               setAccountTokens([]);
