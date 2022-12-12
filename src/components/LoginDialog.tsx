@@ -26,6 +26,18 @@ const LoginDialog = (): JSX.Element => {
     handleResetWalletUI,
   } = useContext(UIContext);
 
+  const handleEnter = async (e: React.KeyboardEvent<HTMLDivElement>): Promise<void> => {
+    if (e.key === "Enter") {
+      if (mnemonicRequired) {
+        await handleRevealMnemonic();
+      } else if (privateKeyRequired) {
+        await handleRevealPrivateKey();
+      } else {
+        await handleLogin();
+      }
+    }
+  };
+
   const handleCancel = (): void => {
     setOpenLoginDialog(false);
     setMnemonicRequired(false);
@@ -55,6 +67,7 @@ const LoginDialog = (): JSX.Element => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => handleEnter(e)}
           />
         </form>
         {mnemonicRequired && (
