@@ -306,7 +306,6 @@ const Swap = () => {
   const getPrecision = (input: string): number | undefined => {
     debug.log(input);
     const data = input.split(".");
-    debug.log(data);
     if (data && data.length > 1) {
       return data[1].length;
     } else {
