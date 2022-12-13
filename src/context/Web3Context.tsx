@@ -3,17 +3,20 @@ import * as aptos from "aptos";
 import { Buffer } from "buffer";
 import React, { useContext, useEffect, useState } from "react";
 import pixel_coin from "../assets/pixel_coin.png";
-import { ICoin, IContextWeb3, INftDetails } from "../interface";
+import { ICoin, IContextWeb3, INftDetails, INftMetadata } from "../interface";
 import { spikaClient } from "../lib/client";
 import { coinInfo, coinList, coinStore } from "../lib/coin";
 import { setStore } from "../lib/store";
 import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
+import { getNftMetadata } from "../utils/getNftMetadata";
 import { valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
 import { UIContext } from "./UIContext";
+import * as nftsStore from "../lib/nftStore";
+import { getPendingClaims } from "../utils/getPendingClaims";
 
 type Web3ContextProps = {
   children: React.ReactNode;
@@ -335,6 +338,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
+  useEffect(() => {
+    if (accountImported) {
+      getPendingClaims();
+    }
+  }, [accountImported]);
+
   const registerAsset = async (coinType: string, name: string): Promise<void> => {
     const spika = await spikaClient();
     try {
@@ -611,7 +620,13 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const getAccountTokens = async (): Promise<void> => {
+  const getTokenStore = async (): Promise<void> => {
+    // First we check storage.
+    const cached = await nftsStore.getNfts(currentAddress!);
+    if (cached) {
+      setNftDetails(cached.nfts);
+    }
+
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
@@ -620,45 +635,50 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         const resources = await spika.client.getAccountResources(account!.address());
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tokenStore: any = resources.find((r) => r.type === token.tokenStore.type);
-        debug.log(tokenStore);
+        // debug.log(tokenStore);
 
         const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {
-            debug.log("Account doesn't hold any NFT yet.");
+            debug.log("Account doesn't have any TokenStore records.");
             return setAccountTokens([]);
           } else {
             const counter = parseInt(tokenStore.data.deposit_events.counter);
-            // Get Token deposit_events
-            const data = await spika.client.getEventsByEventHandle(currentAddress!, tokenStore.type, "deposit_events", {
-              limit: counter === 0 ? 1 : counter,
-            });
+            const events = await spika.client.getEventsByEventHandle(
+              currentAddress!,
+              tokenStore.type,
+              "deposit_events",
+              {
+                limit: counter === 0 ? 1 : counter,
+              }
+            );
 
-            // Get TokenId for accountDepositedTokens and remove dublicates
-            const tokenIds = [...new Set(data.map((i) => i.data.id))];
-            debug.log(tokenIds);
+            const ids = [...new Set(events.map((event) => event.data.id))];
 
-            const tokens: aptos.TokenTypes.Token[] = [];
+            const data: aptos.TokenTypes.Token[] = [];
 
-            // Returns an array of tokenId and value
             await Promise.all(
-              tokenIds.map(async (token) => {
-                const data = await spika.tokenClient.getTokenForAccount(currentAddress!, token);
-                debug.log(data);
-                if (data) {
-                  tokens.push(data);
+              ids.map(async (id) => {
+                const token = await spika.tokenClient.getTokenForAccount(currentAddress!, id);
+                // debug.log(data);
+                if (token) {
+                  data.push(token);
                 }
               })
             );
 
-            // Returns an array of tokenId and value for all tokens with > 0 balance
-            const result = tokens.filter((token) => {
+            const result = data.filter((token) => {
               return token.amount !== "0";
             });
 
-            if (result == undefined) {
+            if (result === undefined) {
               setAccountTokens([]);
             } else {
-              setAccountTokens(result);
+              const final = result.filter(
+                (value, index, self) =>
+                  index === self.findIndex((t) => t.id.token_data_id.name === value.id.token_data_id.name)
+              );
+              final.sort((a, b) => a.id.token_data_id.name.localeCompare(b.id.token_data_id.name));
+              setAccountTokens(final);
             }
           }
         };
@@ -677,7 +697,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       const spika = await spikaClient();
       try {
         if (accountTokens.length === 0) {
-          // console.log("Account doesn't hold any NFT yet");
           return setNftDetails([]);
         } else {
           const result: INftDetails[] = [];
@@ -689,27 +708,44 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
                 i.id.token_data_id.collection,
                 i.id.token_data_id.name
               );
-              debug.log(`NFT ${i.id.token_data_id.name} details:`, nft);
+
+              let metadata: INftMetadata | undefined = undefined;
+
+              if (nft.uri.toLowerCase().includes("ipfs")) {
+                const _metadata = await getNftMetadata(nft.uri);
+                if (_metadata) {
+                  metadata = _metadata;
+                }
+              }
+
+              if (nft.uri.substr(nft.uri.length - 4).toLowerCase() === "json") {
+                const _metadata = await getNftMetadata(nft.uri);
+                if (_metadata) {
+                  metadata = _metadata;
+                }
+              }
 
               result.push({
                 default_properties: nft.default_properties,
-                description: nft.description,
+                description: metadata ? metadata.description : nft.description,
                 largest_property_version: nft.largest_property_version,
                 maximum: nft.maximum,
                 mutability_config: nft.mutability_config,
                 name: nft.name,
                 royalty: nft.royalty,
                 supply: nft.supply,
-                uri: nft.uri,
+                uri: metadata ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/") : nft.uri,
                 creator: i.id.token_data_id.creator,
                 collection: i.id.token_data_id.collection,
+                attributes: metadata ? metadata.attributes : [],
               });
             })
           );
 
-          result.reverse();
+          result.sort((a, b) => a.name.localeCompare(b.name));
 
-          debug.log("Account's NFT updated:", result);
+          debug.log("NFTs metadata updated:", result);
+          nftsStore.setNfts(currentAddress!, result);
           return setNftDetails(result);
         }
       } catch (error) {
@@ -760,7 +796,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         getTxnDetails,
         handleEstimate,
         accountTokens,
-        getAccountTokens,
+        getTokenStore,
         getBalance,
         updateBalance,
         getTransactions,

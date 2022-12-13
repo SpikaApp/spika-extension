@@ -52,7 +52,7 @@ export const setStore = (platform: string, key: string, value: any): void => {
     if (
       key === "currentAsset" ||
       key === "accountAssets" ||
-      key === "accountEvents" ||
+      key === "accountNfts" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
       key === "currentPubAccount" ||
@@ -79,7 +79,7 @@ export const getStore = (platform: string, key: string): any => {
       value === "null" ||
       key === "currentAsset" ||
       key === "accountAssets" ||
-      key === "accountEvents" ||
+      key === "accountNfts" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
       key === "currentPubAccount" ||

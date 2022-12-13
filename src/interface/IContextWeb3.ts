@@ -37,7 +37,7 @@ interface IContextWeb3 {
   getDepositEvents: (query: IEventsQuery) => Promise<void>;
   getWithdrawEvents: (query: IEventsQuery) => Promise<void>;
   getTxnDetails: (version: number | bigint) => Promise<void>;
-  getAccountTokens: () => Promise<void>;
+  getTokenStore: () => Promise<void>;
   getBalance: (asset?: ICoin) => Promise<void | string>;
   updateBalance: (asset: ICoin) => Promise<string>;
   getTransactions: () => Promise<aptos.Types.Transaction[]>;

@@ -11,8 +11,30 @@ interface INftDetails {
   royalty: any;
   supply: string;
   uri: string;
+  attributes: Array<INftAttributes>;
   creator?: string;
   collection?: string;
+}
+
+export interface INftMetadata {
+  name: string;
+  description: string;
+  image: string;
+  imageHash: string;
+  edition: number;
+  date: string;
+  attributes: Array<INftAttributes>;
+  compiler: string;
+}
+
+export interface INftAttributes {
+  trait_type: string;
+  value: string;
+}
+
+export interface INftStore {
+  address: string;
+  nfts: Array<INftDetails>;
 }
 
 export default INftDetails;

@@ -31,11 +31,12 @@ const NftButton = styled(Button)(() => ({
 
 const NFTs = (): JSX.Element => {
   const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
-  const { accountImported } = useContext(AccountContext);
-  const { accountTokens, getAccountTokens, getNftDetails, nftDetails } = useContext(Web3Context);
+  const { accountImported, currentAddress } = useContext(AccountContext);
+  const { accountTokens, getTokenStore, getNftDetails, nftDetails } = useContext(Web3Context);
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const [pages] = useState<number>(0);
+  const [cached, setCached] = useState<boolean>(false);
 
   const hidden = true;
 
@@ -44,23 +45,38 @@ const NFTs = (): JSX.Element => {
   useEffect(() => {
     if (accountImported === true) {
       setIsWaiting(true);
-      getAccountTokens();
+      getTokenStore();
       const updateAccountResources = window.setInterval(() => {
-        getAccountTokens();
+        getTokenStore();
       }, 60000);
       return () => window.clearInterval(updateAccountResources);
     }
     return undefined;
-  }, [accountImported]);
+  }, [accountImported, currentAddress]);
 
   useEffect(() => {
     if (accountImported && accountTokens.length > 0) {
-      getNftDetails();
-      setIsWaiting(false);
-    } else if (accountTokens.length === 0) {
+      getMetadata();
+    } else {
       setIsWaiting(false);
     }
   }, [accountTokens]);
+
+  useEffect(() => {
+    if (accountImported && nftDetails.length > 0) {
+      setIsWaiting(false);
+      setCached(true);
+      console.log("WE have some pics in cache");
+    } else {
+      setCached(false);
+      setIsWaiting(true);
+    }
+  }, [nftDetails.length]);
+
+  const getMetadata = async () => {
+    await getNftDetails();
+    setIsWaiting(false);
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePageChange = async (_event: any, newPage: number): Promise<void> => {
@@ -93,12 +109,12 @@ const NFTs = (): JSX.Element => {
           <CircularProgress sx={{ mt: 4 }} color="info" />
         </Stack>
       )}
-      {accountTokens.length === 0 && isWaiting === false && (
+      {isWaiting === false && !cached && (
         <Typography sx={{ mt: 8, mb: "285px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
           No NFTs found
         </Typography>
       )}
-      {accountTokens.length > 0 && !isWaiting && accountImported && (
+      {cached && !isWaiting && accountImported && (
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <Box sx={{ height: "340px", mb: "41px" }}>
             <ImageList
@@ -154,7 +170,7 @@ const NFTs = (): JSX.Element => {
           />
         )}
       </Box>
-      {accountImported && <Footer />}
+      {accountImported && !isWaiting && nftDetails.length > 0 && <Footer />}
       <CreateCollectionDialog />
       <CreateNftDialog />
       <NftDetailsDialog />

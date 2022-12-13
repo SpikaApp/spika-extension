@@ -15,6 +15,7 @@ import {
   IPublicAccount,
 } from "../interface";
 import * as network from "../lib/accountNetworks";
+import * as nftStore from "../lib/nftStore";
 import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
@@ -380,7 +381,9 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setStore(PLATFORM, "currentNetwork", network.networkList[0]);
     setStore(PLATFORM, "currentAsset", aptosCoin);
     assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+    nftStore.addNftStore(_account.address().hex());
     network.addNetworkStore(_account.address().hex());
+
     apps.addAddress(_publicAccount);
     debug.log("Data saved to local storage.");
 
@@ -523,6 +526,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
 
         // Storage.
         assetStore.addAssetStore(_currentAddress, aptosCoin);
+        nftStore.addNftStore(_currentAddress);
         network.addNetworkStore(_currentAddress);
         apps.addAddress(_publicAccount);
         setStore(PLATFORM, "currentAddress", _currentAddress);
