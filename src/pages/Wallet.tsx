@@ -30,8 +30,16 @@ const Wallet = (): JSX.Element => {
     handleAccountManagerUI,
     sendNotification,
   } = useContext(UIContext);
-  const { isLoading, currentAddressName, accountImported, currentNetwork, currentAsset, balance, setIsLoading } =
-    useContext(AccountContext);
+  const {
+    isLoading,
+    currentAddress,
+    currentAddressName,
+    accountImported,
+    currentNetwork,
+    currentAsset,
+    balance,
+    setIsLoading,
+  } = useContext(AccountContext);
   const { getBalance, mintCoins } = useContext(Web3Context);
   const [isOnline, setIsOnline] = useState(false);
   const [chainId, setChainId] = useState<number>();
@@ -47,7 +55,7 @@ const Wallet = (): JSX.Element => {
       return () => window.clearInterval(updateBalance);
     }
     return undefined;
-  }, [currentAsset]);
+  }, [currentAsset, currentAddress]);
 
   useEffect(() => {
     if (chainId !== undefined) {
