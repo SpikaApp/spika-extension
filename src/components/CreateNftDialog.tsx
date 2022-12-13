@@ -50,7 +50,7 @@ const CreateNftDialog = (): JSX.Element => {
       collectionName: collectionName,
       name: nftName,
       description: nftDescription,
-      supply: 1,
+      supply: "1",
       uri: nftUri,
       max: 1,
     });
@@ -132,7 +132,7 @@ const CreateNftDialog = (): JSX.Element => {
           <TextField
             sx={{ mt: 1.5, width: "275px" }}
             id="nftUri"
-            label="URL"
+            label="URI"
             type="string"
             value={nftUri}
             onChange={(e) => setNftUri(e.target.value)}
@@ -198,35 +198,32 @@ const CreateNftDialog = (): JSX.Element => {
           <Button sx={{ width: "121px", mr: 4 }} variant="outlined" onClick={handleCancel}>
             Cancel
           </Button>
-          {!isValidTransaction &&
-            collectionName !== "" &&
-            nftName !== "" &&
-            nftDescription !== "" &&
-            nftUri !== "" && (
-              <LoadingButton
-                sx={{
-                  background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
-                  width: "121px",
-                }}
-                variant="contained"
-                loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
-                loading={isLoading}
-                onClick={handleEstimationRequired}
-              >
-                Estimate
-              </LoadingButton>
-            )}{" "}
-          {!isValidTransaction && (collectionName === "" || nftName === "" || nftDescription === "" || nftUri === "") && (
-            <Button
+          {!isValidTransaction && collectionName !== "" && nftName !== "" && nftDescription !== "" && nftUri !== "" && (
+            <LoadingButton
               sx={{
+                background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
                 width: "121px",
               }}
               variant="contained"
-              disabled
+              loadingIndicator={<CircularProgress sx={{ color: "#FFFFFFF" }} size={18} />}
+              loading={isLoading}
+              onClick={handleEstimationRequired}
             >
               Estimate
-            </Button>
-          )}
+            </LoadingButton>
+          )}{" "}
+          {!isValidTransaction &&
+            (collectionName === "" || nftName === "" || nftDescription === "" || nftUri === "") && (
+              <Button
+                sx={{
+                  width: "121px",
+                }}
+                variant="contained"
+                disabled
+              >
+                Estimate
+              </Button>
+            )}
           {isValidTransaction && (
             <LoadingButton
               sx={{

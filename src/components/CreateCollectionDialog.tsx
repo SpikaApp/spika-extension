@@ -125,7 +125,7 @@ const CreateCollectionDialog = (): JSX.Element => {
           <TextField
             sx={{ mt: 1.5, mb: 1.5, width: "275px" }}
             id="collectionUri"
-            label="URL"
+            label="URI"
             type="string"
             disabled={isValidTransaction ? true : false}
             value={collectionUri}
