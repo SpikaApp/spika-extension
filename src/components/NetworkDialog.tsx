@@ -51,7 +51,7 @@ const NetworkDialog = (): JSX.Element => {
     throwAlert,
     setAccountImported,
   } = useContext(AccountContext);
-  const { updateAccountAssets, getAccountTokens } = useContext(Web3Context);
+  const { updateAccountAssets, getTokenStore } = useContext(Web3Context);
   const [selectedIndex, setSelectedIndex] = useState<string>("");
   const [selectedNetwork, setSelectedNetwork] = useState<INetwork>();
   const [networks, setNetworks] = useState<INetwork[]>([]);
@@ -99,7 +99,7 @@ const NetworkDialog = (): JSX.Element => {
   useEffect(() => {
     if (currentNetwork && openNetworkDialog) {
       updateAccountAssets();
-      getAccountTokens();
+      getTokenStore();
       setAccountImported(false);
       setCurrentAsset(undefined); // reset to initial state and set to aptosCoin in AlertDialog
       setStore(PLATFORM, _currentAsset, aptosCoin);
