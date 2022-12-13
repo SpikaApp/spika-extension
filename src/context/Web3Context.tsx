@@ -6,17 +6,17 @@ import pixel_coin from "../assets/pixel_coin.png";
 import { ICoin, IContextWeb3, INftDetails, INftMetadata } from "../interface";
 import { spikaClient } from "../lib/client";
 import { coinInfo, coinList, coinStore } from "../lib/coin";
+import * as nftsStore from "../lib/nftStore";
 import { setStore } from "../lib/store";
 import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 import { getNftMetadata } from "../utils/getNftMetadata";
+import { getPendingClaims } from "../utils/getPendingClaims";
 import { valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
 import { UIContext } from "./UIContext";
-import * as nftsStore from "../lib/nftStore";
-import { getPendingClaims } from "../utils/getPendingClaims";
 
 type Web3ContextProps = {
   children: React.ReactNode;
