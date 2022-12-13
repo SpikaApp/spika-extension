@@ -3,8 +3,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Link, Typography } from "@mui/material";
 import { useContext, useState, useEffect } from "react";
 import { AccountContext } from "../context/AccountContext";
-
-type IExplorerNetwork = "mainnet" | "testnet" | "devnet";
+import { getNetworkString } from "../utils/getNetworkString";
+import { IExplorerNetwork } from "../interface";
 
 const Footer = (): JSX.Element => {
   const { currentAddress, currentNetwork } = useContext(AccountContext);
@@ -12,23 +12,10 @@ const Footer = (): JSX.Element => {
 
   useEffect(() => {
     if (currentNetwork) {
-      const networkString = getNetworkString();
+      const networkString = getNetworkString(currentNetwork!.name);
       setNetwork(networkString);
     }
   }, [currentNetwork]);
-
-  const getNetworkString = () => {
-    switch (currentNetwork!.name) {
-      case "Mainnet":
-        return "mainnet";
-      case "Testnet":
-        return "testnet";
-      case "Devnet":
-        return "devnet";
-      default:
-        return "mainnet";
-    }
-  };
 
   return (
     <Typography sx={{ mt: 2 }} variant="subtitle1" align="center" color="textPrimary">
