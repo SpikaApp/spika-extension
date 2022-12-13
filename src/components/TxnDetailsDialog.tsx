@@ -23,19 +23,22 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { IExplorerNetwork } from "../interface";
 import convertTimestamp from "../utils/convertTimestamp";
 import copyToClipboard from "../utils/copyToClipboard";
 import debug from "../utils/debug";
+import { getNetworkString } from "../utils/getNetworkString";
 import getTxnFunction from "../utils/getTxnFunction";
 import shortenAddress from "../utils/shortenAddress";
-import { stringToValue } from "../utils/values";
+import { gasToValue, stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 
 const TxnDetailsDialog = (): JSX.Element => {
   const { openTxnDetailsDialog, setOpenTxnDetailsDialog, setTxnType } = useContext(UIContext);
-  const { currentAsset } = useContext(AccountContext);
+  const { currentAsset, currentNetwork } = useContext(AccountContext);
   const { txnDetails, setTxnDetails, amount, setAmount } = useContext(Web3Context);
   const [rows, setRows] = useState<any>([]);
+  const [network, setNetwork] = useState<IExplorerNetwork>("mainnet");
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
@@ -46,19 +49,27 @@ const TxnDetailsDialog = (): JSX.Element => {
       } else if (txnDetails.payload.arguments.length === 2) {
         _amount = txnDetails.payload.arguments[1];
       }
+      const gasUsedInApt = gasToValue(txnDetails.gas_used, txnDetails.gas_unit_price);
+      const maxGasInApt = gasToValue(txnDetails.max_gas_amount, txnDetails.gas_unit_price);
       setRows([
         createData("Time", convertTimestamp(txnDetails.timestamp)),
         createData("Txn Hash", txnDetails.hash),
         createData("Sender", txnDetails.sender),
         createData("Function", `${getTxnFunction(txnDetails.payload.function)}`),
         createData("Amount", `${stringToValue(currentAsset!, amount)} ${currentAsset!.data.symbol}`),
-        createData("Gas used", txnDetails.gas_used),
-        createData("Max gas", txnDetails.max_gas_amount),
-        createData("Gas price", txnDetails.gas_unit_price),
+        createData("Gas used", `${gasUsedInApt} APT`),
+        createData("Max gas", `${maxGasInApt} APT`),
       ]);
       // }
     }
   }, [openTxnDetailsDialog]);
+
+  useEffect(() => {
+    if (currentNetwork) {
+      const networkString = getNetworkString(currentNetwork!.name);
+      setNetwork(networkString);
+    }
+  }, [currentNetwork]);
 
   const createData = (name: any, value: any): any => {
     return { name, value };
@@ -78,7 +89,7 @@ const TxnDetailsDialog = (): JSX.Element => {
         <Tooltip title="Open in Aptos Explorer">
           <Link
             sx={{ ml: 1 }}
-            href={`https://explorer.devnet.aptos.dev/txn/${txnDetails.version}`}
+            href={`https://explorer.aptoslabs.com/txn/${txnDetails.version}?network=${network}`}
             target="_blank"
             underline="none"
             color="link"

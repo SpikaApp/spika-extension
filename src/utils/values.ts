@@ -15,8 +15,8 @@ export const valueToString = (asset: ICoin, value: string): string => {
   return Number(setDecimal).toString();
 };
 
-export const gasToValue = (gasAmount: string): string => {
+export const gasToValue = (gasAmount: string, gasPrice: string): string => {
   const decimal: number = aptosCoin.data.decimals;
-  const setDecimal = `${gasAmount}e-${decimal}`;
+  const setDecimal = `${Number(gasAmount) * Number(gasPrice)}e-${decimal}`;
   return Number(setDecimal).toString();
 };

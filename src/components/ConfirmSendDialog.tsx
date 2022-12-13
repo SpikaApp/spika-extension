@@ -45,14 +45,15 @@ const ConfirmSendDialog = (): JSX.Element => {
       if (estimatedTxnResult) {
         const txn: any = estimatedTxnResult;
         const _amount = txn.payload.arguments[1];
+        const gasUsedInApt = gasToValue(estimatedTxnResult.gas_used, estimatedTxnResult.gas_unit_price);
+        const maxGasInApt = gasToValue(estimatedTxnResult.max_gas_amount, estimatedTxnResult.gas_unit_price);
         setOpenConfirmSendDialog(true);
         setRows([
           createData("Sender", estimatedTxnResult.sender),
           createData("Recipient", txn.payload.arguments[0]),
           createData("Amount", `${stringToValue(currentAsset!, _amount)} ${currentAsset!.data.symbol}`),
-          createData("Gas cost", `${gasToValue(estimatedTxnResult.gas_used)} APT`),
-          createData("Max gas", `${estimatedTxnResult.max_gas_amount} (Gas Units)`),
-          createData("Gas price", `${estimatedTxnResult.gas_unit_price} (Gas Units)`),
+          createData("Gas cost", `${gasUsedInApt} APT`),
+          createData("Max gas", `${maxGasInApt} APT`),
         ]);
       }
     }
