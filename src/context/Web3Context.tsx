@@ -12,7 +12,6 @@ import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 import { getNftMetadata } from "../utils/getNftMetadata";
-import { getPendingClaims } from "../utils/getPendingClaims";
 import { valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
 import { PayloadContext } from "./PayloadContext";
@@ -337,12 +336,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    if (accountImported) {
-      getPendingClaims();
-    }
-  }, [accountImported]);
 
   const registerAsset = async (coinType: string, name: string): Promise<void> => {
     const spika = await spikaClient();
