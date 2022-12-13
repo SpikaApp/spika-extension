@@ -66,7 +66,6 @@ const NFTs = (): JSX.Element => {
     if (accountImported && nftDetails.length > 0) {
       setIsWaiting(false);
       setCached(true);
-      console.log("WE have some pics in cache");
     } else {
       setCached(false);
       setIsWaiting(true);
