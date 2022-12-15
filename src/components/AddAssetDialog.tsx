@@ -26,6 +26,7 @@ import { ICoin } from "../interface";
 import { coinList } from "../lib/coin";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
+import { gasToValue } from "../utils/values";
 import Loading from "./Loading";
 
 const AddAssetDialog = (): JSX.Element => {
@@ -315,7 +316,7 @@ const AddAssetDialog = (): JSX.Element => {
                     mr: "12px",
                   }}
                 >
-                  Estimated network fee: {estimatedTxnResult!.gas_used}
+                  Network fee: {gasToValue(estimatedTxnResult!.gas_used, estimatedTxnResult!.gas_unit_price)} APT
                 </Typography>
               )}
               {estimatedTxnResult && !isValidTransaction && (

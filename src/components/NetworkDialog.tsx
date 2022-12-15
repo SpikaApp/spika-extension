@@ -29,6 +29,7 @@ import { INetwork } from "../interface";
 import { getNetworks, removeNetwork } from "../lib/accountNetworks";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
+import errorParser from "../lib/errorParser";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
@@ -119,7 +120,12 @@ const NetworkDialog = (): JSX.Element => {
       sendNotification({ message: `Network changed to ${selectedNetwork!.name}`, type: "info", autoHide: true });
     } catch (error) {
       console.log(error);
-      throwAlert({ signal: 122, title: "Network change failed", message: `${error}`, error: true });
+      throwAlert({
+        signal: 122,
+        title: "Network change failed",
+        message: `${errorParser(error, "Error occured while trying to change network.")}`,
+        error: true,
+      });
     }
     setIsLocalLoading(false);
   };

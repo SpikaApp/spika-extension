@@ -42,7 +42,7 @@ const TxnDetailsDialog = (): JSX.Element => {
 
   useEffect(() => {
     if (openTxnDetailsDialog) {
-      debug.log(txnDetails);
+      debug.log(`Transaction ${txnDetails.version}:`, txnDetails);
       let _amount: string;
       if (txnDetails.payload.arguments.length === 1) {
         _amount = txnDetails.payload.arguments[0];

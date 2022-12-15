@@ -7,6 +7,7 @@ import { Web3Context } from "../context/Web3Context";
 import copyToClipboard from "../utils/copyToClipboard";
 import debug from "../utils/debug";
 import shortenAddress from "../utils/shortenAddress";
+import { gasToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
@@ -83,10 +84,8 @@ const CreateAccountDialog = (props: CreateAccountDialogProps): JSX.Element => {
           <Tooltip title={props.address} sx={{ ml: "4px", mr: "4px" }}>
             <Chip label={shortenAddress(props.address)} onClick={() => copyToClipboard(props.address)} />
           </Tooltip>
-          <Typography align="center" sx={{ mt: "12px" }}>
-            Estimated network fee: {props.fee}
-            <br />
-            (Gas Units)
+          <Typography align="center" sx={{ mt: "12px", fontWeight: "450" }}>
+            Network fee: {gasToValue(props.fee, "100")} APT
           </Typography>
         </Box>
         <Stack

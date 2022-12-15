@@ -11,14 +11,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { TxnBuilderTypes } from "aptos";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import errorParser from "../lib/errorParser";
+import { gasToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
-import { TxnBuilderTypes } from "aptos";
 
 const CreateCollectionDialog = (): JSX.Element => {
   const { openCreateCollectionDialog, setOpenCreateCollectionDialog } = useContext(UIContext);
@@ -61,7 +63,12 @@ const CreateCollectionDialog = (): JSX.Element => {
       const payload: TxnBuilderTypes.TransactionPayload = await collectionPayload();
       await estimateTransaction(payload, true, true);
     } catch (error) {
-      throwAlert({ signal: 63, title: "Error", message: `${error}`, error: true });
+      throwAlert({
+        signal: 63,
+        title: "Error",
+        message: `${errorParser(error, "Error occured while trying to estimate transaction.")}`,
+        error: true,
+      });
       console.log(error);
     }
     setIsLoading(false);
@@ -164,7 +171,7 @@ const CreateCollectionDialog = (): JSX.Element => {
                 mr: "12px",
               }}
             >
-              Estimated network fee: {estimatedTxnResult!.gas_used}
+              Network fee: {gasToValue(estimatedTxnResult!.gas_used, estimatedTxnResult!.gas_unit_price)} APT
             </Typography>
           )}
 

@@ -17,6 +17,8 @@ import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import errorParser from "../lib/errorParser";
+import { gasToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
@@ -63,7 +65,12 @@ const CreateNftDialog = (): JSX.Element => {
       const payload: TxnBuilderTypes.TransactionPayload = await nftPayload();
       await estimateTransaction(payload, true, true);
     } catch (error) {
-      throwAlert({ signal: 73, title: "Error", message: `${error}`, error: true });
+      throwAlert({
+        signal: 73,
+        title: "Error",
+        message: `${errorParser(error, "Error occured while trying to estimate transaction.")}`,
+        error: true,
+      });
       console.log(error);
     }
     setIsLoading(false);
@@ -161,7 +168,7 @@ const CreateNftDialog = (): JSX.Element => {
                 mr: "12px",
               }}
             >
-              Estimated network fee: {estimatedTxnResult!.gas_used}
+              Network fee: {gasToValue(estimatedTxnResult!.gas_used, estimatedTxnResult!.gas_unit_price)} APT
             </Typography>
           )}
 
