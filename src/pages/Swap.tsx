@@ -573,45 +573,42 @@ const Swap = () => {
                   >
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
-                        <Tooltip title={xCoin.data.name}>
-                          <span>
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                ml: "-4px",
-                                mt: "4px",
-                                mr: "-12px",
-                                alignItems: "left",
-                                justifyContent: "start",
-                                height: "31.5px",
-                                width: "300px",
-                                borderRadius: "8px",
-                                border: 1.3,
-                                borderColor: "#9e9e9e",
-                              }}
-                              disabled={swapEnabled ? false : true}
-                              onClick={() => {
-                                setType("xCoin");
-                                handleAccountAssetsUI();
-                              }}
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            ml: "-4px",
+                            mt: "4px",
+                            mr: "-12px",
+                            alignItems: "left",
+                            justifyContent: "start",
+                            height: "31.5px",
+                            width: "300px",
+                            borderRadius: "8px",
+                            border: 1.3,
+                            borderColor: "#9e9e9e",
+                          }}
+                          disabled={swapEnabled ? false : true}
+                          onClick={() => {
+                            setType("xCoin");
+                            handleAccountAssetsUI();
+                          }}
+                        >
+                          <Box
+                            sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                            component="img"
+                            src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
+                          />
+                          <Tooltip title={xCoin.data.name}>
+                            <Typography
+                              noWrap
+                              color="textPrimary"
+                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
                             >
-                              <Box
-                                sx={{ width: "20px", height: "20px", ml: "-6px" }}
-                                component="img"
-                                src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
-                              />
-
-                              <Typography
-                                noWrap
-                                color="textPrimary"
-                                sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
-                              >
-                                {xCoin.data.symbol}
-                              </Typography>
-                              <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
-                            </Button>
-                          </span>
-                        </Tooltip>
+                              {xCoin.data.symbol}
+                            </Typography>
+                          </Tooltip>
+                          <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                        </Button>
                       </Stack>
                       <Typography
                         color="textSecondary"
@@ -723,45 +720,42 @@ const Swap = () => {
                   >
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
-                        <Tooltip title={yCoin.data.name}>
-                          <span>
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                ml: "-4px",
-                                mt: "4px",
-                                mr: "-12px",
-                                alignItems: "left",
-                                justifyContent: "start",
-                                height: "31.5px",
-                                width: "300px",
-                                borderRadius: "8px",
-                                border: 1.3,
-                                borderColor: "#9e9e9e",
-                              }}
-                              disabled={swapEnabled ? false : true}
-                              onClick={() => {
-                                setType("yCoin");
-                                handleAccountAssetsUI();
-                              }}
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            ml: "-4px",
+                            mt: "4px",
+                            mr: "-12px",
+                            alignItems: "left",
+                            justifyContent: "start",
+                            height: "31.5px",
+                            width: "300px",
+                            borderRadius: "8px",
+                            border: 1.3,
+                            borderColor: "#9e9e9e",
+                          }}
+                          disabled={swapEnabled ? false : true}
+                          onClick={() => {
+                            setType("yCoin");
+                            handleAccountAssetsUI();
+                          }}
+                        >
+                          <Box
+                            sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                            component="img"
+                            src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
+                          />
+                          <Tooltip title={yCoin.data.name}>
+                            <Typography
+                              noWrap
+                              color="textPrimary"
+                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
                             >
-                              <Box
-                                sx={{ width: "20px", height: "20px", ml: "-6px" }}
-                                component="img"
-                                src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
-                              />
-
-                              <Typography
-                                noWrap
-                                color="textPrimary"
-                                sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
-                              >
-                                {yCoin.data.symbol}
-                              </Typography>
-                              <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
-                            </Button>
-                          </span>
-                        </Tooltip>
+                              {yCoin.data.symbol}
+                            </Typography>
+                          </Tooltip>
+                          <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                        </Button>
                       </Stack>
                       <Typography
                         color="textSecondary"
