@@ -11,11 +11,14 @@ import { alpha, styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import spika from "../assets/spika.svg";
-import LogoutDialog from "./LogoutDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
+import LogoutDialog from "./LogoutDialog";
+
+const menuTextFontWeight = "450";
+const menuTextFontSize = "18px";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const StyledMenu = styled<any>((props: any): any => (
@@ -114,14 +117,20 @@ const Navbar = (): JSX.Element => {
                 <Stack>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="create">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         Create Account
                       </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="import">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         Import Account
                       </Typography>
                     </Link>
@@ -133,14 +142,20 @@ const Navbar = (): JSX.Element => {
                 <Stack>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="/">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         Wallet
                       </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="/swap">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         Swap
                       </Typography>
                     </Link>
@@ -148,7 +163,10 @@ const Navbar = (): JSX.Element => {
                   {devMode && (
                     <MenuItem onClick={handleClose} disableRipple>
                       <Link underline="none" component={RouterLink} to="/tests">
-                        <Typography variant="h6" color="textPrimary">
+                        <Typography
+                          color="textPrimary"
+                          sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                        >
                           Tests
                         </Typography>
                       </Link>
@@ -156,14 +174,20 @@ const Navbar = (): JSX.Element => {
                   )}
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="nfts">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         NFTs
                       </Typography>
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleClose} disableRipple>
                     <Link underline="none" component={RouterLink} to="transactions">
-                      <Typography variant="h6" color="textPrimary">
+                      <Typography
+                        color="textPrimary"
+                        sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}
+                      >
                         Transactions
                       </Typography>
                     </Link>
@@ -173,8 +197,17 @@ const Navbar = (): JSX.Element => {
               )}
               {accountImported && (
                 <MenuItem onClick={handleClose} disableRipple>
+                  <Link underline="none" component={RouterLink} to="contacts">
+                    <Typography color="textPrimary" sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}>
+                      Contacts
+                    </Typography>
+                  </Link>
+                </MenuItem>
+              )}
+              {accountImported && (
+                <MenuItem onClick={handleClose} disableRipple>
                   <Link underline="none" component={RouterLink} to="settings">
-                    <Typography variant="h6" color="textPrimary">
+                    <Typography color="textPrimary" sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}>
                       Settings
                     </Typography>
                   </Link>
@@ -182,7 +215,7 @@ const Navbar = (): JSX.Element => {
               )}
               <MenuItem onClick={handleClose} disableRipple>
                 <Link underline="none" component={RouterLink} to="about">
-                  <Typography variant="h6" color="textPrimary">
+                  <Typography color="textPrimary" sx={{ fontWeight: menuTextFontWeight, fontSize: menuTextFontSize }}>
                     About
                   </Typography>
                 </Link>

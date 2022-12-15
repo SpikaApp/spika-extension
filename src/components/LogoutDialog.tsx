@@ -23,7 +23,7 @@ const LogoutDialog = (): JSX.Element => {
         </Stack>
       </DialogTitle>
       <DialogContent sx={{ maxWidth: 320 }}>
-        <DialogContentText sx={{ display: "flex", flexDirection: "row", mb: 2 }}>
+        <DialogContentText sx={{ display: "flex", flexDirection: "row", mb: 2, fontSize: "15px", fontWeight: "450" }}>
           This will delete all stored data from Spika. Remember to export recovery phrase and any imported keys before
           proceeding.
           <br />
