@@ -7,14 +7,17 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  IconButton,
   Radio,
   RadioGroup,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Types } from "aptos";
 import { useContext, useEffect, useState } from "react";
+import ImportContactsIcon from "@mui/icons-material/ImportContacts";
 import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
@@ -25,9 +28,11 @@ import { stringToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import CreateAccountDialog from "./CreateAccountDialog";
 import Loading from "./Loading";
+import AddressBookDialog from "./AddressBookDialog";
 
 const SendDialog = (): JSX.Element => {
-  const { openSendDialog, setOpenSendDialog, handleCreateAccountDialog, setPreviewRequired } = useContext(UIContext);
+  const { openSendDialog, setOpenSendDialog, handleCreateAccountDialog, setPreviewRequired, handleAddressBookUI } =
+    useContext(UIContext);
   const { currentAccountType, currentAsset, currentNetwork, validateAccount, throwAlert, balance } =
     useContext(AccountContext);
   const { create } = useContext(PayloadContext);
@@ -168,6 +173,13 @@ const SendDialog = (): JSX.Element => {
     <Dialog open={openSendDialog} onClose={handleCancel}>
       <DialogTitle sx={{ alignSelf: "center", mb: "-12px" }}>Send {currentAsset!.data.symbol}</DialogTitle>
       <DialogContent sx={{ maxWidth: 375, mb: "-12px" }}>
+        <Stack sx={{ position: "absolute", ml: "225px", mt: "-15px" }}>
+          <Tooltip title="Import from contracts">
+            <IconButton onClick={handleAddressBookUI}>
+              <ImportContactsIcon sx={{ fontSize: "20px" }} />
+            </IconButton>
+          </Tooltip>
+        </Stack>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <TextField
             sx={{ mt: "20px", mb: "20px", width: "275px" }}
@@ -297,6 +309,7 @@ const SendDialog = (): JSX.Element => {
       />
       <Loading />
       <AlertDialog />
+      <AddressBookDialog />
     </Dialog>
   );
 };

@@ -79,6 +79,8 @@ type IContextUI = {
   notificationExpired: boolean;
   setNotificationExpired: React.Dispatch<React.SetStateAction<boolean>>;
   sendNotification: (args: INotification) => void;
+  openAddressBookDialog: boolean;
+  setOpenAddressBookDialog: React.Dispatch<React.SetStateAction<boolean>>;
   disableAllRoutes: boolean;
   setDisableAllRoutes: React.Dispatch<React.SetStateAction<boolean>>;
   previewRequired: boolean;
@@ -115,6 +117,7 @@ type IContextUI = {
   handleKeystoneImportUI: () => void;
   handleSwapSettingsUI: () => void;
   handleContactCardUI: () => void;
+  handleAddressBookUI: () => void;
 };
 
 export default IContextUI;

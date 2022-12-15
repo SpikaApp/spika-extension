@@ -48,6 +48,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [openSwapSettingsDialog, setOpenSwapSettingsDialog] = useState<boolean>(false);
   const [openNotification, setOpenNotification] = useState<boolean>(true);
   const [openContactCard, setOpenContactCard] = useState<boolean>(false);
+  const [openAddressBookDialog, setOpenAddressBookDialog] = useState<boolean>(false);
   const [notification, setNotification] = useState<INotification | undefined>(undefined);
   const [notificationExpired, setNotificationExpired] = useState<boolean>(true);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
@@ -234,6 +235,11 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening Contact Card...");
   };
 
+  const handleAddressBookUI = (): void => {
+    setOpenAddressBookDialog(true);
+    debug.log("Opening Address Book Dialog...");
+  };
+
   const sendNotification = (args: INotification): void => {
     const _notification: INotification = {
       message: args.message,
@@ -353,6 +359,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
         openContactCard,
         setOpenContactCard,
         handleContactCardUI,
+        openAddressBookDialog,
+        setOpenAddressBookDialog,
+        handleAddressBookUI,
         handleSwapSettingsUI,
         disableAllRoutes,
         setDisableAllRoutes,
