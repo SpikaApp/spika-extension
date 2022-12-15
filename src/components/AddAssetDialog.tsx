@@ -16,6 +16,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
@@ -24,6 +25,7 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { coinList } from "../lib/coin";
+import errorParser from "../lib/errorParser";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
 import { gasToValue } from "../utils/values";
@@ -31,8 +33,18 @@ import Loading from "./Loading";
 
 const AddAssetDialog = (): JSX.Element => {
   const { openAddAssetDialog, setOpenAddAssetDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, alertSignal, currentNetwork, accountAssets, currentAsset, setCurrentAsset, throwAlert } =
-    useContext(AccountContext);
+  const {
+    setIsLoading,
+    alertSignal,
+    currentNetwork,
+    accountAssets,
+    currentAsset,
+    setCurrentAsset,
+    throwAlert,
+    validateAccount,
+    currentAddress,
+    accountImported,
+  } = useContext(AccountContext);
   const { register } = useContext(PayloadContext);
   const {
     getBalance,
@@ -56,7 +68,14 @@ const AddAssetDialog = (): JSX.Element => {
   const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
   const _currentAsset = "currentAsset";
   const assetList = coinList.filter((i: ICoin) => !accountAssets.includes(i));
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errMessage, setErrMessage] = useState<string>("");
+  const [isValidAccount, setIsValidAccount] = useState<boolean>(false);
   assetList.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
+
+  const networkFee = (): string => {
+    return gasToValue(estimatedTxnResult!.gas_used, estimatedTxnResult!.gas_unit_price);
+  };
 
   const handleListItemClick = (
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -64,6 +83,7 @@ const AddAssetDialog = (): JSX.Element => {
     asset: ICoin
   ): void => {
     setIsLocalLoading(false);
+    clearError();
     clearPrevEstimation();
     setSelectedIndex(index);
     setSelectedAsset(asset);
@@ -72,9 +92,23 @@ const AddAssetDialog = (): JSX.Element => {
   };
 
   useEffect(() => {
+    if (accountImported && openAddAssetDialog) {
+      _validateAccount(currentAddress!);
+    }
+  }, [openAddAssetDialog]);
+
+  const _validateAccount = async (address: string): Promise<void> => {
+    const result = await validateAccount(address);
+    if (result) {
+      setIsValidAccount(true);
+    } else {
+      setIsValidAccount(false);
+    }
+  };
+
+  useEffect(() => {
     if (estimationRequired) {
-      handleEstimateTransaction(coinType);
-      setEstimationRequired(false);
+      handleEstimateNetworkFee();
     }
   }, [estimationRequired]);
 
@@ -107,6 +141,24 @@ const AddAssetDialog = (): JSX.Element => {
     setIsLoading(true);
     await getBalance();
     setIsLoading(false);
+  };
+
+  const handleEstimateNetworkFee = async (): Promise<void> => {
+    setIsLocalLoading(true);
+    try {
+      await handleEstimateTransaction(coinType);
+    } catch (error) {
+      console.log(error);
+      setIsError(true);
+      setErrMessage(errorParser(error, "Generic Error"));
+    }
+    setEstimationRequired(false);
+    setIsLocalLoading(false);
+  };
+
+  const clearError = (): void => {
+    setIsError(false);
+    setErrMessage("");
   };
 
   const handleEstimateTransaction = async (coinType: string): Promise<void> => {
@@ -174,12 +226,43 @@ const AddAssetDialog = (): JSX.Element => {
     clearDialog();
   };
 
+  const getTextColor = (): string => {
+    if (isValidTransaction) {
+      return "info.main";
+    } else if (!isValidTransaction && estimatedTxnResult) {
+      return "error.main";
+    } else if (isError && isValidAccount) {
+      return "error.main";
+    } else if (!isValidAccount) {
+      return "warning.main";
+    } else {
+      return "info.main";
+    }
+  };
+
   return (
     <Dialog open={openAddAssetDialog}>
       {isCustomToken ? (
         <DialogTitle align="center">Register Custom Asset</DialogTitle>
       ) : (
-        <DialogTitle align="center">Register Asset</DialogTitle>
+        <DialogTitle align="center">
+          Register Asset
+          {isLocalLoading && (
+            <Tooltip title={"Fetching"}>
+              <CircularProgress
+                sx={{
+                  display: "flex",
+                  ml: "215px",
+                  color: "#9e9e9e",
+                  position: "absolute",
+                  mt: "-25px",
+                }}
+                size={20}
+                thickness={5.5}
+              />
+            </Tooltip>
+          )}
+        </DialogTitle>
       )}
       <DialogContent sx={{ display: "flex", flexDirection: "column", width: "305px" }}>
         {isCustomToken ? (
@@ -291,57 +374,22 @@ const AddAssetDialog = (): JSX.Element => {
             </Button>
           </Stack>
         )}
-        <Stack sx={{ minHeight: "54px" }}>
+        <Stack sx={{ minHeight: "32px", mb: "-10px" }}>
           {(selectedIndex !== "" || isCustomToken) && (
             <Box
               sx={{
-                // backgroundColor: "background.paper",
                 minHeight: "24px",
                 alignSelf: "center",
                 mt: isCustomToken ? "12px" : "4px",
-                maxWidth: "260px",
-                // bgcolor: "background.paper",
+                width: "100%",
               }}
             >
-              {isValidTransaction && (
-                <Typography
-                  noWrap
-                  align="center"
-                  variant="subtitle2"
-                  color="warning.dark"
-                  sx={{
-                    maxWidth: "260px",
-                    mt: "2px",
-                    ml: "12px",
-                    mr: "12px",
-                  }}
-                >
-                  Network fee: {gasToValue(estimatedTxnResult!.gas_used, estimatedTxnResult!.gas_unit_price)} APT
-                </Typography>
-              )}
-              {estimatedTxnResult && !isValidTransaction && (
-                <Stack>
-                  {estimatedTxnResult && (
-                    <Typography
-                      variant="subtitle2"
-                      color="error.dark"
-                      sx={{
-                        maxWidth: "260px",
-                        overflow: "hidden",
-                        overflowY: "scroll",
-                        textOverflow: "ellipsis",
-                        wordWrap: "break-word",
-                        maxHeight: "48px",
-                        mt: "2px",
-                        ml: "12px",
-                        mr: "12px",
-                      }}
-                    >
-                      {estimatedTxnResult.vm_status}
-                    </Typography>
-                  )}
-                </Stack>
-              )}
+              <Typography align="center" color={() => getTextColor()} sx={{ fontSize: "14px", fontWeight: "450" }}>
+                {isValidTransaction && `Network Fee: ${networkFee()} APT`}
+                {!isValidTransaction && estimatedTxnResult && `Simulation failed`}
+                {isError && isValidAccount && `${errMessage}`}
+                {!isValidAccount && "Account is not registered on chain"}
+              </Typography>
             </Box>
           )}
         </Stack>

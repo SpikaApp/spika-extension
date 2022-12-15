@@ -621,6 +621,10 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
             const _currentAsset = aptosCoin;
 
             // Storage.
+            await assetStore.addAssetStore(_currentAddress, aptosCoin);
+            await nftStore.addNftStore(_currentAddress);
+            await network.addNetworkStore(_currentAddress);
+            await apps.addAddress(_publicAccount);
             setStore(PLATFORM, "currentAsset", _currentAsset);
             setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
             setStore(PLATFORM, "currentAddress", _currentAddress);
@@ -652,6 +656,10 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
           authKey: _account.authKey().hex(),
         };
         const _currentAddressName: string = await getAccountName(_account.address().hex());
+        await assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+        await nftStore.addNftStore(_account.address().hex());
+        await network.addNetworkStore(_account.address().hex());
+        await apps.addAddress(_publicAccount);
         setStore(PLATFORM, "DATA1", _encryptedPrivateKey);
         setStore(PLATFORM, "currentAddress", _account.address().hex());
         setStore(PLATFORM, "currentAddressName", _currentAddressName);

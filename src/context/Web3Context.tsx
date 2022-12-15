@@ -4,13 +4,13 @@ import { Buffer } from "buffer";
 import React, { useContext, useEffect, useState } from "react";
 import pixel_coin from "../assets/pixel_coin.png";
 import { ICoin, IContextWeb3, INftDetails, INftMetadata } from "../interface";
+import { setAssetStore } from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { coinInfo, coinList, coinStore } from "../lib/coin";
 import errorParser from "../lib/errorParser";
 import * as nftsStore from "../lib/nftStore";
-import { setStore } from "../lib/store";
 import * as token from "../lib/token";
-import { DEFAULT_MAX_GAS, PLATFORM } from "../utils/constants";
+import { DEFAULT_MAX_GAS } from "../utils/constants";
 import debug from "../utils/debug";
 import { getNftMetadata } from "../utils/getNftMetadata";
 import { valueToString } from "../utils/values";
@@ -60,8 +60,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState<number>();
   const [mainnet, setMainnet] = useState<boolean>(false);
-
-  const _accountAssets = "accountAssets";
 
   useEffect(() => {
     if (spikaWallet) {
@@ -629,7 +627,9 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       result.sort((a: ICoin, b: ICoin) => a.data.name.localeCompare(b.data.name));
       result.sort((a: ICoin, b: ICoin) => Number(b.data.balance) - Number(a.data.balance));
       setAccountAssets(result);
-      setStore(PLATFORM, _accountAssets, result);
+      if (currentAddress) {
+        setAssetStore(currentAddress, result);
+      }
       return result;
     }
   };

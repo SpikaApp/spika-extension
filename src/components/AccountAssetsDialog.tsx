@@ -13,19 +13,21 @@ import {
   ListItemText,
   Paper,
   Stack,
+  Tooltip,
 } from "@mui/material";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
-import debug from "../utils/debug";
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { DexContext } from "../context/DexContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
+import { getAssetStore } from "../lib/assetStore";
 import { setStore } from "../lib/store";
 import { fetchCoinlist } from "../utils/coinlist";
 import { PLATFORM } from "../utils/constants";
+import debug from "../utils/debug";
 import { stringToValue } from "../utils/values";
 
 type AccountAssetsDialogProps = {
@@ -36,7 +38,7 @@ type ICoinListType = "account" | "all";
 
 const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, setCurrentAsset, accountAssets, currentNetwork } = useContext(AccountContext);
+  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets, currentNetwork } = useContext(AccountContext);
   const { updateAccountAssets, updateBalance } = useContext(Web3Context);
   const { setIsFetching, setXCoin, setYCoin } = useContext(DexContext);
   const [isLocalLoading, setIsLocalLoading] = useState(true);
@@ -69,7 +71,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       let result: ICoin[] = [];
       switch (listType) {
         case "account":
-          getAccountAsets();
+          getAccountAssets();
           break;
         case "all":
           result = getCoinlist();
@@ -120,13 +122,22 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     return result;
   };
 
-  const getAccountAsets = async (): Promise<void> => {
+  const getAccountAssets = async (): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const cached = await getAssetStore(currentAddress!);
+    console.log(cached);
+    if (cached) {
+      setCoinlist(cached.assets);
+      setSelectedList(cached.assets);
+    }
     setIsLocalLoading(true);
     const data = await updateAccountAssets();
     if (data) {
       setSelectedList(data);
     } else {
-      setSelectedList([]);
+      if (!cached) {
+        setSelectedList([]);
+      }
     }
     setIsLocalLoading(false);
   };
@@ -215,6 +226,21 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     <Dialog open={openAccountAssetsDialog}>
       <DialogTitle align="center" sx={{ mb: "-12px" }}>
         Select Asset
+        {isLocalLoading && coinlist.length !== 0 && (
+          <Tooltip title={"Fetching"}>
+            <CircularProgress
+              sx={{
+                display: "flex",
+                ml: "215px",
+                color: "#9e9e9e",
+                position: "absolute",
+                mt: "-25px",
+              }}
+              size={20}
+              thickness={5.5}
+            />
+          </Tooltip>
+        )}
       </DialogTitle>
       <DialogContent sx={{ minHeight: "330px" }}>
         <Box sx={{ alignItems: "center", mb: "15px", ml: "-5px", mr: "1px" }}>
@@ -235,9 +261,6 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
           <List component="nav" sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}>
             {isLocalLoading && coinlist.length === 0 && (
               <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={32} />
-            )}
-            {isLocalLoading && coinlist.length !== 0 && (
-              <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={18} />
             )}
             {hasList &&
               coinlist.map((asset) => (
