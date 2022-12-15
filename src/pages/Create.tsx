@@ -29,7 +29,12 @@ import { UIContext } from "../context/UIContext";
 import errorParser from "../lib/errorParser";
 import { PLATFORM } from "../utils/constants";
 import copyToClipboard from "../utils/copyToClipboard";
-import { IMnemonicWord, mnemonicToString, normalizeMnemonic } from "../utils/normalizeMnemonic";
+import {
+  createEmptyMnemonicObject,
+  IMnemonicWord,
+  mnemonicToString,
+  normalizeMnemonic,
+} from "../utils/normalizeMnemonic";
 
 type Steps = "generate" | "save" | "confirm" | "create";
 
@@ -43,18 +48,6 @@ interface IPasswordStatus {
   contains: Array<PasswordStrengthIncludes>;
   colorCode: PasswordStrengthColorCode;
 }
-
-const mnemonicTemplate = (): Array<IMnemonicWord> => {
-  const result: Array<IMnemonicWord> = [];
-  for (let i = 0; i < 12; i++) {
-    const data: IMnemonicWord = {
-      index: i,
-      value: "",
-    };
-    result.push(data);
-  }
-  return result;
-};
 
 const Create = (): JSX.Element => {
   // Context: UIContext, AccountContext
@@ -72,7 +65,7 @@ const Create = (): JSX.Element => {
   const [mnemonicValidated, setMnemonicValidated] = useState<boolean>(false);
   const [passwordStatus, setPasswordStatus] = useState<IPasswordStatus | undefined>(undefined);
   const [passwordValidated, setPasswordValidated] = useState<boolean>(false);
-  const [userConfirmedMnemonic, setUserConfirmedMnemonic] = useState<Array<IMnemonicWord>>(mnemonicTemplate());
+  const [userConfirmedMnemonic, setUserConfirmedMnemonic] = useState<Array<IMnemonicWord>>(createEmptyMnemonicObject());
 
   // Page errors.
   const [mnemonicError, setMnemonicError] = useState<boolean>(false);
@@ -86,7 +79,7 @@ const Create = (): JSX.Element => {
 
   useEffect(() => {
     if (step === "confirm") {
-      setUserConfirmedMnemonic(mnemonicTemplate());
+      setUserConfirmedMnemonic(createEmptyMnemonicObject());
       setMnemonicError(false);
       setMnemonicValidated(false);
     }
@@ -150,6 +143,13 @@ const Create = (): JSX.Element => {
     }
   }, [confirmPassword]);
 
+  // Reset confirmPassword if password was changed.
+  useEffect(() => {
+    if (password) {
+      setConfirmPassword("");
+    }
+  }, [password]);
+
   // Check password strength and put it in state.
   useEffect(() => {
     if (password !== "") {
@@ -195,7 +195,6 @@ const Create = (): JSX.Element => {
 
   const handleEditWord = (_word: IMnemonicWord, value: string): void => {
     const completePhrase = value.split(" ");
-
     if (completePhrase.length === 12) {
       const pastedPhrase: Array<IMnemonicWord> = [];
       completePhrase.map((word, index) => {
@@ -244,7 +243,6 @@ const Create = (): JSX.Element => {
 
   const getMnemonicFromString = (mnemonic: string): Array<IMnemonicWord> | undefined => {
     const validated = validateMnemonic(mnemonic, english.wordlist);
-
     if (validated) {
       const data = mnemonic.split(" ");
       const result: Array<IMnemonicWord> = [];
@@ -311,7 +309,6 @@ const Create = (): JSX.Element => {
             </Box>
           </CardContent>
         )}
-
         {step === "save" && (
           <form className="create-form">
             <input hidden type="text" autoComplete="username" value={undefined}></input>
@@ -586,7 +583,6 @@ const Create = (): JSX.Element => {
           </form>
         )}
       </Card>
-
       <Stack sx={{ display: "flex", alignItems: "center" }}>
         {step === "generate" && (
           <Button
@@ -601,10 +597,9 @@ const Create = (): JSX.Element => {
               setStep("save");
             }}
           >
-            Generate Mnemonic
+            Generate mnemonic
           </Button>
         )}
-
         {step === "save" && (
           <Button
             variant="contained"
@@ -620,7 +615,6 @@ const Create = (): JSX.Element => {
             Next
           </Button>
         )}
-
         {step === "confirm" && (
           <Button
             variant="contained"
@@ -633,7 +627,7 @@ const Create = (): JSX.Element => {
               setStep("create");
             }}
           >
-            Confirm Recovery Phrase
+            Confirm recovery phrase
           </Button>
         )}
         {step === "create" && (
