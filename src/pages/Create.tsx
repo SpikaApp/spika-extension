@@ -1,7 +1,6 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import InfoIcon from "@mui/icons-material/Info";
-import ReplyIcon from "@mui/icons-material/Reply";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
   Box,
@@ -24,6 +23,7 @@ import { validateMnemonic } from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import { passwordStrength } from "check-password-strength";
 import { useContext, useEffect, useState } from "react";
+import spika_bg from "../assets/spika_bg.png";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import errorParser from "../lib/errorParser";
@@ -44,6 +44,18 @@ interface IPasswordStatus {
   colorCode: PasswordStrengthColorCode;
 }
 
+const mnemonicTemplate = (): Array<IMnemonicWord> => {
+  const result: Array<IMnemonicWord> = [];
+  for (let i = 0; i < 12; i++) {
+    const data: IMnemonicWord = {
+      index: i,
+      value: "",
+    };
+    result.push(data);
+  }
+  return result;
+};
+
 const Create = (): JSX.Element => {
   // Context: UIContext, AccountContext
   const { sendNotification } = useContext(UIContext);
@@ -60,17 +72,7 @@ const Create = (): JSX.Element => {
   const [mnemonicValidated, setMnemonicValidated] = useState<boolean>(false);
   const [passwordStatus, setPasswordStatus] = useState<IPasswordStatus | undefined>(undefined);
   const [passwordValidated, setPasswordValidated] = useState<boolean>(false);
-  const [userConfirmedMnemonic, setUserConfirmedMnemonic] = useState<Array<IMnemonicWord>>(() => {
-    const result: Array<IMnemonicWord> = [];
-    for (let i = 0; i < 12; i++) {
-      const data: IMnemonicWord = {
-        index: i,
-        value: "",
-      };
-      result.push(data);
-    }
-    return result;
-  });
+  const [userConfirmedMnemonic, setUserConfirmedMnemonic] = useState<Array<IMnemonicWord>>(mnemonicTemplate());
 
   // Page errors.
   const [mnemonicError, setMnemonicError] = useState<boolean>(false);
@@ -81,6 +83,14 @@ const Create = (): JSX.Element => {
     setPassword("");
     setConfirmPassword("");
   }, []);
+
+  useEffect(() => {
+    if (step === "confirm") {
+      setUserConfirmedMnemonic(mnemonicTemplate());
+      setMnemonicError(false);
+      setMnemonicValidated(false);
+    }
+  }, [step]);
 
   // Convert mnemonic to Array<IMnemonicWord>.
   useEffect(() => {
@@ -269,7 +279,7 @@ const Create = (): JSX.Element => {
             </Typography>
             <Stack sx={{ display: "flex", alignItems: "center" }}>
               <FormControlLabel
-                sx={{ mt: 4 }}
+                sx={{ mt: "25px", mb: "36px" }}
                 label={
                   <Typography>
                     I accept the license{" "}
@@ -287,6 +297,18 @@ const Create = (): JSX.Element => {
                 control={<Checkbox sx={{ my: -1 }} checked={checkedLicenseRules} onChange={handleCheckLicenseRules} />}
               />
             </Stack>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                // backgroundColor: "info.main",
+                mb: "-24px",
+              }}
+            >
+              <Box sx={{ width: "75%", height: "75%" }} component="img" src={spika_bg} />
+            </Box>
           </CardContent>
         )}
 
@@ -362,12 +384,7 @@ const Create = (): JSX.Element => {
           <form className="create-form">
             <input hidden type="text" autoComplete="username" value={undefined}></input>
             <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Tooltip title="Go back">
-                <IconButton sx={{ position: "absolute", ml: "-325px" }} onClick={() => setStep("save")}>
-                  <ReplyIcon />
-                </IconButton>
-              </Tooltip>
-              <Box sx={{ border: 2, width: "280px", borderRadius: "12px", py: "6px", px: "10px" }}>
+              <Box sx={{ border: 2, width: "290px", borderRadius: "12px", py: "6px", px: "10px" }}>
                 <Typography align="center" color="textSecondary" sx={{ fontSize: "16px", fontWeight: "450" }}>
                   Confirm Your Recovery Phrase
                 </Typography>
@@ -485,7 +502,7 @@ const Create = (): JSX.Element => {
                   border: 0,
                   borderRadius: "12px",
                   width: "100%",
-                  height: "190px",
+                  height: "178px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
