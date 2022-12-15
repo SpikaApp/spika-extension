@@ -70,6 +70,8 @@ type IContextUI = {
   setKeystoneScanResult: React.Dispatch<React.SetStateAction<IUR | undefined>>;
   openSwapSettingsDialog: boolean;
   setOpenSwapSettingsDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openContactCard: boolean;
+  setOpenContactCard: React.Dispatch<React.SetStateAction<boolean>>;
   openNotification: boolean;
   setOpenNotification: React.Dispatch<React.SetStateAction<boolean>>;
   notification: INotification | undefined;
@@ -112,6 +114,7 @@ type IContextUI = {
   handleKeystoneQRScannerUI: () => void;
   handleKeystoneImportUI: () => void;
   handleSwapSettingsUI: () => void;
+  handleContactCardUI: () => void;
 };
 
 export default IContextUI;

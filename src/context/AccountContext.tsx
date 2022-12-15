@@ -9,17 +9,20 @@ import {
   IAccountType,
   IAlertArgs,
   ICoin,
+  IContact,
   IContextAccount,
   IEncryptedPwd,
   INetwork,
   IPublicAccount,
 } from "../interface";
 import * as network from "../lib/accountNetworks";
-import * as nftStore from "../lib/nftStore";
 import * as assetStore from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
 import * as apps from "../lib/connectedApps";
+import { getContacts, initContacts } from "../lib/contacts";
+import errorParser from "../lib/errorParser";
+import * as nftStore from "../lib/nftStore";
 import {
   getAccountName,
   getAptosAccount,
@@ -67,6 +70,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
   const [currentAccountType, setCurrentAccountType] = useState<IAccountType | undefined>();
   const [publicAccount, setPublicAccount] = useState<IPublicAccount | undefined>();
   const [account, setAccount] = useState<aptos.AptosAccount | undefined>();
+  const [contacts, setContacts] = useState<Array<IContact>>([]);
   const [currentNetwork, setCurrentNetwork] = useState<INetwork | undefined>();
   const [currentAsset, setCurrentAsset] = useState<ICoin | undefined>();
   const [accountAssets, setAccountAssets] = useState<Array<ICoin>>([]);
@@ -143,7 +147,12 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       locker("lock");
     } catch (error) {
       setOpenLoginDialog(false);
-      throwAlert({ signal: 62, title: "Failed load account", message: `${error}`, error: true });
+      throwAlert({
+        signal: 62,
+        title: "Failed to load account",
+        message: `${errorParser(error, "Error occured while loading account.")}`,
+        error: true,
+      });
       setPassword("");
       console.log("Error occured during loading account");
       setAccountRoutesEnabled(true);
@@ -380,9 +389,11 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     setStore(PLATFORM, "currentPubAccount", _publicAccount);
     setStore(PLATFORM, "currentNetwork", network.networkList[0]);
     setStore(PLATFORM, "currentAsset", aptosCoin);
-    assetStore.addAssetStore(_account.address().hex(), aptosCoin);
-    nftStore.addNftStore(_account.address().hex());
-    network.addNetworkStore(_account.address().hex());
+
+    await initContacts();
+    await assetStore.addAssetStore(_account.address().hex(), aptosCoin);
+    await nftStore.addNftStore(_account.address().hex());
+    await network.addNetworkStore(_account.address().hex());
 
     apps.addAddress(_publicAccount);
     debug.log("Data saved to local storage.");
@@ -425,9 +436,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       }
       const result = await initAccount(newMnemonic);
       debug.log("Account created:", result);
-      throwAlert({ signal: 1, title: "Account created", message: `${result}`, error: false });
+      throwAlert({ signal: 1, title: "Success", message: "Account successfully created!", error: false });
     } catch (error) {
-      throwAlert({ signal: 2, title: "Failed create account", message: `${error}`, error: true });
+      throwAlert({
+        signal: 2,
+        title: "Failed to create account",
+        message: `${errorParser(error, "Error occured while creating account.")}`,
+        error: true,
+      });
       console.log(error);
     }
   };
@@ -447,9 +463,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       }
       const result = await initAccount(mnemonic);
       debug.log("Account imported:", result);
-      throwAlert({ signal: 11, title: "Account imported", message: `${result}`, error: false });
+      throwAlert({ signal: 11, title: "Success", message: "Account successfully imported!", error: false });
     } catch (error) {
-      throwAlert({ signal: 12, title: "Failed import account", message: `${error}`, error: true });
+      throwAlert({
+        signal: 12,
+        title: "Failed import account",
+        message: `${errorParser(error, "Error occured while importing account.")}`,
+        error: true,
+      });
       console.log(error);
     }
   };
@@ -458,6 +479,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     try {
       const encryptedMnemonic: string = await getStore(PLATFORM, "DATA0");
       const decryptedMnemonic: string = await passworder.decrypt(password, encryptedMnemonic);
+      await initContacts();
       debug.log("Data encrypted.");
 
       try {
@@ -524,11 +546,14 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
             break;
         }
 
+        const _contacts: Array<IContact> = await getContacts();
+        _contacts.sort((a: IContact, b: IContact) => a.name.localeCompare(b.name));
+
         // Storage.
-        assetStore.addAssetStore(_currentAddress, aptosCoin);
-        nftStore.addNftStore(_currentAddress);
-        network.addNetworkStore(_currentAddress);
-        apps.addAddress(_publicAccount);
+        await assetStore.addAssetStore(_currentAddress, aptosCoin);
+        await nftStore.addNftStore(_currentAddress);
+        await network.addNetworkStore(_currentAddress);
+        await apps.addAddress(_publicAccount);
         setStore(PLATFORM, "currentAddress", _currentAddress);
         setStore(PLATFORM, "currentAddressName", _currentAddressName);
         setStore(PLATFORM, "currentAccountType", _accountType);
@@ -548,6 +573,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         setCurrentAccountType(_accountType);
         setCurrentAsset(_currentAsset);
         setCurrentNetwork(_currentNetwork);
+        setContacts(_contacts);
 
         // Close loging dialog on successfull login.
         setOpenLoginDialog(false);
@@ -557,7 +583,12 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         console.log(error);
         debug.log("Failed to load account.");
         sendNotification({ message: "Test" });
-        throwAlert({ signal: 42, title: "Failed to load account.", message: `${error}`, error: true });
+        throwAlert({
+          signal: 42,
+          title: "Failed to load account",
+          message: `${errorParser(error, "Error occured while loading account.")}`,
+          error: true,
+        });
         setStore(PLATFORM, "currentNetwork", network.networkList[0]);
       }
     } catch (error) {
@@ -638,7 +669,12 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     } catch (error) {
       console.log(error);
       debug.log("Failed to switch account.");
-      throwAlert({ signal: 43, title: "Failed to switch account.", message: `${error}`, error: true });
+      throwAlert({
+        signal: 43,
+        title: "Failed to switch account",
+        message: `${errorParser(error, "Error occured while swithing between accounts.")}`,
+        error: true,
+      });
     }
   };
 
@@ -706,6 +742,8 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         accountAssets,
         setAccountAssets,
         setCurrentAsset,
+        contacts,
+        setContacts,
         balance,
         setBalance,
         handleGenerate,

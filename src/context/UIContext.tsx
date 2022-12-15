@@ -47,6 +47,7 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [keystoneScanResult, setKeystoneScanResult] = useState<IUR | undefined>(undefined);
   const [openSwapSettingsDialog, setOpenSwapSettingsDialog] = useState<boolean>(false);
   const [openNotification, setOpenNotification] = useState<boolean>(true);
+  const [openContactCard, setOpenContactCard] = useState<boolean>(false);
   const [notification, setNotification] = useState<INotification | undefined>(undefined);
   const [notificationExpired, setNotificationExpired] = useState<boolean>(true);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
@@ -228,6 +229,11 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening Settings Dialog...");
   };
 
+  const handleContactCardUI = (): void => {
+    setOpenContactCard(true);
+    debug.log("Opening Contact Card...");
+  };
+
   const sendNotification = (args: INotification): void => {
     const _notification: INotification = {
       message: args.message,
@@ -344,6 +350,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
         notificationExpired,
         setNotificationExpired,
         sendNotification,
+        openContactCard,
+        setOpenContactCard,
+        handleContactCardUI,
         handleSwapSettingsUI,
         disableAllRoutes,
         setDisableAllRoutes,

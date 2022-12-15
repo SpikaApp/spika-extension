@@ -13,7 +13,19 @@ import { PayloadProvider } from "./context/PayloadContext";
 import { UIContext } from "./context/UIContext";
 import { Web3Provider } from "./context/Web3Context";
 import "./index.css";
-import { About, Create, Import, NFTs, Onboarding, Settings, Swap, Tests, Transactions, Wallet } from "./pages";
+import {
+  About,
+  Contacts,
+  Create,
+  Import,
+  NFTs,
+  Onboarding,
+  Settings,
+  Swap,
+  Tests,
+  Transactions,
+  Wallet,
+} from "./pages";
 import { darkTheme, lightTheme } from "./theme";
 
 const App = (): JSX.Element => {
@@ -54,6 +66,7 @@ const App = (): JSX.Element => {
                               {devMode && <Route path="tests" element={<Tests />} />}
                               <Route path="nfts" element={<NFTs />} />
                               <Route path="transactions" element={<Transactions />} />
+                              <Route path="contacts" element={<Contacts />} />
                               <Route path="settings" element={<Settings />} />
                               <Route path="about" element={<About />} />
                             </Routes>

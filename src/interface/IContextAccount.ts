@@ -1,6 +1,6 @@
 import { AptosAccount } from "aptos";
 import React from "react";
-import { ICoin, INetwork, IPublicAccount } from "./";
+import { ICoin, IContact, INetwork, IPublicAccount } from "./";
 
 interface IContextAccount {
   alertSignal: number;
@@ -38,6 +38,8 @@ interface IContextAccount {
   setCurrentAsset: React.Dispatch<React.SetStateAction<ICoin | undefined>>;
   accountAssets: Array<ICoin>;
   setAccountAssets: React.Dispatch<React.SetStateAction<Array<ICoin>>>;
+  contacts: Array<IContact>;
+  setContacts: React.Dispatch<React.SetStateAction<Array<IContact>>>;
   balance: string | undefined;
   setBalance: React.Dispatch<React.SetStateAction<string | undefined>>;
   handleChangePassword: () => void;
