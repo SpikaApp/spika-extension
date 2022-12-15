@@ -204,7 +204,7 @@ const ContactCard = (props: ContactCardProps): JSX.Element => {
           )}
         </Box>
       </DialogTitle>
-      <DialogContent sx={{ maxWidth: 375 }}>
+      <DialogContent sx={{ maxWidth: "375px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Stack sx={{ display: "flex" }}>
           <Typography
             align="left"
