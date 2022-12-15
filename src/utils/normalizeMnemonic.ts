@@ -53,3 +53,15 @@ export const mnemonicToString = (mnemonic: Array<IMnemonicWord>): string => {
     throw new Error("Invalid mnemonic phrase");
   }
 };
+
+export const createEmptyMnemonicObject = (): Array<IMnemonicWord> => {
+  const result: Array<IMnemonicWord> = [];
+  for (let i = 0; i < 12; i++) {
+    const data: IMnemonicWord = {
+      index: i,
+      value: "",
+    };
+    result.push(data);
+  }
+  return result;
+};
