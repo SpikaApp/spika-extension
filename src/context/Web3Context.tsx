@@ -6,6 +6,7 @@ import pixel_coin from "../assets/pixel_coin.png";
 import { ICoin, IContextWeb3, INftDetails, INftMetadata } from "../interface";
 import { spikaClient } from "../lib/client";
 import { coinInfo, coinList, coinStore } from "../lib/coin";
+import errorParser from "../lib/errorParser";
 import * as nftsStore from "../lib/nftStore";
 import { setStore } from "../lib/store";
 import * as token from "../lib/token";
@@ -246,7 +247,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     } catch (error) {
       // logic if txn body doesn't looks good to be submitted to VM
       if (!isSilent) {
-        throwAlert({ signal: 34, title: "Failed to estimate", message: `${error}`, error: true });
+        throwAlert({
+          signal: 34,
+          title: "Failed to estimate",
+          message: `${errorParser(error, "Error occured while estimating transaction")}`,
+          error: true,
+        });
       }
       setRecipientAddress("");
       setAmount("");
@@ -298,7 +304,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       }
     } catch (error) {
       if (!isSilent) {
-        throwAlert({ signal: 32, title: "Transaction failed", message: `${error}`, error: true });
+        throwAlert({
+          signal: 32,
+          title: "Transaction failed",
+          message: `${errorParser(error, "Error occured while submitting transaction.")}`,
+          error: true,
+        });
       }
       console.log(error);
       setIsLoading(false);
@@ -350,7 +361,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       await spika.client.waitForTransaction(submitTxn.hash);
       throwAlert({ signal: 101, title: "Success", message: `${name} successfully registered`, error: false });
     } catch (error) {
-      throwAlert({ signal: 102, title: "Failed to register asset", message: `${error}`, error: true });
+      throwAlert({
+        signal: 102,
+        title: "Failed to register asset",
+        message: `${errorParser(error, `Error occured while trying to register ${name}`)}`,
+        error: true,
+      });
       console.log(error);
       setIsLoading(false);
     }
@@ -407,7 +423,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       await submitTransactionHelper(account!, payload);
       throwAlert({ signal: 61, title: "Transaction sent", message: `${payload}`, error: false });
     } catch (error) {
-      throwAlert({ signal: 62, title: "Transaction failed", message: `${error}`, error: true });
+      throwAlert({
+        signal: 62,
+        title: "Transaction failed",
+        message: `${errorParser(error, "Error occured while trying to create token.")}`,
+        error: true,
+      });
       setIsLoading(false);
       console.log(error);
     }
