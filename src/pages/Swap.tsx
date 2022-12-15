@@ -574,41 +574,43 @@ const Swap = () => {
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
                         <Tooltip title={xCoin.data.name}>
-                          <Button
-                            variant="outlined"
-                            sx={{
-                              ml: "-4px",
-                              mt: "4px",
-                              mr: "-12px",
-                              alignItems: "left",
-                              justifyContent: "start",
-                              height: "31.5px",
-                              width: "300px",
-                              borderRadius: "8px",
-                              border: 1.3,
-                              borderColor: "#9e9e9e",
-                            }}
-                            disabled={swapEnabled ? false : true}
-                            onClick={() => {
-                              setType("xCoin");
-                              handleAccountAssetsUI();
-                            }}
-                          >
-                            <Box
-                              sx={{ width: "20px", height: "20px", ml: "-6px" }}
-                              component="img"
-                              src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
-                            />
-
-                            <Typography
-                              noWrap
-                              color="textPrimary"
-                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                          <span>
+                            <Button
+                              variant="outlined"
+                              sx={{
+                                ml: "-4px",
+                                mt: "4px",
+                                mr: "-12px",
+                                alignItems: "left",
+                                justifyContent: "start",
+                                height: "31.5px",
+                                width: "300px",
+                                borderRadius: "8px",
+                                border: 1.3,
+                                borderColor: "#9e9e9e",
+                              }}
+                              disabled={swapEnabled ? false : true}
+                              onClick={() => {
+                                setType("xCoin");
+                                handleAccountAssetsUI();
+                              }}
                             >
-                              {xCoin.data.symbol}
-                            </Typography>
-                            <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
-                          </Button>
+                              <Box
+                                sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                                component="img"
+                                src={darkMode ? xCoin.data.logo_alt : xCoin.data.logo}
+                              />
+
+                              <Typography
+                                noWrap
+                                color="textPrimary"
+                                sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                              >
+                                {xCoin.data.symbol}
+                              </Typography>
+                              <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                            </Button>
+                          </span>
                         </Tooltip>
                       </Stack>
                       <Typography
@@ -722,41 +724,43 @@ const Swap = () => {
                     <Stack direction="column" sx={{ ml: "-6px" }}>
                       <Stack direction="row" sx={{ width: "105px" }}>
                         <Tooltip title={yCoin.data.name}>
-                          <Button
-                            variant="outlined"
-                            sx={{
-                              ml: "-4px",
-                              mt: "4px",
-                              mr: "-12px",
-                              alignItems: "left",
-                              justifyContent: "start",
-                              height: "31.5px",
-                              width: "300px",
-                              borderRadius: "8px",
-                              border: 1.3,
-                              borderColor: "#9e9e9e",
-                            }}
-                            disabled={swapEnabled ? false : true}
-                            onClick={() => {
-                              setType("yCoin");
-                              handleAccountAssetsUI();
-                            }}
-                          >
-                            <Box
-                              sx={{ width: "20px", height: "20px", ml: "-6px" }}
-                              component="img"
-                              src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
-                            />
-
-                            <Typography
-                              noWrap
-                              color="textPrimary"
-                              sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                          <span>
+                            <Button
+                              variant="outlined"
+                              sx={{
+                                ml: "-4px",
+                                mt: "4px",
+                                mr: "-12px",
+                                alignItems: "left",
+                                justifyContent: "start",
+                                height: "31.5px",
+                                width: "300px",
+                                borderRadius: "8px",
+                                border: 1.3,
+                                borderColor: "#9e9e9e",
+                              }}
+                              disabled={swapEnabled ? false : true}
+                              onClick={() => {
+                                setType("yCoin");
+                                handleAccountAssetsUI();
+                              }}
                             >
-                              {yCoin.data.symbol}
-                            </Typography>
-                            <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
-                          </Button>
+                              <Box
+                                sx={{ width: "20px", height: "20px", ml: "-6px" }}
+                                component="img"
+                                src={darkMode ? yCoin.data.logo_alt : yCoin.data.logo}
+                              />
+
+                              <Typography
+                                noWrap
+                                color="textPrimary"
+                                sx={{ ml: "6px", fontWeight: "650", fontSize: "16px" }}
+                              >
+                                {yCoin.data.symbol}
+                              </Typography>
+                              <ArrowDropDownIcon sx={{ position: "absolute", ml: "80px" }} />
+                            </Button>
+                          </span>
                         </Tooltip>
                       </Stack>
                       <Typography
