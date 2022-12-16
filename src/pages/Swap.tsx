@@ -66,6 +66,8 @@ const Swap = () => {
     slippage,
     maxGasAmount,
     transactionTimeout,
+    isFetching,
+    setIsFetching,
     simulateSwapTransaction,
     submitSwapTransaction,
   } = useContext(DexContext);
@@ -123,6 +125,10 @@ const Swap = () => {
     }
   }, [accountAssets]);
 
+  useEffect(() => {
+    console.log(isFetching);
+  }, [isFetching]);
+
   // On xCoin change => update balance.
   // Skip balance update if changing X to Y.
   useEffect(() => {
@@ -153,6 +159,7 @@ const Swap = () => {
 
   // Fetch balance.
   const getCurrentBalance = async (type: string, coin: ICoin): Promise<void> => {
+    setIsFetching(true);
     const balance = await getBalance(coin);
     if (type === "xCoin") {
       setXCoinBalance(Number(balance));
@@ -161,6 +168,7 @@ const Swap = () => {
     } else {
       debug.log("[Swap]: Unknown or undefined coin type.");
     }
+    setIsFetching(false);
   };
 
   // If xCoin changed => clearSwap().
@@ -408,9 +416,11 @@ const Swap = () => {
       }
     } catch (error) {
       sendNotification({
-        message: errorParser(error, `Failed to get ${xCoin.data.symbol}/${yCoin.data.symbol} quote`),
-        type: "error",
+        message: `No route from ${fromSymbol} to ${toSymbol}`,
+        type: "warning",
+        autoHide: true,
       });
+      setE_NO_ROUTE(true);
       console.log(error);
     }
     setIsLocalLoading(false);
@@ -651,18 +661,26 @@ const Swap = () => {
                             },
                             maxLength: "11",
                           }}
-                          disabled={swapEnabled ? false : true}
+                          disabled={swapEnabled && !isFetching ? false : true}
                           disableUnderline
                           placeholder="0.00"
                         />
                       </Stack>
-                      <Typography
-                        color="textSecondary"
-                        sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
-                        align="right"
-                      >
-                        {isNaN(xCoinBalance) ? "0" : stringToValue(xCoin, xCoinBalance.toString())}
-                      </Typography>
+                      {isFetching ? (
+                        <CircularProgress
+                          sx={{ alignSelf: "end", mt: "8px", mr: "12px", color: "#9e9e9e" }}
+                          size={15}
+                          thickness={8}
+                        />
+                      ) : (
+                        <Typography
+                          color="textSecondary"
+                          sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
+                          align="right"
+                        >
+                          {isNaN(xCoinBalance) ? "0" : stringToValue(xCoin, xCoinBalance.toString())}
+                        </Typography>
+                      )}
                     </Stack>
                   </Stack>
                 </Box>
@@ -797,13 +815,21 @@ const Swap = () => {
                           type="number"
                         />
                       </Stack>
-                      <Typography
-                        color="textSecondary"
-                        sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
-                        align="right"
-                      >
-                        {isNaN(yCoinBalance) ? "0" : stringToValue(yCoin, yCoinBalance.toString())}
-                      </Typography>
+                      {isFetching ? (
+                        <CircularProgress
+                          sx={{ alignSelf: "end", mt: "8px", mr: "12px", color: "#9e9e9e" }}
+                          size={15}
+                          thickness={8}
+                        />
+                      ) : (
+                        <Typography
+                          color="textSecondary"
+                          sx={{ mt: "4px", mr: "12px", fontWeight: "550", fontSize: "14px" }}
+                          align="right"
+                        >
+                          {isNaN(yCoinBalance) ? "0" : stringToValue(yCoin, yCoinBalance.toString())}
+                        </Typography>
+                      )}
                     </Stack>
                   </Stack>
                 </Box>
@@ -836,7 +862,8 @@ const Swap = () => {
                     (outputAmount == "" ? true : false) ||
                     (E_INSUFFICIENT_BALANCE ? true : false) ||
                     (E_BAD_PAIR ? true : false) ||
-                    (E_NO_ROUTE ? true : false)
+                    (E_NO_ROUTE ? true : false) ||
+                    (isFetching ? true : false)
                   }
                   onClick={() => {
                     executeSwap(quotation!, inputAmount);
@@ -848,7 +875,15 @@ const Swap = () => {
                     !E_INSUFFICIENT_BALANCE &&
                     !E_BAD_PAIR &&
                     !E_NO_ROUTE &&
+                    !isFetching &&
                     "Enter an amount"}
+                  {swapEnabled &&
+                    inputAmount === "" &&
+                    !E_INSUFFICIENT_BALANCE &&
+                    !E_BAD_PAIR &&
+                    !E_NO_ROUTE &&
+                    isFetching &&
+                    "Updating balance"}
                   {swapEnabled && !E_INSUFFICIENT_BALANCE && !E_NO_ROUTE && E_BAD_PAIR && "Select coin"}
                   {swapEnabled &&
                     !E_INSUFFICIENT_BALANCE &&
