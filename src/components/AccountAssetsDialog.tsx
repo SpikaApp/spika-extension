@@ -38,10 +38,11 @@ type ICoinListType = "account" | "all";
 
 const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets, currentNetwork } = useContext(AccountContext);
+  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets, currentNetwork, validateAccount } =
+    useContext(AccountContext);
   const { updateAccountAssets, updateBalance } = useContext(Web3Context);
   const { setIsFetching, setXCoin, setYCoin } = useContext(DexContext);
-  const [isLocalLoading, setIsLocalLoading] = useState(true);
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
   const [selectedList, setSelectedList] = useState<ICoin[]>([]);
   const [coinlist, setCoinlist] = useState<ICoin[]>([]);
   const [searchString, setSearchString] = useState<string>("");
@@ -124,22 +125,32 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
 
   const getAccountAssets = async (): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cached = await getAssetStore(currentAddress!);
-    console.log(cached);
-    if (cached) {
-      setCoinlist(cached.assets);
-      setSelectedList(cached.assets);
-    }
-    setIsLocalLoading(true);
-    const data = await updateAccountAssets();
-    if (data) {
-      setSelectedList(data);
+    const validated = await validateAccount(currentAddress!);
+    console.log("Validated: ", validated);
+    if (!validated) {
+      setCoinlist([]);
+      setSelectedList([]);
+      setIsLocalLoading(false);
+      return;
     } else {
-      if (!cached) {
-        setSelectedList([]);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const cached = await getAssetStore(currentAddress!);
+      console.log(cached);
+      if (cached) {
+        setCoinlist(cached.assets);
+        setSelectedList(cached.assets);
       }
+      setIsLocalLoading(true);
+      const data = await updateAccountAssets();
+      if (data) {
+        setSelectedList(data);
+      } else {
+        if (!cached) {
+          setSelectedList([]);
+        }
+      }
+      setIsLocalLoading(false);
     }
-    setIsLocalLoading(false);
   };
 
   const getCoinlist = (): ICoin[] => {
@@ -174,9 +185,9 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const handleCancel = (): void => {
     setOpenAccountAssetsDialog(false);
     setIsLocalLoading(true);
-    // setListType(undefined);
-    // setSelectedList([]);
-    // setCoinlist([]);
+    setListType(undefined);
+    setSelectedList([]);
+    setCoinlist([]);
     setSearchString("");
   };
 
