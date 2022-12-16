@@ -37,82 +37,76 @@ type AccountAssetsDialogProps = {
 type ICoinListType = "account" | "all";
 
 const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
+  // Context.
   const { openAccountAssetsDialog, setOpenAccountAssetsDialog, darkMode } = useContext(UIContext);
-  const { setIsLoading, currentAddress, setCurrentAsset, accountAssets, currentNetwork, validateAccount } =
-    useContext(AccountContext);
-  const { updateAccountAssets, updateBalance } = useContext(Web3Context);
+  const { setIsLoading, setCurrentAsset, currentNetwork, currentAddress } = useContext(AccountContext);
+  const { updateAccountAssets, updateBalance, mainnet } = useContext(Web3Context);
   const { setIsFetching, setXCoin, setYCoin } = useContext(DexContext);
   const [isLocalLoading, setIsLocalLoading] = useState(false);
-  const [selectedList, setSelectedList] = useState<ICoin[]>([]);
-  const [coinlist, setCoinlist] = useState<ICoin[]>([]);
-  const [searchString, setSearchString] = useState<string>("");
-  const [listType, setListType] = useState<ICoinListType | undefined>(undefined);
-  const [hasList, setHasList] = useState<boolean>(false);
 
+  // Coinlist cached in LocalStorage.
+  const [cachedList, setCachedList] = useState<Array<ICoin>>([]);
+
+  // Coinlist that we use to search coins.
+  const [selectedList, setSelectedList] = useState<Array<ICoin>>([]);
+  // Coinlist that we render.
+  const [coinlist, setCoinlist] = useState<Array<ICoin>>([]);
+  // Search string.
+  const [searchString, setSearchString] = useState<string>("");
+  // Coinlist type.
+  const [listType, setListType] = useState<ICoinListType | undefined>(undefined);
+
+  // LocalStorage keys.
   const _currentAsset = "currentAsset";
 
+  // On open AccountAssetsDialog set coinlist type.
+  // "all" - show all available coins
+  // "account" - show coins registered in currentAddress
   useEffect(() => {
     if (openAccountAssetsDialog) {
+      getCachedList();
       if (props && props.type === "yCoin") {
         setListType("all");
-        debug.log("Setting coin list type to 'all'");
+        debug.log("Setting coin list type to: all");
       } else {
-        if (listType === "all") {
-          setSelectedList(accountAssets);
-          setCoinlist(accountAssets);
-        }
         setListType("account");
-        debug.log("Setting coin list type to 'account'");
+        debug.log("Setting coin list type to: account");
       }
     }
   }, [openAccountAssetsDialog]);
 
+  // Once listType set...
   useEffect(() => {
     if (openAccountAssetsDialog) {
-      let result: ICoin[] = [];
+      let result: Array<ICoin> = [];
       switch (listType) {
         case "account":
-          getAccountAssets();
+          updateList();
           break;
         case "all":
           result = getCoinlist();
           setSelectedList(result);
           break;
       }
-      debug.log(`Selected coinlist set to: ${listType === "account" ? "account" : "dex coins"}`);
     }
-  }, [listType]);
+  }, [listType !== undefined]);
 
-  useEffect(() => {
-    if (!isLocalLoading) {
-      setCoinlist(search(selectedList, searchString));
-      debug.log("Coinlist updated:", selectedList);
-    }
-  }, [!isLocalLoading]);
-
-  useEffect(() => {
-    if (coinlist.length !== 0) {
-      setHasList(true);
-    } else {
-      setHasList(false);
-    }
-  }, [coinlist]);
-
+  // Search in selectedList and update coinlist with result.
   useEffect(() => {
     if (selectedList.length > 0) {
-      let result: ICoin[];
+      let result: Array<ICoin>;
       if (searchString === "") {
         result = selectedList;
       } else {
         result = search(selectedList, searchString);
       }
-      debug.log(`Search string '${searchString}' matches the following coinlist:`, result);
       setCoinlist(result);
     }
-  }, [searchString]);
+  }, [selectedList, searchString]);
 
-  const search = (list: ICoin[], searchStr: string): ICoin[] => {
-    const result: ICoin[] = [];
+  // Search function.
+  const search = (list: Array<ICoin>, searchStr: string): Array<ICoin> => {
+    const result: Array<ICoin> = [];
     list.filter((asset) => {
       const matchByName = asset.data.name.toLowerCase().includes(searchStr.toLowerCase());
       const matchBySymbol = asset.data.symbol.toLowerCase().includes(searchStr.toLowerCase());
@@ -123,37 +117,28 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     return result;
   };
 
-  const getAccountAssets = async (): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const validated = await validateAccount(currentAddress!);
-    console.log("Validated: ", validated);
-    if (!validated) {
-      setCoinlist([]);
-      setSelectedList([]);
-      setIsLocalLoading(false);
-      return;
+  const updateList = async (): Promise<void> => {
+    if (cachedList.length > 0 && mainnet) setSelectedList(cachedList);
+    setIsLocalLoading(true);
+    const data = await updateAccountAssets();
+    if (data) {
+      setSelectedList(data);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const cached = await getAssetStore(currentAddress!);
-      console.log(cached);
-      if (cached) {
-        setCoinlist(cached.assets);
-        setSelectedList(cached.assets);
-      }
-      setIsLocalLoading(true);
-      const data = await updateAccountAssets();
-      if (data) {
-        setSelectedList(data);
-      } else {
-        if (!cached) {
-          setSelectedList([]);
-        }
-      }
-      setIsLocalLoading(false);
+      setSelectedList([]);
     }
+    setIsLocalLoading(false);
   };
 
-  const getCoinlist = (): ICoin[] => {
+  const getCachedList = async (): Promise<void> => {
+    let result: Array<ICoin> = [];
+    if (currentAddress && mainnet) {
+      const cached = await getAssetStore(currentAddress);
+      if (cached) result = cached.assets;
+    }
+    setCachedList(result);
+  };
+
+  const getCoinlist = (): Array<ICoin> => {
     setIsFetching(false);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const result = fetchCoinlist(currentNetwork!.data.node_url);
@@ -163,6 +148,8 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   };
 
   const handleSwitchAsset = async (asset: ICoin): Promise<void> => {
+    setOpenAccountAssetsDialog(false);
+    setIsLoading(false);
     if (props && props.type === "xCoin") {
       setXCoin(asset);
     } else if (props && props.type === "yCoin") {
@@ -172,20 +159,20 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       setCurrentAsset(asset);
     }
     await handleUpdateBalance(asset);
-    setOpenAccountAssetsDialog(false);
     handleCancel();
   };
 
   const handleUpdateBalance = async (asset: ICoin): Promise<void> => {
-    setIsLoading(true);
+    setIsLocalLoading(true);
     await updateBalance(asset);
-    setIsLoading(false);
+    setIsLocalLoading(false);
   };
 
   const handleCancel = (): void => {
     setOpenAccountAssetsDialog(false);
     setIsLocalLoading(true);
     setListType(undefined);
+    setCachedList([]);
     setSelectedList([]);
     setCoinlist([]);
     setSearchString("");
@@ -273,7 +260,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
             {isLocalLoading && coinlist.length === 0 && (
               <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={32} />
             )}
-            {hasList &&
+            {coinlist.length !== 0 &&
               coinlist.map((asset) => (
                 <Stack key={asset.type}>
                   <ListItemButton
