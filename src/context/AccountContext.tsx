@@ -361,6 +361,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
       publicKey: _account.pubKey().hex(),
       account: _account.address().hex(),
       authKey: _account.authKey().hex(),
+      address: _account.address().hex(),
     };
     debug.log("Account initialized:", _publicAccount.account);
 
@@ -520,6 +521,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
               publicKey: _account.pubKey().hex(),
               account: _account.address().hex(),
               authKey: _account.authKey().hex(),
+              address: _account.address().hex(),
             };
             if (!spikaMasterAccount) await initSpikaMasterAccount(_publicAccount);
             _currentAddressName = await getAccountName(_currentAddress);
@@ -534,6 +536,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
               publicKey: "NOT_AVAILABLE",
               account: _currentAddress,
               authKey: _currentAddress,
+              address: _currentAddress,
             };
             _currentAsset = await getStore(PLATFORM, "currentAsset");
             if (_currentAsset === undefined || _currentAsset === null) {
@@ -617,6 +620,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
               publicKey: "NOT_AVAILABLE",
               account: _exAccount.account,
               authKey: _exAccount.account,
+              address: _exAccount.account,
             };
             const _currentAsset = aptosCoin;
 
@@ -654,6 +658,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
           publicKey: _account.pubKey().hex(),
           account: _account.address().hex(),
           authKey: _account.authKey().hex(),
+          address: _account.address().hex(),
         };
         const _currentAddressName: string = await getAccountName(_account.address().hex());
         await assetStore.addAssetStore(_account.address().hex(), aptosCoin);
