@@ -15,7 +15,7 @@ export type { default as IContextWeb3 } from "./IContextWeb3";
 export type { default as IEncryptedPwd } from "./IEncryptedPwd";
 export type { default as IExplorerNetwork } from "./IExplorerNetwork";
 export type { IUR } from "./IKeystone";
-export type { default as INetwork } from "./INetwork";
+export type { default as INetwork, INetworkType } from "./INetwork";
 export type { default as INetworkStore } from "./INetworkStore";
 export type { default as INftDetails, INftMetadata } from "./INftDetails";
 export type { default as INotification } from "./INotification";

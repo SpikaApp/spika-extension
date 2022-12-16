@@ -6,6 +6,7 @@ const _currentRoute = "currentRoute";
 const _request = "currentRequest";
 const _sender = "currentSender";
 const _currentPubAccount = "currentPubAccount";
+const _networkResponse = "networkResponse";
 const _connectedApps = "connectedApps";
 const _lastConnectedApp = "lastConnectedApp";
 
@@ -154,6 +155,15 @@ const handleDisconnect = async (sender, sendResponse) => {
   sendResponse(result);
 };
 
+const handleNetwork = async (sendResponse) => {
+  const response = await getStore(_networkResponse);
+  if (response && response.name) {
+    sendResponse(response.name);
+  } else {
+    sendResponse(undefined);
+  }
+};
+
 const spikaMessenger = (message, sender, sendResponse) => {
   // console.log("[worker]: spikaMessenger: ", message);
   if (message.id === "locker") {
@@ -166,6 +176,8 @@ const spikaMessenger = (message, sender, sendResponse) => {
     handleIsConnected(sender, sendResponse);
   } else if (message.method === "disconnect") {
     handleDisconnect(sender, sendResponse);
+  } else if (message.method === "network") {
+    handleNetwork(sendResponse);
   } else if (
     message.method === "account" ||
     message.method === "signMessage" ||

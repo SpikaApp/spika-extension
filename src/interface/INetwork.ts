@@ -11,4 +11,6 @@ interface INetworkData {
   custom: boolean;
 }
 
+export type INetworkType = "mainnet" | "testnet" | "devnet";
+
 export default INetwork;

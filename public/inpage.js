@@ -21,6 +21,10 @@ class SpikaWeb3 {
     return this._message("account", {});
   }
 
+  network() {
+    return this._message("network", {});
+  }
+
   signMessage(message) {
     return this._message("signMessage", message);
   }

@@ -12,6 +12,7 @@ import * as nftsStore from "../lib/nftStore";
 import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS } from "../utils/constants";
 import debug from "../utils/debug";
+import getCurrentNetwork from "../utils/getCurrentNetwork";
 import { getNftMetadata } from "../utils/getNftMetadata";
 import { valueToString } from "../utils/values";
 import { AccountContext } from "./AccountContext";
@@ -76,6 +77,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
       (async () => {
         const result = await isMainnet();
         setMainnet(result);
+        getCurrentNetwork();
       })();
     }
   }, [currentNetwork]);

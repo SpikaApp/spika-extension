@@ -76,6 +76,7 @@ export const addSpikaAccount = async (): Promise<ISpikaMasterAccount> => {
     publicKey: account.pubKey().hex(),
     account: account.address().hex(),
     authKey: account.authKey().hex(),
+    address: account.address().hex(),
   };
   let spikaMasterAccount = await getSpikaMasterAccount();
   const data: Array<ISpikaAccount> = spikaMasterAccount.master;

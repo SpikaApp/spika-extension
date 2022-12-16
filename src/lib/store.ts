@@ -55,6 +55,7 @@ export const setStore = (platform: string, key: string, value: any): void => {
       key === "accountNfts" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
+      key === "networkResponse" ||
       key === "currentPubAccount" ||
       key === "contacts" ||
       key === "spikaMasterAccount"
@@ -83,6 +84,7 @@ export const getStore = (platform: string, key: string): any => {
       key === "accountNfts" ||
       key === "accountNetworks" ||
       key === "currentNetwork" ||
+      key === "networkResponse" ||
       key === "currentPubAccount" ||
       key === "contacts" ||
       key === "spikaMasterAccount"

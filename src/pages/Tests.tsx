@@ -3,7 +3,6 @@ import { Button, Card, CardContent, Container, Stack } from "@mui/material";
 import * as bip39 from "@scure/bip39";
 import * as english from "@scure/bip39/wordlists/english";
 import * as aptos from "aptos";
-import { Types } from "aptos";
 import { useContext } from "react";
 import AccountDetailsDialog from "../components/AccountDetailsDialog";
 import AccountManagerDialog from "../components/AccountManagerDialog";
@@ -17,6 +16,7 @@ import { spikaClient } from "../lib/client";
 import { addSpikaAccount, initSpikaMasterAccount } from "../lib/spikaAccount";
 import { APTOS_DERIVE_PATH } from "../utils/constants";
 import debug from "../utils/debug";
+import getCurrentNetwork from "../utils/getCurrentNetwork";
 
 const Tests = (): JSX.Element => {
   const { handleAccountManagerUI } = useContext(UIContext);
@@ -31,9 +31,9 @@ const Tests = (): JSX.Element => {
     debug.log("Address:", account.address().hex());
   };
 
-  const estimateGasPrice = async (): Promise<Types.GasEstimation> => {
-    const spika = await spikaClient();
-    return await spika.client.estimateGasPrice();
+  const chainIds = async (): Promise<void> => {
+    const result = await getCurrentNetwork();
+    console.log(result);
   };
 
   const estimateMaxGasAmount = async () => {
@@ -66,8 +66,8 @@ const Tests = (): JSX.Element => {
               <Button sx={{ mb: 2 }} variant="outlined" onClick={generateAddress}>
                 Generate Address
               </Button>
-              <Button sx={{ mb: 2 }} variant="outlined" onClick={estimateGasPrice}>
-                Estimate Gas Price
+              <Button sx={{ mb: 2 }} variant="outlined" onClick={chainIds}>
+                Get Chain ID
               </Button>
               <Button sx={{ mb: 2 }} variant="outlined" onClick={estimateMaxGasAmount}>
                 Estimate Max Gas
