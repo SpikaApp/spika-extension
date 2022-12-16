@@ -10,8 +10,8 @@ const _currentNetwork = "currentNetwork";
 const _accountNetworks = "accountNetworks";
 const _pwd = "PWD";
 
-const currentVersion = await getStore(PLATFORM, _accountVersion);
-let updateVersion = currentVersion;
+let currentVersion: string;
+let updateVersion: string;
 
 const applyUpdate = async (): Promise<void> => {
   await getVersion();
@@ -27,8 +27,15 @@ const applyUpdate = async (): Promise<void> => {
   }
 };
 
-const getVersion = async (): Promise<string> => {
-  return await getStore(PLATFORM, _accountVersion);
+const getVersion = async (): Promise<void> => {
+  const result = await getStore(PLATFORM, _accountVersion);
+  if (result) {
+    currentVersion = result;
+    updateVersion = currentVersion;
+  } else {
+    currentVersion = "0.0.0";
+    updateVersion = currentVersion;
+  }
 };
 
 const setVersion = async (): Promise<void> => {
