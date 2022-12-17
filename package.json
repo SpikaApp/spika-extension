@@ -5,15 +5,14 @@
   "scripts": {
     "dev": "vite --cors",
     "build": "vite build",
-    "preview": "vite preview",
-    "postinstall": "patch-package",
-    "build:patch": "npm run build && npm run postinstall"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@keystonehq/animated-qr": "^0.3.1-alpha.0",
     "@keystonehq/aptos-keyring": "^0.1.1-alpha.1",
+    "@keystonehq/bc-ur-registry-aptos": "0.1.1-alpha.0",
     "@manahippo/hippo-sdk": "^3.1.2",
     "@metamask/browser-passworder": "^3.0.0",
     "@metamask/obs-store": "^7.0.0",
@@ -22,7 +21,8 @@
     "@mui/material": "^5.10.13",
     "@ngraveio/bc-ur": "^1.1.6",
     "@scure/bip39": "^1.1.0",
-    "aptos": "^1.3.15",
+    "aptos": "1.3.15",
+    "axios": "^1.2.1",
     "buffer": "^6.0.3",
     "check-password-strength": "^2.0.7",
     "compare-versions": "^5.0.1",
@@ -31,11 +31,13 @@
     "react-dom": "^18.2.0",
     "react-number-format": "^5.1.1",
     "react-router-dom": "^6.4.3",
+    "safe-buffer": "^5.2.1",
     "tslib": "^2.4.1",
     "typescript": "^4.8.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.5",
     "@types/chrome": "^0.0.200",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",
@@ -49,7 +51,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "patch-package": "^6.5.0",
+    "prettier": "^2.8.1",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "vite": "^3.2.3"
   },
