@@ -118,11 +118,11 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   };
 
   const updateList = async (): Promise<void> => {
-    if (cachedList.length > 0 && mainnet) setSelectedList(cachedList);
+    if (cachedList.length > 1 && mainnet) setSelectedList(() => cachedList);
     setIsLocalLoading(true);
     const data = await updateAccountAssets();
     if (data) {
-      setSelectedList(data);
+      setSelectedList(() => data);
     } else {
       setSelectedList([]);
     }
