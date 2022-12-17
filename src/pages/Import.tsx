@@ -54,7 +54,6 @@ const Import = (): JSX.Element => {
       try {
         const mnemonicString = mnemonicToString(mnemonicObject);
         if (mnemonicString) {
-          console.log("Valid Mnemonic");
           setMnemonic(mnemonicString);
           setMnemonicValidated(true);
           setMnemonicError(false);
