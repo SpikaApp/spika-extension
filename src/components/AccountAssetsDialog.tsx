@@ -42,10 +42,10 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const { setIsLoading, setCurrentAsset, currentNetwork, currentAddress } = useContext(AccountContext);
   const { updateAccountAssets, updateBalance, mainnet } = useContext(Web3Context);
   const { setIsFetching, setXCoin, setYCoin } = useContext(DexContext);
-  const [isLocalLoading, setIsLocalLoading] = useState(false);
 
-  // Coinlist cached in LocalStorage.
-  const [cachedList, setCachedList] = useState<Array<ICoin>>([]);
+  // Dialog state.
+  const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
+  const [cacheChecked, setCacheChecked] = useState<boolean>(false);
 
   // Coinlist that we use to search coins.
   const [selectedList, setSelectedList] = useState<Array<ICoin>>([]);
@@ -64,7 +64,6 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   // "account" - show coins registered in currentAddress
   useEffect(() => {
     if (openAccountAssetsDialog) {
-      getCachedList();
       if (props && props.type === "yCoin") {
         setListType("all");
         debug.log("Setting coin list type to: all");
@@ -81,7 +80,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       let result: Array<ICoin> = [];
       switch (listType) {
         case "account":
-          updateList();
+          getCachedList();
           break;
         case "all":
           result = getCoinlist();
@@ -90,6 +89,13 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       }
     }
   }, [listType !== undefined]);
+
+  // After initial list loaded from storage => fetch updated list from chain.
+  useEffect(() => {
+    if (cacheChecked) {
+      updateList();
+    }
+  }, [cacheChecked]);
 
   // Search in selectedList and update coinlist with result.
   useEffect(() => {
@@ -118,7 +124,6 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   };
 
   const updateList = async (): Promise<void> => {
-    if (cachedList.length > 1 && mainnet) setSelectedList(() => cachedList);
     setIsLocalLoading(true);
     const data = await updateAccountAssets();
     if (data) {
@@ -135,7 +140,8 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       const cached = await getAssetStore(currentAddress);
       if (cached) result = cached.assets;
     }
-    setCachedList(result);
+    if (result.length > 1 && mainnet) setSelectedList(result);
+    setCacheChecked(true);
   };
 
   const getCoinlist = (): Array<ICoin> => {
@@ -171,8 +177,8 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   const handleCancel = (): void => {
     setOpenAccountAssetsDialog(false);
     setIsLocalLoading(true);
+    setCacheChecked(false);
     setListType(undefined);
-    setCachedList([]);
     setSelectedList([]);
     setCoinlist([]);
     setSearchString("");
