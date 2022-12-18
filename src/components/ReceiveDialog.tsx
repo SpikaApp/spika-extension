@@ -1,29 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, TextField } from "@mui/material";
 import { QRCodeCanvas } from "qrcode.react";
 import { useContext } from "react";
 import logo from "../assets/logo_bg.png";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import { Web3Context } from "../context/Web3Context";
 import copyToClipboard from "../utils/copyToClipboard";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";
 
 const ReceiveDialog = (): JSX.Element => {
   const { openReceiveDialog, setOpenReceiveDialog } = useContext(UIContext);
-  const { currentAddress, currentNetwork } = useContext(AccountContext);
-  const { chainId } = useContext(Web3Context);
+  const { currentAddress } = useContext(AccountContext);
 
   const handleClick = () => {
     copyToClipboard(currentAddress!);
@@ -39,7 +27,6 @@ const ReceiveDialog = (): JSX.Element => {
         <Stack sx={{ display: "flex", alignItems: "center" }}>Account Address</Stack>
       </DialogTitle>
       <DialogContent>
-        {/* <DialogContentText sx={{ marginBottom: 2 }}>Provide recipient address and amount:</DialogContentText> */}
         <Stack direction="column" sx={{ display: "flex", alignItems: "center", maxWidth: 300 }}>
           <Paper
             sx={{
@@ -56,17 +43,13 @@ const ReceiveDialog = (): JSX.Element => {
               includeMargin={false}
               level="M"
               size={128}
-              imageSettings={{ src: logo, excavate: true, height: 30, width: 30 }}
+              imageSettings={{ src: logo, excavate: true, height: 25, width: 25 }}
             />
           </Paper>
           <TextField sx={{ width: 275, mt: 2, mb: 2 }} id="output-field" multiline maxRows={6} value={currentAddress} />
           <Button variant="outlined" onClick={handleClick}>
             Copy to clipboard
           </Button>
-          <Typography noWrap align="left" variant="body1" sx={{ ml: "75px", my: 3, width: "200px" }}>
-            Network: {currentNetwork!.name} <br />
-            Chain id: {chainId}
-          </Typography>
         </Stack>
       </DialogContent>
       <DialogActions>
