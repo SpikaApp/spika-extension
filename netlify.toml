@@ -1,7 +1,7 @@
 [context.production]
   publish = "dist/"
   command = "pnpm build"
-  environment = { NODE_VERSION = "16.18.1" }
+  environment = { NODE_VERSION = "16.19.0" }
 
 [[redirects]]
   from = "/*"
