@@ -12,13 +12,3 @@
   from = "/*"
   to = "/404"
   status = 404
-
-[[redirects]]
-  from = "/api/*"
-  to = "https://fullnode.devnet.aptoslabs.com/v1:splat"
-  status = 200
-
-[[redirects]]
-  from = "/faucet/*"
-  to = "https://faucet.devnet.aptoslabs.com/:splat"
-  status = 200
