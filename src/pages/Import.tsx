@@ -238,7 +238,7 @@ const Import = (): JSX.Element => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    mb: "-18px",
+                    mb: "-26px",
                   }}
                 >
                   {mnemonicError && (
