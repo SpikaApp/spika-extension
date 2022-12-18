@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 import { ICoin, IContextDex } from "../interface";
 import { spikaClient } from "../lib/client";
 import { aptosCoin } from "../lib/coin";
+import { DEFAULT_MAX_GAS } from "../utils/constants";
 import { AccountContext } from "./AccountContext";
 import { Web3Context } from "./Web3Context";
 
@@ -21,7 +22,7 @@ export const DexProvider = ({ children }: DexContextProps) => {
   const [yCoin, setYCoin] = useState<ICoin>(aptosCoin);
   const [slippage, setSlippage] = useState<string>("1");
   const [transactionTimeout, setTransactionTimeout] = useState<string>("10");
-  const [maxGasAmount, setMaxGasAmount] = useState<string>("20000");
+  const [maxGasAmount, setMaxGasAmount] = useState<string>(DEFAULT_MAX_GAS);
 
   const simulateSwapTransaction = async (
     payload: aptos.TxnBuilderTypes.TransactionPayloadEntryFunction
