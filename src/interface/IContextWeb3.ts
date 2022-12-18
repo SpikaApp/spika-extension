@@ -20,7 +20,6 @@ interface IContextWeb3 {
   txnDetails: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setTxnDetails: React.Dispatch<React.SetStateAction<any>>;
-  nftDetails: INftDetails[];
   depositEventsCounter: number;
   setDepositEventsCounter: React.Dispatch<React.SetStateAction<number>>;
   withdrawEventsCounter: number;
@@ -29,19 +28,17 @@ interface IContextWeb3 {
   setWithdrawEvents: React.Dispatch<React.SetStateAction<aptos.Types.Event[]>>;
   depositEvents: aptos.Types.Event[];
   setDepositEvents: React.Dispatch<React.SetStateAction<aptos.Types.Event[]>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  accountTokens: any;
   isValidAsset: boolean;
   setIsValidAsset: React.Dispatch<React.SetStateAction<boolean>>;
   getEventsCount: (events: string) => Promise<void | 0>;
   getDepositEvents: (query: IEventsQuery) => Promise<void>;
   getWithdrawEvents: (query: IEventsQuery) => Promise<void>;
   getTxnDetails: (version: number | bigint) => Promise<void>;
-  getTokenStore: () => Promise<void>;
+  getTokenStore: () => Promise<Array<aptos.TokenTypes.Token>>;
   getBalance: (asset?: ICoin) => Promise<void | string>;
   updateBalance: (asset: ICoin) => Promise<string>;
   getTransactions: () => Promise<aptos.Types.Transaction[]>;
-  getNftDetails: () => Promise<void>;
+  getNftDetails: (tokens: Array<aptos.TokenTypes.Token>) => Promise<Array<INftDetails>>;
   createToken: (payload: aptos.TxnBuilderTypes.TransactionPayload) => Promise<void>;
   selectedAsset: ICoin | Record<string, never>;
   setSelectedAsset: React.Dispatch<React.SetStateAction<ICoin | Record<string, never>>>;

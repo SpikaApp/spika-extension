@@ -5,7 +5,6 @@ import {
   Container,
   ImageList,
   ImageListItem,
-  Pagination,
   Paper,
   Stack,
   Tooltip,
@@ -21,6 +20,8 @@ import NftDetailsDialog from "../components/NftDetailsDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
+import { INftDetails } from "../interface";
+import * as nftStore from "../lib/nftStore";
 
 const NftButton = styled(Button)(() => ({
   borderRadius: "8px",
@@ -30,56 +31,55 @@ const NftButton = styled(Button)(() => ({
 }));
 
 const NFTs = (): JSX.Element => {
-  const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI } = useContext(UIContext);
+  const { handleCreateCollectionUI, handleCreateNFTUI, handleNftDetailsUI, sendNotification } = useContext(UIContext);
   const { accountImported, currentAddress } = useContext(AccountContext);
-  const { accountTokens, getTokenStore, getNftDetails, nftDetails } = useContext(Web3Context);
-  const [isWaiting, setIsWaiting] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
-  const [pages] = useState<number>(0);
-  const [cached, setCached] = useState<boolean>(false);
-
-  const hidden = true;
-
-  // const limitPerPage = 9;
+  const { getTokenStore, getNftDetails } = useContext(Web3Context);
+  const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
+  const [cacheChecked, setCacheChecked] = useState<boolean>(false);
+  const [nfts, setNfts] = useState<Array<INftDetails>>([]);
 
   useEffect(() => {
-    if (accountImported === true) {
-      setIsWaiting(true);
-      getTokenStore();
-      const updateAccountResources = window.setInterval(() => {
-        getTokenStore();
+    if (accountImported) {
+      getCached();
+    }
+  }, [accountImported]);
+
+  useEffect(() => {
+    if (accountImported && cacheChecked) {
+      getNftsForAccount();
+      const updateNfts = window.setInterval(() => {
+        getNftsForAccount();
       }, 60000);
-      return () => window.clearInterval(updateAccountResources);
+      return () => window.clearInterval(updateNfts);
     }
     return undefined;
-  }, [accountImported, currentAddress]);
+  }, [cacheChecked, currentAddress]);
 
-  useEffect(() => {
-    if (accountImported && accountTokens.length > 0) {
-      getMetadata();
-    } else {
-      setIsWaiting(false);
+  const getCached = async (): Promise<void> => {
+    if (currentAddress) {
+      const cached = await nftStore.getNfts(currentAddress);
+      if (cached && cached.nfts.length > 0) {
+        setNfts(cached.nfts);
+      }
+      setCacheChecked(true);
     }
-  }, [accountTokens]);
-
-  useEffect(() => {
-    if (accountImported && nftDetails.length > 0) {
-      setIsWaiting(false);
-      setCached(true);
-    } else {
-      setCached(false);
-      setIsWaiting(true);
-    }
-  }, [nftDetails.length]);
-
-  const getMetadata = async () => {
-    await getNftDetails();
-    setIsWaiting(false);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handlePageChange = async (_event: any, newPage: number): Promise<void> => {
-    setPage(newPage);
+  const getNftsForAccount = async (): Promise<void> => {
+    let result: Array<INftDetails> = [];
+    if (currentAddress) {
+      setIsLocalLoading(true);
+      const tokens = await getTokenStore();
+      if (tokens.length !== 0) result = await getNftDetails(tokens);
+      setNfts((nfts) => {
+        if (nfts.length !== result.length) {
+          sendNotification({ message: "NFTs updated", type: "info", autoHide: true });
+        }
+        return result;
+      });
+      nftStore.setNfts(currentAddress, result);
+      setIsLocalLoading(false);
+    }
   };
 
   return (
@@ -93,29 +93,29 @@ const NFTs = (): JSX.Element => {
           justifyContent: "space-around",
         }}
       >
-        <Button sx={{ width: "160px", mr: 2 }} variant="outlined" onClick={handleCreateCollectionUI}>
+        <Button sx={{ width: "160px", mr: "2px" }} variant="outlined" onClick={handleCreateCollectionUI}>
           <Typography align="center">Create Collection</Typography>
         </Button>
         <Button sx={{ width: "160px" }} variant="outlined" onClick={handleCreateNFTUI}>
           <Typography align="center">Create NFT</Typography>
         </Button>
       </Stack>
-      {isWaiting === true && accountImported && (
-        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: 8, mb: "241px" }}>
+      {isLocalLoading && nfts.length === 0 && (
+        <Stack direction="column" sx={{ display: "flex", alignItems: "center", mt: "65px", mb: "256px" }}>
           <Typography align="center" variant="h6" color="textSecondary" gutterBottom>
             Updating metadata...
           </Typography>
           <CircularProgress sx={{ mt: 4 }} color="info" />
         </Stack>
       )}
-      {isWaiting === false && !cached && (
-        <Typography sx={{ mt: 8, mb: "285px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
+      {!isLocalLoading && nfts.length === 0 && (
+        <Typography sx={{ mt: "65px", mb: "335px" }} variant="h6" align="center" color="textPrimary" gutterBottom>
           No NFTs found
         </Typography>
       )}
-      {cached && !isWaiting && accountImported && (
+      {nfts.length > 0 && (
         <Stack sx={{ display: "flex", alignItems: "center" }}>
-          <Box sx={{ height: "340px", mb: "41px" }}>
+          <Box sx={{ height: "340px", mb: "76px" }}>
             <ImageList
               gap={18}
               cols={3}
@@ -128,7 +128,7 @@ const NFTs = (): JSX.Element => {
                 maxHeight: "340px",
               }}
             >
-              {nftDetails.map((nft) => (
+              {nfts.map((nft) => (
                 <ImageListItem key={nft.name + nft.description + nft.uri}>
                   <Tooltip title={nft.name}>
                     <NftButton
@@ -154,22 +154,7 @@ const NFTs = (): JSX.Element => {
           </Box>
         </Stack>
       )}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
-        {accountTokens !== 0 && !isWaiting && accountImported && hidden && <Box sx={{ mb: "35px" }} />}
-        {accountTokens !== 0 && !isWaiting && accountImported && !hidden && (
-          <Pagination
-            count={pages}
-            page={page}
-            siblingCount={0}
-            boundaryCount={1}
-            variant="text"
-            size="medium"
-            shape="circular"
-            onChange={handlePageChange}
-          />
-        )}
-      </Box>
-      {accountImported && !isWaiting && nftDetails.length > 0 && <Footer />}
+      {accountImported && <Footer />}
       <CreateCollectionDialog />
       <CreateNftDialog />
       <NftDetailsDialog />

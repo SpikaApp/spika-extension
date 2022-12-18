@@ -8,7 +8,6 @@ import { setAssetStore } from "../lib/assetStore";
 import { spikaClient } from "../lib/client";
 import { coinInfo, coinList, coinStore } from "../lib/coin";
 import errorParser from "../lib/errorParser";
-import * as nftsStore from "../lib/nftStore";
 import * as token from "../lib/token";
 import { DEFAULT_MAX_GAS } from "../utils/constants";
 import debug from "../utils/debug";
@@ -52,11 +51,8 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
   const [withdrawEvents, setWithdrawEvents] = useState<aptos.Types.Event[]>([]);
   const [depositEventsCounter, setDepositEventsCounter] = useState<number>(0);
   const [withdrawEventsCounter, setWithdrawEventsCounter] = useState<number>(0);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [accountTokens, setAccountTokens] = useState<any[]>([]);
   const [isValidAsset, setIsValidAsset] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<ICoin | Record<string, never>>({});
-  const [nftDetails, setNftDetails] = useState<INftDetails[]>([]);
   const [aptosName, setAptosName] = useState("");
   const [aptosAddress, setAptosAddress] = useState("");
   const [chainId, setChainId] = useState<number>();
@@ -636,13 +632,8 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     }
   };
 
-  const getTokenStore = async (): Promise<void> => {
-    // First we check storage.
-    const cached = await nftsStore.getNfts(currentAddress!);
-    if (cached) {
-      setNftDetails(cached.nfts);
-    }
-
+  const getTokenStore = async (): Promise<Array<aptos.TokenTypes.Token>> => {
+    let final: Array<aptos.TokenTypes.Token> = [];
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
@@ -655,8 +646,8 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
 
         const getTokens = async (): Promise<void> => {
           if (tokenStore === undefined) {
-            debug.log("Account doesn't have any TokenStore records.");
-            return setAccountTokens([]);
+            debug.log("No TokenStore records found for:", currentAddress);
+            final = [];
           } else {
             const counter = parseInt(tokenStore.data.deposit_events.counter);
             const events = await spika.client.getEventsByEventHandle(
@@ -686,38 +677,33 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
               return token.amount !== "0";
             });
 
-            if (result === undefined) {
-              setAccountTokens([]);
-            } else {
-              const final = result.filter(
+            if (result !== undefined) {
+              final = result.filter(
                 (value, index, self) =>
                   index === self.findIndex((t) => t.id.token_data_id.name === value.id.token_data_id.name)
               );
               final.sort((a, b) => a.id.token_data_id.name.localeCompare(b.id.token_data_id.name));
-              setAccountTokens(final);
             }
           }
         };
-        getTokens();
+        await getTokens();
       } catch (error) {
         console.log(error);
       }
-    } else {
-      setAccountTokens([]);
     }
+    return final;
   };
 
-  const getNftDetails = async (): Promise<void> => {
+  const getNftDetails = async (tokens: Array<aptos.TokenTypes.Token>): Promise<Array<INftDetails>> => {
+    let final: Array<INftDetails> = [];
     const isAccount = await validateAccount(currentAddress!);
     if (isAccount) {
       const spika = await spikaClient();
       try {
-        if (accountTokens.length === 0) {
-          return setNftDetails([]);
-        } else {
-          const result: INftDetails[] = [];
+        if (tokens.length !== 0) {
+          const result: Array<INftDetails> = [];
           await Promise.all(
-            accountTokens.map(async (i) => {
+            tokens.map(async (i) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const nft: any = await spika.tokenClient.getTokenData(
                 i.id.token_data_id.creator,
@@ -761,15 +747,13 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
           result.sort((a, b) => a.name.localeCompare(b.name));
 
           debug.log("NFTs metadata updated:", result);
-          nftsStore.setNfts(currentAddress!, result);
-          return setNftDetails(result);
+          final = result;
         }
       } catch (error) {
         console.log(error);
       }
-    } else {
-      setNftDetails([]);
     }
+    return final;
   };
 
   const clearPrevEstimation = () => {
@@ -795,7 +779,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         setEstimatedTxnResult,
         txnDetails,
         setTxnDetails,
-        nftDetails,
         mintCoins,
         handleSend,
         getEventsCount,
@@ -811,7 +794,6 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         setDepositEvents,
         getTxnDetails,
         handleEstimate,
-        accountTokens,
         getTokenStore,
         getBalance,
         updateBalance,
