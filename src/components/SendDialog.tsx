@@ -174,7 +174,7 @@ const SendDialog = (): JSX.Element => {
       <DialogTitle sx={{ alignSelf: "center", mb: "-12px" }}>Send {currentAsset!.data.symbol}</DialogTitle>
       <DialogContent sx={{ maxWidth: 375, mb: "-12px" }}>
         <Stack sx={{ position: "absolute", ml: "225px", mt: "-15px" }}>
-          <Tooltip title="Import from contracts">
+          <Tooltip title="Open Contacts">
             <IconButton onClick={handleAddressBookUI}>
               <ImportContactsIcon sx={{ fontSize: "20px" }} />
             </IconButton>
