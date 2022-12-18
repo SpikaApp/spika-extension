@@ -3,6 +3,7 @@ import { Button, Dialog, DialogContent, DialogActions, DialogTitle, Stack, TextF
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
 import { setNetwork } from "../lib/accountNetworks";
+import { INetwork } from "../interface";
 
 const AddCustomNetworkDialog = (): JSX.Element => {
   const { openAddCustomNetworkDialog, setOpenAddCustomNetworkDialog, setSomethingChanged } = useContext(UIContext);
@@ -12,20 +13,33 @@ const AddCustomNetworkDialog = (): JSX.Element => {
   const [faucetUrl, setFaucetUrl] = useState<string>("");
 
   const handleAddNetwork = async (): Promise<void> => {
-    const customNetwork = {
-      name: networkName,
-      data: {
-        node_url: nodeUrl,
-        faucet_url: faucetUrl,
-        custom: true,
-        testnet: true,
-      },
-    };
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await setNetwork(currentAddress!, customNetwork);
-    setSomethingChanged(true);
-    setOpenAddCustomNetworkDialog(false);
-    clearNetworkData();
+    if (currentAddress) {
+      let customNetwork: INetwork;
+      if (faucetUrl !== "") {
+        customNetwork = {
+          name: networkName,
+          data: {
+            node_url: nodeUrl,
+            faucet_url: faucetUrl,
+            custom: true,
+            testnet: true,
+          },
+        };
+      } else {
+        customNetwork = {
+          name: networkName,
+          data: {
+            node_url: nodeUrl,
+            custom: true,
+            testnet: false,
+          },
+        };
+      }
+      await setNetwork(currentAddress, customNetwork);
+      setSomethingChanged(true);
+      setOpenAddCustomNetworkDialog(false);
+      clearNetworkData();
+    }
   };
 
   const handleCancel = (): void => {
@@ -87,7 +101,7 @@ const AddCustomNetworkDialog = (): JSX.Element => {
               Cancel
             </Button>
 
-            {networkName !== "" && nodeUrl !== "" && faucetUrl !== "" ? (
+            {networkName !== "" && nodeUrl !== "" ? (
               <Button
                 sx={{
                   background: "linear-gradient(126.53deg, #3FE1FF -25.78%, #1700FF 74.22%);",
