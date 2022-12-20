@@ -2,7 +2,7 @@ import { dependencies, version } from "../../package.json";
 
 // Extension version
 export const EXTENSION_VERSION: string = version;
-export const APTOS_SDK_VERSION: string = dependencies.aptos.slice(1);
+export const APTOS_SDK_VERSION: string = dependencies.aptos;
 
 // Node and Faucet URLs (default to Devnet)
 export const NODE_URL = "https://fullnode.devnet.aptoslabs.com/v1";
