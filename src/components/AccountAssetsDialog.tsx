@@ -2,11 +2,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   List,
   ListItemButton,
   ListItemIcon,
@@ -24,7 +26,7 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { ICoin } from "../interface";
 import { getAssetStore } from "../lib/assetStore";
-import { setStore } from "../lib/store";
+import { getStore, setStore } from "../lib/store";
 import { fetchCoinlist } from "../utils/coinlist";
 import { PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
@@ -46,6 +48,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
   // Dialog state.
   const [isLocalLoading, setIsLocalLoading] = useState<boolean>(false);
   const [cacheChecked, setCacheChecked] = useState<boolean>(false);
+  const [checkedDisplayNoBalance, setCheckedDisplayNoBalance] = useState<boolean>(false);
 
   // Coinlist that we use to search coins.
   const [selectedList, setSelectedList] = useState<Array<ICoin>>([]);
@@ -58,6 +61,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
 
   // LocalStorage keys.
   const _currentAsset = "currentAsset";
+  const _hideNoBalance = "hideNoBalance";
 
   // On open AccountAssetsDialog set coinlist type.
   // "all" - show all available coins
@@ -80,6 +84,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
       let result: Array<ICoin> = [];
       switch (listType) {
         case "account":
+          getSettings();
           getCachedList();
           break;
         case "all":
@@ -102,13 +107,41 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     if (selectedList.length > 0) {
       let result: Array<ICoin>;
       if (searchString === "") {
-        result = selectedList;
+        if (checkedDisplayNoBalance) {
+          result = selectedList.filter((coin) => coin.data.balance !== "0");
+        } else {
+          result = selectedList;
+        }
       } else {
-        result = search(selectedList, searchString);
+        if (checkedDisplayNoBalance) {
+          result = search(
+            selectedList.filter((coin) => coin.data.balance !== "0"),
+            searchString
+          );
+        } else {
+          result = search(selectedList, searchString);
+        }
       }
       setCoinlist(result);
     }
   }, [selectedList, searchString]);
+
+  useEffect(() => {
+    if (!checkedDisplayNoBalance) {
+      setCoinlist(search(selectedList, searchString));
+    } else {
+      setCoinlist(
+        search(
+          selectedList.filter((coin) => coin.data.balance !== "0"),
+          searchString
+        )
+      );
+    }
+  }, [checkedDisplayNoBalance]);
+
+  useEffect(() => {
+    if (props && props.type === "yCoin") setCheckedDisplayNoBalance(false);
+  }, [props]);
 
   // Search function.
   const search = (list: Array<ICoin>, searchStr: string): Array<ICoin> => {
@@ -123,15 +156,13 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     return result;
   };
 
-  const updateList = async (): Promise<void> => {
-    setIsLocalLoading(true);
-    const data = await updateAccountAssets();
-    if (data) {
-      setSelectedList(() => data);
+  const getSettings = async (): Promise<void> => {
+    const result = await getStore(PLATFORM, _hideNoBalance);
+    if (result) {
+      setCheckedDisplayNoBalance(true);
     } else {
-      setSelectedList([]);
+      setCheckedDisplayNoBalance(false);
     }
-    setIsLocalLoading(false);
   };
 
   const getCachedList = async (): Promise<void> => {
@@ -142,6 +173,17 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     }
     if (result.length > 1 && mainnet) setSelectedList(result);
     setCacheChecked(true);
+  };
+
+  const updateList = async (): Promise<void> => {
+    setIsLocalLoading(true);
+    const data = await updateAccountAssets();
+    if (data) {
+      setSelectedList(() => data);
+    } else {
+      setSelectedList([]);
+    }
+    setIsLocalLoading(false);
   };
 
   const getCoinlist = (): Array<ICoin> => {
@@ -172,6 +214,11 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
     setIsLocalLoading(true);
     await updateBalance(asset);
     setIsLocalLoading(false);
+  };
+
+  const handleCheckDisplayNoBalance = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckedDisplayNoBalance(event.target.checked);
+    setStore(PLATFORM, _hideNoBalance, event.target.checked);
   };
 
   const handleCancel = (): void => {
@@ -246,8 +293,8 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
           </Tooltip>
         )}
       </DialogTitle>
-      <DialogContent sx={{ minHeight: "330px" }}>
-        <Box sx={{ alignItems: "center", mb: "15px", ml: "-5px", mr: "1px" }}>
+      <DialogContent sx={{ height: "330px", border: 0 }}>
+        <Box sx={{ alignItems: "center", mt: "12px", mb: "15px", ml: "7px", mr: "10px", width: "245px" }}>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -261,7 +308,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
             />
           </Search>
         </Box>
-        <Paper sx={{ width: "260px", minHeight: "65px", bgcolor: "background.paper" }}>
+        <Paper sx={{ width: "265px", height: "255px", bgcolor: "background.paper" }}>
           <List component="nav" sx={{ overflow: "hidden", overflowY: "visible", maxHeight: "255px" }}>
             {isLocalLoading && coinlist.length === 0 && (
               <CircularProgress sx={{ display: "flex", ml: "110px", mt: "10px", color: "#9e9e9e" }} size={32} />
@@ -307,8 +354,20 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
           </List>
         </Paper>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Close</Button>
+      <DialogActions sx={{ mt: "-10px" }}>
+        <Stack sx={{ display: "flex", flexDirection: "column", border: 0, width: "100%" }}>
+          {(!props || props.type !== "yCoin") && (
+            <FormControlLabel
+              sx={{ ml: "8px" }}
+              control={<Checkbox checked={checkedDisplayNoBalance} onChange={handleCheckDisplayNoBalance} />}
+              label="Hide coins with no balance"
+              labelPlacement="end"
+            />
+          )}
+          <Stack sx={{ border: 0, width: "100%", alignItems: "end" }}>
+            <Button onClick={handleCancel}>Close</Button>
+          </Stack>
+        </Stack>
       </DialogActions>
     </Dialog>
   );
