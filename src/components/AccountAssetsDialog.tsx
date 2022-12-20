@@ -293,7 +293,7 @@ const AccountAssetsDialog = (props: AccountAssetsDialogProps): JSX.Element => {
           </Tooltip>
         )}
       </DialogTitle>
-      <DialogContent sx={{ height: "330px", border: 0 }}>
+      <DialogContent sx={{ height: "340px", border: 0 }}>
         <Box sx={{ alignItems: "center", mt: "12px", mb: "15px", ml: "7px", mr: "10px", width: "245px" }}>
           <Search>
             <SearchIconWrapper>
