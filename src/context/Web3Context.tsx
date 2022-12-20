@@ -260,7 +260,7 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
     payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
     isBcs?: boolean,
     silent?: boolean
-  ): Promise<void> => {
+  ): Promise<aptos.Types.Transaction | void> => {
     const spika = await spikaClient();
     let _payload;
     let isSilent = false;
@@ -293,11 +293,12 @@ export const Web3Provider = ({ children }: Web3ContextProps) => {
         });
       }
       const bcsTxn = aptos.AptosClient.generateBCSTransaction(account!, transaction);
-      const result = await spika.client.submitSignedBCSTransaction(bcsTxn);
-      await spika.client.waitForTransaction(result.hash);
+      const submit = await spika.client.submitSignedBCSTransaction(bcsTxn);
+      const result = spika.client.waitForTransactionWithResult(submit.hash);
       if (!isSilent) {
-        throwAlert({ signal: 31, title: "Transaction sent", message: `${result.hash}`, error: false });
+        throwAlert({ signal: 31, title: "Transaction sent", message: `${submit.hash}`, error: false });
       }
+      return result;
     } catch (error) {
       if (!isSilent) {
         throwAlert({

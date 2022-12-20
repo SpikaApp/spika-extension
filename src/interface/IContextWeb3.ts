@@ -64,7 +64,7 @@ interface IContextWeb3 {
     payload?: aptos.Types.EntryFunctionPayload | aptos.TxnBuilderTypes.TransactionPayload,
     isBcs?: boolean,
     silent?: boolean
-  ) => Promise<void>;
+  ) => Promise<aptos.Types.Transaction | void>;
   signMessage: (message: string) => Promise<string>;
   signTransaction: (payload: aptos.Types.EntryFunctionPayload) => Promise<Uint8Array | unknown>;
   signAndSubmitTransaction: (

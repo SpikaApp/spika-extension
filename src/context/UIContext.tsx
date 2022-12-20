@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { IContextUI, INftDetails, INotification, IUR } from "../interface";
+import { IContextUI, INftDetails, INotification, ISpikaNews, IUR } from "../interface";
 import { getMem, getStore } from "../lib/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
@@ -31,6 +31,8 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [txnType, setTxnType] = useState<number>(0); // 0: undefined, 1: inbound, 2: outbound
   const [openTxnDetailsDialog, setOpenTxnDetailsDialog] = useState<boolean>(false);
   const [openNftDetailsDialog, setOpenNftDetailsDialog] = useState<boolean>(false);
+  const [forceUpdateNfts, setForceUpdateNfts] = useState<boolean>(false);
+  const [openOfferDialog, setOpenOfferDialog] = useState<boolean>(false);
   const [selectedNft, setSelectedNft] = useState<INftDetails | undefined>();
   const [mnemonicRequired, setMnemonicRequired] = useState<boolean>(false);
   const [privateKeyRequired, setPrivateKeyRequired] = useState<boolean>(false);
@@ -51,6 +53,9 @@ export const UIProvider = ({ children }: UIContextProps) => {
   const [openAddressBookDialog, setOpenAddressBookDialog] = useState<boolean>(false);
   const [notification, setNotification] = useState<INotification | undefined>(undefined);
   const [notificationExpired, setNotificationExpired] = useState<boolean>(true);
+  const [spikaNews, setSpikaNews] = useState<Array<ISpikaNews>>([]);
+  const [spikaNewsNumber, setSpikaNewsNumber] = useState<number>(0);
+  const [openConfirmClaimDialog, setOpenConfirmClaimDialog] = useState<boolean>(false);
   const [disableAllRoutes, setDisableAllRoutes] = useState<boolean>(false);
   const [currentRoute, setCurrentRoute] = useState<string | undefined>();
   const [previewRequired, setPreviewRequired] = useState<boolean>(true);
@@ -184,6 +189,11 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening NFT Details Dialog...");
   };
 
+  const handleOfferDialogUI = (): void => {
+    setOpenOfferDialog(true);
+    debug.log("Opening Offer Dialog...");
+  };
+
   const handleConnectedSitesUI = (): void => {
     setOpenConnectedSitesDialog(true);
     debug.log("Opening Connected Sites Dialog...");
@@ -240,6 +250,11 @@ export const UIProvider = ({ children }: UIContextProps) => {
     debug.log("Opening Address Book Dialog...");
   };
 
+  const handleConfirmClaimUI = (): void => {
+    setOpenConfirmClaimDialog(true);
+    debug.log("Opening Confirm Claim Dialog...");
+  };
+
   const sendNotification = (args: INotification): void => {
     const _notification: INotification = {
       message: args.message,
@@ -283,10 +298,15 @@ export const UIProvider = ({ children }: UIContextProps) => {
         setOpenTxnDetailsDialog,
         txnType,
         setTxnType,
+        forceUpdateNfts,
+        setForceUpdateNfts,
         openNftDetailsDialog,
         setOpenNftDetailsDialog,
         selectedNft,
         setSelectedNft,
+        openOfferDialog,
+        setOpenOfferDialog,
+        handleOfferDialogUI,
         handleNftDetailsUI,
         openLoginDialog,
         setOpenLoginDialog,
@@ -356,6 +376,13 @@ export const UIProvider = ({ children }: UIContextProps) => {
         notificationExpired,
         setNotificationExpired,
         sendNotification,
+        spikaNews,
+        setSpikaNews,
+        spikaNewsNumber,
+        setSpikaNewsNumber,
+        openConfirmClaimDialog,
+        setOpenConfirmClaimDialog,
+        handleConfirmClaimUI,
         openContactCard,
         setOpenContactCard,
         handleContactCardUI,

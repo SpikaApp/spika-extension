@@ -1,6 +1,13 @@
 import { BCS, TxnBuilderTypes } from "aptos";
 import React, { createContext } from "react";
-import { IContextPayload, IPayloadCollectionArgs, IPayloadNftArgs, IPayloadTransferArgs } from "../interface";
+import {
+  IContextPayload,
+  IPayloadCollectionArgs,
+  IPayloadNftArgs,
+  IPayloadTransferArgs,
+  IPayloadOfferArgs,
+  IPayloadClaimArgs,
+} from "../interface";
 import { spikaClient } from "../lib/client";
 import debug from "../utils/debug";
 
@@ -87,6 +94,29 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
     return payload;
   };
 
+  // Offer NFT
+  const offer = async (args: IPayloadOfferArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
+    const spika = await spikaClient();
+    const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
+      "0x3::token_transfers::offer_script",
+      [],
+      [args.receiver, args.creator, args.collectionName, args.name, args.property_version, args.amount]
+    );
+    debug.log("Payload prepared:", payload);
+    return payload;
+  };
+
+  const claim = async (args: IPayloadClaimArgs): Promise<TxnBuilderTypes.TransactionPayload> => {
+    const spika = await spikaClient();
+    const payload = spika.tokenClient.transactionBuilder.buildTransactionPayload(
+      "0x3::token_transfers::claim_script",
+      [],
+      [args.sender, args.creator, args.collectionName, args.name, args.property_version]
+    );
+    debug.log("Payload prepared:", payload);
+    return payload;
+  };
+
   return (
     <PayloadContext.Provider
       value={{
@@ -95,6 +125,8 @@ export const PayloadProvider = ({ children }: PayloadContextProps) => {
         transfer,
         collection,
         nft,
+        offer,
+        claim,
       }}
     >
       {children}

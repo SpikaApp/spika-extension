@@ -1,5 +1,5 @@
 import React from "react";
-import { INftDetails, INotification, IUR } from ".";
+import { INftDetails, INotification, ISpikaNews, IUR } from ".";
 
 type IContextUI = {
   spikaWallet: boolean | undefined;
@@ -26,6 +26,10 @@ type IContextUI = {
   setOpenNftDetailsDialog: React.Dispatch<React.SetStateAction<boolean>>;
   selectedNft: INftDetails | undefined;
   setSelectedNft: React.Dispatch<React.SetStateAction<INftDetails | undefined>>;
+  forceUpdateNfts: boolean;
+  setForceUpdateNfts: React.Dispatch<React.SetStateAction<boolean>>;
+  openOfferDialog: boolean;
+  setOpenOfferDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openLoginDialog: boolean;
   setOpenLoginDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openLogoutDialog: boolean;
@@ -79,6 +83,12 @@ type IContextUI = {
   notificationExpired: boolean;
   setNotificationExpired: React.Dispatch<React.SetStateAction<boolean>>;
   sendNotification: (args: INotification) => void;
+  spikaNews: Array<ISpikaNews>;
+  setSpikaNews: React.Dispatch<React.SetStateAction<Array<ISpikaNews>>>;
+  spikaNewsNumber: number;
+  setSpikaNewsNumber: React.Dispatch<React.SetStateAction<number>>;
+  openConfirmClaimDialog: boolean;
+  setOpenConfirmClaimDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openAddressBookDialog: boolean;
   setOpenAddressBookDialog: React.Dispatch<React.SetStateAction<boolean>>;
   disableAllRoutes: boolean;
@@ -98,6 +108,7 @@ type IContextUI = {
   handleCreateCollectionUI: () => void;
   handleCreateNFTUI: () => void;
   handleNftDetailsUI: (nft: INftDetails) => void;
+  handleOfferDialogUI: () => void;
   handleLoginUI: () => void;
   handleLogoutUI: () => void;
   handleMnemonicUI: () => void;
@@ -118,6 +129,7 @@ type IContextUI = {
   handleSwapSettingsUI: () => void;
   handleContactCardUI: () => void;
   handleAddressBookUI: () => void;
+  handleConfirmClaimUI: () => void;
 };
 
 export default IContextUI;

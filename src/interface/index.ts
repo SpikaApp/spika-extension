@@ -9,6 +9,8 @@ export type {
   IPayloadCollectionArgs,
   IPayloadNftArgs,
   IPayloadTransferArgs,
+  IPayloadOfferArgs,
+  IPayloadClaimArgs,
 } from "./IContextPayload";
 export type { default as IContextUI } from "./IContextUI";
 export type { default as IContextWeb3 } from "./IContextWeb3";
@@ -18,7 +20,7 @@ export type { IUR } from "./IKeystone";
 export type { default as INetwork, INetworkType } from "./INetwork";
 export type { default as INetworkStore } from "./INetworkStore";
 export type { default as INftDetails, INftMetadata } from "./INftDetails";
-export type { default as INotification } from "./INotification";
+export type { default as INotification, ISpikaNews } from "./INotification";
 export type { default as IPublicAccount } from "./IPublicAccount";
 export type { IKeystoneAccount, ISpikaAccount, ISpikaMasterAccount } from "./ISpikaMasterAccount";
 export * from "./IWallet";

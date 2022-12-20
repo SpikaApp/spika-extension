@@ -1,4 +1,4 @@
-import { TxnBuilderTypes } from "aptos";
+import { AptosAccount, TxnBuilderTypes } from "aptos";
 
 interface IContextPayload {
   create: (address: string) => Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
@@ -6,6 +6,8 @@ interface IContextPayload {
   transfer: (args: IPayloadTransferArgs) => Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
   collection: (args: IPayloadCollectionArgs) => Promise<TxnBuilderTypes.TransactionPayload>;
   nft: (args: IPayloadNftArgs) => Promise<TxnBuilderTypes.TransactionPayload>;
+  offer: (args: IPayloadOfferArgs) => Promise<TxnBuilderTypes.TransactionPayload>;
+  claim: (args: IPayloadClaimArgs) => Promise<TxnBuilderTypes.TransactionPayload>;
 }
 
 export interface IPayloadTransferArgs {
@@ -35,6 +37,25 @@ export interface IPayloadNftArgs {
   property_keys?: Array<string>;
   property_values?: Array<string>;
   property_types?: Array<string>;
+}
+
+export interface IPayloadOfferArgs {
+  account: AptosAccount;
+  receiver: string;
+  creator: string;
+  collectionName: string;
+  name: string;
+  amount: number;
+  property_version: number;
+}
+
+export interface IPayloadClaimArgs {
+  account: AptosAccount;
+  sender: string;
+  creator: string;
+  collectionName: string;
+  name: string;
+  property_version: number;
 }
 
 export default IContextPayload;

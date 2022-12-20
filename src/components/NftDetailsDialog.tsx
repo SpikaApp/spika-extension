@@ -7,10 +7,12 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  IconButton,
   Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import { styled } from "@mui/material/styles";
 import { useContext } from "react";
 import default_nft from "../assets/default_nft.jpg";
@@ -18,9 +20,11 @@ import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { INftAttributes } from "../interface/INftDetails";
 import shortenAddress from "../utils/shortenAddress";
+import OfferDialog from "./OfferDialog";
 
 const NftDetailsDialog = (): JSX.Element => {
-  const { openNftDetailsDialog, setOpenNftDetailsDialog, selectedNft, setSelectedNft } = useContext(UIContext);
+  const { openNftDetailsDialog, setOpenNftDetailsDialog, selectedNft, setSelectedNft, handleOfferDialogUI } =
+    useContext(UIContext);
   const { accountImported } = useContext(AccountContext);
 
   const Item = styled(Paper)(({ theme }) => ({
@@ -46,6 +50,11 @@ const NftDetailsDialog = (): JSX.Element => {
         <Dialog open={openNftDetailsDialog} onClose={handleClose}>
           <DialogTitle align="center" sx={{ mb: "-10px" }}>
             <Box sx={{ width: "260px" }}>{selectedNft.name}</Box>
+            <Tooltip title="Send">
+              <IconButton sx={{ position: "absolute", mt: "-36px", ml: "90px" }} onClick={handleOfferDialogUI}>
+                <SendIcon />
+              </IconButton>
+            </Tooltip>
           </DialogTitle>
           <DialogContent sx={{ alignItems: "center", justifyContent: "center" }}>
             <Box sx={{ flexGrow: 1 }}>
@@ -141,6 +150,7 @@ const NftDetailsDialog = (): JSX.Element => {
           </DialogActions>
         </Dialog>
       )}
+      <OfferDialog nft={selectedNft!} />
     </Box>
   );
 };
