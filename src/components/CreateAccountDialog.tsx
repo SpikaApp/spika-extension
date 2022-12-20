@@ -84,7 +84,7 @@ const CreateAccountDialog = (props: CreateAccountDialogProps): JSX.Element => {
           <Tooltip title={props.address} sx={{ ml: "4px", mr: "4px" }}>
             <Chip label={shortenAddress(props.address)} onClick={() => copyToClipboard(props.address)} />
           </Tooltip>
-          <Typography align="center" sx={{ mt: "12px", fontWeight: "450" }}>
+          <Typography color="info.main" align="center" sx={{ mt: "12px", fontWeight: "450" }}>
             Network fee: {gasToValue(props.fee, "100")} APT
           </Typography>
         </Box>
