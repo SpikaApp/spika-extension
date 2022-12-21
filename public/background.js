@@ -168,12 +168,15 @@ const handleNetwork = async (sendResponse) => {
 
 const handleNotifyOnChange = async (message) => {
   let ids = [];
+  let data;
   switch (message.method) {
     case "network_change_event":
-      ids = await getMem(_networkChangeListeners);
+      data = await getMem(_networkChangeListeners);
+      if (data) ids = data;
       break;
     case "account_change_event":
-      ids = await getMem(_accountChangeListeners);
+      data = await getMem(_accountChangeListeners);
+      if (data) ids = data;
       break;
   }
   if (ids.length > 0) {
