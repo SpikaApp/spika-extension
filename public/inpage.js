@@ -100,4 +100,4 @@ class SpikaWeb3 {
   }
 }
 
-window.petra = new SpikaWeb3();
+window.spika = new SpikaWeb3();
