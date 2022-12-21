@@ -32,6 +32,7 @@ import { aptosCoin } from "../lib/coin";
 import errorParser from "../lib/errorParser";
 import { setStore } from "../lib/store";
 import { PLATFORM } from "../utils/constants";
+import getCurrentNetwork from "../utils/getCurrentNetwork";
 import AddCustomNetworkDialog from "./AddCustomNetworkDialog";
 
 const NetworkDialog = (): JSX.Element => {
@@ -62,6 +63,20 @@ const NetworkDialog = (): JSX.Element => {
 
   const _currentNetwork = "currentNetwork";
   const _currentAsset = "currentAsset";
+
+  const networkChanger = (name: string, api: string, chainId: number): void => {
+    if (PLATFORM === "chrome-extension:") {
+      const network = {
+        name: name,
+        api: api,
+        chainId: chainId,
+      };
+      chrome.runtime.sendMessage({
+        method: "network_change_event",
+        network: network,
+      });
+    }
+  };
 
   const handleListItemClick = async (
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -111,12 +126,14 @@ const NetworkDialog = (): JSX.Element => {
     setIsLocalLoading(true);
     try {
       const spika = await spikaClient(selectedNetwork);
-      await spika.client.getChainId();
+      const chainId = await spika.client.getChainId();
       setStore(PLATFORM, _currentNetwork, selectedNetwork);
       setCurrentNetwork(selectedNetwork);
       setOpenNetworkDialog(false);
       setAccountImported(true);
       setCurrentAsset(aptosCoin);
+      const getNetwork = await getCurrentNetwork();
+      networkChanger(getNetwork.name, selectedNetwork!.data.node_url, chainId);
       sendNotification({ message: `Network changed to ${selectedNetwork!.name}`, type: "info", autoHide: true });
     } catch (error) {
       console.log(error);

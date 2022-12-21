@@ -1,5 +1,6 @@
 class SpikaWeb3 {
   requestId;
+  wallet = "spika";
 
   constructor() {
     this.requestId = 0;
@@ -37,8 +38,16 @@ class SpikaWeb3 {
     return this._message("signTransaction", transaction);
   }
 
+  onNetworkChange(callback) {
+    return this._handleNetworkChange("onNetworkChange", callback);
+  }
+
+  onAccountChange(callback) {
+    return this._handleAccountChange("onAccountChange", callback);
+  }
+
   _message(method, args) {
-    const wallet = "spika";
+    const wallet = this.wallet;
     const id = this.requestId++;
     return new Promise(function (resolve, reject) {
       window.postMessage({ wallet, method, args, id });
@@ -58,6 +67,37 @@ class SpikaWeb3 {
       });
     });
   }
+
+  _handleNetworkChange(method, callback) {
+    const wallet = this.wallet;
+    const id = this.requestId++;
+    window.postMessage({ wallet, method, id });
+    window.addEventListener("message", async function handler(event) {
+      if (event.data.method === "network_change_event") {
+        const response = {
+          networkName: event.data.network.name,
+          api: event.data.network.api,
+          chainId: event.data.network.chainId,
+        };
+        await callback(response);
+      }
+    });
+  }
+
+  _handleAccountChange(method, callback) {
+    const wallet = this.wallet;
+    const id = this.requestId++;
+    window.postMessage({ wallet, method, id });
+    window.addEventListener("message", async function handler(event) {
+      if (event.data.method === "account_change_event") {
+        const response = {
+          address: event.data.account.address,
+          publicKey: event.data.account.publicKey,
+        };
+        await callback(response);
+      }
+    });
+  }
 }
 
-window.spika = new SpikaWeb3();
+window.petra = new SpikaWeb3();

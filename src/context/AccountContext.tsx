@@ -89,6 +89,19 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
     }
   };
 
+  const accountChanger = (publicAccount: IPublicAccount): void => {
+    if (PLATFORM === "chrome-extension:") {
+      const account = {
+        address: publicAccount.address,
+        chainId: publicAccount.publicKey,
+      };
+      chrome.runtime.sendMessage({
+        method: "account_change_event",
+        account: account,
+      });
+    }
+  };
+
   const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
@@ -644,6 +657,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
             setCurrentAddressName(_currentAddressName);
             setCurrentAccountType(type);
             setCurrentAsset(_currentAsset);
+            accountChanger(_publicAccount);
             debug.log("Local storage, session storage, state updated.");
         }
       } else {
@@ -677,6 +691,7 @@ export const AccountProvider = ({ children }: AccountContextProps) => {
         setCurrentAddressName(_currentAddressName);
         setCurrentAccountType("master");
         setCurrentAsset(_currentAsset);
+        accountChanger(_publicAccount);
         debug.log("Local storage, session storage, state updated.");
       }
     } catch (error) {

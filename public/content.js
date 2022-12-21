@@ -13,15 +13,22 @@ const injectScript = () => {
 
 injectScript();
 
-// inpage -> contentscript
 window.addEventListener("message", function (request) {
   if (request.data.wallet === "spika" && request.data.method) {
     console.log("[content.js]: new request: ", request.data);
-    // contentscript -> background
     chrome.runtime.sendMessage(request.data, function (response) {
-      // contentscript -> inpage
-      // console.log("[content.js]: forwarding response: ", response);
       window.postMessage({ responseMethod: request.data.method, id: request.data.id, response });
     });
   }
 });
+
+const spikaEvents = (message) => {
+  if (message.method === "network_change_event") {
+    window.postMessage({ method: message.method, network: message.network });
+  }
+  if (message.method === "account_change_event") {
+    window.postMessage({ method: message.method, account: message.account });
+  }
+};
+
+chrome.runtime.onMessage.addListener(spikaEvents);

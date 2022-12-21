@@ -9,6 +9,8 @@ const _currentPubAccount = "currentPubAccount";
 const _networkResponse = "networkResponse";
 const _connectedApps = "connectedApps";
 const _lastConnectedApp = "lastConnectedApp";
+const _networkChangeListeners = "networkChangeListeners";
+const _accountChangeListeners = "accountChangeListeners";
 
 const permissionDialog = "PermissionDialog";
 
@@ -164,10 +166,63 @@ const handleNetwork = async (sendResponse) => {
   }
 };
 
+const handleNotifyOnChange = async (message) => {
+  let ids = [];
+  switch (message.method) {
+    case "network_change_event":
+      ids = await getMem(_networkChangeListeners);
+      break;
+    case "account_change_event":
+      ids = await getMem(_accountChangeListeners);
+      break;
+  }
+  if (ids.length > 0) {
+    ids.map((id) => {
+      const sendMessage = () => {
+        if (!chrome.runtime.lastError) {
+          chrome.tabs.sendMessage(id, message);
+        }
+      };
+      chrome.tabs.get(id, sendMessage);
+    });
+  }
+};
+
+const handleRegisterListener = async (message, sender) => {
+  let key;
+  let data = [];
+  console.log(sender);
+  switch (message.method) {
+    case "onNetworkChange":
+      key = _networkChangeListeners;
+      var networkChangeListeners = await getMem(key);
+      if (networkChangeListeners) {
+        data = networkChangeListeners;
+      }
+      break;
+    case "onAccountChange":
+      key = _accountChangeListeners;
+      var accountChangeListeners = await getMem(key);
+      if (accountChangeListeners) {
+        data = accountChangeListeners;
+      }
+      break;
+    default:
+      return;
+  }
+  const registered = data.find((id) => id === sender.tab.id);
+  if (!registered) {
+    data.push(sender.tab.id);
+  }
+  setMem(key, data);
+};
+
 const spikaMessenger = (message, sender, sendResponse) => {
-  // console.log("[worker]: spikaMessenger: ", message);
+  console.log("[worker]: spikaMessenger: ", message);
   if (message.id === "locker") {
     setMem(_locker, message.method);
+  } else if (message.method === "network_change_event" || message.method === "account_change_event") {
+    handleNotifyOnChange(message);
   } else if (message.method === "connect") {
     handleAutoConnect(message, sender, sendResponse);
   } else if (message.method === "account") {
@@ -178,6 +233,10 @@ const spikaMessenger = (message, sender, sendResponse) => {
     handleDisconnect(sender, sendResponse);
   } else if (message.method === "network") {
     handleNetwork(sendResponse);
+  } else if (message.method === "onNetworkChange") {
+    handleRegisterListener(message, sender);
+  } else if (message.method === "onAccountChange") {
+    handleRegisterListener(message, sender);
   } else if (
     message.method === "account" ||
     message.method === "signMessage" ||
