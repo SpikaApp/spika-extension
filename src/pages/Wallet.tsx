@@ -98,19 +98,32 @@ const Wallet = (): JSX.Element => {
         <Container maxWidth="xs">
           <Card sx={{ mb: 2, height: "185px", mt: "100px" }}>
             <Stack sx={{ display: "flex", flexDirection: "row", mt: "18px", mb: "-12px", alignItems: "center" }}>
-              <Tooltip sx={{ mr: "75px" }} title="Change network">
+              <Tooltip sx={{ mr: "30px" }} title="Change network">
                 <Chip
                   label={
-                    <Stack sx={{ display: "flex", flexDirection: "row" }}>
+                    <Stack sx={{ display: "flex", flexDirection: "row", px: "10px" }}>
                       <CircleIcon
                         sx={{
                           color: isOnline ? "success.light" : "error.main",
                           width: "12px",
                           height: "12px",
-                          mt: "4px",
+                          display: "flex",
+                          alignSelf: "center",
                         }}
                       />
-                      <Typography noWrap sx={{ ml: "5px", maxWidth: "100px" }} variant="body2">
+                      <Typography
+                        noWrap
+                        sx={{
+                          minWidth: "65px",
+                          maxWidth: "100px",
+                          fontWeight: "500",
+                          px: "10px",
+                          height: "24px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                        variant="body2"
+                      >
                         {currentNetwork!.name}
                       </Typography>
                     </Stack>
@@ -124,7 +137,16 @@ const Wallet = (): JSX.Element => {
                     <Typography
                       align="center"
                       noWrap
-                      sx={{ ml: "5px", mr: "5px", minWidth: "50px", maxWidth: "100px" }}
+                      sx={{
+                        display: "flex",
+                        minWidth: "100px",
+                        maxWidth: "100px",
+                        fontWeight: "500",
+                        px: "10px",
+                        height: "24px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                       variant="body2"
                     >
                       {currentAddressName}
@@ -154,7 +176,14 @@ const Wallet = (): JSX.Element => {
                     <Stack direction="row">
                       <Tooltip title="Switch active asset">
                         <Button
-                          sx={{ mr: "2px", width: "220px", height: "50px", display: "flex" }}
+                          sx={{
+                            mr: "2px",
+                            width: "220px",
+                            height: "50px",
+                            display: "flex",
+                            borderWidth: 2,
+                            borderRadius: "22px",
+                          }}
                           variant="outlined"
                           onClick={handleAccountAssetsUI}
                         >
