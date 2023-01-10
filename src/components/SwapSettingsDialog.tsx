@@ -100,7 +100,7 @@ const SwapSettingsDialog = (): JSX.Element => {
               fullWidth={false}
               InputLabelProps={{ shrink: true }}
               value={maxGasAmount === DEFAULT_MAX_GAS ? "" : maxGasAmount}
-              placeholder={maxGasAmount === DEFAULT_MAX_GAS ? "20000 (default)" : maxGasAmount}
+              placeholder={maxGasAmount === DEFAULT_MAX_GAS ? `${maxGasAmount} (default)` : maxGasAmount}
               inputProps={{ style: { textAlign: "right" } }}
               onChange={(e) => setMaxGasAmount(e.target.value)}
             />
