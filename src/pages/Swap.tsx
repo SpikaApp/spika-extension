@@ -125,10 +125,6 @@ const Swap = () => {
     }
   }, [accountAssets]);
 
-  useEffect(() => {
-    console.log(isFetching);
-  }, [isFetching]);
-
   // On xCoin change => update balance.
   // Skip balance update if changing X to Y.
   useEffect(() => {
