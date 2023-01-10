@@ -22,6 +22,17 @@
     }
   },
   {
+    "type": "0x777821c78442e17d82c3d7a371f42de7189e4248e529fe6eee6bca40ddbb::apcoin::ApCoin",
+    "data": {
+      "name": "APass Coin",
+      "symbol": "APC",
+      "decimals": 8,
+      "logo": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APC.svg",
+      "logo_alt": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APC.svg",
+      "swap": true
+    }
+  },
+  {
     "type": "0x5c738a5dfa343bee927c39ebe85b0ceb95fdb5ee5b323c95559614f5a77c47cf::Aptoge::Aptoge",
     "data": {
       "name": "Aptoge",
@@ -29,6 +40,17 @@
       "decimals": 6,
       "logo": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APTOGE.svg",
       "logo_alt": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APTOGE.svg",
+      "swap": true
+    }
+  },
+  {
+    "type": "0xd0b4efb4be7c3508d9a26a9b5405cf9f860d0b9e5fe2f498b90e68b8d2cedd3e::aptos_launch_token::AptosLaunchToken",
+    "data": {
+      "name": "AptosLaunch Token",
+      "symbol": "ALT",
+      "decimals": 8,
+      "logo": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/Aptoslaunchlogob.svg",
+      "logo_alt": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/Aptoslaunchlogob.svg",
       "swap": true
     }
   },
