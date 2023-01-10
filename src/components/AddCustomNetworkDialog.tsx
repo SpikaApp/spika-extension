@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Button, Dialog, DialogContent, DialogActions, DialogTitle, Stack, TextField } from "@mui/material";
 import { UIContext } from "../context/UIContext";
 import { AccountContext } from "../context/AccountContext";
-import { setNetwork } from "../lib/accountNetworks";
+import { setNetwork } from "../core/accountNetworks";
 import { INetwork } from "../interface";
 
 const AddCustomNetworkDialog = (): JSX.Element => {

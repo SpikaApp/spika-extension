@@ -1,5 +1,5 @@
 import { ICoin } from "../interface";
-import { dexClient } from "../lib/client";
+import { dexClient } from "../core/client";
 
 import aptos_light from "../assets/aptos_light.png";
 import aptos_dark from "../assets/aptos_dark.png";

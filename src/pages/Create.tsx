@@ -26,7 +26,7 @@ import { useContext, useEffect, useState } from "react";
 import spika_bg from "../assets/spika_bg.png";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import errorParser from "../lib/errorParser";
+import errorParser from "../core/errorParser";
 import { PLATFORM } from "../utils/constants";
 import copyToClipboard from "../utils/copyToClipboard";
 import {

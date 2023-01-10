@@ -8,7 +8,7 @@ import {
   IPayloadOfferArgs,
   IPayloadClaimArgs,
 } from "../interface";
-import { spikaClient } from "../lib/client";
+import { spikaClient } from "../core/client";
 import debug from "../utils/debug";
 
 type PayloadContextProps = {

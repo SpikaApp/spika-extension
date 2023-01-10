@@ -23,7 +23,7 @@ import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { INftDetails } from "../interface";
-import errorParser from "../lib/errorParser";
+import errorParser from "../core/errorParser";
 import { gasToValue } from "../utils/values";
 import AddressBookDialog from "./AddressBookDialog";
 

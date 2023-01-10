@@ -1,4 +1,4 @@
-import { setStore, getStore, removeStore, removeMem } from "../lib/store";
+import { setStore, getStore, removeStore, removeMem } from "../core/store";
 import { PLATFORM, EXTENSION_VERSION } from "./constants";
 import { compare } from "compare-versions";
 

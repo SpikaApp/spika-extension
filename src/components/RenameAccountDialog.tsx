@@ -3,8 +3,8 @@ import { Button, Dialog, DialogContent, DialogTitle, Stack, TextField } from "@m
 import { useContext, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import { renameAccount, renameKeystoneAccount } from "../lib/spikaAccount";
-import { setStore } from "../lib/store";
+import { renameAccount, renameKeystoneAccount } from "../core/spikaAccount";
+import { setStore } from "../core/store";
 import { PLATFORM } from "../utils/constants";
 
 interface RenameAccountDialogProps {

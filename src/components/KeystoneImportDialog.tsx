@@ -21,7 +21,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { UIContext } from "../context/UIContext";
 import { IKeystoneAccount, IUR } from "../interface";
-import { getNotImportedKeystoneAccounts, importKeystoneAccount } from "../lib/spikaAccount";
+import { getNotImportedKeystoneAccounts, importKeystoneAccount } from "../core/spikaAccount";
 import shortenAddress from "../utils/shortenAddress";
 
 import keystone_dark from "../assets/keystone_dark.svg";

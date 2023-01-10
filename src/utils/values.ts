@@ -1,5 +1,5 @@
 import { ICoin } from "../interface";
-import { aptosCoin } from "../lib/coin";
+import { aptosCoin } from "../core/coin";
 
 export const stringToValue = (asset: ICoin, value: string): string => {
   const decimal: number = asset.data.decimals;

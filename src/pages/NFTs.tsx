@@ -34,9 +34,9 @@ import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
 import { INftDetails } from "../interface";
 import { IPendingClaim, IPendingClaims } from "../interface/IQueryQL";
-import { fetchGraphQL } from "../lib/fetchGraphQL";
-import * as nftStore from "../lib/nftStore";
-import { pendingClaims } from "../lib/query";
+import { fetchGraphQL } from "../core/fetchGraphQL";
+import * as nftStore from "../core/nftStore";
+import { pendingClaims } from "../core/query";
 import { getNftMetadata } from "../utils/getNftMetadata";
 import shortenAddress from "../utils/shortenAddress";
 

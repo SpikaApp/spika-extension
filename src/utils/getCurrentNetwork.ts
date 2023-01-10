@@ -1,6 +1,6 @@
 import { AptosClient } from "aptos";
 import { INetwork } from "../interface";
-import { getStore, setStore } from "../lib/store";
+import { getStore, setStore } from "../core/store";
 import { PLATFORM } from "./constants";
 
 const _currentNetwork = "currentNetwork";

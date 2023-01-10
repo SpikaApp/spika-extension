@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite --cors",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write src/**/*.ts{,x}",
+    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -32,6 +34,7 @@
     "react-router-dom": "^6.4.3",
     "safe-buffer": "^5.2.1",
     "tslib": "^2.4.1",
+    "twitter-api-sdk": "^1.2.1",
     "typescript": "^4.8.4",
     "uuid": "^9.0.0"
   },

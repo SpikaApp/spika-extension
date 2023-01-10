@@ -16,7 +16,7 @@ import SendDialog from "../components/SendDialog";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import { aptosCoin } from "../lib/coin";
+import { aptosCoin } from "../core/coin";
 import { stringToValue } from "../utils/values";
 
 const Wallet = (): JSX.Element => {

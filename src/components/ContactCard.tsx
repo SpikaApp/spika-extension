@@ -17,7 +17,7 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { IContact } from "../interface";
-import { deleteContact, editContact, getContacts } from "../lib/contacts";
+import { deleteContact, editContact, getContacts } from "../core/contacts";
 import copyToClipboard from "../utils/copyToClipboard";
 
 interface ContactCardProps {

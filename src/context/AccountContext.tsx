@@ -15,14 +15,14 @@ import {
   INetwork,
   IPublicAccount,
 } from "../interface";
-import * as network from "../lib/accountNetworks";
-import * as assetStore from "../lib/assetStore";
-import { spikaClient } from "../lib/client";
-import { aptosCoin } from "../lib/coin";
-import * as apps from "../lib/connectedApps";
-import { getContacts, initContacts } from "../lib/contacts";
-import errorParser from "../lib/errorParser";
-import * as nftStore from "../lib/nftStore";
+import * as network from "../core/accountNetworks";
+import * as assetStore from "../core/assetStore";
+import { spikaClient } from "../core/client";
+import { aptosCoin } from "../core/coin";
+import * as apps from "../core/connectedApps";
+import { getContacts, initContacts } from "../core/contacts";
+import errorParser from "../core/errorParser";
+import * as nftStore from "../core/nftStore";
 import {
   getAccountName,
   getAptosAccount,
@@ -31,8 +31,8 @@ import {
   getSpikaAccountCurrentIndex,
   getSpikaMasterAccount,
   initSpikaMasterAccount,
-} from "../lib/spikaAccount";
-import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../lib/store";
+} from "../core/spikaAccount";
+import { clearStore, getMem, getStore, removeMem, setMem, setStore } from "../core/store";
 import { APTOS_DERIVE_PATH, EXTENSION_VERSION, PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";
 import { decryptPassword, encryptPassword } from "../utils/pwd";

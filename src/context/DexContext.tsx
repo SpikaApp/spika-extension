@@ -2,8 +2,8 @@
 import * as aptos from "aptos";
 import React, { createContext, useContext, useState } from "react";
 import { ICoin, IContextDex } from "../interface";
-import { spikaClient } from "../lib/client";
-import { aptosCoin } from "../lib/coin";
+import { spikaClient } from "../core/client";
+import { aptosCoin } from "../core/coin";
 import { DEFAULT_MAX_GAS } from "../utils/constants";
 import { AccountContext } from "./AccountContext";
 import { Web3Context } from "./Web3Context";

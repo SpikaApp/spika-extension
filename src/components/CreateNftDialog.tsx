@@ -17,7 +17,7 @@ import { AccountContext } from "../context/AccountContext";
 import { PayloadContext } from "../context/PayloadContext";
 import { UIContext } from "../context/UIContext";
 import { Web3Context } from "../context/Web3Context";
-import errorParser from "../lib/errorParser";
+import errorParser from "../core/errorParser";
 import { gasToValue } from "../utils/values";
 import AlertDialog from "./AlertDialog";
 import Loading from "./Loading";

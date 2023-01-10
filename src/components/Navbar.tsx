@@ -12,7 +12,7 @@ import { Link as RouterLink } from "react-router-dom";
 import spika from "../assets/spika.svg";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
-import { setStore } from "../lib/store";
+import { setStore } from "../core/store";
 import { PLATFORM } from "../utils/constants";
 import LogoutDialog from "./LogoutDialog";
 

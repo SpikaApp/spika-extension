@@ -21,7 +21,7 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { IConnectedApps } from "../interface";
-import { getConnectedApps, removeApp } from "../lib/connectedApps";
+import { getConnectedApps, removeApp } from "../core/connectedApps";
 import { PLATFORM } from "../utils/constants";
 import copyToClipboard from "../utils/copyToClipboard";
 import shortenAddress from "../utils/shortenAddress";

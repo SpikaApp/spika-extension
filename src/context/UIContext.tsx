@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { IContextUI, INftDetails, INotification, ISpikaNews, IUR } from "../interface";
-import { getMem, getStore } from "../lib/store";
+import { getMem, getStore } from "../core/store";
 import applyUpdate from "../utils/applyUpdate";
 import { PLATFORM } from "../utils/constants";
 import debug from "../utils/debug";

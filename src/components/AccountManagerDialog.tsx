@@ -22,7 +22,7 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/AccountContext";
 import { UIContext } from "../context/UIContext";
 import { IAccountType, IKeystoneAccount, ISpikaAccount } from "../interface";
-import { addSpikaAccount, getKeystoneAccountsFromMasterAccount, getSpikaMasterAccount } from "../lib/spikaAccount";
+import { addSpikaAccount, getKeystoneAccountsFromMasterAccount, getSpikaMasterAccount } from "../core/spikaAccount";
 import shortenAddress from "../utils/shortenAddress";
 import ConnectWalletDialog from "./ConnectWalletDialog";
 import KeystoneImportDialog from "./KeystoneImportDialog";
